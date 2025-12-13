@@ -27,62 +27,62 @@ const TV_API_CONFIG = {
         "wan-luo-tv": "UCVktcIoQvZgmNdmNwXOYPxg"
     },
     
-    // Direct stream URLs with multiple fallback options
+    // Direct stream URLs - YouTube streams as primary (most reliable)
     directStreams: {
         "ntv-uganda": [
-            "https://streaming.viewmedia.tv/web_012/Stream/playlist.m3u8",
             "https://ythls-v3.onrender.com/channel/UCwga1dPCqBddbtq5KYRii2g.m3u8",
-            "https://ythls.armelin.one/channel/UCwga1dPCqBddbtq5KYRii2g.m3u8"
+            "https://ythls.armelin.one/channel/UCwga1dPCqBddbtq5KYRii2g.m3u8",
+            "https://streaming.viewmedia.tv/web_012/Stream/playlist.m3u8"
         ],
         "nbs-tv": [
-            "https://streaming.viewmedia.tv/web_006/Stream/playlist.m3u8",
             "https://ythls-v3.onrender.com/channel/UCT0bVGYRe-Qg_CAjJ7RQb0g.m3u8",
-            "https://ythls.armelin.one/channel/UCT0bVGYRe-Qg_CAjJ7RQb0g.m3u8"
+            "https://ythls.armelin.one/channel/UCT0bVGYRe-Qg_CAjJ7RQb0g.m3u8",
+            "https://streaming.viewmedia.tv/web_006/Stream/playlist.m3u8"
         ],
         "ubc-tv": [
-            "https://streaming.viewmedia.tv/web_013/Stream/playlist.m3u8",
             "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8",
-            "https://ythls.armelin.one/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8"
+            "https://ythls.armelin.one/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8",
+            "https://streaming.viewmedia.tv/web_013/Stream/playlist.m3u8"
         ],
         "bukedde-tv": [
-            "https://streaming.viewmedia.tv/web_014/Stream/playlist.m3u8",
             "https://ythls-v3.onrender.com/channel/UCouBdXAhnJbVpXlLi5YYkxg.m3u8",
-            "https://ythls.armelin.one/channel/UCouBdXAhnJbVpXlLi5YYkxg.m3u8"
+            "https://ythls.armelin.one/channel/UCouBdXAhnJbVpXlLi5YYkxg.m3u8",
+            "https://streaming.viewmedia.tv/web_014/Stream/playlist.m3u8"
         ],
         "urban-tv": [
-            "https://streaming.viewmedia.tv/web_015/Stream/playlist.m3u8",
             "https://ythls-v3.onrender.com/channel/UCxS3-UXJjVdOZmnPpzgRXOg.m3u8",
-            "https://ythls.armelin.one/channel/UCxS3-UXJjVdOZmnPpzgRXOg.m3u8"
+            "https://ythls.armelin.one/channel/UCxS3-UXJjVdOZmnPpzgRXOg.m3u8",
+            "https://streaming.viewmedia.tv/web_015/Stream/playlist.m3u8"
         ],
         "spark-tv": [
-            "https://streaming.viewmedia.tv/web_016/Stream/playlist.m3u8",
             "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8",
-            "https://ythls.armelin.one/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8"
+            "https://ythls.armelin.one/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8",
+            "https://streaming.viewmedia.tv/web_016/Stream/playlist.m3u8"
         ],
         "tv-west": [
-            "https://streaming.viewmedia.tv/web_017/Stream/playlist.m3u8",
-            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8"
+            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8",
+            "https://streaming.viewmedia.tv/web_017/Stream/playlist.m3u8"
         ],
         "salt-tv": [
-            "https://streaming.viewmedia.tv/web_018/Stream/playlist.m3u8",
-            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8"
+            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8",
+            "https://streaming.viewmedia.tv/web_018/Stream/playlist.m3u8"
         ],
         "tv-east": [
-            "https://streaming.viewmedia.tv/web_019/Stream/playlist.m3u8",
-            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8"
+            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8",
+            "https://streaming.viewmedia.tv/web_019/Stream/playlist.m3u8"
         ],
         "bbs-tv": [
-            "https://streaming.viewmedia.tv/web_020/Stream/playlist.m3u8",
             "https://ythls-v3.onrender.com/channel/UCgLpjHjfGTbBBi5T5JaBcKg.m3u8",
-            "https://ythls.armelin.one/channel/UCgLpjHjfGTbBBi5T5JaBcKg.m3u8"
+            "https://ythls.armelin.one/channel/UCgLpjHjfGTbBBi5T5JaBcKg.m3u8",
+            "https://streaming.viewmedia.tv/web_020/Stream/playlist.m3u8"
         ],
         "tv-north": [
-            "https://streaming.viewmedia.tv/web_021/Stream/playlist.m3u8",
-            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8"
+            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8",
+            "https://streaming.viewmedia.tv/web_021/Stream/playlist.m3u8"
         ],
         "wan-luo-tv": [
-            "https://streaming.viewmedia.tv/web_022/Stream/playlist.m3u8",
-            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8"
+            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8",
+            "https://streaming.viewmedia.tv/web_022/Stream/playlist.m3u8"
         ]
     }
 };
