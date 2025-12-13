@@ -193,7 +193,7 @@
             <div class="app-wrapper">
                 <!-- Sidebar -->
                 <div class="app-aside nav-aside" id="aside">
-                    <button class="modal-close d-md-none d-block" data-dismiss="modal">
+                    <button class="modal-close d-md-none d-block" data-dismiss="modal" aria-label="Close menu" title="Close menu">
                         <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
                             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -267,8 +267,8 @@
                             <div class="filter-section">
                                 <div class="filter-row">
                                     <div class="filter-group">
-                                        <label class="filter-label">Genre</label>
-                                        <select class="filter-select" id="genreFilter">
+                                        <label class="filter-label" for="genreFilter">Genre</label>
+                                        <select class="filter-select" id="genreFilter" aria-label="Filter by genre">
                                             <option value="">All Genres</option>
                                             <option value="action">Action</option>
                                             <option value="comedy">Comedy</option>
@@ -281,8 +281,8 @@
                                     </div>
                                     
                                     <div class="filter-group">
-                                        <label class="filter-label">Year</label>
-                                        <select class="filter-select" id="yearFilter">
+                                        <label class="filter-label" for="yearFilter">Year</label>
+                                        <select class="filter-select" id="yearFilter" aria-label="Filter by year">
                                             <option value="">All Years</option>
                                             <option value="2024">2024</option>
                                             <option value="2023">2023</option>
@@ -293,8 +293,8 @@
                                     </div>
                                     
                                     <div class="filter-group">
-                                        <label class="filter-label">Status</label>
-                                        <select class="filter-select" id="statusFilter">
+                                        <label class="filter-label" for="statusFilter">Status</label>
+                                        <select class="filter-select" id="statusFilter" aria-label="Filter by status">
                                             <option value="">All Status</option>
                                             <option value="ongoing">Ongoing</option>
                                             <option value="completed">Completed</option>
@@ -302,8 +302,8 @@
                                     </div>
                                     
                                     <div class="filter-group">
-                                        <label class="filter-label">Sort By</label>
-                                        <select class="filter-select" id="sortFilter">
+                                        <label class="filter-label" for="sortFilter">Sort By</label>
+                                        <select class="filter-select" id="sortFilter" aria-label="Sort movies">
                                             <option value="latest">Latest</option>
                                             <option value="popular">Most Popular</option>
                                             <option value="rating">Highest Rated</option>
@@ -320,17 +320,17 @@
 
                             <!-- Pagination -->
                             <div class="pagination">
-                                <button class="page-btn" id="prevPage" disabled>
+                                <button class="page-btn" id="prevPage" disabled aria-label="Previous page" title="Previous page">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <polyline points="15 18 9 12 15 6"></polyline>
                                     </svg>
                                 </button>
-                                <button class="page-btn active">1</button>
-                                <button class="page-btn">2</button>
-                                <button class="page-btn">3</button>
-                                <button class="page-btn">4</button>
-                                <button class="page-btn">5</button>
-                                <button class="page-btn" id="nextPage">
+                                <button class="page-btn active" aria-label="Page 1" title="Page 1">1</button>
+                                <button class="page-btn" aria-label="Page 2" title="Page 2">2</button>
+                                <button class="page-btn" aria-label="Page 3" title="Page 3">3</button>
+                                <button class="page-btn" aria-label="Page 4" title="Page 4">4</button>
+                                <button class="page-btn" aria-label="Page 5" title="Page 5">5</button>
+                                <button class="page-btn" id="nextPage" aria-label="Next page" title="Next page">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <polyline points="9 18 15 12 9 6"></polyline>
                                     </svg>
