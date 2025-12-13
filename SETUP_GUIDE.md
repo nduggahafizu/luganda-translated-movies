@@ -62,8 +62,8 @@ This will install:
 The `.env` file is already created in `server/.env`. Verify these settings:
 
 ```env
-# TMDB API Key (already configured)
-TMDB_API_KEY=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
+# TMDB API Key (Get your own from https://www.themoviedb.org/settings/api)
+TMDB_API_KEY=your_tmdb_api_key_here
 
 # MongoDB Connection (update if using Atlas)
 MONGODB_URI=mongodb://localhost:27017/luganda-movies
