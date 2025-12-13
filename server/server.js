@@ -52,14 +52,25 @@ app.use('/api/', limiter);
 app.use('/uploads', express.static('uploads'));
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI, {
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/luganda-movies';
+
+mongoose.connect(MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
-.then(() => console.log('✅ MongoDB Connected Successfully'))
+.then(() => {
+    console.log('✅ MongoDB Connected Successfully');
+    console.log(`📦 Database: ${MONGODB_URI}`);
+})
 .catch(err => {
-    console.error('❌ MongoDB Connection Error:', err);
-    process.exit(1);
+    console.error('⚠️  MongoDB Connection Warning:', err.message);
+    console.log('⚠️  Server will continue without MongoDB');
+    console.log('⚠️  Some features may not work until MongoDB is connected');
+    console.log('');
+    console.log('💡 To fix this:');
+    console.log('   1. Start MongoDB: net start MongoDB');
+    console.log('   2. Or use MongoDB Atlas (cloud): Update MONGODB_URI in .env');
+    console.log('');
 });
 
 // Session middleware for watch progress and playlists
