@@ -5,11 +5,14 @@ server/node_modules/
 # Environment variables
 .env
 server/.env
+.env.local
+.env.production
 
 # Logs
 *.log
 npm-debug.log*
 logs/
+server/logs/
 
 # OS files
 .DS_Store
@@ -35,3 +38,18 @@ NETLIFY_API_KEY_UPDATE.md
 SECURITY_FIX_COMPLETE.md
 update-api-key.bat
 server/.env.backup
+
+# Redis dump
+dump.rdb
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Uploads
+uploads/
+server/uploads/
+
+# Backups
+backups/
+*.backup

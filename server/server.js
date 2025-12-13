@@ -2,10 +2,20 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
-const morgan = require('morgan');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
+const responseTime = require('response-time');
+const swaggerUi = require('swagger-ui-express');
 require('dotenv').config();
+
+// Import middleware
+const { logger, requestLogger } = require('./middleware/logger');
+const { cache, clearCache, getCacheStats } = require('./middleware/cache');
+const { metricsMiddleware, getHealthCheck, getApiMetrics } = require('./utils/monitoring');
+const { refreshTokenHandler } = require('./middleware/jwtAuth');
+
+// Import Swagger configuration
+const swaggerSpec = require('./config/swagger');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -19,34 +29,97 @@ const playlistRoutes = require('./routes/playlist');
 // Initialize Express app
 const app = express();
 
-// Security middleware
-app.use(helmet());
+// Trust proxy (important for rate limiting behind reverse proxy)
+app.set('trust proxy', 1);
 
-// CORS configuration
-app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
-    credentials: true
+// Response time header
+app.use(responseTime());
+
+// Metrics tracking
+app.use(metricsMiddleware);
+
+// Security middleware with enhanced configuration
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            scriptSrc: ["'self'"],
+            imgSrc: ["'self'", "data:", "https:"],
+        }
+    },
+    hsts: {
+        maxAge: 31536000,
+        includeSubDomains: true,
+        preload: true
+    }
 }));
 
+// Enhanced CORS configuration
+const corsOptions = {
+    origin: function (origin, callback) {
+        const allowedOrigins = process.env.ALLOWED_ORIGINS 
+            ? process.env.ALLOWED_ORIGINS.split(',')
+            : ['http://localhost:3000', 'http://localhost:5000'];
+        
+        // Allow requests with no origin (mobile apps, Postman, etc.)
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: ['X-Response-Time'],
+    maxAge: 86400 // 24 hours
+};
+app.use(cors(corsOptions));
+
 // Body parser middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Compression middleware
 app.use(compression());
 
-// Logging middleware
-if (process.env.NODE_ENV === 'development') {
-    app.use(morgan('dev'));
-}
+// Request logging with Winston
+app.use(requestLogger);
 
-// Rate limiting
-const limiter = rateLimit({
-    windowMs: (process.env.RATE_LIMIT_WINDOW ? parseInt(process.env.RATE_LIMIT_WINDOW) * 60 * 1000 : 15 * 60 * 1000),
-    max: (process.env.RATE_LIMIT_MAX_REQUESTS ? parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) : 100),
-    message: 'Too many requests from this IP, please try again later.'
-});
-app.use('/api/', limiter);
+// Enhanced Rate limiting with multiple tiers
+const createRateLimiter = (windowMinutes, maxRequests) => {
+    return rateLimit({
+        windowMs: windowMinutes * 60 * 1000,
+        max: maxRequests,
+        message: {
+            status: 'error',
+            message: 'Too many requests from this IP, please try again later.'
+        },
+        standardHeaders: true,
+        legacyHeaders: false,
+        handler: (req, res) => {
+            logger.warn('Rate limit exceeded', {
+                ip: req.ip,
+                url: req.url
+            });
+            res.status(429).json({
+                status: 'error',
+                message: 'Too many requests, please try again later.'
+            });
+        }
+    });
+};
+
+// Apply different rate limits to different routes
+const generalLimiter = createRateLimiter(15, 100); // 100 requests per 15 minutes
+const authLimiter = createRateLimiter(15, 5);      // 5 requests per 15 minutes for auth
+const apiLimiter = createRateLimiter(1, 30);       // 30 requests per minute for API
+
+app.use('/api/auth', authLimiter);
+app.use('/api/', generalLimiter);
 
 // Static files
 app.use('/uploads', express.static('uploads'));
@@ -85,23 +158,126 @@ app.use(session({
     }
 }));
 
+// Swagger API Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Luganda Movies API Documentation'
+}));
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/payments', paymentRoutes);
-app.use('/api/luganda-movies', lugandaMoviesRoutes);
-app.use('/api/vjs', vjRoutes);
-app.use('/api/movies', moviesApiRoutes);
+app.use('/api/luganda-movies', cache(300), lugandaMoviesRoutes); // Cache for 5 minutes
+app.use('/api/vjs', cache(600), vjRoutes); // Cache for 10 minutes
+app.use('/api/movies', cache(300), moviesApiRoutes); // Cache for 5 minutes
 app.use('/api/watch-progress', watchProgressRoutes);
 app.use('/api/playlist', playlistRoutes);
 
-// Health check endpoint
-app.get('/api/health', (req, res) => {
+// Token refresh endpoint
+app.post('/api/auth/refresh', refreshTokenHandler);
+
+/**
+ * @swagger
+ * /api/health:
+ *   get:
+ *     summary: Health check endpoint
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: API is running
+ */
+app.get('/api/health', async (req, res) => {
+    try {
+        const health = await getHealthCheck();
+        res.json(health);
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Health check failed',
+            error: error.message
+        });
+    }
+});
+
+/**
+ * @swagger
+ * /api/metrics:
+ *   get:
+ *     summary: Get API metrics
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: API metrics
+ */
+app.get('/api/metrics', (req, res) => {
+    const metrics = getApiMetrics();
     res.json({
         status: 'success',
-        message: 'Luganda Movies API is running',
-        timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV
+        metrics
     });
+});
+
+/**
+ * @swagger
+ * /api/cache/stats:
+ *   get:
+ *     summary: Get cache statistics
+ *     tags: [Cache]
+ *     responses:
+ *       200:
+ *         description: Cache statistics
+ */
+app.get('/api/cache/stats', async (req, res) => {
+    try {
+        const stats = await getCacheStats();
+        res.json({
+            status: 'success',
+            cache: stats
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to get cache stats',
+            error: error.message
+        });
+    }
+});
+
+/**
+ * @swagger
+ * /api/cache/clear:
+ *   post:
+ *     summary: Clear cache
+ *     tags: [Cache]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               pattern:
+ *                 type: string
+ *                 example: "cache:*"
+ *     responses:
+ *       200:
+ *         description: Cache cleared
+ */
+app.post('/api/cache/clear', async (req, res) => {
+    try {
+        const { pattern } = req.body;
+        const result = await clearCache(pattern || 'cache:*');
+        res.json({
+            status: 'success',
+            message: 'Cache cleared',
+            result
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to clear cache',
+            error: error.message
+        });
+    }
 });
 
 // Root endpoint
@@ -110,14 +286,22 @@ app.get('/', (req, res) => {
         message: 'Welcome to Luganda Movies API',
         version: '1.0.0',
         description: 'API for Luganda translated movies streaming platform',
+        documentation: '/api-docs',
         endpoints: {
             health: '/api/health',
+            metrics: '/api/metrics',
+            documentation: '/api-docs',
             lugandaMovies: '/api/luganda-movies',
             movies: '/api/movies',
+            vjs: '/api/vjs',
             auth: '/api/auth',
             payments: '/api/payments',
             watchProgress: '/api/watch-progress',
-            playlist: '/api/playlist'
+            playlist: '/api/playlist',
+            cache: {
+                stats: '/api/cache/stats',
+                clear: '/api/cache/clear'
+            }
         }
     });
 });
