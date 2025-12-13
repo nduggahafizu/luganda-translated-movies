@@ -12,6 +12,9 @@ const authRoutes = require('./routes/auth');
 const paymentRoutes = require('./routes/payments');
 const lugandaMoviesRoutes = require('./routes/luganda-movies');
 const vjRoutes = require('./routes/vjs');
+const moviesApiRoutes = require('./routes/movies-api');
+const watchProgressRoutes = require('./routes/watch-progress');
+const playlistRoutes = require('./routes/playlist');
 
 // Initialize Express app
 const app = express();
@@ -59,11 +62,26 @@ mongoose.connect(process.env.MONGODB_URI, {
     process.exit(1);
 });
 
+// Session middleware for watch progress and playlists
+const session = require('express-session');
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'luganda-movies-secret-key',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { 
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+    }
+}));
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/luganda-movies', lugandaMoviesRoutes);
 app.use('/api/vjs', vjRoutes);
+app.use('/api/movies', moviesApiRoutes);
+app.use('/api/watch-progress', watchProgressRoutes);
+app.use('/api/playlist', playlistRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -84,8 +102,11 @@ app.get('/', (req, res) => {
         endpoints: {
             health: '/api/health',
             lugandaMovies: '/api/luganda-movies',
+            movies: '/api/movies',
             auth: '/api/auth',
-            payments: '/api/payments'
+            payments: '/api/payments',
+            watchProgress: '/api/watch-progress',
+            playlist: '/api/playlist'
         }
     });
 });
