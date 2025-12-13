@@ -27,20 +27,63 @@ const TV_API_CONFIG = {
         "wan-luo-tv": "UCVktcIoQvZgmNdmNwXOYPxg"
     },
     
-    // Direct stream URLs (fallbacks or primary sources)
+    // Direct stream URLs with multiple fallback options
     directStreams: {
-        "ntv-uganda": "https://ythls.onrender.com/channel/UCwga1dPCqBddbtq5KYRii2g.m3u8",
-        "nbs-tv": "https://ythls.onrender.com/channel/UCwga1dPCqBddbtq5KYRii2g.m3u8",
-        "ubc-tv": "https://ythls.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8",
-        "bukedde-tv": "https://ythls.onrender.com/channel/UCouBdXAhnJbVpXlLi5YYkxg.m3u8",
-        "urban-tv": "https://stream.hydeinnovations.com:2140/live/bosstv/index.m3u8",
-        "spark-tv": "https://stream.hydeinnovations.com:2140/live/bosstv/index.m3u8",
-        "tv-west": "https://stream.hydeinnovations.com:2140/live/bosstv/index.m3u8",
-        "salt-tv": "https://stream.hydeinnovations.com:2140/live/bosstv/index.m3u8",
-        "tv-east": "https://stream.hydeinnovations.com:2140/live/bosstv/index.m3u8",
-        "bbs-tv": "https://ythls.onrender.com/channel/UCgLpjHjfGTbBBi5T5JaBcKg.m3u8",
-        "tv-north": "https://stream.hydeinnovations.com:2140/live/bosstv/index.m3u8",
-        "wan-luo-tv": "https://stream.hydeinnovations.com:2140/live/bosstv/index.m3u8"
+        "ntv-uganda": [
+            "https://streaming.viewmedia.tv/web_012/Stream/playlist.m3u8",
+            "https://ythls-v3.onrender.com/channel/UCwga1dPCqBddbtq5KYRii2g.m3u8",
+            "https://ythls.armelin.one/channel/UCwga1dPCqBddbtq5KYRii2g.m3u8"
+        ],
+        "nbs-tv": [
+            "https://streaming.viewmedia.tv/web_006/Stream/playlist.m3u8",
+            "https://ythls-v3.onrender.com/channel/UCT0bVGYRe-Qg_CAjJ7RQb0g.m3u8",
+            "https://ythls.armelin.one/channel/UCT0bVGYRe-Qg_CAjJ7RQb0g.m3u8"
+        ],
+        "ubc-tv": [
+            "https://streaming.viewmedia.tv/web_013/Stream/playlist.m3u8",
+            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8",
+            "https://ythls.armelin.one/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8"
+        ],
+        "bukedde-tv": [
+            "https://streaming.viewmedia.tv/web_014/Stream/playlist.m3u8",
+            "https://ythls-v3.onrender.com/channel/UCouBdXAhnJbVpXlLi5YYkxg.m3u8",
+            "https://ythls.armelin.one/channel/UCouBdXAhnJbVpXlLi5YYkxg.m3u8"
+        ],
+        "urban-tv": [
+            "https://streaming.viewmedia.tv/web_015/Stream/playlist.m3u8",
+            "https://ythls-v3.onrender.com/channel/UCxS3-UXJjVdOZmnPpzgRXOg.m3u8",
+            "https://ythls.armelin.one/channel/UCxS3-UXJjVdOZmnPpzgRXOg.m3u8"
+        ],
+        "spark-tv": [
+            "https://streaming.viewmedia.tv/web_016/Stream/playlist.m3u8",
+            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8",
+            "https://ythls.armelin.one/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8"
+        ],
+        "tv-west": [
+            "https://streaming.viewmedia.tv/web_017/Stream/playlist.m3u8",
+            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8"
+        ],
+        "salt-tv": [
+            "https://streaming.viewmedia.tv/web_018/Stream/playlist.m3u8",
+            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8"
+        ],
+        "tv-east": [
+            "https://streaming.viewmedia.tv/web_019/Stream/playlist.m3u8",
+            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8"
+        ],
+        "bbs-tv": [
+            "https://streaming.viewmedia.tv/web_020/Stream/playlist.m3u8",
+            "https://ythls-v3.onrender.com/channel/UCgLpjHjfGTbBBi5T5JaBcKg.m3u8",
+            "https://ythls.armelin.one/channel/UCgLpjHjfGTbBBi5T5JaBcKg.m3u8"
+        ],
+        "tv-north": [
+            "https://streaming.viewmedia.tv/web_021/Stream/playlist.m3u8",
+            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8"
+        ],
+        "wan-luo-tv": [
+            "https://streaming.viewmedia.tv/web_022/Stream/playlist.m3u8",
+            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8"
+        ]
     }
 };
 
@@ -51,17 +94,31 @@ const TV_API_CONFIG = {
  */
 async function getStreamUrl(stationId) {
     try {
-        // First try to get from IPTV-org API
-        const iptvOrgStream = await fetchFromIptvOrg(stationId);
-        if (iptvOrgStream) return iptvOrgStream;
+        // Get stream URLs for this station (array of fallbacks)
+        const streamUrls = TV_API_CONFIG.directStreams[stationId];
         
-        // If not found, use direct stream URL as fallback
-        return TV_API_CONFIG.directStreams[stationId] || null;
+        if (!streamUrls || streamUrls.length === 0) {
+            console.error(`No stream URLs configured for ${stationId}`);
+            return null;
+        }
+        
+        // Return the first URL (primary source)
+        // The player will handle fallbacks if this fails
+        return Array.isArray(streamUrls) ? streamUrls[0] : streamUrls;
     } catch (error) {
         console.error("Error getting stream URL:", error);
-        // Fallback to direct stream
-        return TV_API_CONFIG.directStreams[stationId] || null;
+        return null;
     }
+}
+
+/**
+ * Get all fallback URLs for a station
+ * @param {string} stationId - The ID of the TV station
+ * @returns {Array<string>} - Array of stream URLs
+ */
+function getAllStreamUrls(stationId) {
+    const streamUrls = TV_API_CONFIG.directStreams[stationId];
+    return Array.isArray(streamUrls) ? streamUrls : [streamUrls];
 }
 
 /**
@@ -184,5 +241,6 @@ document.addEventListener('DOMContentLoaded', initTvStations);
 // Export functions for use in other scripts
 window.UgandaTvApi = {
     getStreamUrl,
+    getAllStreamUrls,
     getYouTubeLiveUrl
 };
