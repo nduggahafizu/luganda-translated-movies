@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Uganda TV Stations - Unruly Movies</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Watch popular Uganda TV stations live on Unruly Movies">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#7CFC00">
+    <meta name="google-adsense-account" content="ca-pub-1904736753681797">
+    
+    <link rel="shortcut icon" href="assets/images/favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
+    
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, rgba(124, 252, 0, 0.1), rgba(0, 217, 255, 0.1));
+            padding: 60px 20px;
+            text-align: center;
+            border-radius: 20px;
+            margin-bottom: 40px;
+        }
+        
+        /* Stream status indicators */
+        .stream-status {
+            margin-top: 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-online {
+            color: var(--primary-color);
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .status-online::before {
+            content: "";
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .status-offline {
+            color: #ff4444;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .status-offline::before {
+            content: "";
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #ff4444;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        
+        .hero-section h1 {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #7CFC00, #00D9FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-section p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .tv-stations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+        
+        .tv-station-card {
+            background-color: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .tv-station-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-color: var(--primary-color);
+        }
+        
+        .tv-station-thumbnail {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            background-color: var(--background-dark);
+        }
+        
+        .tv-station-thumbnail img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .tv-station-info {
+            padding: 20px;
+        }
+        
+        .tv-station-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .tv-station-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .watch-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .watch-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(124, 252, 0, 0.4);
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-section h1 {
+                font-size: 28px;
+            }
+            
+            .hero-section p {
+                font-size: 16px;
+            }
+            
+            .tv-stations-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="app">
+            <!-- Header -->
+            <div class="app-header">
+                <div class="navbar navbar-expand-lg">
+                    <div class="menu d-md-none d-block">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </div>
+                    <div class="app-navbar">
+                        <a href="index.html" class="navbar-brand">
+                            <img src="assets/images/logo.png" alt="Unruly Movies" width="180" height="50">
+                        </a>
+                    </div>
+                    <div class="search-btn d-md-none d-block">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </div>
+                    
+                    <form class="header-search input-group d-md-block d-none" method="post" action="search.html">
+                        <div class="typeahead__container app-search">
+                            <div class="typeahead__field">
+                                <div class="typeahead__query">
+                                    <label for="search-input" class="btn px-0 mb-0" aria-label="Search">
+                                        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <path d="m21 21-4.35-4.35"></path>
+                                        </svg>
+                                    </label>
+                                    <input class="video-search form-control" name="q" type="text" id="search-input" placeholder="Search TV stations..." autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <ul class="navbar-nav navbar-user ml-auto align-items-center text-nowrap">
+                        <li class="nav-item">
+                            <a class="nav-link" href="subscribe.html" aria-label="Subscribe">
+                                <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                                </svg>
+                                <span class="d-none d-lg-inline">Subscribe</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn-login" href="login.html">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn-register" href="register.html">Sign Up</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="app-wrapper">
+                <!-- Main Content -->
+                <div class="app-container flex-fill">
+                    <div class="container">
+                        <div class="app-content pt-md-3">
+                            
+                            <!-- Hero Section -->
+                            <div class="hero-section">
+                                <h1>Uganda TV Stations</h1>
+                                <p>Watch your favorite Uganda TV stations live. Stay connected with local news, entertainment, and sports from Uganda's top broadcasters.</p>
+                            </div>
+
+                            <!-- TV Stations Grid -->
+                            <h2 class="section-title">Popular TV Stations</h2>
+                            <div class="tv-stations-grid">
+                                <!-- NTV Uganda -->
+                                <div class="tv-station-card">
+                                    <div class="tv-station-thumbnail">
+                                        <img src="https://www.ntvuganda.co.ug/wp-content/uploads/2022/01/NTV-Uganda-Logo.png" alt="NTV Uganda">
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">NTV Uganda</h3>
+                                        <p class="tv-station-description">Uganda's leading TV station offering news, entertainment, and sports coverage.</p>
+                                        <a href="player.html?station=ntv-uganda" class="watch-btn">Watch Now</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- NBS TV -->
+                                <div class="tv-station-card">
+                                    <div class="tv-station-thumbnail">
+                                        <img src="https://www.nbstv.co.ug/wp-content/uploads/2020/07/NBS-TV-Logo.png" alt="NBS TV">
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">NBS TV</h3>
+                                        <p class="tv-station-description">A 24-hour news channel with current affairs, business, and entertainment programming.</p>
+                                        <a href="player.html?station=nbs-tv" class="watch-btn">Watch Now</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- UBC TV -->
+                                <div class="tv-station-card">
+                                    <div class="tv-station-thumbnail">
+                                        <img src="https://www.ubconline.co.ug/wp-content/uploads/2019/04/UBC-TV-Logo.jpg" alt="UBC TV">
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">UBC TV</h3>
+                                        <p class="tv-station-description">Uganda's national broadcaster providing news, cultural programs, and sports.</p>
+                                        <a href="player.html?station=ubc-tv" class="watch-btn">Watch Now</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Bukedde TV -->
+                                <div class="tv-station-card">
+                                    <div class="tv-station-thumbnail">
+                                        <img src="https://www.bukedde.co.ug/wp-content/uploads/2019/08/Bukedde-TV-Logo.jpg" alt="Bukedde TV">
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">Bukedde TV</h3>
+                                        <p class="tv-station-description">Local language TV station broadcasting in Luganda with news and entertainment.</p>
+                                        <a href="player.html?station=bukedde-tv" class="watch-btn">Watch Now</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Urban TV -->
+                                <div class="tv-station-card">
+                                    <div class="tv-station-thumbnail">
+                                        <img src="https://www.urbantv.co.ug/wp-content/uploads/2020/05/Urban-TV-Logo.png" alt="Urban TV">
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">Urban TV</h3>
+                                        <p class="tv-station-description">Youth-focused TV station with entertainment, music, and lifestyle content.</p>
+                                        <a href="player.html?station=urban-tv" class="watch-btn">Watch Now</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Spark TV -->
+                                <div class="tv-station-card">
+                                    <div class="tv-station-thumbnail">
+                                        <img src="https://www.sparktv.co.ug/wp-content/uploads/2019/06/Spark-TV-Logo.jpg" alt="Spark TV">
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">Spark TV</h3>
+                                        <p class="tv-station-description">Entertainment channel with a focus on women's issues, lifestyle, and local content.</p>
+                                        <a href="player.html?station=spark-tv" class="watch-btn">Watch Now</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- TV West -->
+                                <div class="tv-station-card">
+                                    <div class="tv-station-thumbnail">
+                                        <img src="https://www.tvwest.co.ug/wp-content/uploads/2020/03/TV-West-Logo.jpg" alt="TV West">
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">TV West</h3>
+                                        <p class="tv-station-description">Regional TV station serving western Uganda with local news and programming.</p>
+                                        <a href="player.html?station=tv-west" class="watch-btn">Watch Now</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Salt TV -->
+                                <div class="tv-station-card">
+                                    <div class="tv-station-thumbnail">
+                                        <img src="https://www.salttv.co.ug/wp-content/uploads/2019/09/Salt-TV-Logo.png" alt="Salt TV">
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">Salt TV</h3>
+                                        <p class="tv-station-description">Faith-based TV station with religious programming, inspirational content, and family shows.</p>
+                                        <a href="player.html?station=salt-tv" class="watch-btn">Watch Now</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Regional TV Stations -->
+                            <h2 class="section-title">Regional TV Stations</h2>
+                            <div class="tv-stations-grid">
+                                <!-- TV East -->
+                                <div class="tv-station-card">
+                                    <div class="tv-station-thumbnail">
+                                        <img src="https://www.tveast.co.ug/wp-content/uploads/2020/04/TV-East-Logo.jpg" alt="TV East">
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">TV East</h3>
+                                        <p class="tv-station-description">Regional broadcaster serving eastern Uganda with local news and programming.</p>
+                                        <a href="player.html?station=tv-east" class="watch-btn">Watch Now</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- BBS TV -->
+                                <div class="tv-station-card">
+                                    <div class="tv-station-thumbnail">
+                                        <img src="https://www.bbstv.ug/wp-content/uploads/2019/07/BBS-TV-Logo.png" alt="BBS TV">
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">BBS TV</h3>
+                                        <p class="tv-station-description">Buganda Kingdom's official TV station with cultural programming and local news.</p>
+                                        <a href="player.html?station=bbs-tv" class="watch-btn">Watch Now</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- TV North -->
+                                <div class="tv-station-card">
+                                    <div class="tv-station-thumbnail">
+                                        <img src="https://www.tvnorth.co.ug/wp-content/uploads/2020/06/TV-North-Logo.jpg" alt="TV North">
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">TV North</h3>
+                                        <p class="tv-station-description">Regional broadcaster serving northern Uganda with local news and programming.</p>
+                                        <a href="player.html?station=tv-north" class="watch-btn">Watch Now</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Wan Luo TV -->
+                                <div class="tv-station-card">
+                                    <div class="tv-station-thumbnail">
+                                        <img src="https://www.wanluotv.co.ug/wp-content/uploads/2020/08/Wan-Luo-TV-Logo.jpg" alt="Wan Luo TV">
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">Wan Luo TV</h3>
+                                        <p class="tv-station-description">Local language TV station broadcasting in Luo with news and cultural programming.</p>
+                                        <a href="player.html?station=wan-luo-tv" class="watch-btn">Watch Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="app-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="footer-text my-3">
+                            2025 Unruly Movies. All rights reserved.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/uganda-tv-api.js"></script>
+    <script>
+        // Handle TV station player
+        document.querySelectorAll('.watch-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                // Prevent default navigation
+                e.preventDefault();
+                
+                // Get station ID from href
+                const href = this.getAttribute('href');
+                const urlParams = new URLSearchParams(href.split('?')[1]);
+                const stationId = urlParams.get('station');
+                
+                // Get stream URL from API
+                UgandaTvApi.getStreamUrl(stationId).then(streamUrl => {
+                    if (streamUrl) {
+                        // Navigate to player with stream URL
+                        window.location.href = `player.html?station=${stationId}&stream=${encodeURIComponent(streamUrl)}`;
+                    } else {
+                        alert('Stream not available at the moment. Please try again later.');
+                    }
+                }).catch(error => {
+                    console.error('Error getting stream URL:', error);
+                    alert('Error accessing stream. Please try again later.');
+                });
+                
+                // Analytics tracking
+                console.log('User clicked to watch:', stationId);
+            });
+        });
+    </script>
+</body>
+</html>

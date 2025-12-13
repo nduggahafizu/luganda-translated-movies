@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Watch Now - Unruly Movies</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Watch movies and TV shows on Unruly Movies">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#7CFC00">
+    <meta name="google-adsense-account" content="ca-pub-1904736753681797">
+    
+    <link rel="shortcut icon" href="assets/images/favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
+    
+    <style>
+        .player-container {
+            background-color: #000;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .video-player {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            background-color: #000;
+        }
+        
+        .video-player video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            outline: none;
+        }
+        
+        .player-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .video-player:hover .player-controls {
+            opacity: 1;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 5px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .progress-filled {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+        
+        .controls-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .control-btn {
+            background: transparent;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            padding: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .control-btn:hover {
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+        
+        .control-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .time-display {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .volume-slider {
+            width: 80px;
+            height: 5px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .volume-filled {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+            width: 100%;
+        }
+        
+        .spacer {
+            flex: 1;
+        }
+        
+        .movie-info {
+            background-color: var(--background-light);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .movie-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .movie-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .movie-description {
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: #000;
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(124, 252, 0, 0.4);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .episodes-section {
+            background-color: var(--background-light);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .episodes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .episode-card {
+            background-color: var(--background-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .episode-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .episode-card.active {
+            border-color: var(--primary-color);
+            background-color: rgba(124, 252, 0, 0.1);
+        }
+        
+        .episode-number {
+            font-size: 12px;
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .episode-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .episode-duration {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .related-section {
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .movie-title {
+                font-size: 24px;
+            }
+            
+            .movie-info {
+                padding: 20px;
+            }
+            
+            .episodes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="app">
+            <!-- Header -->
+            <div class="app-header">
+                <div class="navbar navbar-expand-lg">
+                    <div class="menu d-md-none d-block">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </div>
+                    <div class="app-navbar">
+                        <a href="index.html" class="navbar-brand">
+                            <img src="assets/images/logo.png" alt="Unruly Movies" width="180" height="50">
+                        </a>
+                    </div>
+                    
+                    <ul class="navbar-nav navbar-user ml-auto align-items-center text-nowrap">
+                        <li class="nav-item">
+                            <a class="nav-link btn-login" href="login.html">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn-register" href="register.html">Sign Up</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="app-wrapper">
+                <!-- Main Content -->
+                <div class="app-container flex-fill" style="max-width: 1400px; margin: 0 auto;">
+                    <div class="container">
+                        <div class="app-content pt-md-3">
+                            
+                            <!-- Video Player -->
+                            <div class="player-container">
+                                <div class="video-player" id="videoPlayer">
+                                    <video id="mainVideo" poster="https://image.tmdb.org/t/p/original/kXfqcdQKsToO0OUXHcrrNCHDBzO.jpg">
+                                        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    
+                                    <div class="player-controls">
+                                        <div class="progress-bar" id="progressBar">
+                                            <div class="progress-filled" id="progressFilled"></div>
+                                        </div>
+                                        
+                                        <div class="controls-row">
+                                            <button class="control-btn" id="playPauseBtn">
+                                                <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor">
+                                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                                </svg>
+                                            </button>
+                                            
+                                            <div class="time-display">
+                                                <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+                                            </div>
+                                            
+                                            <div class="volume-control">
+                                                <button class="control-btn" id="muteBtn">
+                                                    <svg id="volumeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                                                    </svg>
+                                                </button>
+                                                <div class="volume-slider" id="volumeSlider">
+                                                    <div class="volume-filled" id="volumeFilled"></div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="spacer"></div>
+                                            
+                                            <button class="control-btn" id="settingsBtn">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <circle cx="12" cy="12" r="3"></circle>
+                                                    <path d="M12 1v6m0 6v6m-6-6h6m6 0h6"></path>
+                                                </svg>
+                                            </button>
+                                            
+                                            <button class="control-btn" id="fullscreenBtn">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Movie Info -->
+                            <div class="movie-info">
+                                <h1 class="movie-title" id="movieTitle">Loading...</h1>
+                                
+                                <div class="movie-meta">
+                                    <div class="meta-item">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                                        </svg>
+                                        <span id="movieYear">2024</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <polyline points="12 6 12 12 16 14"></polyline>
+                                        </svg>
+                                        <span id="movieDuration">2h 30m</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                        </svg>
+                                        <span id="movieRating">8.5</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span class="quality">HD</span>
+                                    </div>
+                                </div>
+                                
+                                <p class="movie-description" id="movieDescription">
+                                    Loading description...
+                                </p>
+                                
+                                <div class="action-buttons">
+                                    <button class="action-btn btn-primary">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                        </svg>
+                                        Add to Watchlist
+                                    </button>
+                                    <button class="action-btn btn-secondary">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                                            <polyline points="16 6 12 2 8 6"></polyline>
+                                            <line x1="12" y1="2" x2="12" y2="15"></line>
+                                        </svg>
+                                        Share
+                                    </button>
+                                    <button class="action-btn btn-secondary">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="7 10 12 15 17 10"></polyline>
+                                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                                        </svg>
+                                        Download
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Episodes Section (for TV Series) -->
+                            <div class="episodes-section" id="episodesSection" style="display: none;">
+                                <h2 class="section-title">Episodes - Season 1</h2>
+                                <div class="episodes-grid" id="episodesGrid">
+                                    <!-- Episodes will be generated here -->
+                                </div>
+                            </div>
+
+                            <!-- Related Content -->
+                            <div class="related-section">
+                                <div class="app-heading">
+                                    <div class="text">You May Also Like</div>
+                                </div>
+                                <div class="row row-cols-2 row-cols-md-5 list-scrollable">
+                                    <!-- Related content cards -->
+                                    <div class="col">
+                                        <div class="list-movie position-relative">
+                                            <a href="#" class="list-media">
+                                                <div class="list-media-attr">
+                                                    <div class="quality">HD</div>
+                                                </div>
+                                                <div class="play-btn">
+                                                    <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                                    </svg>
+                                                </div>
+                                                <div class="media media-cover" style="background-image: url('https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg');"></div>
+                                            </a>
+                                            <div class="list-caption">
+                                                <a href="#" class="list-title">The Marvels</a>
+                                                <a href="#" class="list-category">Action</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="app-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="footer-text my-3">
+                            2025 Unruly Movies. All rights reserved.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/uganda-tv-api.js"></script>
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const movieTitle = urlParams.get('movie') || urlParams.get('series') || urlParams.get('station');
+        const isSeries = urlParams.has('series');
+        const isStation = urlParams.has('station');
+        const streamUrl = urlParams.get('stream');
+
+        // Update page content
+        document.getElementById('movieTitle').textContent = movieTitle || 'Sample Movie';
+        
+        if (isStation) {
+            document.getElementById('movieDescription').textContent = 
+                `Watch ${movieTitle} live. Stay updated with the latest news, entertainment, and programming from Uganda.`;
+            document.getElementById('movieYear').textContent = 'Live';
+            document.getElementById('movieDuration').textContent = '24/7';
+            document.getElementById('movieRating').textContent = 'Live';
+            
+            // Hide episodes section for live TV
+            document.getElementById('episodesSection').style.display = 'none';
+        } else {
+            document.getElementById('movieDescription').textContent = isSeries 
+                ? 'An epic TV series that will keep you on the edge of your seat. Follow the thrilling journey of our heroes as they navigate through challenges and adventures.'
+                : 'An epic cinematic experience that will keep you on the edge of your seat. Immerse yourself in a world of adventure, drama, and unforgettable moments.';
+                
+            // Show episodes section for series
+            if (isSeries) {
+                document.getElementById('episodesSection').style.display = 'block';
+                
+                // Generate sample episodes
+                const episodesGrid = document.getElementById('episodesGrid');
+                for (let i = 1; i <= 10; i++) {
+                    const episodeCard = document.createElement('div');
+                    episodeCard.className = 'episode-card' + (i === 1 ? ' active' : '');
+                    episodeCard.innerHTML = `
+                        <div class="episode-number">Episode ${i}</div>
+                        <div class="episode-title">Episode Title ${i}</div>
+                        <div class="episode-duration">45 min</div>
+                    `;
+                    episodeCard.onclick = () => {
+                        document.querySelectorAll('.episode-card').forEach(card => card.classList.remove('active'));
+                        episodeCard.classList.add('active');
+                        alert(`Playing Episode ${i}`);
+                    };
+                    episodesGrid.appendChild(episodeCard);
+                }
+            }
+        }
+        
+        // Set video source if stream URL is provided
+        if (streamUrl) {
+            const video = document.getElementById('mainVideo');
+            const source = document.createElement('source');
+            source.src = streamUrl;
+            source.type = streamUrl.includes('.m3u8') ? 'application/x-mpegURL' : 'video/mp4';
+            
+            // Remove existing sources
+            while (video.firstChild) {
+                video.removeChild(video.firstChild);
+            }
+            
+            // Add new source
+            video.appendChild(source);
+            video.load();
+            
+            // Auto-play for live TV
+            if (isStation) {
+                video.play().catch(error => {
+                    console.error('Error auto-playing video:', error);
+                    alert('Click the play button to start watching.');
+                });
+            }
+        }
+
+        // Video Player Controls
+        const video = document.getElementById('mainVideo');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const playIcon = document.getElementById('playIcon');
+        const progressBar = document.getElementById('progressBar');
+        const progressFilled = document.getElementById('progressFilled');
+        const currentTimeEl = document.getElementById('currentTime');
+        const durationEl = document.getElementById('duration');
+        const muteBtn = document.getElementById('muteBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const volumeFilled = document.getElementById('volumeFilled');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const videoPlayer = document.getElementById('videoPlayer');
+
+        // Play/Pause
+        playPauseBtn.addEventListener('click', () => {
+            if (video.paused) {
+                video.play();
+                playIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
+            } else {
+                video.pause();
+                playIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+            }
+        });
+
+        // Update progress bar
+        video.addEventListener('timeupdate', () => {
+            const percent = (video.currentTime / video.duration) * 100;
+            progressFilled.style.width = percent + '%';
+            currentTimeEl.textContent = formatTime(video.currentTime);
+        });
+
+        // Set duration
+        video.addEventListener('loadedmetadata', () => {
+            durationEl.textContent = formatTime(video.duration);
+        });
+
+        // Seek
+        progressBar.addEventListener('click', (e) => {
+            const rect = progressBar.getBoundingClientRect();
+            const percent = (e.clientX - rect.left) / rect.width;
+            video.currentTime = percent * video.duration;
+        });
+
+        // Mute/Unmute
+        muteBtn.addEventListener('click', () => {
+            video.muted = !video.muted;
+            volumeFilled.style.width = video.muted ? '0%' : (video.volume * 100) + '%';
+        });
+
+        // Volume control
+        volumeSlider.addEventListener('click', (e) => {
+            const rect = volumeSlider.getBoundingClientRect();
+            const percent = (e.clientX - rect.left) / rect.width;
+            video.volume = percent;
+            volumeFilled.style.width = (percent * 100) + '%';
+            video.muted = false;
+        });
+
+        // Fullscreen
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                videoPlayer.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        // Format time helper
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                playPauseBtn.click();
+            } else if (e.code === 'ArrowRight') {
+                video.currentTime += 10;
+            } else if (e.code === 'ArrowLeft') {
+                video.currentTime -= 10;
+            } else if (e.code === 'KeyF') {
+                fullscreenBtn.click();
+            } else if (e.code === 'KeyM') {
+                muteBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>

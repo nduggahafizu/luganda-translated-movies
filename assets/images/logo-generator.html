@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unruly Movies Logo Generator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #0a0a0a;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            text-align: center;
+            background: #1a1a1a;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        canvas {
+            border: 2px solid #7CFC00;
+            border-radius: 10px;
+            margin: 20px 0;
+            background: white;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #7CFC00, #5CB300);
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(124, 252, 0, 0.4);
+        }
+        
+        h1 {
+            color: #7CFC00;
+            margin-bottom: 10px;
+        }
+        
+        p {
+            color: #b3b3b3;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Unruly Movies Logo</h1>
+        <p>Right-click on the logo below and save as "logo.png"</p>
+        <canvas id="logoCanvas" width="600" height="200"></canvas>
+        <br>
+        <button onclick="downloadLogo()">Download Logo</button>
+        <button onclick="generateFavicon()">Generate Favicon</button>
+        <br>
+        <canvas id="faviconCanvas" width="64" height="64" style="display:none;"></canvas>
+    </div>
+
+    <script>
+        // Generate main logo
+        const canvas = document.getElementById('logoCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Background
+        ctx.fillStyle = 'transparent';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Add gradient background
+        const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+        gradient.addColorStop(0, 'rgba(124, 252, 0, 0.1)');
+        gradient.addColorStop(1, 'rgba(0, 217, 255, 0.1)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw play button icon
+        ctx.fillStyle = '#7CFC00';
+        ctx.beginPath();
+        ctx.arc(100, 100, 50, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.moveTo(85, 75);
+        ctx.lineTo(85, 125);
+        ctx.lineTo(125, 100);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Draw text
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 60px Arial';
+        ctx.fillText('UNRULY', 180, 90);
+        
+        ctx.fillStyle = '#7CFC00';
+        ctx.font = 'bold 40px Arial';
+        ctx.fillText('MOVIES', 180, 135);
+        
+        // Add tagline
+        ctx.fillStyle = '#b3b3b3';
+        ctx.font = '16px Arial';
+        ctx.fillText('Stream Unlimited Entertainment', 180, 160);
+        
+        function downloadLogo() {
+            const link = document.createElement('a');
+            link.download = 'logo.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        function generateFavicon() {
+            const faviconCanvas = document.getElementById('faviconCanvas');
+            const fCtx = faviconCanvas.getContext('2d');
+            
+            // Background
+            fCtx.fillStyle = '#0a0a0a';
+            fCtx.fillRect(0, 0, 64, 64);
+            
+            // Play button
+            fCtx.fillStyle = '#7CFC00';
+            fCtx.beginPath();
+            fCtx.arc(32, 32, 28, 0, Math.PI * 2);
+            fCtx.fill();
+            
+            // Triangle
+            fCtx.fillStyle = '#000';
+            fCtx.beginPath();
+            fCtx.moveTo(24, 18);
+            fCtx.lineTo(24, 46);
+            fCtx.lineTo(46, 32);
+            fCtx.closePath();
+            fCtx.fill();
+            
+            // Download
+            const link = document.createElement('a');
+            link.download = 'favicon.png';
+            link.href = faviconCanvas.toDataURL();
+            link.click();
+            
+            alert('Favicon generated! Save it as favicon.png in the assets/images folder.');
+        }
+    </script>
+</body>
+</html>
