@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>About Us - Luganda Movies</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Learn about Luganda Movies - Uganda's premier platform for VJ translated movies and entertainment.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#7CFC00">
+    <meta name="google-adsense-account" content="ca-pub-1904736753681797">
+    
+    <link rel="shortcut icon" href="assets/images/favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
+    
+    <style>
+        .about-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .about-hero {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, rgba(124, 252, 0, 0.1), rgba(124, 252, 0, 0.05));
+            border-radius: 20px;
+            margin-bottom: 60px;
+        }
+        
+        .about-hero h1 {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .about-hero p {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+        
+        .section {
+            margin-bottom: 60px;
+        }
+        
+        .section h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+        
+        .section p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .feature-card {
+            background-color: var(--background-light);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 10px 30px rgba(124, 252, 0, 0.2);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .feature-icon svg {
+            width: 32px;
+            height: 32px;
+            color: #000;
+        }
+        
+        .feature-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+        
+        .feature-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 30px;
+            background-color: var(--background-light);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .stat-number {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .team-member {
+            text-align: center;
+            padding: 30px;
+            background-color: var(--background-light);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .team-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 700;
+            color: #000;
+        }
+        
+        .team-member h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--text-primary);
+        }
+        
+        .team-member .role {
+            font-size: 14px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .team-member p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+        
+        .cta-section {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, rgba(124, 252, 0, 0.1), rgba(124, 252, 0, 0.05));
+            border-radius: 20px;
+            margin-top: 60px;
+        }
+        
+        .cta-section h2 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+        
+        .cta-section p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .cta-btn {
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .cta-btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: #000;
+        }
+        
+        .cta-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(124, 252, 0, 0.4);
+        }
+        
+        .cta-btn-secondary {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .cta-btn-secondary:hover {
+            background: var(--primary-color);
+            color: #000;
+        }
+        
+        @media (max-width: 768px) {
+            .about-hero h1 {
+                font-size: 32px;
+            }
+            
+            .about-hero p {
+                font-size: 16px;
+            }
+            
+            .section h2 {
+                font-size: 24px;
+            }
+            
+            .stat-number {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="app">
+            <!-- Header -->
+            <div class="app-header">
+                <div class="navbar navbar-expand-lg">
+                    <div class="menu d-md-none d-block">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </div>
+                    <div class="app-navbar">
+                        <a href="index.html" class="navbar-brand">
+                            <img src="assets/images/logo.png" alt="Luganda Movies" width="180" height="50">
+                        </a>
+                    </div>
+                    
+                    <ul class="navbar-nav navbar-user ml-auto align-items-center text-nowrap">
+                        <li class="nav-item">
+                            <a class="nav-link btn-login" href="login.html">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn-register" href="register.html">Sign Up</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="app-wrapper">
+                <!-- Main Content -->
+                <div class="app-container flex-fill">
+                    <div class="about-content">
+                        
+                        <!-- Hero Section -->
+                        <div class="about-hero">
+                            <h1>About Luganda Movies</h1>
+                            <p>Uganda's premier platform for VJ translated movies, bringing international entertainment to Ugandan audiences in their native language.</p>
+                        </div>
+
+                        <!-- Our Story -->
+                        <div class="section">
+                            <h2>Our Story</h2>
+                            <p>Luganda Movies was born from a simple idea: to make world-class entertainment accessible to Ugandan audiences in their native language. We recognized that language should never be a barrier to enjoying great movies and TV shows.</p>
+                            
+                            <p>Founded in 2024, we've partnered with Uganda's most talented VJ (Video Jockey) translators who bring their unique style and cultural understanding to every translation. These VJs don't just translate—they localize, adding context, humor, and cultural references that make international content feel authentically Ugandan.</p>
+                            
+                            <p>Today, we're proud to be the leading platform for Luganda-translated entertainment, serving thousands of viewers across Uganda and the diaspora.</p>
+                        </div>
+
+                        <!-- Mission & Vision -->
+                        <div class="section">
+                            <h2>Our Mission</h2>
+                            <p>To bridge the entertainment gap by providing high-quality, culturally relevant Luganda translations of international movies and TV shows, while supporting and promoting Uganda's talented VJ community.</p>
+                            
+                            <h2 style="margin-top: 40px;">Our Vision</h2>
+                            <p>To become Africa's leading platform for localized entertainment, expanding beyond Luganda to other African languages, and creating a sustainable ecosystem for content creators and translators.</p>
+                        </div>
+
+                        <!-- What We Offer -->
+                        <div class="section">
+                            <h2>What We Offer</h2>
+                            <div class="features-grid">
+                                <div class="feature-card">
+                                    <div class="feature-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                                            <line x1="7" y1="2" x2="7" y2="22"></line>
+                                            <line x1="17" y1="2" x2="17" y2="22"></line>
+                                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                                        </svg>
+                                    </div>
+                                    <h3>VJ Translated Movies</h3>
+                                    <p>Thousands of movies translated by Uganda's best VJs, from Hollywood blockbusters to indie gems.</p>
+                                </div>
+                                
+                                <div class="feature-card">
+                                    <div class="feature-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                                            <polyline points="17 2 12 7 7 2"></polyline>
+                                        </svg>
+                                    </div>
+                                    <h3>Live Uganda TV</h3>
+                                    <p>Stream live Ugandan TV channels including NTV, UBC, and more, all in one place.</p>
+                                </div>
+                                
+                                <div class="feature-card">
+                                    <div class="feature-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <polygon points="10 8 16 12 10 16 10 8"></polygon>
+                                        </svg>
+                                    </div>
+                                    <h3>HD Streaming</h3>
+                                    <p>High-quality streaming with adaptive bitrate for smooth playback on any device.</p>
+                                </div>
+                                
+                                <div class="feature-card">
+                                    <div class="feature-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                    </div>
+                                    <h3>VJ Profiles</h3>
+                                    <p>Discover and follow your favorite VJ translators, explore their work, and support their craft.</p>
+                                </div>
+                                
+                                <div class="feature-card">
+                                    <div class="feature-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="7 10 12 15 17 10"></polyline>
+                                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                                        </svg>
+                                    </div>
+                                    <h3>Offline Viewing</h3>
+                                    <p>Download movies for offline viewing (Premium feature coming soon).</p>
+                                </div>
+                                
+                                <div class="feature-card">
+                                    <div class="feature-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                        </svg>
+                                    </div>
+                                    <h3>Secure & Safe</h3>
+                                    <p>Your data is protected with industry-standard encryption and security measures.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stats -->
+                        <div class="section">
+                            <h2>Our Impact</h2>
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-number">10K+</div>
+                                    <div class="stat-label">Movies Translated</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">50+</div>
+                                    <div class="stat-label">VJ Translators</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">100K+</div>
+                                    <div class="stat-label">Active Users</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">1M+</div>
+                                    <div class="stat-label">Monthly Views</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Our Values -->
+                        <div class="section">
+                            <h2>Our Values</h2>
+                            <div class="features-grid">
+                                <div class="feature-card">
+                                    <h3>🎯 Quality First</h3>
+                                    <p>We partner only with the best VJ translators to ensure high-quality, culturally relevant translations.</p>
+                                </div>
+                                
+                                <div class="feature-card">
+                                    <h3>🤝 Community Driven</h3>
+                                    <p>We listen to our users and continuously improve based on feedback and suggestions.</p>
+                                </div>
+                                
+                                <div class="feature-card">
+                                    <h3>💡 Innovation</h3>
+                                    <p>We leverage technology to make entertainment more accessible and enjoyable for everyone.</p>
+                                </div>
+                                
+                                <div class="feature-card">
+                                    <h3>🌍 Cultural Pride</h3>
+                                    <p>We celebrate Ugandan culture and language while bringing the world's best entertainment to our audience.</p>
+                                </div>
+                                
+                                <div class="feature-card">
+                                    <h3>⚖️ Fair Compensation</h3>
+                                    <p>We ensure VJ translators are fairly compensated for their creative work and talent.</p>
+                                </div>
+                                
+                                <div class="feature-card">
+                                    <h3>🔒 Trust & Safety</h3>
+                                    <p>We prioritize user privacy, data security, and a safe viewing environment for all ages.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Team Section -->
+                        <div class="section">
+                            <h2>Meet Our Team</h2>
+                            <div class="team-grid">
+                                <div class="team-member">
+                                    <div class="team-avatar">LM</div>
+                                    <h3>Luganda Movies Team</h3>
+                                    <p class="role">Founders & Developers</p>
+                                    <p>Passionate about bringing quality entertainment to Ugandan audiences through innovative technology.</p>
+                                </div>
+                                
+                                <div class="team-member">
+                                    <div class="team-avatar">VJ</div>
+                                    <h3>VJ Community</h3>
+                                    <p class="role">Content Creators</p>
+                                    <p>50+ talented VJ translators bringing their unique style and cultural expertise to every translation.</p>
+                                </div>
+                                
+                                <div class="team-member">
+                                    <div class="team-avatar">CS</div>
+                                    <h3>Support Team</h3>
+                                    <p class="role">Customer Success</p>
+                                    <p>Dedicated to ensuring you have the best experience on our platform, available 24/7.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CTA Section -->
+                        <div class="cta-section">
+                            <h2>Join the Luganda Movies Family</h2>
+                            <p>Start enjoying unlimited VJ translated movies and TV shows today!</p>
+                            <div class="cta-buttons">
+                                <a href="register.html" class="cta-btn cta-btn-primary">Get Started Free</a>
+                                <a href="subscribe.html" class="cta-btn cta-btn-secondary">View Plans</a>
+                            </div>
+                        </div>
+
+                        <!-- Contact Info -->
+                        <div class="section" style="text-align: center; margin-top: 60px;">
+                            <h2>Get in Touch</h2>
+                            <p>Have questions or want to partner with us? We'd love to hear from you!</p>
+                            <p style="margin-top: 20px;">
+                                <a href="contact.html" class="cta-btn cta-btn-secondary">Contact Us</a>
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="app-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="footer-text my-3">
+                            <a href="privacy-policy.html" style="margin: 0 10px;">Privacy Policy</a> |
+                            <a href="terms.html" style="margin: 0 10px;">Terms of Service</a> |
+                            <a href="contact.html" style="margin: 0 10px;">Contact</a> |
+                            <a href="about.html" style="margin: 0 10px;">About Us</a>
+                            <br><br>
+                            2025 Luganda Movies. All rights reserved.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
