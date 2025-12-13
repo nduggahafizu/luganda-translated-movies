@@ -1,0 +1,346 @@
+/* ===================================
+   Unruly Movies - Responsive Styles
+   =================================== */
+
+/* Tablet Devices (768px and up) */
+@media (min-width: 768px) {
+    .d-md-block {
+        display: block !important;
+    }
+    
+    .d-md-none {
+        display: none !important;
+    }
+    
+    .row-cols-md-4 > .col {
+        width: 25%;
+    }
+    
+    .row-cols-md-5 > .col {
+        width: 20%;
+    }
+}
+
+/* Large Devices (992px and up) */
+@media (min-width: 992px) {
+    .d-lg-block {
+        display: block !important;
+    }
+    
+    .d-lg-inline {
+        display: inline !important;
+    }
+    
+    .d-lg-none {
+        display: none !important;
+    }
+}
+
+/* Mobile Devices (max-width: 767px) */
+@media (max-width: 767px) {
+    /* Header */
+    .navbar {
+        padding: 10px 15px;
+    }
+    
+    .navbar-brand img {
+        height: 35px;
+    }
+    
+    .header-search {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        max-width: 100%;
+        background-color: var(--background-dark);
+        padding: 15px;
+        z-index: 10000;
+        transform: translateY(-100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .header-search.active {
+        transform: translateY(0);
+    }
+    
+    /* Sidebar */
+    .app-aside {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 280px;
+        height: 100vh;
+        z-index: 9999;
+        transition: left 0.3s ease;
+        padding-top: 60px;
+    }
+    
+    .app-aside.show {
+        left: 0;
+    }
+    
+    .modal-close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: transparent;
+        border: none;
+        color: var(--text-primary);
+        cursor: pointer;
+        z-index: 10;
+    }
+    
+    /* Main Content */
+    .app-container {
+        padding: 15px;
+    }
+    
+    /* Hero Slider */
+    .slide {
+        height: 350px;
+    }
+    
+    .slide-caption {
+        padding: 30px 20px;
+    }
+    
+    .slide .title {
+        font-size: 28px;
+    }
+    
+    .slide .description {
+        font-size: 14px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .carousel-control {
+        padding: 0 10px;
+    }
+    
+    .control-prev,
+    .control-next {
+        width: 40px;
+        height: 40px;
+    }
+    
+    /* Section Headings */
+    .app-heading .text {
+        font-size: 20px;
+    }
+    
+    .app-heading .all {
+        font-size: 12px;
+        padding: 6px 15px;
+    }
+    
+    /* Movie Cards */
+    .list-scrollable > .col {
+        width: 150px;
+    }
+    
+    .list-title {
+        font-size: 14px;
+    }
+    
+    .list-category {
+        font-size: 12px;
+    }
+    
+    .play-btn {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .play-btn .icon {
+        width: 20px;
+        height: 20px;
+    }
+    
+    /* Footer */
+    .app-footer {
+        padding: 30px 15px 20px;
+    }
+    
+    .footer-nav .nav-head {
+        font-size: 14px;
+    }
+    
+    .footer-nav a {
+        font-size: 13px;
+    }
+    
+    /* Scroll to Top */
+    .scroll-up {
+        width: 45px;
+        height: 45px;
+        bottom: 20px;
+        right: 20px;
+    }
+    
+    .scroll-up svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* Small Mobile Devices (max-width: 480px) */
+@media (max-width: 480px) {
+    .slide {
+        height: 300px;
+    }
+    
+    .slide .title {
+        font-size: 24px;
+    }
+    
+    .slide-header {
+        gap: 10px;
+        font-size: 12px;
+    }
+    
+    .list-scrollable > .col {
+        width: 130px;
+    }
+    
+    .app-section {
+        margin-bottom: 35px;
+    }
+    
+    .navbar-nav {
+        gap: 8px;
+    }
+    
+    .nav-link {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+}
+
+/* Landscape Mobile Devices */
+@media (max-width: 767px) and (orientation: landscape) {
+    .slide {
+        height: 280px;
+    }
+    
+    .app-aside {
+        width: 250px;
+    }
+}
+
+/* Large Desktop (1400px and up) */
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1600px;
+    }
+    
+    .slide {
+        height: 550px;
+    }
+    
+    .slide .title {
+        font-size: 48px;
+    }
+    
+    .list-scrollable > .col {
+        width: 220px;
+    }
+}
+
+/* Extra Large Desktop (1920px and up) */
+@media (min-width: 1920px) {
+    .container {
+        max-width: 1800px;
+    }
+    
+    .slide {
+        height: 600px;
+    }
+    
+    .app-heading .text {
+        font-size: 28px;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .app-header,
+    .app-aside,
+    .app-footer,
+    .scroll-up,
+    .play-btn,
+    .carousel-control,
+    .carousel-indicators {
+        display: none !important;
+    }
+    
+    body {
+        background: white;
+        color: black;
+    }
+    
+    .app-container {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Dark Mode Support (if system prefers dark) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-dark: #0a0a0a;
+        --background-light: #1a1a1a;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    :root {
+        --border-color: #ffffff;
+        --text-secondary: #ffffff;
+    }
+    
+    .list-media-attr,
+    .play-btn {
+        border: 2px solid var(--primary-color);
+    }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .nav-link,
+    .list-movie,
+    .control-prev,
+    .control-next {
+        -webkit-tap-highlight-color: rgba(124, 252, 0, 0.2);
+    }
+    
+    .play-btn {
+        opacity: 1;
+    }
+    
+    /* Increase touch targets */
+    .nav-link {
+        min-height: 44px;
+    }
+    
+    .control-prev,
+    .control-next {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}

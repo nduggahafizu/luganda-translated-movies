@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Subscription Plans - Unruly Movies</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Choose your Unruly Movies subscription plan. Watch unlimited movies and TV shows with premium features.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#7CFC00">
+    <meta name="google-adsense-account" content="ca-pub-1904736753681797">
+    
+    <link rel="shortcut icon" href="assets/images/favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
+    
+    <style>
+        .pricing-hero {
+            background: linear-gradient(135deg, rgba(124, 252, 0, 0.1), rgba(0, 217, 255, 0.1));
+            padding: 80px 20px 60px;
+            text-align: center;
+            border-radius: 20px;
+            margin-bottom: 50px;
+        }
+        
+        .pricing-hero h1 {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #7CFC00, #00D9FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .pricing-hero p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .pricing-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .pricing-card {
+            background: linear-gradient(135deg, var(--background-light), var(--background-dark));
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pricing-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-color);
+            box-shadow: 0 20px 40px rgba(124, 252, 0, 0.2);
+        }
+        
+        .pricing-card:hover::before {
+            opacity: 1;
+        }
+        
+        .pricing-card.featured {
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+        }
+        
+        .pricing-card.featured::before {
+            opacity: 1;
+        }
+        
+        .pricing-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: #000;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        
+        .pricing-name {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+        
+        .pricing-price {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .pricing-price span {
+            font-size: 18px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .pricing-description {
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .pricing-features {
+            list-style: none;
+            padding: 0;
+            margin: 30px 0;
+            text-align: left;
+        }
+        
+        .pricing-features li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+        }
+        
+        .pricing-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .feature-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--primary-color);
+            flex-shrink: 0;
+        }
+        
+        .feature-icon.disabled {
+            color: var(--text-secondary);
+            opacity: 0.3;
+        }
+        
+        .pricing-button {
+            width: 100%;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .pricing-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(124, 252, 0, 0.4);
+        }
+        
+        .pricing-button.secondary {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .pricing-button.secondary:hover {
+            background: var(--primary-color);
+            color: #000;
+        }
+        
+        .faq-section {
+            max-width: 800px;
+            margin: 80px auto 50px;
+            padding: 0 20px;
+        }
+        
+        .faq-title {
+            font-size: 36px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .faq-item {
+            background-color: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            padding: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .faq-question:hover {
+            color: var(--primary-color);
+        }
+        
+        .faq-icon {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.3s ease;
+        }
+        
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+        }
+        
+        .faq-answer-content {
+            padding: 0 20px 20px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+        
+        @media (max-width: 768px) {
+            .pricing-hero h1 {
+                font-size: 32px;
+            }
+            
+            .pricing-hero p {
+                font-size: 16px;
+            }
+            
+            .pricing-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .pricing-card.featured {
+                transform: scale(1);
+            }
+            
+            .pricing-price {
+                font-size: 36px;
+            }
+            
+            .faq-title {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="app">
+            <!-- Header (same as index.html) -->
+            <div class="app-header">
+                <div class="navbar navbar-expand-lg">
+                    <div class="menu d-md-none d-block">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </div>
+                    <div class="app-navbar">
+                        <a href="index.html" class="navbar-brand">
+                            <img src="assets/images/logo.png" alt="Unruly Movies" width="180" height="50">
+                        </a>
+                    </div>
+                    <ul class="navbar-nav navbar-user ml-auto align-items-center text-nowrap">
+                        <li class="nav-item">
+                            <a class="nav-link btn-login" href="login.html">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn-register" href="register.html">Sign Up</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="app-wrapper">
+                <div class="app-container flex-fill">
+                    <!-- Hero Section -->
+                    <div class="pricing-hero">
+                        <h1>Choose Your Plan</h1>
+                        <p>Unlock unlimited entertainment with Unruly Movies. Watch thousands of movies and TV shows in stunning quality.</p>
+                    </div>
+
+                    <!-- Pricing Cards -->
+                    <div class="pricing-container">
+                        <!-- Free Plan -->
+                        <div class="pricing-card">
+                            <div class="pricing-name">Free</div>
+                            <div class="pricing-price">$0<span>/month</span></div>
+                            <div class="pricing-description">Perfect for casual viewers</div>
+                            
+                            <ul class="pricing-features">
+                                <li>
+                                    <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    Limited content library
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    SD quality streaming
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    Watch with ads
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    1 device at a time
+                                </li>
+                                <li>
+                                    <svg class="feature-icon disabled" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                    No offline downloads
+                                </li>
+                                <li>
+                                    <svg class="feature-icon disabled" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                    No early access
+                                </li>
+                            </ul>
+                            
+                            <button class="pricing-button secondary" onclick="window.location.href='register.html'">Get Started</button>
+                        </div>
+
+                        <!-- Basic Plan -->
+                        <div class="pricing-card featured">
+                            <span class="pricing-badge">Most Popular</span>
+                            <div class="pricing-name">Basic</div>
+                            <div class="pricing-price">$9.99<span>/month</span></div>
+                            <div class="pricing-description">Great for movie enthusiasts</div>
+                            
+                            <ul class="pricing-features">
+                                <li>
+                                    <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    Full content library
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    HD quality streaming
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    Ad-free experience
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    2 devices simultaneously
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    Offline downloads
+                                </li>
+                                <li>
+                                    <svg class="feature-icon disabled" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                    No 4K content
+                                </li>
+                            </ul>
+                            
+                            <button class="pricing-button" onclick="window.location.href='payment.html?plan=basic&duration=monthly'">Subscribe Now</button>
+                        </div>
+
+                        <!-- Premium Plan -->
+                        <div class="pricing-card">
+                            <span class="pricing-badge" style="background: linear-gradient(135deg, #FFD700, #FFA500);">Premium</span>
+                            <div class="pricing-name">Premium</div>
+                            <div class="pricing-price">$14.99<span>/month</span></div>
+                            <div class="pricing-description">Ultimate viewing experience</div>
+                            
+                            <ul class="pricing-features">
+                                <li>
+                                    <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    Full content library
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    4K Ultra HD streaming
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    Ad-free experience
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    4 devices simultaneously
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    Unlimited downloads
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    Early access to new releases
+                                </li>
+                            </ul>
+                            
+                            <button class="pricing-button" onclick="window.location.href='payment.html?plan=premium&duration=monthly'">Subscribe Now</button>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Section -->
+                    <div class="faq-section">
+                        <h2 class="faq-title">Frequently Asked Questions</h2>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question" onclick="toggleFAQ(this)">
+                                <span>Can I cancel my subscription anytime?</span>
+                                <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="faq-answer">
+                                <div class="faq-answer-content">
+                                    Yes! You can cancel your subscription at any time. There are no cancellation fees, and you'll continue to have access until the end of your billing period.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question" onclick="toggleFAQ(this)">
+                                <span>What payment methods do you accept?</span>
+                                <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="faq-answer">
+                                <div class="faq-answer-content">
+                                    We accept all major credit cards (Visa, MasterCard, American Express), PayPal, and various digital payment methods depending on your region.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question" onclick="toggleFAQ(this)">
+                                <span>Can I switch plans later?</span>
+                                <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="faq-answer">
+                                <div class="faq-answer-content">
+                                    Absolutely! You can upgrade or downgrade your plan at any time. Changes will take effect at the start of your next billing cycle.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question" onclick="toggleFAQ(this)">
+                                <span>Is there a free trial available?</span>
+                                <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="faq-answer">
+                                <div class="faq-answer-content">
+                                    Yes! New users get a 7-day free trial for Basic and Premium plans. No credit card required for the Free plan.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question" onclick="toggleFAQ(this)">
+                                <span>How many devices can I use?</span>
+                                <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="faq-answer">
+                                <div class="faq-answer-content">
+                                    It depends on your plan: Free (1 device), Basic (2 devices), Premium (4 devices). You can register unlimited devices but can only stream on the specified number simultaneously.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="app-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="footer-text my-3">
+                            2025 Unruly Movies. All rights reserved.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleFAQ(element) {
+            const faqItem = element.parentElement;
+            const isActive = faqItem.classList.contains('active');
+            
+            // Close all FAQ items
+            document.querySelectorAll('.faq-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Open clicked item if it wasn't active
+            if (!isActive) {
+                faqItem.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>

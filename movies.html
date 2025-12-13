@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Luganda Movies - Browse VJ Translated Movies</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Browse thousands of Luganda translated movies. Watch the latest VJ translations and classic films in HD quality.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#7CFC00">
+    <meta name="google-adsense-account" content="ca-pub-1904736753681797">
+    
+    <link rel="shortcut icon" href="assets/images/favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
+    
+    <style>
+        .filter-section {
+            background-color: var(--background-light);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        
+        .filter-select {
+            width: 100%;
+            padding: 10px 15px;
+            background-color: var(--background-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 40px 0;
+        }
+        
+        .page-btn {
+            padding: 10px 15px;
+            background-color: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .page-btn:hover {
+            background-color: var(--primary-color);
+            color: #000;
+            border-color: var(--primary-color);
+        }
+        
+        .page-btn.active {
+            background-color: var(--primary-color);
+            color: #000;
+            border-color: var(--primary-color);
+        }
+        
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        @media (max-width: 768px) {
+            .movies-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+            
+            .filter-group {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="app">
+            <!-- Header -->
+            <div class="app-header">
+                <div class="navbar navbar-expand-lg">
+                    <div class="menu d-md-none d-block">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </div>
+                    <div class="app-navbar">
+                        <a href="index.html" class="navbar-brand">
+                            <img src="assets/images/logo.png" alt="Luganda Movies" width="180" height="50">
+                        </a>
+                    </div>
+                    <div class="search-btn d-md-none d-block">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </div>
+                    
+                    <form class="header-search input-group d-md-block d-none" method="post" action="search.html">
+                        <div class="typeahead__container app-search">
+                            <div class="typeahead__field">
+                                <div class="typeahead__query">
+                                    <label for="search-input" class="btn px-0 mb-0" aria-label="Search">
+                                        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <path d="m21 21-4.35-4.35"></path>
+                                        </svg>
+                                    </label>
+                                    <input class="video-search form-control" name="q" type="text" id="search-input" placeholder="Search Luganda movies, VJs..." autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <ul class="navbar-nav navbar-user ml-auto align-items-center text-nowrap">
+                        <li class="nav-item">
+                            <a class="nav-link" href="subscribe.html" aria-label="Subscribe">
+                                <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                                </svg>
+                                <span class="d-none d-lg-inline">Subscribe</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn-login" href="login.html">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn-register" href="register.html">Sign Up</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="app-wrapper">
+                <!-- Sidebar -->
+                <div class="app-aside nav-aside" id="aside">
+                    <button class="modal-close d-md-none d-block" data-dismiss="modal">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    
+                    <ul class="nav">
+                        <li>
+                            <a href="index.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                </svg>
+                                Home
+                            </a>
+                        </li>
+                        <li class="active">
+                            <a href="movies.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                                    <line x1="7" y1="2" x2="7" y2="22"></line>
+                                    <line x1="17" y1="2" x2="17" y2="22"></line>
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                    <line x1="2" y1="7" x2="7" y2="7"></line>
+                                    <line x1="2" y1="17" x2="7" y2="17"></line>
+                                    <line x1="17" y1="17" x2="22" y2="17"></line>
+                                    <line x1="17" y1="7" x2="22" y2="7"></line>
+                                </svg>
+                                Movies
+                            </a>
+                        </li>
+                        <li>
+                            <a href="vjs.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                                VJ Translators
+                            </a>
+                        </li>
+                        <li>
+                            <a href="subscribe.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                                    <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                                </svg>
+                                Subscription Plans
+                            </a>
+                        </li>
+                        <li>
+                            <a href="uganda-tv.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                    <line x1="12" y1="7" x2="12" y2="22"></line>
+                                </svg>
+                                Uganda TV
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Main Content -->
+                <div class="app-container flex-fill">
+                    <div class="container">
+                        <div class="app-content pt-md-3">
+                            
+                            <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 30px;">Browse Luganda Movies</h1>
+                            
+                            <!-- Filters -->
+                            <div class="filter-section">
+                                <div class="filter-row">
+                                    <div class="filter-group">
+                                        <label class="filter-label">Genre</label>
+                                        <select class="filter-select" id="genreFilter">
+                                            <option value="">All Genres</option>
+                                            <option value="action">Action</option>
+                                            <option value="comedy">Comedy</option>
+                                            <option value="drama">Drama</option>
+                                            <option value="horror">Horror</option>
+                                            <option value="sci-fi">Sci-Fi</option>
+                                            <option value="romance">Romance</option>
+                                            <option value="thriller">Thriller</option>
+                                            <option value="animation">Animation</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="filter-group">
+                                        <label class="filter-label">Year</label>
+                                        <select class="filter-select" id="yearFilter">
+                                            <option value="">All Years</option>
+                                            <option value="2025">2025</option>
+                                            <option value="2024">2024</option>
+                                            <option value="2023">2023</option>
+                                            <option value="2022">2022</option>
+                                            <option value="2021">2021</option>
+                                            <option value="2020">2020</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="filter-group">
+                                        <label class="filter-label">VJ Translator</label>
+                                        <select class="filter-select" id="vjFilter">
+                                            <option value="">All VJs</option>
+                                            <option value="VJ Junior">VJ Junior</option>
+                                            <option value="VJ Emmy">VJ Emmy</option>
+                                            <option value="VJ Ice P">VJ Ice P</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="filter-group">
+                                        <label class="filter-label">Quality</label>
+                                        <select class="filter-select" id="qualityFilter">
+                                            <option value="">All Quality</option>
+                                            <option value="4k">4K Ultra HD</option>
+                                            <option value="hd">HD</option>
+                                            <option value="sd">SD</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="filter-group">
+                                        <label class="filter-label">Sort By</label>
+                                        <select class="filter-select" id="sortFilter">
+                                            <option value="latest">Latest Translation</option>
+                                            <option value="popular">Most Popular</option>
+                                            <option value="rating">Best Translation</option>
+                                            <option value="title">Title A-Z</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Movies Grid -->
+                            <div class="movies-grid" id="moviesGrid">
+                                <!-- Movie cards will be generated here -->
+                            </div>
+
+                            <!-- Pagination -->
+                            <div class="pagination">
+                                <button class="page-btn" id="prevPage" disabled>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="15 18 9 12 15 6"></polyline>
+                                    </svg>
+                                </button>
+                                <button class="page-btn active">1</button>
+                                <button class="page-btn">2</button>
+                                <button class="page-btn">3</button>
+                                <button class="page-btn">4</button>
+                                <button class="page-btn">5</button>
+                                <button class="page-btn" id="nextPage">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="9 18 15 12 9 6"></polyline>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="app-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="footer-text my-3">
+                            2025 Luganda Movies. All rights reserved.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll to Top -->
+    <div class="scroll-up">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </div>
+
+    <script src="js/luganda-movies-api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Use sample Luganda movies data
+        const movies = SAMPLE_LUGANDA_MOVIES;
+
+        function renderMovies(moviesToRender) {
+            const grid = document.getElementById('moviesGrid');
+            grid.innerHTML = '';
+            
+            if (moviesToRender.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">No movies found matching your filters.</p>';
+                return;
+            }
+            
+            moviesToRender.forEach(movie => {
+                const movieCard = `
+                    <div class="list-movie position-relative">
+                        <a href="player.html?id=${movie._id}" class="list-media">
+                            <div class="list-media-attr">
+                                <div class="quality">${movie.video.quality.toUpperCase()}</div>
+                                <div class="imdb">
+                                    <span>${movie.rating.translationRating.toFixed(1)}</span>
+                                    <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
+                                        <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" 
+                                                stroke-dasharray="${movie.rating.translationRating * 20} 100" 
+                                                stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="play-btn">
+                                <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </div>
+                            <div class="media media-cover" style="background-image: url('${movie.poster}');"></div>
+                        </a>
+                        <div class="list-caption">
+                            <a href="player.html?id=${movie._id}" class="list-title">${movie.originalTitle}</a>
+                            <a href="#" class="list-category">VJ ${movie.vjName}</a>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += movieCard;
+            });
+        }
+
+        // Initial render
+        renderMovies(movies);
+
+        // Filter functionality
+        document.querySelectorAll('.filter-select').forEach(select => {
+            select.addEventListener('change', () => {
+                let filtered = [...movies];
+                
+                const genre = document.getElementById('genreFilter').value;
+                const year = document.getElementById('yearFilter').value;
+                const vj = document.getElementById('vjFilter').value;
+                const quality = document.getElementById('qualityFilter').value;
+                const sort = document.getElementById('sortFilter').value;
+                
+                // Apply filters
+                if (genre) filtered = filtered.filter(m => m.genres.includes(genre));
+                if (year) filtered = filtered.filter(m => m.year == year);
+                if (vj) filtered = filtered.filter(m => m.vjName === vj);
+                if (quality) filtered = filtered.filter(m => m.video.quality === quality);
+                
+                // Apply sorting
+                if (sort === 'rating') filtered.sort((a, b) => b.rating.translationRating - a.rating.translationRating);
+                if (sort === 'title') filtered.sort((a, b) => a.originalTitle.localeCompare(b.originalTitle));
+                if (sort === 'latest') filtered.sort((a, b) => b.year - a.year);
+                if (sort === 'popular') filtered.sort((a, b) => b.views - a.views);
+                
+                renderMovies(filtered);
+            });
+        });
+    </script>
+</body>
+</html>

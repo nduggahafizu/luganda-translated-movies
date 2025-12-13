@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Disallow admin or private pages
+Disallow: /server/
+Disallow: /*.bat
+
+# Sitemap
+Sitemap: https://watch.unrulymovies.com/sitemap.xml

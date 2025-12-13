@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Luganda Movies - Watch Luganda Translated Movies by Uganda's Top VJs</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Luganda Movies - Watch your favorite international movies translated to Luganda by Uganda's best VJs. Stream thousands of VJ movies in HD quality.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="index,follow" />
+    <meta name="theme-color" content="#7CFC00">
+    <meta name="HandheldFriendly" content="True">
+    <meta http-equiv="cleartype" content="on">
+    <meta name="google-adsense-account" content="ca-pub-1904736753681797">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="assets/images/favicon.png">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+
+    <!-- Global JS Vars -->
+    <script type="text/javascript">
+        var _URL = window.location.origin;
+        var _ASSETS = _URL + "/assets";
+        var _Auth = false;
+
+        window.i18n = {
+            'No comments yet': 'No comments yet',
+            'You must sign in': 'You must sign in',
+            'Follow': 'Follow',
+            'Following': 'Following',
+            'Show more': 'Show more',
+            'Show less': 'Show less',
+            'no results': 'no results',
+            'Results': 'Results',
+            'Comment': 'Comment',
+            'Actors': 'Actors',
+        };
+
+        var __ = function(msgid) {
+            return window.i18n[msgid] || msgid;
+        };
+    </script>
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <a class="skip-link" href="#maincontent">Skip to content</a>
+
+    <div class="container">
+        <div class="app">
+            <!-- Header -->
+            <div class="app-header">
+                <div class="navbar navbar-expand-lg">
+                    <div class="menu d-md-none d-block" data-toggle="modal" data-target="#aside">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </div>
+                    <div class="app-navbar">
+                        <a href="index.html" class="navbar-brand">
+                            <img src="assets/images/logo.png" alt="Luganda Movies" width="180" height="50">
+                        </a>
+                    </div>
+                    <div class="search-btn d-md-none d-block">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </div>
+                    
+                    <form class="header-search input-group d-md-block d-none" method="post" action="search.html">
+                        <div class="typeahead__container app-search">
+                            <div class="typeahead__field">
+                                <div class="typeahead__query">
+                                    <label for="search-input" class="btn px-0 mb-0" aria-label="Search">
+                                        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <path d="m21 21-4.35-4.35"></path>
+                                        </svg>
+                                    </label>
+                                    <input class="video-search form-control" name="q" type="text" id="search-input" placeholder="Search Luganda movies, VJs..." autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <ul class="navbar-nav navbar-user ml-auto align-items-center text-nowrap">
+                        <li class="nav-item">
+                            <a class="nav-link" href="subscribe.html" aria-label="Subscribe">
+                                <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                                </svg>
+                                <span class="d-none d-lg-inline">Subscribe</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn-login" href="login.html">
+                                Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn-register" href="register.html">
+                                Sign Up
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="app-wrapper">
+                <!-- Sidebar -->
+                <div class="app-aside nav-aside" id="aside">
+                    <button class="modal-close d-md-none d-block" data-dismiss="modal">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    
+                    <ul class="nav">
+                        <li class="active">
+                            <a href="index.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                </svg>
+                                Home
+                            </a>
+                        </li>
+                        <li>
+                            <a href="movies.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                                    <line x1="7" y1="2" x2="7" y2="22"></line>
+                                    <line x1="17" y1="2" x2="17" y2="22"></line>
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                    <line x1="2" y1="7" x2="7" y2="7"></line>
+                                    <line x1="2" y1="17" x2="7" y2="17"></line>
+                                    <line x1="17" y1="17" x2="22" y2="17"></line>
+                                    <line x1="17" y1="7" x2="22" y2="7"></line>
+                                </svg>
+                                Movies
+                            </a>
+                        </li>
+                        <li>
+                            <a href="vjs.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                                VJ Translators
+                            </a>
+                        </li>
+                        <li>
+                            <a href="genres.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="14" width="7" height="7"></rect>
+                                    <rect x="3" y="14" width="7" height="7"></rect>
+                                </svg>
+                                Genres
+                            </a>
+                        </li>
+                        <li>
+                            <a href="subscribe.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                                    <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                                </svg>
+                                Subscription Plans
+                            </a>
+                        </li>
+                        <li>
+                            <a href="uganda-tv.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                    <line x1="12" y1="7" x2="12" y2="22"></line>
+                                </svg>
+                                Uganda TV
+                            </a>
+                        </li>
+                    </ul>
+
+                    <ul class="nav-trend d-none d-lg-block">
+                        <li class="nav-header">Trending VJ Movies</li>
+                        <li>
+                            <a href="#" class="nav-content">
+                                <div>Fast & Furious 9</div>
+                                <div class="view">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                        <polyline points="17 6 23 6 23 12"></polyline>
+                                    </svg>
+                                    <div>32.1K views</div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-content">
+                                <div>Black Panther</div>
+                                <div class="view">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                        <polyline points="17 6 23 6 23 12"></polyline>
+                                    </svg>
+                                    <div>28.4K views</div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-content">
+                                <div>Avatar: The Way of Water</div>
+                                <div class="view">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                        <polyline points="17 6 23 6 23 12"></polyline>
+                                    </svg>
+                                    <div>25.6K views</div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Main Content -->
+                <div class="app-container flex-fill">
+                    <div class="container">
+                        <div class="app-content pt-md-3">
+                            
+                            <!-- Hero Slider -->
+                            <div class="app-section">
+                                <div class="app-slider">
+                                    <div id="slider" class="carousel slide carousel-fade" data-ride="carousel">
+                                        <div class="carousel-inner">
+                                            <ol class="carousel-indicators">
+                                                <li data-target="#slider" data-slide-to="0" class="active"></li>
+                                                <li data-target="#slider" data-slide-to="1"></li>
+                                                <li data-target="#slider" data-slide-to="2"></li>
+                                            </ol>
+                                            
+                            <div class="carousel-item active">
+                                <a href="#" class="slide media media-slide" style="background-image: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.3)), url('https://image.tmdb.org/t/p/original/bOFaAXmWWXC3Rbv4u4uM9ZSzRXP.jpg');">
+                                    <div class="slide-caption">
+                                        <div class="d-flex align-items-center">
+                                            <div>
+                                                <div class="slide-header">
+                                                    <div class="imdb">VJ: Junior</div>
+                                                    <div>2021</div>
+                                                    <div class="category text-12">Luganda Movie</div>
+                                                </div>
+                                <div class="title">Fast & Furious 9</div>
+                                                <div class="description">
+                                    Dom and the crew must take on an international terrorist who turns out to be Dom's forsaken brother.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                                            
+                                            <div class="carousel-item">
+                                                <a href="#" class="slide media media-slide" style="background-image: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.3)), url('https://image.tmdb.org/t/p/original/uxzzxijgPIY7slzFvMotPv8wjKA.jpg');">
+                                                    <div class="slide-caption">
+                                                        <div class="d-flex align-items-center">
+                                                            <div>
+                                                                <div class="slide-header">
+                                                                    <div class="imdb">VJ: Emmy</div>
+                                                                    <div>2018</div>
+                                                                    <div class="category text-12">Luganda Movie</div>
+                                                                </div>
+                                                <div class="title">Black Panther</div>
+                                                                <div class="description">
+                                                    T'Challa returns home to the African nation of Wakanda to take his rightful place as king.
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                            
+                                            <div class="carousel-item">
+                                                <a href="#" class="slide media media-slide" style="background-image: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.3)), url('https://image.tmdb.org/t/p/original/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg');">
+                                                    <div class="slide-caption">
+                                                        <div class="d-flex align-items-center">
+                                                            <div>
+                                                                <div class="slide-header">
+                                                                    <div class="imdb">VJ: Emmy</div>
+                                                                    <div>2022</div>
+                                                                    <div class="category text-12">Luganda Movie</div>
+                                                                </div>
+                                                <div class="title">Avatar: The Way of Water</div>
+                                                                <div class="description">
+                                                    Jake Sully and Ney'tiri have formed a family and are doing everything to stay together.
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="carousel-control">
+                                            <a class="control-prev" href="#slider" role="button" data-slide="prev" aria-label="Previous">
+                                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <polyline points="15 18 9 12 15 6"></polyline>
+                                                </svg>
+                                            </a>
+                                            <a class="control-next" href="#slider" role="button" data-slide="next" aria-label="Next">
+                                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Latest Luganda Movies -->
+                            <div class="app-section">
+                                <div class="app-heading">
+                                    <div class="text">Latest Luganda Translations</div>
+                                    <a href="movies.html" class="all">View All</a>
+                                </div>
+                                <div class="row row-cols-2 row-cols-md-5 list-scrollable" id="latestMovies">
+                                    <!-- Movie Card 1 -->
+                                    <div class="col">
+                                        <div class="list-movie position-relative">
+                                            <a href="#" class="list-media">
+                                                <div class="list-media-attr">
+                                                    <div class="quality">HD</div>
+                                                    <div class="imdb">
+                                                        <span>8.5</span>
+                                                        <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
+                                                            <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" stroke-dasharray="85 100" stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                <div class="play-btn">
+                                                    <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                                    </svg>
+                                                </div>
+                                                <div class="media media-cover" style="background-image: url('https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg');"></div>
+                                            </a>
+                                            <div class="list-caption">
+                                                <a href="#" class="list-title">The Marvels</a>
+                                                <a href="#" class="list-category">Action</a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Movie Card 2 -->
+                                    <div class="col">
+                                        <div class="list-movie position-relative">
+                                            <a href="#" class="list-media">
+                                                <div class="list-media-attr">
+                                                    <div class="quality">4K</div>
+                                                    <div class="imdb">
+                                                        <span>7.9</span>
+                                                        <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
+                                                            <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" stroke-dasharray="79 100" stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                <div class="play-btn">
+                                                    <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                                    </svg>
+                                                </div>
+                                                <div class="media media-cover" style="background-image: url('https://image.tmdb.org/t/p/w500/vZloFAK7NmvMGKE7VkF5UHaz0I.jpg');"></div>
+                                            </a>
+                                            <div class="list-caption">
+                                                <a href="#" class="list-title">Wonka</a>
+                                                <a href="#" class="list-category">Fantasy</a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Movie Card 3 -->
+                                    <div class="col">
+                                        <div class="list-movie position-relative">
+                                            <a href="#" class="list-media">
+                                                <div class="list-media-attr">
+                                                    <div class="quality">HD</div>
+                                                    <div class="imdb">
+                                                        <span>8.1</span>
+                                                        <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
+                                                            <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" stroke-dasharray="81 100" stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                <div class="play-btn">
+                                                    <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                                    </svg>
+                                                </div>
+                                                <div class="media media-cover" style="background-image: url('https://image.tmdb.org/t/p/w500/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg');"></div>
+                                            </a>
+                                            <div class="list-caption">
+                                                <a href="#" class="list-title">Avatar: The Way of Water</a>
+                                                <a href="#" class="list-category">Sci-Fi</a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Movie Card 4 -->
+                                    <div class="col">
+                                        <div class="list-movie position-relative">
+                                            <a href="#" class="list-media">
+                                                <div class="list-media-attr">
+                                                    <div class="quality">HD</div>
+                                                    <div class="imdb">
+                                                        <span>7.5</span>
+                                                        <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
+                                                            <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" stroke-dasharray="75 100" stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                <div class="play-btn">
+                                                    <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                                    </svg>
+                                                </div>
+                                                <div class="media media-cover" style="background-image: url('https://image.tmdb.org/t/p/w500/r2J02Z2OpNTctfOSN1Ydgii51I3.jpg');"></div>
+                                            </a>
+                                            <div class="list-caption">
+                                                <a href="#" class="list-title">Guardians of the Galaxy Vol. 3</a>
+                                                <a href="#" class="list-category">Action</a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Movie Card 5 -->
+                                    <div class="col">
+                                        <div class="list-movie position-relative">
+                                            <a href="#" class="list-media">
+                                                <div class="list-media-attr">
+                                                    <div class="quality">4K</div>
+                                                    <div class="imdb">
+                                                        <span>8.3</span>
+                                                        <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
+                                                            <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" stroke-dasharray="83 100" stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                <div class="play-btn">
+                                                    <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                                    </svg>
+                                                </div>
+                                                <div class="media media-cover" style="background-image: url('https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg');"></div>
+                                            </a>
+                                            <div class="list-caption">
+                                                <a href="#" class="list-title">Spider-Man: Across the Spider-Verse</a>
+                                                <a href="#" class="list-category">Animation</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Popular VJ Movies -->
+                            <div class="app-section">
+                                <div class="app-heading">
+                                    <div class="text">Popular VJ Movies</div>
+                                    <a href="movies.html" class="all">View All</a>
+                                </div>
+                                <div class="row row-cols-2 row-cols-md-5 list-scrollable" id="popularMovies">
+                                    <!-- Series Card 1 -->
+                                    <div class="col">
+                                        <div class="list-movie position-relative">
+                                            <a href="#" class="list-media">
+                                                <div class="list-media-attr">
+                                                    <div class="quality">HD</div>
+                                                    <div class="imdb">
+                                                        <span>8.7</span>
+                                                        <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
+                                                            <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" stroke-dasharray="87 100" stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                <div class="play-btn">
+                                                    <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                    </svg>
+                                </div>
+                                <div class="media media-cover" style="background-image: url('https://image.tmdb.org/t/p/w500/vUUqzWa2LnHIVqkaKVlVGkVcZIW.jpg');"></div>
+                            </a>
+                            <div class="list-caption">
+                                <a href="#" class="list-title">Breaking Bad</a>
+                                <a href="#" class="list-category">Drama</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Series Card 2 -->
+                    <div class="col">
+                        <div class="list-movie position-relative">
+                            <a href="#" class="list-media">
+                                <div class="list-media-attr">
+                                    <div class="quality">HD</div>
+                                    <div class="imdb">
+                                        <span>8.5</span>
+                                        <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
+                                            <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" stroke-dasharray="85 100" stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="play-btn">
+                                    <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                    </svg>
+                                </div>
+                                <div class="media media-cover" style="background-image: url('https://image.tmdb.org/t/p/w500/9yxep7oJdkj3PLA3XRz0oJd9XnY.jpg');"></div>
+                            </a>
+                            <div class="list-caption">
+                                <a href="#" class="list-title">Stranger Things</a>
+                                <a href="#" class="list-category">Sci-Fi</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Series Card 3 -->
+                    <div class="col">
+                        <div class="list-movie position-relative">
+                            <a href="#" class="list-media">
+                                <div class="list-media-attr">
+                                    <div class="quality">HD</div>
+                                    <div class="imdb">
+                                        <span>8.6</span>
+                                        <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
+                                            <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" stroke-dasharray="86 100" stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="play-btn">
+                                    <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                    </svg>
+                                </div>
+                                <div class="media media-cover" style="background-image: url('https://image.tmdb.org/t/p/w500/9ijMGlJKqcslswWUzTEwScm82Gs.jpg');"></div>
+                            </a>
+                            <div class="list-caption">
+                                <a href="#" class="list-title">The Last of Us</a>
+                                <a href="#" class="list-category">Drama</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Series Card 4 -->
+                    <div class="col">
+                        <div class="list-movie position-relative">
+                            <a href="#" class="list-media">
+                                <div class="list-media-attr">
+                                    <div class="quality">HD</div>
+                                    <div class="imdb">
+                                        <span>8.1</span>
+                                        <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
+                                            <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" stroke-dasharray="81 100" stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="play-btn">
+                                    <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                    </svg>
+                                </div>
+                                <div class="media media-cover" style="background-image: url('https://image.tmdb.org/t/p/w500/9xeEGUZjgiKlI69jwIOi0hjKUIk.jpg');"></div>
+                            </a>
+                            <div class="list-caption">
+                                <a href="#" class="list-title">Wednesday</a>
+                                <a href="#" class="list-category">Comedy</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Series Card 5 -->
+                                    <div class="col">
+                                        <div class="list-movie position-relative">
+                                            <a href="#" class="list-media">
+                                                <div class="list-media-attr">
+                                                    <div class="quality">HD</div>
+                                                    <div class="imdb">
+                                                        <span>8.5</span>
+                                                        <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
+                                                            <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" stroke-dasharray="85 100" stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                <div class="play-btn">
+                                                    <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+<polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                    </svg>
+                                </div>
+                                <div class="media media-cover" style="background-image: url('https://image.tmdb.org/t/p/w500/qmJGd5IfURq8iPQ9KF3les47vFS.jpg');"></div>
+                            </a>
+                            <div class="list-caption">
+                                <a href="#" class="list-title">Game of Thrones</a>
+                                <a href="#" class="list-category">Fantasy</a>
+                            </div>
+                        </div>
+                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="app-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="footer-text my-3">
+                            2025 Luganda Movies. All rights reserved.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll to Top Button -->
+    <div class="scroll-up">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/luganda-movies-api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Load Luganda movies on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Use sample data for now (until backend is running)
+                const latestMovies = SAMPLE_LUGANDA_MOVIES.slice(0, 5);
+                const popularMovies = SAMPLE_LUGANDA_MOVIES.slice(0, 5).sort((a, b) => b.views - a.views);
+                
+                // Render latest movies
+                renderMovies(latestMovies, 'latestMovies');
+                
+                // Render popular movies
+                renderMovies(popularMovies, 'popularMovies');
+                
+            } catch (error) {
+                console.error('Error loading movies:', error);
+            }
+        });
+        
+        function renderMovies(movies, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            movies.forEach(movie => {
+                const movieCard = `
+                    <div class="col">
+                        <div class="list-movie position-relative">
+                            <a href="player.html?id=${movie._id}" class="list-media">
+                                <div class="list-media-attr">
+                                    <div class="quality">${movie.video.quality.toUpperCase()}</div>
+                                    <div class="imdb">
+                                        <span>${movie.rating.translationRating.toFixed(1)}</span>
+                                        <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
+                                            <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" 
+                                                    stroke-dasharray="${movie.rating.translationRating * 20} 100" 
+                                                    stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="play-btn">
+                                    <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                    </svg>
+                                </div>
+                                <div class="media media-cover" style="background-image: url('${movie.poster}');"></div>
+                            </a>
+                            <div class="list-caption">
+                                <a href="player.html?id=${movie._id}" class="list-title">${movie.originalTitle}</a>
+                                <a href="#" class="list-category">VJ ${movie.vjName}</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += movieCard;
+            });
+        }
+    </script>
+</body>
+</html>

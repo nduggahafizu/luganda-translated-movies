@@ -1,0 +1,33 @@
+const express = require('express');
+const router = express.Router();
+const paymentController = require('../controllers/paymentController');
+const { protect } = require('../middleware/auth');
+const { validatePayment } = require('../middleware/validation');
+
+// Protected routes
+router.post('/create-payment-intent', protect, validatePayment, paymentController.createPaymentIntent);
+router.post('/stripe/confirm', protect, paymentController.confirmStripePayment);
+router.post('/pesapal/initiate', protect, paymentController.initiatePesapalPayment);
+router.get('/pesapal/callback', paymentController.pesapalCallback);
+router.post('/pesapal/ipn', paymentController.pesapalIPN);
+router.get('/history', protect, paymentController.getPaymentHistory);
+router.get('/:id', protect, paymentController.getPayment);
+
+// Webhook routes (public)
+router.post('/stripe/webhook', express.raw({ type: 'application/json' }), paymentController.stripeWebhook);
+
+// Public test endpoints (for development/testing)
+router.get('/test/config', (req, res) => {
+    res.json({
+        success: true,
+        message: 'Payment configuration status',
+        config: {
+            pesapalConfigured: !!(process.env.PESAPAL_CONSUMER_KEY && process.env.PESAPAL_CONSUMER_SECRET),
+            stripeConfigured: !!process.env.STRIPE_SECRET_KEY,
+            environment: process.env.PESAPAL_ENVIRONMENT || 'not set',
+            ipnUrl: process.env.PESAPAL_IPN_URL || 'not set'
+        }
+    });
+});
+
+module.exports = router;
