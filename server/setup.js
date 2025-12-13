@@ -57,7 +57,7 @@ MONGODB_URI=${MONGODB_URI}
 JWT_SECRET=your_jwt_secret_key_change_in_production_12345
 
 # TMDB API Configuration
-TMDB_API_KEY=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
+TMDB_API_KEY=your_tmdb_api_key_here
 
 # Frontend URL (for CORS)
 FRONTEND_URL=http://localhost:8000
