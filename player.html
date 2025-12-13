@@ -487,6 +487,9 @@
         </div>
     </div>
 
+    <!-- HLS.js for streaming support -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    
     <script src="js/main.js"></script>
     <script src="js/uganda-tv-api.js"></script>
     <script>
@@ -541,25 +544,93 @@
         // Set video source if stream URL is provided
         if (streamUrl) {
             const video = document.getElementById('mainVideo');
-            const source = document.createElement('source');
-            source.src = streamUrl;
-            source.type = streamUrl.includes('.m3u8') ? 'application/x-mpegURL' : 'video/mp4';
             
-            // Remove existing sources
-            while (video.firstChild) {
-                video.removeChild(video.firstChild);
-            }
-            
-            // Add new source
-            video.appendChild(source);
-            video.load();
-            
-            // Auto-play for live TV
-            if (isStation) {
-                video.play().catch(error => {
-                    console.error('Error auto-playing video:', error);
-                    alert('Click the play button to start watching.');
-                });
+            // Check if it's an HLS stream
+            if (streamUrl.includes('.m3u8')) {
+                // Use HLS.js for HLS streams
+                if (Hls.isSupported()) {
+                    const hls = new Hls({
+                        enableWorker: true,
+                        lowLatencyMode: true,
+                        backBufferLength: 90
+                    });
+                    
+                    hls.loadSource(streamUrl);
+                    hls.attachMedia(video);
+                    
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        console.log('HLS stream loaded successfully');
+                        
+                        // Auto-play for live TV
+                        if (isStation) {
+                            video.play().catch(error => {
+                                console.error('Error auto-playing video:', error);
+                                alert('Click the play button to start watching.');
+                            });
+                        }
+                    });
+                    
+                    hls.on(Hls.Events.ERROR, function(event, data) {
+                        console.error('HLS error:', data);
+                        if (data.fatal) {
+                            switch(data.type) {
+                                case Hls.ErrorTypes.NETWORK_ERROR:
+                                    console.error('Network error - trying to recover');
+                                    hls.startLoad();
+                                    break;
+                                case Hls.ErrorTypes.MEDIA_ERROR:
+                                    console.error('Media error - trying to recover');
+                                    hls.recoverMediaError();
+                                    break;
+                                default:
+                                    console.error('Fatal error - cannot recover');
+                                    alert('Error loading stream. The stream may be offline or unavailable.');
+                                    hls.destroy();
+                                    break;
+                            }
+                        }
+                    });
+                    
+                    // Store hls instance for cleanup
+                    window.hlsPlayer = hls;
+                    
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    // Native HLS support (Safari)
+                    video.src = streamUrl;
+                    video.addEventListener('loadedmetadata', function() {
+                        console.log('Native HLS stream loaded');
+                        if (isStation) {
+                            video.play().catch(error => {
+                                console.error('Error auto-playing video:', error);
+                                alert('Click the play button to start watching.');
+                            });
+                        }
+                    });
+                } else {
+                    alert('Your browser does not support HLS streaming. Please try a different browser.');
+                }
+            } else {
+                // Regular MP4 or other formats
+                const source = document.createElement('source');
+                source.src = streamUrl;
+                source.type = 'video/mp4';
+                
+                // Remove existing sources
+                while (video.firstChild) {
+                    video.removeChild(video.firstChild);
+                }
+                
+                // Add new source
+                video.appendChild(source);
+                video.load();
+                
+                // Auto-play for live TV
+                if (isStation) {
+                    video.play().catch(error => {
+                        console.error('Error auto-playing video:', error);
+                        alert('Click the play button to start watching.');
+                    });
+                }
             }
         }
 
