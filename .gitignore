@@ -29,3 +29,9 @@ build/
 # Temporary files
 *.tmp
 *.temp
+
+# Security-sensitive documentation (contains API keys)
+NETLIFY_API_KEY_UPDATE.md
+SECURITY_FIX_COMPLETE.md
+update-api-key.bat
+server/.env.backup
