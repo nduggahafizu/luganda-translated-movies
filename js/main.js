@@ -24,8 +24,8 @@
 
         // Close sidebar when clicking outside
         document.addEventListener('click', function(e) {
-            if (sidebar.classList.contains('show') && 
-                !sidebar.contains(e.target) && 
+            if (sidebar.classList.contains('show') &&
+                !sidebar.contains(e.target) &&
                 !menuBtn.contains(e.target)) {
                 sidebar.classList.remove('show');
                 body.style.overflow = '';

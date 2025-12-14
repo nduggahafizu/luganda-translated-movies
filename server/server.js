@@ -136,7 +136,7 @@ mongoose.connect(MONGODB_URI, {
     console.log('✅ MongoDB Connected Successfully');
     console.log(`📦 Database: ${MONGODB_URI}`);
 })
-.catch(err => {
+.catch((err) => {
     console.error('⚠️  MongoDB Connection Warning:', err.message);
     console.log('⚠️  Server will continue without MongoDB');
     console.log('⚠️  Some features may not work until MongoDB is connected');
