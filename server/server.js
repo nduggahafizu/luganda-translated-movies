@@ -1,4 +1,4 @@
-const express = require('express');
+ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -25,6 +25,7 @@ const vjRoutes = require('./routes/vjs');
 const moviesApiRoutes = require('./routes/movies-api');
 const watchProgressRoutes = require('./routes/watch-progress');
 const playlistRoutes = require('./routes/playlist');
+const tmdbProxyRoutes = require('./routes/tmdb-proxy');
 
 // Initialize Express app
 const app = express();
@@ -172,6 +173,7 @@ app.use('/api/vjs', cache(600), vjRoutes); // Cache for 10 minutes
 app.use('/api/movies', cache(300), moviesApiRoutes); // Cache for 5 minutes
 app.use('/api/watch-progress', watchProgressRoutes);
 app.use('/api/playlist', playlistRoutes);
+app.use('/api/tmdb', cache(600), tmdbProxyRoutes); // TMDB proxy with 10 min cache
 
 // Token refresh endpoint
 app.post('/api/auth/refresh', refreshTokenHandler);
@@ -298,6 +300,7 @@ app.get('/', (req, res) => {
             payments: '/api/payments',
             watchProgress: '/api/watch-progress',
             playlist: '/api/playlist',
+            tmdb: '/api/tmdb',
             cache: {
                 stats: '/api/cache/stats',
                 clear: '/api/cache/clear'
