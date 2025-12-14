@@ -379,12 +379,12 @@
                                                         After completing his training, an elite young assassin embarks on his first mission and is quickly ensnared in an intricate plot laid by powerful people pulling strings from the shadows. Upon failing to complete the assignment, he is forced to go on the run—from the government and rival assassin groups alike—as he seeks to unmask the players behind the conspiracy.
                                                     </p>
                                                     <div class="featured-movie-actions">
-                                                        <a href="https://www.youtube.com/watch?v=OsYMprBZR_g" target="_blank" class="btn-play-featured">
+                                                        <button class="btn-play-featured" onclick="openVideoModal()">
                                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                                                                 <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                                             </svg>
                                                             Watch Now
-                                                        </a>
+                                                        </button>
                                                         <button class="btn-add-list">
                                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                                 <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -712,6 +712,28 @@
         </div>
     </div>
 
+    <!-- Video Modal -->
+    <div id="videoModal" class="video-modal">
+        <div class="video-modal-content">
+            <button class="video-modal-close" onclick="closeVideoModal()" aria-label="Close video">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="video-modal-wrapper">
+                <iframe 
+                    id="videoPlayer"
+                    src="" 
+                    title="Song of the Assassins - VJ Ice P" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    referrerpolicy="strict-origin-when-cross-origin" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+    </div>
+
     <!-- Scroll to Top Button -->
     <div class="scroll-up">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -727,6 +749,37 @@
     <script src="js/myvj-features.js"></script>
     <script src="js/main.js"></script>
     <script>
+        // Video Modal Functions
+        function openVideoModal() {
+            const modal = document.getElementById('videoModal');
+            const videoPlayer = document.getElementById('videoPlayer');
+            videoPlayer.src = 'https://www.youtube.com/embed/OsYMprBZR_g?autoplay=1';
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeVideoModal() {
+            const modal = document.getElementById('videoModal');
+            const videoPlayer = document.getElementById('videoPlayer');
+            videoPlayer.src = '';
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('videoModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeVideoModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeVideoModal();
+            }
+        });
+
         // Load Luganda movies on page load
         document.addEventListener('DOMContentLoaded', async function() {
             try {
