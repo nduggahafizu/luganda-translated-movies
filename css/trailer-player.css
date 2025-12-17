@@ -1,0 +1,314 @@
+/**
+ * Trailer Player Styles
+ * Modal and button styles for movie trailers
+ */
+
+/* Trailer Modal */
+.trailer-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.trailer-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+.trailer-modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 1200px;
+    background-color: var(--background-dark, #1a1a1a);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.4s ease;
+}
+
+.trailer-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 10;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.trailer-close-btn:hover {
+    background-color: var(--primary-color, #7CFC00);
+    color: #000;
+    transform: rotate(90deg);
+}
+
+.trailer-player-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    background-color: #000;
+}
+
+#trailerPlayer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#trailerPlayer iframe {
+    width: 100%;
+    height: 100%;
+}
+
+.trailer-loading,
+.trailer-error {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #000;
+    color: #fff;
+}
+
+.trailer-loading .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top-color: var(--primary-color, #7CFC00);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+.trailer-error svg {
+    color: #ff4444;
+    margin-bottom: 15px;
+}
+
+.trailer-loading p,
+.trailer-error p {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.trailer-info {
+    padding: 20px 30px;
+    background-color: var(--background-light, #2a2a2a);
+}
+
+.trailer-info h3 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    color: var(--text-primary, #fff);
+}
+
+.trailer-info p {
+    font-size: 14px;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+    margin: 0;
+}
+
+/* Movie Card Buttons */
+.movie-card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 0 10px 10px;
+}
+
+.btn-play,
+.btn-trailer {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-play {
+    background-color: var(--primary-color, #7CFC00);
+    color: #000;
+}
+
+.btn-play:hover {
+    background-color: #6FE000;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(127, 252, 0, 0.3);
+}
+
+.btn-trailer {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary, #fff);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-trailer:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: var(--primary-color, #7CFC00);
+    color: var(--primary-color, #7CFC00);
+    transform: translateY(-2px);
+}
+
+.btn-play svg,
+.btn-trailer svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Movie Card Hover Actions */
+.list-movie {
+    position: relative;
+}
+
+.list-movie .movie-card-actions {
+    position: absolute;
+    bottom: 60px;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.list-movie:hover .movie-card-actions {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+}
+
+/* Alternative: Always visible buttons */
+.movie-card-actions.always-visible {
+    position: static;
+    opacity: 1;
+    transform: none;
+    pointer-events: all;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .trailer-modal-content {
+        width: 95%;
+        margin: 20px;
+    }
+
+    .trailer-info {
+        padding: 15px 20px;
+    }
+
+    .trailer-info h3 {
+        font-size: 20px;
+    }
+
+    .trailer-info p {
+        font-size: 13px;
+    }
+
+    .movie-card-actions {
+        flex-direction: column;
+    }
+
+    .btn-play,
+    .btn-trailer {
+        width: 100%;
+        padding: 12px;
+    }
+
+    /* Always show buttons on mobile */
+    .list-movie .movie-card-actions {
+        position: static;
+        opacity: 1;
+        transform: none;
+        pointer-events: all;
+    }
+}
+
+@media (max-width: 480px) {
+    .trailer-close-btn {
+        width: 35px;
+        height: 35px;
+        top: 10px;
+        right: 10px;
+    }
+
+    .btn-play,
+    .btn-trailer {
+        font-size: 13px;
+        padding: 10px;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .trailer-modal-content {
+        background-color: #1a1a1a;
+    }
+
+    .trailer-info {
+        background-color: #2a2a2a;
+    }
+}
