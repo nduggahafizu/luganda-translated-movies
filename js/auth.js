@@ -4,8 +4,8 @@
    =================================== */
 
 // Configuration
-const API_URL = 'https://watch.unrulymovies.com/api'; // Update with your backend URL
-const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com'; // Add your Google Client ID
+const API_URL = 'http://localhost:5000/api'; // Backend URL (change to production URL when deploying)
+const GOOGLE_CLIENT_ID = '573762962600-nr77v5emb2spn7aleg9p2l7c0d6be3a9.apps.googleusercontent.com'; // Your Google Client ID
 
 // Initialize Google Sign-In
 function initGoogleSignIn() {
