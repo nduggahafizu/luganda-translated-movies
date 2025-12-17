@@ -917,15 +917,43 @@
         // Load Luganda movies on page load
         document.addEventListener('DOMContentLoaded', async function() {
             try {
-                // Use sample data for now (until backend is running)
-                const latestMovies = SAMPLE_LUGANDA_MOVIES.slice(0, 5);
-                const popularMovies = SAMPLE_LUGANDA_MOVIES.slice(0, 5).sort((a, b) => b.views - a.views);
-                
-                // Render latest movies
-                renderMovies(latestMovies, 'latestMovies');
-                
-                // Render popular movies
-                renderMovies(popularMovies, 'popularMovies');
+                // Try to fetch from backend API first
+                try {
+                    // Fetch latest movies from backend (sorted by newest first)
+                    const latestResponse = await LugandaMoviesAPI.getLatest(10);
+                    const latestMovies = latestResponse.data || latestResponse.movies || [];
+                    
+                    // Fetch trending/popular movies
+                    const trendingResponse = await LugandaMoviesAPI.getTrending(10);
+                    const popularMovies = trendingResponse.data || trendingResponse.movies || [];
+                    
+                    // Render latest movies (newest first from backend)
+                    if (latestMovies.length > 0) {
+                        renderMovies(latestMovies.slice(0, 5), 'latestMovies');
+                    } else {
+                        // Fallback to sample data if no movies in database
+                        console.log('No movies in database, using sample data');
+                        renderMovies(SAMPLE_LUGANDA_MOVIES.slice(0, 5), 'latestMovies');
+                    }
+                    
+                    // Render popular movies
+                    if (popularMovies.length > 0) {
+                        renderMovies(popularMovies.slice(0, 5), 'popularMovies');
+                    } else {
+                        // Fallback to sample data sorted by views
+                        const samplePopular = SAMPLE_LUGANDA_MOVIES.slice(0, 5).sort((a, b) => b.views - a.views);
+                        renderMovies(samplePopular, 'popularMovies');
+                    }
+                    
+                } catch (apiError) {
+                    console.log('Backend API not available, using sample data:', apiError.message);
+                    // Fallback to sample data if backend is not running
+                    const latestMovies = SAMPLE_LUGANDA_MOVIES.slice(0, 5);
+                    const popularMovies = SAMPLE_LUGANDA_MOVIES.slice(0, 5).sort((a, b) => b.views - a.views);
+                    
+                    renderMovies(latestMovies, 'latestMovies');
+                    renderMovies(popularMovies, 'popularMovies');
+                }
                 
             } catch (error) {
                 console.error('Error loading movies:', error);

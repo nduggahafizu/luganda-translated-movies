@@ -124,10 +124,245 @@ const LugandaMoviesAPI = (function() {
 
 // Sample Luganda movies data (for development/demo purposes)
 const SAMPLE_LUGANDA_MOVIES = [
+    // VJ Ice P Movies
     {
         _id: '1',
+        originalTitle: 'Lokah',
+        lugandaTitle: 'Lokah (Luganda)',
+        vjName: 'VJ Ice P',
+        year: 2023,
+        genres: ['action', 'drama'],
+        rating: {
+            imdb: 7.5,
+            userRating: 8.2,
+            translationRating: 4.8
+        },
+        video: {
+            quality: 'hd'
+        },
+        poster: 'https://image.tmdb.org/t/p/w500/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg',
+        description: 'An intense Indian action drama that follows the journey of a fearless protagonist.',
+        vjId: 'vj-ice-p',
+        translationQuality: 4.8,
+        views: 25420,
+        featured: true,
+        trending: true
+    },
+    {
+        _id: '2',
+        originalTitle: 'Running Man',
+        lugandaTitle: 'Running Man (Luganda)',
+        vjName: 'VJ Ice P',
+        year: 2013,
+        genres: ['action', 'thriller'],
+        rating: {
+            imdb: 6.9,
+            userRating: 7.8,
+            translationRating: 4.7
+        },
+        video: {
+            quality: 'hd'
+        },
+        poster: 'https://image.tmdb.org/t/p/w500/jfINh7Wr6vWwNq5k0jZF6o5YpXA.jpg',
+        description: 'A man wrongly accused of murder must run for his life while trying to prove his innocence.',
+        vjId: 'vj-ice-p',
+        translationQuality: 4.7,
+        views: 18900,
+        featured: true,
+        trending: true
+    },
+    {
+        _id: '3',
+        originalTitle: 'Kantara',
+        lugandaTitle: 'Kantara (Luganda)',
+        vjName: 'VJ Ice P',
+        year: 2022,
+        genres: ['action', 'drama', 'thriller'],
+        rating: {
+            imdb: 8.2,
+            userRating: 8.9,
+            translationRating: 4.9
+        },
+        video: {
+            quality: '4k'
+        },
+        poster: 'https://image.tmdb.org/t/p/w500/8I37NtDffNV7AZlDa7uDvvqhovU.jpg',
+        description: 'A legendary Indian film that explores the conflict between man and nature in a small village.',
+        vjId: 'vj-ice-p',
+        translationQuality: 4.9,
+        views: 32100,
+        featured: true,
+        trending: true
+    },
+    {
+        _id: '4',
+        originalTitle: 'Frankenstein',
+        lugandaTitle: 'Frankenstein (Luganda)',
+        vjName: 'VJ Ice P',
+        year: 2015,
+        genres: ['horror', 'sci-fi', 'thriller'],
+        rating: {
+            imdb: 6.2,
+            userRating: 7.1,
+            translationRating: 4.5
+        },
+        video: {
+            quality: 'hd'
+        },
+        poster: 'https://image.tmdb.org/t/p/w500/4WnZkVlFxMkQ7XhGKFJPKPGVLqL.jpg',
+        description: 'A modern retelling of Mary Shelley\'s classic tale of a scientist who creates a monster.',
+        vjId: 'vj-ice-p',
+        translationQuality: 4.5,
+        views: 14200,
+        featured: false,
+        trending: true
+    },
+    {
+        _id: '5',
+        originalTitle: 'Predator: Badlands',
+        lugandaTitle: 'Predator: Badlands (Luganda)',
+        vjName: 'VJ Ice P',
+        year: 2025,
+        genres: ['action', 'sci-fi', 'thriller'],
+        rating: {
+            imdb: 7.8,
+            userRating: 8.3,
+            translationRating: 4.6
+        },
+        video: {
+            quality: '4k'
+        },
+        poster: 'https://image.tmdb.org/t/p/w500/sR0SpCrXamlIkw5qnbfth0p0aQi.jpg',
+        description: 'The latest installment in the Predator franchise brings the hunt to the badlands.',
+        vjId: 'vj-ice-p',
+        translationQuality: 4.6,
+        views: 28500,
+        featured: true,
+        trending: true
+    },
+    {
+        _id: '6',
+        originalTitle: 'Fist of Fury',
+        lugandaTitle: 'Fist of Fury (Luganda)',
+        vjName: 'VJ Ice P',
+        year: 1972,
+        genres: ['action', 'drama'],
+        rating: {
+            imdb: 7.3,
+            userRating: 8.1,
+            translationRating: 4.7
+        },
+        video: {
+            quality: 'hd'
+        },
+        poster: 'https://image.tmdb.org/t/p/w500/nJQFZPi9z8cAKmK4JMl4hGDhGd.jpg',
+        description: 'Bruce Lee stars in this classic martial arts film about a student seeking revenge for his master\'s death.',
+        vjId: 'vj-ice-p',
+        translationQuality: 4.7,
+        views: 21500,
+        featured: false,
+        trending: true
+    },
+    
+    // VJ Soul Series
+    {
+        _id: '7',
+        originalTitle: 'War Season 1',
+        lugandaTitle: 'War Season 1 (Luganda)',
+        vjName: 'VJ Soul',
+        year: 2024,
+        genres: ['action', 'drama', 'thriller'],
+        rating: {
+            imdb: 8.1,
+            userRating: 8.7,
+            translationRating: 4.8
+        },
+        video: {
+            quality: '4k'
+        },
+        poster: 'https://image.tmdb.org/t/p/w500/6UH52Fmau8RPsMAbQbjwN3wJSCj.jpg',
+        description: 'An epic war series that follows soldiers through intense battles and personal struggles. Season 1.',
+        vjId: 'vj-soul',
+        translationQuality: 4.8,
+        views: 35600,
+        featured: true,
+        trending: true
+    },
+    {
+        _id: '8',
+        originalTitle: 'War Season 2',
+        lugandaTitle: 'War Season 2 (Luganda)',
+        vjName: 'VJ Soul',
+        year: 2024,
+        genres: ['action', 'drama', 'thriller'],
+        rating: {
+            imdb: 8.3,
+            userRating: 8.9,
+            translationRating: 4.9
+        },
+        video: {
+            quality: '4k'
+        },
+        poster: 'https://image.tmdb.org/t/p/w500/6UH52Fmau8RPsMAbQbjwN3wJSCj.jpg',
+        description: 'The war intensifies in Season 2 as alliances shift and new enemies emerge.',
+        vjId: 'vj-soul',
+        translationQuality: 4.9,
+        views: 32400,
+        featured: true,
+        trending: true
+    },
+    {
+        _id: '9',
+        originalTitle: 'War Season 3',
+        lugandaTitle: 'War Season 3 (Luganda)',
+        vjName: 'VJ Soul',
+        year: 2024,
+        genres: ['action', 'drama', 'thriller'],
+        rating: {
+            imdb: 8.4,
+            userRating: 9.0,
+            translationRating: 4.9
+        },
+        video: {
+            quality: '4k'
+        },
+        poster: 'https://image.tmdb.org/t/p/w500/6UH52Fmau8RPsMAbQbjwN3wJSCj.jpg',
+        description: 'Season 3 brings the conflict to a climax with explosive action and emotional depth.',
+        vjId: 'vj-soul',
+        translationQuality: 4.9,
+        views: 29800,
+        featured: true,
+        trending: true
+    },
+    {
+        _id: '10',
+        originalTitle: 'War Season 4',
+        lugandaTitle: 'War Season 4 (Luganda)',
+        vjName: 'VJ Soul',
+        year: 2024,
+        genres: ['action', 'drama', 'thriller'],
+        rating: {
+            imdb: 8.5,
+            userRating: 9.1,
+            translationRating: 5.0
+        },
+        video: {
+            quality: '4k'
+        },
+        poster: 'https://image.tmdb.org/t/p/w500/6UH52Fmau8RPsMAbQbjwN3wJSCj.jpg',
+        description: 'The epic conclusion to the War series. Season 4 delivers an unforgettable finale.',
+        vjId: 'vj-soul',
+        translationQuality: 5.0,
+        views: 38900,
+        featured: true,
+        trending: true
+    },
+    
+    // Additional Popular Movies
+    {
+        _id: '11',
         originalTitle: 'Fast & Furious 9',
-        lugandaTitle: '',
+        lugandaTitle: 'Fast & Furious 9 (Luganda)',
         vjName: 'VJ Junior',
         year: 2021,
         genres: ['action', 'thriller'],
@@ -144,13 +379,13 @@ const SAMPLE_LUGANDA_MOVIES = [
         vjId: 'vj-junior',
         translationQuality: 4.5,
         views: 15420,
-        featured: true,
-        trending: true
+        featured: false,
+        trending: false
     },
     {
-        _id: '2',
+        _id: '12',
         originalTitle: 'Black Panther',
-        lugandaTitle: '',
+        lugandaTitle: 'Black Panther (Luganda)',
         vjName: 'VJ Emmy',
         year: 2018,
         genres: ['action', 'adventure'],
@@ -167,146 +402,8 @@ const SAMPLE_LUGANDA_MOVIES = [
         vjId: 'vj-emmy',
         translationQuality: 4.8,
         views: 28350,
-        featured: true,
-        trending: true
-    },
-    {
-        _id: '3',
-        originalTitle: 'Spider-Man: No Way Home',
-        lugandaTitle: '',
-        vjName: 'VJ Junior',
-        year: 2021,
-        genres: ['action', 'adventure', 'sci-fi'],
-        rating: {
-            imdb: 8.2,
-            userRating: 8.9,
-            translationRating: 4.7
-        },
-        video: {
-            quality: '4k'
-        },
-        poster: 'https://image.tmdb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg',
-        description: 'With Spider-Man\'s identity now revealed, Peter asks Doctor Strange for help.',
-        vjId: 'vj-junior',
-        translationQuality: 4.7,
-        views: 32100,
-        featured: true,
-        trending: true
-    },
-    {
-        _id: '4',
-        originalTitle: 'John Wick 4',
-        lugandaTitle: '',
-        vjName: 'VJ Ice P',
-        year: 2023,
-        genres: ['action', 'thriller'],
-        rating: {
-            imdb: 7.8,
-            userRating: 8.5,
-            translationRating: 4.6
-        },
-        video: {
-            quality: 'hd'
-        },
-        poster: 'https://image.tmdb.org/t/p/w500/vZloFAK7NmvMGKE7VkF5UHaz0I.jpg',
-        description: 'John Wick uncovers a path to defeating The High Table.',
-        vjId: 'vj-ice-p',
-        translationQuality: 4.6,
-        views: 19800,
         featured: false,
-        trending: true
-    },
-    {
-        _id: '5',
-        originalTitle: 'Avatar: The Way of Water',
-        lugandaTitle: '',
-        vjName: 'VJ Emmy',
-        year: 2022,
-        genres: ['sci-fi', 'adventure'],
-        rating: {
-            imdb: 7.6,
-            userRating: 8.1,
-            translationRating: 4.4
-        },
-        video: {
-            quality: '4k'
-        },
-        poster: 'https://image.tmdb.org/t/p/w500/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg',
-        description: 'Jake Sully and Ney\'tiri have formed a family and are doing everything to stay together.',
-        vjId: 'vj-emmy',
-        translationQuality: 4.4,
-        views: 25600,
-        featured: true,
         trending: false
-    },
-    {
-        _id: '6',
-        originalTitle: 'The Equalizer 3',
-        lugandaTitle: '',
-        vjName: 'VJ Junior',
-        year: 2023,
-        genres: ['action', 'thriller'],
-        rating: {
-            imdb: 6.8,
-            userRating: 7.8,
-            translationRating: 4.5
-        },
-        video: {
-            quality: 'hd'
-        },
-        poster: 'https://image.tmdb.org/t/p/w500/b0Ej6fnXAP8fK75hlyi2jKqdhHz.jpg',
-        description: 'Robert McCall finds himself at home in Southern Italy but discovers his friends are under the control of local crime bosses.',
-        vjId: 'vj-junior',
-        translationQuality: 4.5,
-        views: 14200,
-        featured: false,
-        trending: true
-    },
-    {
-        _id: '7',
-        originalTitle: 'Guardians of the Galaxy Vol. 3',
-        lugandaTitle: '',
-        vjName: 'VJ Ice P',
-        year: 2023,
-        genres: ['action', 'adventure', 'sci-fi'],
-        rating: {
-            imdb: 7.9,
-            userRating: 8.3,
-            translationRating: 4.6
-        },
-        video: {
-            quality: '4k'
-        },
-        poster: 'https://image.tmdb.org/t/p/w500/r2J02Z2OpNTctfOSN1Ydgii51I3.jpg',
-        description: 'Still reeling from the loss of Gamora, Peter Quill rallies his team to defend the universe.',
-        vjId: 'vj-ice-p',
-        translationQuality: 4.6,
-        views: 21500,
-        featured: false,
-        trending: true
-    },
-    {
-        _id: '8',
-        originalTitle: 'Mission: Impossible - Dead Reckoning',
-        lugandaTitle: '',
-        vjName: 'VJ Emmy',
-        year: 2023,
-        genres: ['action', 'thriller'],
-        rating: {
-            imdb: 7.7,
-            userRating: 8.0,
-            translationRating: 4.7
-        },
-        video: {
-            quality: '4k'
-        },
-        poster: 'https://image.tmdb.org/t/p/w500/NNxYkU70HPurnNCSiCjYAmacwm.jpg',
-        description: 'Ethan Hunt and his IMF team must track down a terrifying new weapon.',
-        vjId: 'vj-emmy',
-        translationQuality: 4.7,
-        views: 18900,
-        featured: true,
-        trending: true
     }
 ];
 
