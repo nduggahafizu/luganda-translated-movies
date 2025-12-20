@@ -1,0 +1,306 @@
+{
+  "testDate": "2025-12-20T21:23:53.097Z",
+  "summary": {
+    "totalStations": 12,
+    "stationsWithWorkingStreams": 0,
+    "totalStreamsWorking": 0,
+    "totalStreamsTotal": 32,
+    "successRate": 0
+  },
+  "results": [
+    {
+      "stationId": "ntv-uganda",
+      "stationName": "NTV Uganda",
+      "totalStreams": 4,
+      "workingStreams": 0,
+      "results": [
+        {
+          "url": "https://stream.ntvuganda.co.ug/live/ntv/index.m3u8",
+          "accessible": false,
+          "error": "getaddrinfo ENOTFOUND stream.ntvuganda.co.ug"
+        },
+        {
+          "url": "https://bcovlive-a.akamaihd.net/b4e4e5e5e5e5e5e5e5e5e5e5e5e5e5e5/us-east-1/6314071972001/playlist.m3u8",
+          "accessible": false,
+          "statusCode": 403,
+          "statusMessage": "Forbidden",
+          "contentType": "application/xml"
+        },
+        {
+          "url": "https://ythls-v3.onrender.com/channel/UCwga1dPCqBddbtq5KYRii2g.m3u8",
+          "accessible": false,
+          "statusCode": 503,
+          "statusMessage": "Service Unavailable",
+          "contentType": "text/html; charset=utf-8"
+        },
+        {
+          "url": "https://ythls.armelin.one/channel/UCwga1dPCqBddbtq5KYRii2g.m3u8",
+          "accessible": false,
+          "statusCode": 404,
+          "statusMessage": "Not Found",
+          "contentType": "application/json; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "stationId": "nbs-tv",
+      "stationName": "NBS TV",
+      "totalStreams": 3,
+      "workingStreams": 0,
+      "results": [
+        {
+          "url": "https://stream.nbstv.co.ug/live/nbs/index.m3u8",
+          "accessible": false,
+          "error": "getaddrinfo ENOTFOUND stream.nbstv.co.ug"
+        },
+        {
+          "url": "https://ythls-v3.onrender.com/channel/UCT0bVGYRe-Qg_CAjJ7RQb0g.m3u8",
+          "accessible": false,
+          "statusCode": 503,
+          "statusMessage": "Service Unavailable",
+          "contentType": "text/html; charset=utf-8"
+        },
+        {
+          "url": "https://ythls.armelin.one/channel/UCT0bVGYRe-Qg_CAjJ7RQb0g.m3u8",
+          "accessible": false,
+          "statusCode": 404,
+          "statusMessage": "Not Found",
+          "contentType": "application/json; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "stationId": "ubc-tv",
+      "stationName": "UBC TV",
+      "totalStreams": 3,
+      "workingStreams": 0,
+      "results": [
+        {
+          "url": "https://webstreaming.viewmedia.tv/web_013/Stream/playlist.m3u8",
+          "accessible": false,
+          "error": "getaddrinfo ENOTFOUND webstreaming.viewmedia.tv"
+        },
+        {
+          "url": "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8",
+          "accessible": false,
+          "statusCode": 503,
+          "statusMessage": "Service Unavailable",
+          "contentType": "text/html; charset=utf-8"
+        },
+        {
+          "url": "https://ythls.armelin.one/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8",
+          "accessible": false,
+          "statusCode": 404,
+          "statusMessage": "Not Found",
+          "contentType": "application/json; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "stationId": "bukedde-tv",
+      "stationName": "Bukedde TV",
+      "totalStreams": 3,
+      "workingStreams": 0,
+      "results": [
+        {
+          "url": "https://stream.bukeddetv.co.ug/live/bukedde/index.m3u8",
+          "accessible": false,
+          "error": "getaddrinfo ENOTFOUND stream.bukeddetv.co.ug"
+        },
+        {
+          "url": "https://ythls-v3.onrender.com/channel/UCouBdXAhnJbVpXlLi5YYkxg.m3u8",
+          "accessible": false,
+          "statusCode": 429,
+          "statusMessage": "Too Many Requests",
+          "contentType": "text/html; charset=UTF-8"
+        },
+        {
+          "url": "https://ythls.armelin.one/channel/UCouBdXAhnJbVpXlLi5YYkxg.m3u8",
+          "accessible": false,
+          "statusCode": 404,
+          "statusMessage": "Not Found",
+          "contentType": "application/json; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "stationId": "urban-tv",
+      "stationName": "Urban TV",
+      "totalStreams": 3,
+      "workingStreams": 0,
+      "results": [
+        {
+          "url": "https://stream.urbantv.co.ug/live/urban/index.m3u8",
+          "accessible": false,
+          "error": "getaddrinfo ENOTFOUND stream.urbantv.co.ug"
+        },
+        {
+          "url": "https://ythls-v3.onrender.com/channel/UCxS3-UXJjVdOZmnPpzgRXOg.m3u8",
+          "accessible": false,
+          "statusCode": 429,
+          "statusMessage": "Too Many Requests",
+          "contentType": "text/html; charset=UTF-8"
+        },
+        {
+          "url": "https://ythls.armelin.one/channel/UCxS3-UXJjVdOZmnPpzgRXOg.m3u8",
+          "accessible": false,
+          "statusCode": 404,
+          "statusMessage": "Not Found",
+          "contentType": "application/json; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "stationId": "spark-tv",
+      "stationName": "Spark TV",
+      "totalStreams": 3,
+      "workingStreams": 0,
+      "results": [
+        {
+          "url": "https://stream.sparktv.co.ug/live/spark/index.m3u8",
+          "accessible": false,
+          "error": "getaddrinfo ENOTFOUND stream.sparktv.co.ug"
+        },
+        {
+          "url": "https://webstreaming.viewmedia.tv/web_016/Stream/playlist.m3u8",
+          "accessible": false,
+          "error": "getaddrinfo ENOTFOUND webstreaming.viewmedia.tv"
+        },
+        {
+          "url": "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8",
+          "accessible": false,
+          "statusCode": 429,
+          "statusMessage": "Too Many Requests",
+          "contentType": "text/html; charset=UTF-8"
+        }
+      ]
+    },
+    {
+      "stationId": "tv-west",
+      "stationName": "TV West",
+      "totalStreams": 2,
+      "workingStreams": 0,
+      "results": [
+        {
+          "url": "https://webstreaming.viewmedia.tv/web_017/Stream/playlist.m3u8",
+          "accessible": false,
+          "error": "getaddrinfo ENOTFOUND webstreaming.viewmedia.tv"
+        },
+        {
+          "url": "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8",
+          "accessible": false,
+          "statusCode": 429,
+          "statusMessage": "Too Many Requests",
+          "contentType": "text/html; charset=UTF-8"
+        }
+      ]
+    },
+    {
+      "stationId": "salt-tv",
+      "stationName": "Salt TV",
+      "totalStreams": 2,
+      "workingStreams": 0,
+      "results": [
+        {
+          "url": "https://webstreaming.viewmedia.tv/web_018/Stream/playlist.m3u8",
+          "accessible": false,
+          "error": "getaddrinfo ENOTFOUND webstreaming.viewmedia.tv"
+        },
+        {
+          "url": "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8",
+          "accessible": false,
+          "statusCode": 429,
+          "statusMessage": "Too Many Requests",
+          "contentType": "text/html; charset=UTF-8"
+        }
+      ]
+    },
+    {
+      "stationId": "tv-east",
+      "stationName": "TV East",
+      "totalStreams": 2,
+      "workingStreams": 0,
+      "results": [
+        {
+          "url": "https://webstreaming.viewmedia.tv/web_019/Stream/playlist.m3u8",
+          "accessible": false,
+          "error": "getaddrinfo ENOTFOUND webstreaming.viewmedia.tv"
+        },
+        {
+          "url": "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8",
+          "accessible": false,
+          "statusCode": 429,
+          "statusMessage": "Too Many Requests",
+          "contentType": "text/html; charset=UTF-8"
+        }
+      ]
+    },
+    {
+      "stationId": "bbs-tv",
+      "stationName": "BBS TV",
+      "totalStreams": 3,
+      "workingStreams": 0,
+      "results": [
+        {
+          "url": "https://stream.bbstv.co.ug/live/bbs/index.m3u8",
+          "accessible": false,
+          "error": "getaddrinfo ENOTFOUND stream.bbstv.co.ug"
+        },
+        {
+          "url": "https://ythls-v3.onrender.com/channel/UCgLpjHjfGTbBBi5T5JaBcKg.m3u8",
+          "accessible": false,
+          "statusCode": 429,
+          "statusMessage": "Too Many Requests",
+          "contentType": "text/html; charset=UTF-8"
+        },
+        {
+          "url": "https://ythls.armelin.one/channel/UCgLpjHjfGTbBBi5T5JaBcKg.m3u8",
+          "accessible": false,
+          "statusCode": 404,
+          "statusMessage": "Not Found",
+          "contentType": "application/json; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "stationId": "tv-north",
+      "stationName": "TV North",
+      "totalStreams": 2,
+      "workingStreams": 0,
+      "results": [
+        {
+          "url": "https://webstreaming.viewmedia.tv/web_021/Stream/playlist.m3u8",
+          "accessible": false,
+          "error": "getaddrinfo ENOTFOUND webstreaming.viewmedia.tv"
+        },
+        {
+          "url": "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8",
+          "accessible": false,
+          "statusCode": 429,
+          "statusMessage": "Too Many Requests",
+          "contentType": "text/html; charset=UTF-8"
+        }
+      ]
+    },
+    {
+      "stationId": "wan-luo-tv",
+      "stationName": "Wan Luo TV",
+      "totalStreams": 2,
+      "workingStreams": 0,
+      "results": [
+        {
+          "url": "https://webstreaming.viewmedia.tv/web_022/Stream/playlist.m3u8",
+          "accessible": false,
+          "error": "getaddrinfo ENOTFOUND webstreaming.viewmedia.tv"
+        },
+        {
+          "url": "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8",
+          "accessible": false,
+          "statusCode": 429,
+          "statusMessage": "Too Many Requests",
+          "contentType": "text/html; charset=UTF-8"
+        }
+      ]
+    }
+  ]
+}
