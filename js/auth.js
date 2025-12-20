@@ -3,9 +3,9 @@
    Features: Google Sign-In, Remember Me, Persistent Login
    =================================== */
 
-// Configuration
-const API_URL = 'http://localhost:5000/api'; // Backend URL (change to production URL when deploying)
-const GOOGLE_CLIENT_ID = '573762962600-nr77v5emb2spn7aleg9p2l7c0d6be3a9.apps.googleusercontent.com'; // Your Google Client ID
+// Configuration - Uses Config.js for environment-aware URLs
+const API_URL = window.Config ? window.Config.authUrl : 'http://localhost:5000/api/auth';
+const GOOGLE_CLIENT_ID = window.Config ? window.Config.GOOGLE_CLIENT_ID : '573762962600-nr77v5emb2spn7aleg9p2l7c0d6be3a9.apps.googleusercontent.com';
 
 // Initialize Google Sign-In
 function initGoogleSignIn() {
@@ -40,7 +40,8 @@ async function handleGoogleSignIn(response) {
         showLoading(true);
         
         // Send Google token to backend
-        const res = await fetch(`${API_URL}/auth/google`, {
+        const authUrl = window.Config ? window.Config.getApiUrl('/auth/google') : `${API_URL}/google`;
+        const res = await fetch(authUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -153,7 +154,8 @@ async function loginWithEmail(email, password, rememberMe) {
     try {
         showLoading(true);
         
-        const response = await fetch(`${API_URL}/auth/login`, {
+        const loginUrl = window.Config ? window.Config.getApiUrl('/auth/login') : `${API_URL}/login`;
+        const response = await fetch(loginUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -187,7 +189,8 @@ async function registerWithEmail(fullName, email, password) {
     try {
         showLoading(true);
         
-        const response = await fetch(`${API_URL}/auth/register`, {
+        const registerUrl = window.Config ? window.Config.getApiUrl('/auth/register') : `${API_URL}/register`;
+        const response = await fetch(registerUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

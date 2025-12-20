@@ -5,8 +5,8 @@
 const LugandaMoviesAPI = (function() {
     'use strict';
 
-    // API Base URL
-    const API_BASE_URL = 'http://localhost:5000/api/luganda-movies';
+    // API Base URL - Uses Config.js for environment-aware URLs
+    const API_BASE_URL = window.Config ? window.Config.moviesUrl : 'http://localhost:5000/api/luganda-movies';
 
     // Helper function for API calls
     async function apiCall(endpoint, options = {}) {
