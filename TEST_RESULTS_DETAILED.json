@@ -1,0 +1,89 @@
+{
+  "timestamp": "2025-12-20T19:11:57.773Z",
+  "environment": "localhost",
+  "tests": [
+    {
+      "name": "Config.js Load",
+      "status": "pass",
+      "details": "Configuration file complete",
+      "error": null,
+      "timestamp": "2025-12-20T19:11:57.808Z"
+    },
+    {
+      "name": "Health Check",
+      "status": "pass",
+      "details": "Status: healthy",
+      "error": null,
+      "timestamp": "2025-12-20T19:11:57.815Z"
+    },
+    {
+      "name": "Google Auth Endpoint",
+      "status": "fail",
+      "details": "Unexpected response",
+      "error": "Unexpected status",
+      "timestamp": "2025-12-20T19:11:57.819Z"
+    },
+    {
+      "name": "Login Page Google Button",
+      "status": "pass",
+      "details": "All Google Auth elements present",
+      "error": null,
+      "timestamp": "2025-12-20T19:11:57.821Z"
+    },
+    {
+      "name": "Email Registration",
+      "status": "fail",
+      "details": "Too many requests, please try again later.",
+      "error": "",
+      "timestamp": "2025-12-20T19:11:57.824Z"
+    },
+    {
+      "name": "Email Login",
+      "status": "warning",
+      "details": "Could not create test user for login test",
+      "error": null,
+      "timestamp": "2025-12-20T19:11:57.827Z"
+    },
+    {
+      "name": "Invalid Credentials",
+      "status": "fail",
+      "details": "Security validation not working",
+      "error": null,
+      "timestamp": "2025-12-20T19:11:57.830Z"
+    },
+    {
+      "name": "VJs Endpoint",
+      "status": "pass",
+      "details": "Retrieved 11 VJs",
+      "error": null,
+      "timestamp": "2025-12-20T19:11:57.841Z"
+    },
+    {
+      "name": "Movie Data Retrieval",
+      "status": "pass",
+      "details": "Retrieved 8 movies",
+      "error": null,
+      "timestamp": "2025-12-20T19:11:57.851Z"
+    },
+    {
+      "name": "Get Movie by ID",
+      "status": "pass",
+      "details": "Retrieved: Song of the Assassins",
+      "error": null,
+      "timestamp": "2025-12-20T19:11:57.866Z"
+    },
+    {
+      "name": "Player Page Load",
+      "status": "pass",
+      "details": "All player elements present",
+      "error": null,
+      "timestamp": "2025-12-20T19:11:57.867Z"
+    }
+  ],
+  "summary": {
+    "total": 11,
+    "passed": 7,
+    "failed": 3,
+    "warnings": 1
+  }
+}
