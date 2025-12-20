@@ -1,0 +1,723 @@
+{
+  "generatedAt": "2025-12-20T21:32:21.162Z",
+  "totalStreams": 43,
+  "workingStreams": 15,
+  "successRate": 35,
+  "streams": [
+    {
+      "name": "3ABN TV Uganda (720p) [Not 24/7]",
+      "logo": "https://i.imgur.com/mml9lI2.png",
+      "category": "Religious",
+      "url": "https://3abn.bozztv.com/3abn/3abn_uganda_live/index.m3u8",
+      "tested": true,
+      "working": true,
+      "statusCode": 200,
+      "contentType": "application/vnd.apple.mpegurl"
+    },
+    {
+      "name": "ACW UG TV (480p)",
+      "logo": "https://i.imgur.com/8pzEmcJ.jpeg",
+      "category": "General;Music",
+      "url": "https://live.acwugtv.com/hls/stream.m3u8",
+      "tested": true,
+      "working": true,
+      "statusCode": 200,
+      "contentType": "application/x-mpegURL"
+    },
+    {
+      "name": "Alpha Digital (480p)",
+      "logo": "https://i.imgur.com/sLt242H.png",
+      "category": "Religious",
+      "url": "https://streamfi-alphatvdgtl1.zettawiseroutes.com:8181/hls/stream.m3u8",
+      "tested": true,
+      "working": false,
+      "statusCode": 404,
+      "contentType": "text/html"
+    },
+    {
+      "name": "Ark TV (1080p) [Not 24/7]",
+      "logo": "https://i.imgur.com/yCHNZXD.png",
+      "category": "Religious",
+      "url": "https://stream.hydeinnovations.com/arktv-international/index.fmp4.m3u8",
+      "tested": true,
+      "working": true,
+      "statusCode": 200,
+      "contentType": "application/vnd.apple.mpegurl"
+    },
+    {
+      "name": "BTM TV (480p) [Not 24/7]",
+      "logo": "https://i.imgur.com/NUvA2jf.png",
+      "category": "General",
+      "url": "https://btmug.zerocdn.org/hls/stream.m3u8",
+      "tested": true,
+      "working": false
+    },
+    {
+      "name": "BTV (480p)",
+      "logo": "https://i.imgur.com/rcHZ1al.png",
+      "category": "Entertainment",
+      "url": "https://streamfi-alphadgtl1.zettawiseroutes.com:8181/hls/stream.m3u8",
+      "tested": true,
+      "working": false,
+      "statusCode": 404,
+      "contentType": "text/html"
+    },
+    {
+      "name": "Bukedde TV 1 (576p)",
+      "logo": "https://i.imgur.com/HFq5QlJ.png",
+      "category": "General",
+      "url": "https://stream.hydeinnovations.com/bukedde1flussonic/index.m3u8",
+      "tested": true,
+      "working": true,
+      "statusCode": 200,
+      "contentType": "application/vnd.apple.mpegurl"
+    },
+    {
+      "name": "Bukedde TV 2 (576p) [Not 24/7]",
+      "logo": "https://i.imgur.com/ukwPZeY.png",
+      "category": "General",
+      "url": "https://stream.hydeinnovations.com/bukedde2flussonic/index.m3u8",
+      "tested": true,
+      "working": true,
+      "statusCode": 200,
+      "contentType": "application/vnd.apple.mpegurl"
+    },
+    {
+      "name": "CCCO Aspire TV (676p)",
+      "logo": "https://i.imgur.com/33FHk1A.jpg",
+      "category": "Religious",
+      "url": "https://panel.freedomflixtv.org:3948/hybrid/play.m3u8",
+      "tested": true,
+      "working": false
+    },
+    {
+      "name": "COU Family Television (720p)",
+      "logo": "https://i.imgur.com/l53Eur6.png",
+      "category": "Family;Religious",
+      "url": "https://stream.castr.com/66b2205a464da535308e57e1/live_2c12d7a053f511ef9a978b0191f4a826/index.fmp4.m3u8",
+      "tested": true,
+      "working": false,
+      "statusCode": 403,
+      "contentType": "text/html"
+    },
+    {
+      "name": "Dream TV (480p)",
+      "logo": "https://i.imgur.com/XRUDhqQ.png",
+      "category": "Religious",
+      "url": "https://streamfi-dreamtv1.zettawiseroutes.com:8181/hls/stream.m3u8",
+      "tested": true,
+      "working": false,
+      "statusCode": 404,
+      "contentType": "text/html"
+    },
+    {
+      "name": "Faraja Television (1080p) [Not 24/7]",
+      "logo": "https://i.imgur.com/NmnOGHI.jpg",
+      "category": "General",
+      "url": "https://panel.freedomflixtv.org:3868/hybrid/play.m3u8",
+      "tested": true,
+      "working": false
+    },
+    {
+      "name": "FORT TV (480p)",
+      "logo": "https://i.ibb.co/4KN5zW9/fort-tv-logo-GENE.png",
+      "category": "Entertainment",
+      "url": "https://fort.co-works.org/memfs/87017643-274a-4bc0-a786-7767a0d159c2.m3u8",
+      "tested": true,
+      "working": true,
+      "statusCode": 200,
+      "contentType": "application/vnd.apple.mpegurl"
+    },
+    {
+      "name": "Freedom Experience TV (720p)",
+      "logo": "https://i.imgur.com/1SiJpPy.png",
+      "category": "Religious",
+      "url": "https://panel.freedomflixtv.org:3934/hybrid/play.m3u8",
+      "tested": true,
+      "working": false
+    },
+    {
+      "name": "Freedom Love Zone TV (720p)",
+      "logo": "https://i.imgur.com/PmbLsTk.jpg",
+      "category": "Entertainment",
+      "url": "https://panel.freedomflixtv.org:3665/hybrid/play.m3u8",
+      "tested": true,
+      "working": false
+    },
+    {
+      "name": "Freedom Movie Sphere (720p)",
+      "logo": "https://i.imgur.com/jEyrlPp.jpg",
+      "category": "Movies",
+      "url": "https://panel.freedomflixtv.org:3311/stream/play.m3u8",
+      "tested": true,
+      "working": false
+    },
+    {
+      "name": "Galaxy TV (720p) [Not 24/7]",
+      "logo": "https://i.imgur.com/P5OABe5.png",
+      "category": "Music",
+      "url": "https://stream.castr.com/6463248048d6cd3e143655b2/live_43351ad0f3b411ed81c78fcc31887c54/index.fmp4.m3u8",
+      "tested": true,
+      "working": false,
+      "statusCode": 403,
+      "contentType": "text/html"
+    },
+    {
+      "name": "Ground TV",
+      "logo": "https://i.imgur.com/BqLHvvk.png",
+      "category": "Music",
+      "url": "https://panel.freedomflixtv.org:3764/hybrid/play.m3u8",
+      "tested": true,
+      "working": false
+    },
+    {
+      "name": "Gugudde TV (480p)",
+      "logo": "https://i.imgur.com/XEakc6Q.png",
+      "category": "Religious",
+      "url": "https://jk3lzqq4lw79-hls-live.5centscdn.com/gugudde/c9a1fdac6e082dd89e7173244f34d7b3.sdp/chunks.m3u8",
+      "tested": true,
+      "working": false
+    },
+    {
+      "name": "Host TV (720p)",
+      "logo": "https://i.imgur.com/quKplFg.jpg",
+      "category": "Entertainment",
+      "url": "https://panel.freedomflixtv.org:3994/hybrid/play.m3u8",
+      "tested": true,
+      "working": false
+    },
+    {
+      "name": "KSTV Uganda (480p)",
+      "logo": "https://i.imgur.com/MMPzPSl.png",
+      "category": "Religious",
+      "url": "https://kstv48.fra1.cdn.digitaloceanspaces.com/hls/0/stream.m3u8",
+      "tested": true,
+      "working": false
+    },
+    {
+      "name": "Praise Jesus Tower TV (480p)",
+      "logo": "https://i.imgur.com/KT4qIve.png",
+      "category": "Religious",
+      "url": "https://vsrv1.az-streamingserver.com:3555/live/dyjoqlgklive.m3u8",
+      "tested": true,
+      "working": false,
+      "statusCode": 404,
+      "contentType": "text/html; charset=UTF-8"
+    },
+    {
+      "name": "Ramogi TV (720p)",
+      "logo": "https://i.postimg.cc/0N2WN2Jt/ramogitv.png",
+      "category": "General",
+      "url": "https://citizentv.castr.com/5ea49827ff3b5d7b22708777/live_9b761ff063f511eca12909b8ef1524b4/index.m3u8",
+      "tested": true,
+      "working": true,
+      "statusCode": 200,
+      "contentType": "application/x-mpegURL"
+    },
+    {
+      "name": "Salt TV (1080p) [Not 24/7]",
+      "logo": "https://i.imgur.com/AK9nE6Y.png",
+      "category": "Religious",
+      "url": "https://live.salttelevision.com/app/stream/abr.m3u8",
+      "tested": true,
+      "working": false,
+      "statusCode": 404,
+      "contentType": "text/plain; charset=utf-8"
+    },
+    {
+      "name": "Spirit Of Glory TV (360p)",
+      "logo": "https://i.imgur.com/tR3Vfco.png",
+      "category": "Religious",
+      "url": "https://panel.freedomflixtv.org:3937/hybrid/play.m3u8",
+      "tested": true,
+      "working": false
+    },
+    {
+      "name": "Spirit TV (720p)",
+      "logo": "https://i.imgur.com/RGfoWmD.png",
+      "category": "Religious",
+      "url": "https://tv.tuhlprintltd.com/hls/stream.m3u8",
+      "tested": true,
+      "working": false,
+      "statusCode": 441
+    },
+    {
+      "name": "Trust TV (720p)",
+      "logo": "https://i.imgur.com/01k6voZ.png",
+      "category": "Religious",
+      "url": "https://panel.freedomflixtv.org:3900/hybrid/play.m3u8",
+      "tested": true,
+      "working": false
+    },
+    {
+      "name": "TV West (720p)",
+      "logo": "https://i.imgur.com/EiJzkIz.png",
+      "category": "General",
+      "url": "https://stream.hydeinnovations.com/tvwest-flussonic/index.m3u8",
+      "tested": true,
+      "working": true,
+      "statusCode": 200,
+      "contentType": "application/vnd.apple.mpegurl"
+    },
+    {
+      "name": "Wan Luo TV (576p)",
+      "logo": "https://i.imgur.com/4PUUp3E.png",
+      "category": "General",
+      "url": "https://stream.hydeinnovations.com/luotv-flussonic/index.m3u8",
+      "tested": true,
+      "working": true,
+      "statusCode": 200,
+      "contentType": "application/vnd.apple.mpegurl"
+    },
+    {
+      "name": "NTV Uganda",
+      "url": "https://www.youtube.com/channel/UCwga1dPCqBddbtq5KYRii2g/live",
+      "type": "youtube-embed",
+      "embedUrl": "https://www.youtube.com/embed/live_stream?channel=UCwga1dPCqBddbtq5KYRii2g&autoplay=1",
+      "category": "YouTube Live",
+      "tested": false,
+      "working": true,
+      "note": "YouTube embed - not tested via HEAD request"
+    },
+    {
+      "name": "NBS TV",
+      "url": "https://www.youtube.com/channel/UCT0bVGYRe-Qg_CAjJ7RQb0g/live",
+      "type": "youtube-embed",
+      "embedUrl": "https://www.youtube.com/embed/live_stream?channel=UCT0bVGYRe-Qg_CAjJ7RQb0g&autoplay=1",
+      "category": "YouTube Live",
+      "tested": false,
+      "working": true,
+      "note": "YouTube embed - not tested via HEAD request"
+    },
+    {
+      "name": "UBC TV",
+      "url": "https://www.youtube.com/channel/UCVktcIoQvZgmNdmNwXOYPxg/live",
+      "type": "youtube-embed",
+      "embedUrl": "https://www.youtube.com/embed/live_stream?channel=UCVktcIoQvZgmNdmNwXOYPxg&autoplay=1",
+      "category": "YouTube Live",
+      "tested": false,
+      "working": true,
+      "note": "YouTube embed - not tested via HEAD request"
+    },
+    {
+      "name": "Bukedde TV",
+      "url": "https://www.youtube.com/channel/UCouBdXAhnJbVpXlLi5YYkxg/live",
+      "type": "youtube-embed",
+      "embedUrl": "https://www.youtube.com/embed/live_stream?channel=UCouBdXAhnJbVpXlLi5YYkxg&autoplay=1",
+      "category": "YouTube Live",
+      "tested": false,
+      "working": true,
+      "note": "YouTube embed - not tested via HEAD request"
+    },
+    {
+      "name": "Urban TV",
+      "url": "https://www.youtube.com/channel/UCxS3-UXJjVdOZmnPpzgRXOg/live",
+      "type": "youtube-embed",
+      "embedUrl": "https://www.youtube.com/embed/live_stream?channel=UCxS3-UXJjVdOZmnPpzgRXOg&autoplay=1",
+      "category": "YouTube Live",
+      "tested": false,
+      "working": true,
+      "note": "YouTube embed - not tested via HEAD request"
+    },
+    {
+      "name": "BBS TV",
+      "url": "https://www.youtube.com/channel/UCgLpjHjfGTbBBi5T5JaBcKg/live",
+      "type": "youtube-embed",
+      "embedUrl": "https://www.youtube.com/embed/live_stream?channel=UCgLpjHjfGTbBBi5T5JaBcKg&autoplay=1",
+      "category": "YouTube Live",
+      "tested": false,
+      "working": true,
+      "note": "YouTube embed - not tested via HEAD request"
+    },
+    {
+      "name": "NTV Uganda",
+      "url": "https://streaming.viewmedia.tv/web_006/Stream/playlist.m3u8",
+      "category": "News",
+      "tested": true,
+      "working": false
+    },
+    {
+      "name": "NBS TV",
+      "url": "https://streaming.viewmedia.tv/web_012/Stream/playlist.m3u8",
+      "category": "News",
+      "tested": true,
+      "working": false
+    },
+    {
+      "name": "UBC TV",
+      "url": "https://webstreaming.viewmedia.tv/web_013/Stream/playlist.m3u8",
+      "category": "General",
+      "tested": true,
+      "working": false
+    },
+    {
+      "name": "Bukedde TV",
+      "url": "https://streaming.viewmedia.tv/web_014/Stream/playlist.m3u8",
+      "category": "Entertainment",
+      "tested": true,
+      "working": false
+    },
+    {
+      "name": "BBS TV",
+      "url": "https://streaming.viewmedia.tv/web_015/Stream/playlist.m3u8",
+      "category": "General",
+      "tested": true,
+      "working": false
+    },
+    {
+      "name": "Spark TV",
+      "url": "https://streaming.viewmedia.tv/web_016/Stream/playlist.m3u8",
+      "category": "Entertainment",
+      "tested": true,
+      "working": false
+    },
+    {
+      "name": "Urban TV",
+      "url": "https://streaming.viewmedia.tv/web_017/Stream/playlist.m3u8",
+      "category": "Entertainment",
+      "tested": true,
+      "working": false
+    },
+    {
+      "name": "Salt TV",
+      "url": "https://streaming.viewmedia.tv/web_018/Stream/playlist.m3u8",
+      "category": "Religious",
+      "tested": true,
+      "working": false
+    }
+  ],
+  "workingOnly": [
+    {
+      "name": "3ABN TV Uganda (720p) [Not 24/7]",
+      "logo": "https://i.imgur.com/mml9lI2.png",
+      "category": "Religious",
+      "url": "https://3abn.bozztv.com/3abn/3abn_uganda_live/index.m3u8",
+      "tested": true,
+      "working": true,
+      "statusCode": 200,
+      "contentType": "application/vnd.apple.mpegurl"
+    },
+    {
+      "name": "ACW UG TV (480p)",
+      "logo": "https://i.imgur.com/8pzEmcJ.jpeg",
+      "category": "General;Music",
+      "url": "https://live.acwugtv.com/hls/stream.m3u8",
+      "tested": true,
+      "working": true,
+      "statusCode": 200,
+      "contentType": "application/x-mpegURL"
+    },
+    {
+      "name": "Ark TV (1080p) [Not 24/7]",
+      "logo": "https://i.imgur.com/yCHNZXD.png",
+      "category": "Religious",
+      "url": "https://stream.hydeinnovations.com/arktv-international/index.fmp4.m3u8",
+      "tested": true,
+      "working": true,
+      "statusCode": 200,
+      "contentType": "application/vnd.apple.mpegurl"
+    },
+    {
+      "name": "Bukedde TV 1 (576p)",
+      "logo": "https://i.imgur.com/HFq5QlJ.png",
+      "category": "General",
+      "url": "https://stream.hydeinnovations.com/bukedde1flussonic/index.m3u8",
+      "tested": true,
+      "working": true,
+      "statusCode": 200,
+      "contentType": "application/vnd.apple.mpegurl"
+    },
+    {
+      "name": "Bukedde TV 2 (576p) [Not 24/7]",
+      "logo": "https://i.imgur.com/ukwPZeY.png",
+      "category": "General",
+      "url": "https://stream.hydeinnovations.com/bukedde2flussonic/index.m3u8",
+      "tested": true,
+      "working": true,
+      "statusCode": 200,
+      "contentType": "application/vnd.apple.mpegurl"
+    },
+    {
+      "name": "FORT TV (480p)",
+      "logo": "https://i.ibb.co/4KN5zW9/fort-tv-logo-GENE.png",
+      "category": "Entertainment",
+      "url": "https://fort.co-works.org/memfs/87017643-274a-4bc0-a786-7767a0d159c2.m3u8",
+      "tested": true,
+      "working": true,
+      "statusCode": 200,
+      "contentType": "application/vnd.apple.mpegurl"
+    },
+    {
+      "name": "Ramogi TV (720p)",
+      "logo": "https://i.postimg.cc/0N2WN2Jt/ramogitv.png",
+      "category": "General",
+      "url": "https://citizentv.castr.com/5ea49827ff3b5d7b22708777/live_9b761ff063f511eca12909b8ef1524b4/index.m3u8",
+      "tested": true,
+      "working": true,
+      "statusCode": 200,
+      "contentType": "application/x-mpegURL"
+    },
+    {
+      "name": "TV West (720p)",
+      "logo": "https://i.imgur.com/EiJzkIz.png",
+      "category": "General",
+      "url": "https://stream.hydeinnovations.com/tvwest-flussonic/index.m3u8",
+      "tested": true,
+      "working": true,
+      "statusCode": 200,
+      "contentType": "application/vnd.apple.mpegurl"
+    },
+    {
+      "name": "Wan Luo TV (576p)",
+      "logo": "https://i.imgur.com/4PUUp3E.png",
+      "category": "General",
+      "url": "https://stream.hydeinnovations.com/luotv-flussonic/index.m3u8",
+      "tested": true,
+      "working": true,
+      "statusCode": 200,
+      "contentType": "application/vnd.apple.mpegurl"
+    },
+    {
+      "name": "NTV Uganda",
+      "url": "https://www.youtube.com/channel/UCwga1dPCqBddbtq5KYRii2g/live",
+      "type": "youtube-embed",
+      "embedUrl": "https://www.youtube.com/embed/live_stream?channel=UCwga1dPCqBddbtq5KYRii2g&autoplay=1",
+      "category": "YouTube Live",
+      "tested": false,
+      "working": true,
+      "note": "YouTube embed - not tested via HEAD request"
+    },
+    {
+      "name": "NBS TV",
+      "url": "https://www.youtube.com/channel/UCT0bVGYRe-Qg_CAjJ7RQb0g/live",
+      "type": "youtube-embed",
+      "embedUrl": "https://www.youtube.com/embed/live_stream?channel=UCT0bVGYRe-Qg_CAjJ7RQb0g&autoplay=1",
+      "category": "YouTube Live",
+      "tested": false,
+      "working": true,
+      "note": "YouTube embed - not tested via HEAD request"
+    },
+    {
+      "name": "UBC TV",
+      "url": "https://www.youtube.com/channel/UCVktcIoQvZgmNdmNwXOYPxg/live",
+      "type": "youtube-embed",
+      "embedUrl": "https://www.youtube.com/embed/live_stream?channel=UCVktcIoQvZgmNdmNwXOYPxg&autoplay=1",
+      "category": "YouTube Live",
+      "tested": false,
+      "working": true,
+      "note": "YouTube embed - not tested via HEAD request"
+    },
+    {
+      "name": "Bukedde TV",
+      "url": "https://www.youtube.com/channel/UCouBdXAhnJbVpXlLi5YYkxg/live",
+      "type": "youtube-embed",
+      "embedUrl": "https://www.youtube.com/embed/live_stream?channel=UCouBdXAhnJbVpXlLi5YYkxg&autoplay=1",
+      "category": "YouTube Live",
+      "tested": false,
+      "working": true,
+      "note": "YouTube embed - not tested via HEAD request"
+    },
+    {
+      "name": "Urban TV",
+      "url": "https://www.youtube.com/channel/UCxS3-UXJjVdOZmnPpzgRXOg/live",
+      "type": "youtube-embed",
+      "embedUrl": "https://www.youtube.com/embed/live_stream?channel=UCxS3-UXJjVdOZmnPpzgRXOg&autoplay=1",
+      "category": "YouTube Live",
+      "tested": false,
+      "working": true,
+      "note": "YouTube embed - not tested via HEAD request"
+    },
+    {
+      "name": "BBS TV",
+      "url": "https://www.youtube.com/channel/UCgLpjHjfGTbBBi5T5JaBcKg/live",
+      "type": "youtube-embed",
+      "embedUrl": "https://www.youtube.com/embed/live_stream?channel=UCgLpjHjfGTbBBi5T5JaBcKg&autoplay=1",
+      "category": "YouTube Live",
+      "tested": false,
+      "working": true,
+      "note": "YouTube embed - not tested via HEAD request"
+    }
+  ],
+  "byStation": {
+    "3ABN TV Uganda (720p) [Not 24/7]": [
+      {
+        "name": "3ABN TV Uganda (720p) [Not 24/7]",
+        "logo": "https://i.imgur.com/mml9lI2.png",
+        "category": "Religious",
+        "url": "https://3abn.bozztv.com/3abn/3abn_uganda_live/index.m3u8",
+        "tested": true,
+        "working": true,
+        "statusCode": 200,
+        "contentType": "application/vnd.apple.mpegurl"
+      }
+    ],
+    "ACW UG TV (480p)": [
+      {
+        "name": "ACW UG TV (480p)",
+        "logo": "https://i.imgur.com/8pzEmcJ.jpeg",
+        "category": "General;Music",
+        "url": "https://live.acwugtv.com/hls/stream.m3u8",
+        "tested": true,
+        "working": true,
+        "statusCode": 200,
+        "contentType": "application/x-mpegURL"
+      }
+    ],
+    "Ark TV (1080p) [Not 24/7]": [
+      {
+        "name": "Ark TV (1080p) [Not 24/7]",
+        "logo": "https://i.imgur.com/yCHNZXD.png",
+        "category": "Religious",
+        "url": "https://stream.hydeinnovations.com/arktv-international/index.fmp4.m3u8",
+        "tested": true,
+        "working": true,
+        "statusCode": 200,
+        "contentType": "application/vnd.apple.mpegurl"
+      }
+    ],
+    "Bukedde TV 1 (576p)": [
+      {
+        "name": "Bukedde TV 1 (576p)",
+        "logo": "https://i.imgur.com/HFq5QlJ.png",
+        "category": "General",
+        "url": "https://stream.hydeinnovations.com/bukedde1flussonic/index.m3u8",
+        "tested": true,
+        "working": true,
+        "statusCode": 200,
+        "contentType": "application/vnd.apple.mpegurl"
+      }
+    ],
+    "Bukedde TV 2 (576p) [Not 24/7]": [
+      {
+        "name": "Bukedde TV 2 (576p) [Not 24/7]",
+        "logo": "https://i.imgur.com/ukwPZeY.png",
+        "category": "General",
+        "url": "https://stream.hydeinnovations.com/bukedde2flussonic/index.m3u8",
+        "tested": true,
+        "working": true,
+        "statusCode": 200,
+        "contentType": "application/vnd.apple.mpegurl"
+      }
+    ],
+    "FORT TV (480p)": [
+      {
+        "name": "FORT TV (480p)",
+        "logo": "https://i.ibb.co/4KN5zW9/fort-tv-logo-GENE.png",
+        "category": "Entertainment",
+        "url": "https://fort.co-works.org/memfs/87017643-274a-4bc0-a786-7767a0d159c2.m3u8",
+        "tested": true,
+        "working": true,
+        "statusCode": 200,
+        "contentType": "application/vnd.apple.mpegurl"
+      }
+    ],
+    "Ramogi TV (720p)": [
+      {
+        "name": "Ramogi TV (720p)",
+        "logo": "https://i.postimg.cc/0N2WN2Jt/ramogitv.png",
+        "category": "General",
+        "url": "https://citizentv.castr.com/5ea49827ff3b5d7b22708777/live_9b761ff063f511eca12909b8ef1524b4/index.m3u8",
+        "tested": true,
+        "working": true,
+        "statusCode": 200,
+        "contentType": "application/x-mpegURL"
+      }
+    ],
+    "TV West (720p)": [
+      {
+        "name": "TV West (720p)",
+        "logo": "https://i.imgur.com/EiJzkIz.png",
+        "category": "General",
+        "url": "https://stream.hydeinnovations.com/tvwest-flussonic/index.m3u8",
+        "tested": true,
+        "working": true,
+        "statusCode": 200,
+        "contentType": "application/vnd.apple.mpegurl"
+      }
+    ],
+    "Wan Luo TV (576p)": [
+      {
+        "name": "Wan Luo TV (576p)",
+        "logo": "https://i.imgur.com/4PUUp3E.png",
+        "category": "General",
+        "url": "https://stream.hydeinnovations.com/luotv-flussonic/index.m3u8",
+        "tested": true,
+        "working": true,
+        "statusCode": 200,
+        "contentType": "application/vnd.apple.mpegurl"
+      }
+    ],
+    "NTV Uganda": [
+      {
+        "name": "NTV Uganda",
+        "url": "https://www.youtube.com/channel/UCwga1dPCqBddbtq5KYRii2g/live",
+        "type": "youtube-embed",
+        "embedUrl": "https://www.youtube.com/embed/live_stream?channel=UCwga1dPCqBddbtq5KYRii2g&autoplay=1",
+        "category": "YouTube Live",
+        "tested": false,
+        "working": true,
+        "note": "YouTube embed - not tested via HEAD request"
+      }
+    ],
+    "NBS TV": [
+      {
+        "name": "NBS TV",
+        "url": "https://www.youtube.com/channel/UCT0bVGYRe-Qg_CAjJ7RQb0g/live",
+        "type": "youtube-embed",
+        "embedUrl": "https://www.youtube.com/embed/live_stream?channel=UCT0bVGYRe-Qg_CAjJ7RQb0g&autoplay=1",
+        "category": "YouTube Live",
+        "tested": false,
+        "working": true,
+        "note": "YouTube embed - not tested via HEAD request"
+      }
+    ],
+    "UBC TV": [
+      {
+        "name": "UBC TV",
+        "url": "https://www.youtube.com/channel/UCVktcIoQvZgmNdmNwXOYPxg/live",
+        "type": "youtube-embed",
+        "embedUrl": "https://www.youtube.com/embed/live_stream?channel=UCVktcIoQvZgmNdmNwXOYPxg&autoplay=1",
+        "category": "YouTube Live",
+        "tested": false,
+        "working": true,
+        "note": "YouTube embed - not tested via HEAD request"
+      }
+    ],
+    "Bukedde TV": [
+      {
+        "name": "Bukedde TV",
+        "url": "https://www.youtube.com/channel/UCouBdXAhnJbVpXlLi5YYkxg/live",
+        "type": "youtube-embed",
+        "embedUrl": "https://www.youtube.com/embed/live_stream?channel=UCouBdXAhnJbVpXlLi5YYkxg&autoplay=1",
+        "category": "YouTube Live",
+        "tested": false,
+        "working": true,
+        "note": "YouTube embed - not tested via HEAD request"
+      }
+    ],
+    "Urban TV": [
+      {
+        "name": "Urban TV",
+        "url": "https://www.youtube.com/channel/UCxS3-UXJjVdOZmnPpzgRXOg/live",
+        "type": "youtube-embed",
+        "embedUrl": "https://www.youtube.com/embed/live_stream?channel=UCxS3-UXJjVdOZmnPpzgRXOg&autoplay=1",
+        "category": "YouTube Live",
+        "tested": false,
+        "working": true,
+        "note": "YouTube embed - not tested via HEAD request"
+      }
+    ],
+    "BBS TV": [
+      {
+        "name": "BBS TV",
+        "url": "https://www.youtube.com/channel/UCgLpjHjfGTbBBi5T5JaBcKg/live",
+        "type": "youtube-embed",
+        "embedUrl": "https://www.youtube.com/embed/live_stream?channel=UCgLpjHjfGTbBBi5T5JaBcKg&autoplay=1",
+        "category": "YouTube Live",
+        "tested": false,
+        "working": true,
+        "note": "YouTube embed - not tested via HEAD request"
+      }
+    ]
+  }
+}

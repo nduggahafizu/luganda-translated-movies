@@ -1,0 +1,202 @@
+{
+  "testDate": "2025-12-20T21:35:30.493Z",
+  "summary": {
+    "totalStations": 12,
+    "stationsWithWorkingStreams": 12,
+    "totalStreamsWorking": 14,
+    "totalStreamsTotal": 14,
+    "successRate": 100,
+    "youtubeEmbeds": 10,
+    "hlsStreams": 4
+  },
+  "results": [
+    {
+      "stationId": "ntv-uganda",
+      "stationName": "NTV Uganda",
+      "totalStreams": 1,
+      "workingStreams": 1,
+      "results": [
+        {
+          "url": "https://www.youtube.com/embed/live_stream?channel=UCwga1dPCqBddbtq5KYRii2g&autoplay=1",
+          "accessible": true,
+          "type": "youtube-embed",
+          "note": "YouTube embed - will show error if channel offline"
+        }
+      ]
+    },
+    {
+      "stationId": "nbs-tv",
+      "stationName": "NBS TV",
+      "totalStreams": 1,
+      "workingStreams": 1,
+      "results": [
+        {
+          "url": "https://www.youtube.com/embed/live_stream?channel=UCT0bVGYRe-Qg_CAjJ7RQb0g&autoplay=1",
+          "accessible": true,
+          "type": "youtube-embed",
+          "note": "YouTube embed - will show error if channel offline"
+        }
+      ]
+    },
+    {
+      "stationId": "ubc-tv",
+      "stationName": "UBC TV",
+      "totalStreams": 1,
+      "workingStreams": 1,
+      "results": [
+        {
+          "url": "https://www.youtube.com/embed/live_stream?channel=UCVktcIoQvZgmNdmNwXOYPxg&autoplay=1",
+          "accessible": true,
+          "type": "youtube-embed",
+          "note": "YouTube embed - will show error if channel offline"
+        }
+      ]
+    },
+    {
+      "stationId": "bukedde-tv",
+      "stationName": "Bukedde TV",
+      "totalStreams": 3,
+      "workingStreams": 3,
+      "results": [
+        {
+          "url": "https://stream.hydeinnovations.com/bukedde1flussonic/index.m3u8",
+          "accessible": true,
+          "statusCode": 200,
+          "statusMessage": "OK",
+          "contentType": "application/vnd.apple.mpegurl",
+          "type": "hls-stream"
+        },
+        {
+          "url": "https://stream.hydeinnovations.com/bukedde2flussonic/index.m3u8",
+          "accessible": true,
+          "statusCode": 200,
+          "statusMessage": "OK",
+          "contentType": "application/vnd.apple.mpegurl",
+          "type": "hls-stream"
+        },
+        {
+          "url": "https://www.youtube.com/embed/live_stream?channel=UCouBdXAhnJbVpXlLi5YYkxg&autoplay=1",
+          "accessible": true,
+          "type": "youtube-embed",
+          "note": "YouTube embed - will show error if channel offline"
+        }
+      ]
+    },
+    {
+      "stationId": "urban-tv",
+      "stationName": "Urban TV",
+      "totalStreams": 1,
+      "workingStreams": 1,
+      "results": [
+        {
+          "url": "https://www.youtube.com/embed/live_stream?channel=UCxS3-UXJjVdOZmnPpzgRXOg&autoplay=1",
+          "accessible": true,
+          "type": "youtube-embed",
+          "note": "YouTube embed - will show error if channel offline"
+        }
+      ]
+    },
+    {
+      "stationId": "spark-tv",
+      "stationName": "Spark TV",
+      "totalStreams": 1,
+      "workingStreams": 1,
+      "results": [
+        {
+          "url": "https://www.youtube.com/embed/live_stream?channel=UCVktcIoQvZgmNdmNwXOYPxg&autoplay=1",
+          "accessible": true,
+          "type": "youtube-embed",
+          "note": "YouTube embed - will show error if channel offline"
+        }
+      ]
+    },
+    {
+      "stationId": "tv-west",
+      "stationName": "TV West",
+      "totalStreams": 1,
+      "workingStreams": 1,
+      "results": [
+        {
+          "url": "https://stream.hydeinnovations.com/tvwest-flussonic/index.m3u8",
+          "accessible": true,
+          "statusCode": 200,
+          "statusMessage": "OK",
+          "contentType": "application/vnd.apple.mpegurl",
+          "type": "hls-stream"
+        }
+      ]
+    },
+    {
+      "stationId": "salt-tv",
+      "stationName": "Salt TV",
+      "totalStreams": 1,
+      "workingStreams": 1,
+      "results": [
+        {
+          "url": "https://www.youtube.com/embed/live_stream?channel=UCVktcIoQvZgmNdmNwXOYPxg&autoplay=1",
+          "accessible": true,
+          "type": "youtube-embed",
+          "note": "YouTube embed - will show error if channel offline"
+        }
+      ]
+    },
+    {
+      "stationId": "tv-east",
+      "stationName": "TV East",
+      "totalStreams": 1,
+      "workingStreams": 1,
+      "results": [
+        {
+          "url": "https://www.youtube.com/embed/live_stream?channel=UCVktcIoQvZgmNdmNwXOYPxg&autoplay=1",
+          "accessible": true,
+          "type": "youtube-embed",
+          "note": "YouTube embed - will show error if channel offline"
+        }
+      ]
+    },
+    {
+      "stationId": "bbs-tv",
+      "stationName": "BBS TV",
+      "totalStreams": 1,
+      "workingStreams": 1,
+      "results": [
+        {
+          "url": "https://www.youtube.com/embed/live_stream?channel=UCgLpjHjfGTbBBi5T5JaBcKg&autoplay=1",
+          "accessible": true,
+          "type": "youtube-embed",
+          "note": "YouTube embed - will show error if channel offline"
+        }
+      ]
+    },
+    {
+      "stationId": "tv-north",
+      "stationName": "TV North",
+      "totalStreams": 1,
+      "workingStreams": 1,
+      "results": [
+        {
+          "url": "https://www.youtube.com/embed/live_stream?channel=UCVktcIoQvZgmNdmNwXOYPxg&autoplay=1",
+          "accessible": true,
+          "type": "youtube-embed",
+          "note": "YouTube embed - will show error if channel offline"
+        }
+      ]
+    },
+    {
+      "stationId": "wan-luo-tv",
+      "stationName": "Wan Luo TV",
+      "totalStreams": 1,
+      "workingStreams": 1,
+      "results": [
+        {
+          "url": "https://stream.hydeinnovations.com/luotv-flussonic/index.m3u8",
+          "accessible": true,
+          "statusCode": 200,
+          "statusMessage": "OK",
+          "contentType": "application/vnd.apple.mpegurl",
+          "type": "hls-stream"
+        }
+      ]
+    }
+  ]
+}

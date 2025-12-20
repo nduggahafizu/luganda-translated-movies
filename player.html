@@ -545,9 +545,34 @@
         // Set video source if stream URL is provided
         if (streamUrl) {
             const video = document.getElementById('mainVideo');
+            const videoPlayer = document.querySelector('.video-player');
             
+            // Check if it's a YouTube embed URL
+            if (streamUrl.includes('youtube.com/embed')) {
+                console.log('YouTube embed detected, using iframe player');
+                
+                // Hide video element and controls
+                video.style.display = 'none';
+                document.querySelector('.player-controls').style.display = 'none';
+                
+                // Create iframe for YouTube
+                const iframe = document.createElement('iframe');
+                iframe.src = streamUrl;
+                iframe.style.position = 'absolute';
+                iframe.style.top = '0';
+                iframe.style.left = '0';
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+                iframe.style.border = 'none';
+                iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+                iframe.allowFullscreen = true;
+                
+                videoPlayer.appendChild(iframe);
+                
+                console.log('YouTube iframe player loaded');
+            }
             // Check if it's an HLS stream
-            if (streamUrl.includes('.m3u8')) {
+            else if (streamUrl.includes('.m3u8')) {
                 // Use HLS.js for HLS streams
                 if (Hls.isSupported()) {
                     const hls = new Hls({
