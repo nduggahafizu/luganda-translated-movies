@@ -5,8 +5,10 @@
 const LugandaMoviesAPI = (function() {
     'use strict';
 
-    // API Base URL
-    const API_BASE_URL = 'http://localhost:5000/api/luganda-movies';
+    // API Base URL - Railway production backend
+    const API_BASE_URL = process.env.NODE_ENV === 'production'
+        ? 'https://avatars.nduggahafizu.com/u/186216534?v=4/api/luganda-movies'  // Railway backend URL
+        : 'http://localhost:5000/api/luganda-movies';
 
     // Helper function for API calls
     async function apiCall(endpoint, options = {}) {
