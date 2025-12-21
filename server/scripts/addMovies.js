@@ -33,16 +33,17 @@ async function addMovie(movieTitle, vjName, lugandaTitle = null, customData = {}
 
         // Search for movie on TMDB
         console.log('   Searching TMDB...');
-        const searchResults = await tmdbService.searchMovies(movieTitle);
+        const searchResponse = await tmdbService.searchMovies(movieTitle);
         
-        if (!searchResults || searchResults.length === 0) {
+        if (!searchResponse || !searchResponse.results || searchResponse.results.length === 0) {
             console.error(`   ✗ Movie not found on TMDB: ${movieTitle}`);
             return null;
         }
 
         // Get the first result (most relevant)
-        const tmdbMovie = searchResults[0];
-        console.log(`   ✓ Found: ${tmdbMovie.title} (${tmdbMovie.year})`);
+        const tmdbMovie = searchResponse.results[0];
+        const movieYear = tmdbMovie.release_date ? new Date(tmdbMovie.release_date).getFullYear() : 'N/A';
+        console.log(`   ✓ Found: ${tmdbMovie.title} (${movieYear})`);
 
         // Get full movie details
         console.log('   Fetching full details...');
@@ -59,57 +60,60 @@ async function addMovie(movieTitle, vjName, lugandaTitle = null, customData = {}
             return existingMovie;
         }
 
+        // Format movie data from TMDB
+        const formattedMovie = tmdbService.formatMovieForDatabase(movieDetails);
+
         // Prepare movie data
         const movieData = {
             // Original movie info
-            originalTitle: movieDetails.title,
-            lugandaTitle: lugandaTitle || `${movieDetails.title} (Luganda)`,
+            originalTitle: formattedMovie.originalTitle,
+            lugandaTitle: lugandaTitle || `${formattedMovie.originalTitle} (Luganda)`,
             vjName: vjName,
             vjId: vjName.toLowerCase().replace(/\s+/g, '-'),
             
             // Description
-            description: movieDetails.overview || 'No description available',
+            description: formattedMovie.description || 'No description available',
             lugandaDescription: customData.lugandaDescription || null,
             
             // Movie details
-            year: movieDetails.year,
-            duration: movieDetails.runtime || 120,
+            year: formattedMovie.year,
+            duration: formattedMovie.duration || 120,
             
             // Ratings
             rating: {
-                imdb: movieDetails.rating || 0,
+                imdb: formattedMovie.rating.imdb || 0,
                 userRating: 0,
-                totalRatings: 0,
+                totalRatings: formattedMovie.rating.totalRatings || 0,
                 translationRating: customData.translationRating || 4.5,
                 totalTranslationRatings: 0
             },
             
             // Categories
-            genres: movieDetails.genres || ['action'],
+            genres: formattedMovie.genres || ['action'],
             
             // Cast and crew
-            cast: movieDetails.cast || [],
-            director: movieDetails.director || 'Unknown',
-            writers: movieDetails.writers || [],
+            cast: formattedMovie.cast || [],
+            director: formattedMovie.director || 'Unknown',
+            writers: [],
             
             // Language
-            originalLanguage: movieDetails.language || 'English',
+            originalLanguage: formattedMovie.originalLanguage || 'en',
             availableLanguages: ['English', 'Luganda'],
-            country: movieDetails.country || 'USA',
+            country: formattedMovie.country || 'USA',
             
             // Media
-            poster: movieDetails.poster || '',
-            backdrop: movieDetails.backdrop || null,
-            trailer: movieDetails.trailer || null,
+            poster: formattedMovie.poster || '',
+            backdrop: formattedMovie.backdrop || null,
+            trailer: formattedMovie.trailer || null,
             
             // Video info (placeholder - will be updated when video is uploaded)
             video: {
-                originalVideoPath: customData.videoPath || null,
+                originalVideoPath: customData.videoPath || 'pending-upload',
                 lugandaVideoPath: null,
                 lugandaAudioPath: null,
                 quality: customData.quality || 'hd',
                 size: 0,
-                duration: movieDetails.runtime || 120,
+                duration: formattedMovie.duration || 120,
                 format: 'mp4'
             },
             
@@ -127,9 +131,9 @@ async function addMovie(movieTitle, vjName, lugandaTitle = null, customData = {}
             likes: 0,
             downloads: 0,
             
-            // Tags
-            tags: [vjName, 'luganda', 'translated', ...movieDetails.genres],
-            ageRating: movieDetails.ageRating || 'PG-13',
+            // Tags (only string values)
+            tags: [vjName, 'luganda', 'translated', ...formattedMovie.genres],
+            ageRating: 'PG-13',
             
             // Translation metadata
             translationDate: new Date(),
@@ -216,13 +220,13 @@ async function addMultipleMovies(moviesList) {
     return results;
 }
 
-// Movies to add based on your request
+// Latest Movies to add from kpsounds.com (December 2025)
 const moviesToAdd = [
-    // VJ Ice P Movies
+    // VJ ICE P - Latest 2025 Movies
     {
-        title: 'Lokah',
+        title: '28 Years Later',
         vj: 'VJ Ice P',
-        lugandaTitle: 'Lokah (Luganda)',
+        lugandaTitle: '28 Years Later (Luganda)',
         customData: {
             translationRating: 4.8,
             featured: true,
@@ -230,58 +234,232 @@ const moviesToAdd = [
         }
     },
     {
-        title: 'Running Man',
+        title: 'Ghost Killer',
         vj: 'VJ Ice P',
-        lugandaTitle: 'Running Man (Luganda)',
+        lugandaTitle: 'Ghost Killer (Luganda)',
         customData: {
-            translationRating: 4.7
+            translationRating: 4.7,
+            trending: true
         }
     },
     {
-        title: 'Kantara',
+        title: 'Desert Dawn',
         vj: 'VJ Ice P',
-        lugandaTitle: 'Kantara (Luganda)',
+        lugandaTitle: 'Desert Dawn (Luganda)',
         customData: {
-            translationRating: 4.9,
+            translationRating: 4.6,
             featured: true
         }
     },
     {
-        title: 'Frankenstein',
+        title: 'Bhairavam',
         vj: 'VJ Ice P',
-        lugandaTitle: 'Frankenstein (Luganda)',
+        lugandaTitle: 'Bhairavam Part 1 & 2 (Luganda)',
+        customData: {
+            translationRating: 4.8,
+            trending: true
+        }
+    },
+    {
+        title: 'Reign of Assassins',
+        vj: 'VJ Ice P',
+        lugandaTitle: 'Reign of Assassins (Luganda)',
+        customData: {
+            translationRating: 4.7,
+            featured: true
+        }
+    },
+    {
+        title: 'Blood of Youth',
+        vj: 'VJ Ice P',
+        lugandaTitle: 'Blood of Youth (Luganda)',
+        customData: {
+            translationRating: 4.6
+        }
+    },
+    {
+        title: 'The Old Way',
+        vj: 'VJ Ice P',
+        lugandaTitle: 'The Old Way (Luganda)',
+        customData: {
+            translationRating: 4.5
+        }
+    },
+    
+    // VJ JUNIOR - Latest 2025 Movies
+    {
+        title: 'Follow',
+        vj: 'VJ Junior',
+        lugandaTitle: 'Follow (Luganda)',
+        customData: {
+            translationRating: 4.7,
+            trending: true
+        }
+    },
+    {
+        title: 'Tornado',
+        vj: 'VJ Junior',
+        lugandaTitle: 'Tornado (Luganda)',
+        customData: {
+            translationRating: 4.6,
+            featured: true
+        }
+    },
+    {
+        title: 'The Shadow\'s Edge',
+        vj: 'VJ Junior',
+        lugandaTitle: 'The Shadow\'s Edge (Luganda)',
+        customData: {
+            translationRating: 4.8,
+            trending: true
+        }
+    },
+    {
+        title: 'The Family Plan 2',
+        vj: 'VJ Junior',
+        lugandaTitle: 'The Family Plan 2 (Luganda)',
+        customData: {
+            translationRating: 4.7,
+            featured: true
+        }
+    },
+    {
+        title: 'Escobank',
+        vj: 'VJ Junior',
+        lugandaTitle: 'Escobank (Luganda)',
         customData: {
             translationRating: 4.5
         }
     },
     {
-        title: 'Predator Badlands',
-        vj: 'VJ Ice P',
-        lugandaTitle: 'Predator Badlands (Luganda)',
+        title: 'All of You',
+        vj: 'VJ Junior',
+        lugandaTitle: 'All of You (Luganda)',
         customData: {
-            translationRating: 4.6,
+            translationRating: 4.6
+        }
+    },
+    {
+        title: 'Jurassic World Rebirth',
+        vj: 'VJ Junior',
+        lugandaTitle: 'Jurassic World Rebirth (Luganda)',
+        customData: {
+            translationRating: 4.9,
+            featured: true,
             trending: true
         }
     },
     {
-        title: 'Fist of Fury',
-        vj: 'VJ Ice P',
-        lugandaTitle: 'Fist of Fury (Luganda)',
+        title: 'The Pickup',
+        vj: 'VJ Junior',
+        lugandaTitle: 'The Pickup (Luganda)',
         customData: {
-            translationRating: 4.7
+            translationRating: 4.5
+        }
+    },
+    
+    // VJ EMMY - Latest 2025 Movies
+    {
+        title: 'How to Train Your Dragon',
+        vj: 'VJ Emmy',
+        lugandaTitle: 'How to Train Your Dragon (Luganda)',
+        customData: {
+            translationRating: 4.9,
+            featured: true,
+            trending: true
+        }
+    },
+    {
+        title: 'Predator: Badlands',
+        vj: 'VJ Emmy',
+        lugandaTitle: 'Predator: Badlands (Luganda)',
+        customData: {
+            translationRating: 4.8,
+            trending: true
+        }
+    },
+    {
+        title: 'The Sandman',
+        vj: 'VJ Emmy',
+        lugandaTitle: 'The Sandman (Luganda)',
+        customData: {
+            translationRating: 4.7,
+            featured: true
+        }
+    },
+    {
+        title: 'Muzzle',
+        vj: 'VJ Emmy',
+        lugandaTitle: 'Muzzle: City of Wolves (Luganda)',
+        customData: {
+            translationRating: 4.6
+        }
+    },
+    {
+        title: 'Dora and the Lost City of Gold',
+        vj: 'VJ Emmy',
+        lugandaTitle: 'Dora and the Search for Sol Dorado (Luganda)',
+        customData: {
+            translationRating: 4.5
+        }
+    },
+    
+    // VJ SOUL - Latest Movies
+    {
+        title: 'Superman',
+        vj: 'VJ Soul',
+        lugandaTitle: 'Superman (Luganda)',
+        customData: {
+            translationRating: 4.8,
+            featured: true,
+            trending: true
         }
     }
 ];
 
-// Series to add (VJ Soul)
+// Series to add
 const seriesToAdd = [
     {
-        title: 'War',
-        vj: 'VJ Soul',
-        lugandaTitle: 'War Season 1 (Luganda)',
+        title: 'Last Samurai Standing',
+        vj: 'VJ Ice P',
+        lugandaTitle: 'Last Samurai Standing (Luganda)',
         customData: {
             translationRating: 4.8,
             featured: true
+        }
+    },
+    {
+        title: 'Ever Night',
+        vj: 'VJ Ice P',
+        lugandaTitle: 'Ever Night Season 2 (Luganda)',
+        customData: {
+            translationRating: 4.7,
+            trending: true
+        }
+    },
+    {
+        title: 'Land of Warriors',
+        vj: 'VJ Ice P',
+        lugandaTitle: 'Land of Warriors 2 (Luganda)',
+        customData: {
+            translationRating: 4.6
+        }
+    },
+    {
+        title: 'Love and Sword',
+        vj: 'VJ Ice P',
+        lugandaTitle: 'Love and Sword 2025 (Luganda)',
+        customData: {
+            translationRating: 4.7,
+            featured: true
+        }
+    },
+    {
+        title: 'Man vs Baby',
+        vj: 'VJ Junior',
+        lugandaTitle: 'Man vs Baby (Luganda)',
+        customData: {
+            translationRating: 4.5
         }
     }
 ];

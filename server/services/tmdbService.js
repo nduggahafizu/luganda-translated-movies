@@ -243,19 +243,29 @@ class TMDBService {
      * Format movie data for our database
      */
     formatMovieForDatabase(tmdbMovie) {
+        // Map genres to our allowed values
+        let genres = [];
+        if (tmdbMovie.genres && tmdbMovie.genres.length > 0) {
+            genres = tmdbMovie.genres.map(g => this.mapGenreName(g.name));
+            // Remove duplicates
+            genres = [...new Set(genres)];
+        } else {
+            genres = ['drama']; // default genre
+        }
+        
         return {
             tmdbId: tmdbMovie.id,
             originalTitle: tmdbMovie.title,
-            description: tmdbMovie.overview,
-            year: tmdbMovie.release_date ? new Date(tmdbMovie.release_date).getFullYear() : null,
-            duration: tmdbMovie.runtime || 0,
+            description: tmdbMovie.overview || 'No description available',
+            year: tmdbMovie.release_date ? new Date(tmdbMovie.release_date).getFullYear() : new Date().getFullYear(),
+            duration: tmdbMovie.runtime || 120,
             rating: {
                 imdb: tmdbMovie.vote_average || 0,
                 userRating: 0,
                 totalRatings: tmdbMovie.vote_count || 0
             },
-            genres: tmdbMovie.genres ? tmdbMovie.genres.map(g => g.name.toLowerCase()) : [],
-            poster: this.getPosterUrl(tmdbMovie.poster_path),
+            genres: genres,
+            poster: this.getPosterUrl(tmdbMovie.poster_path) || '',
             backdrop: this.getBackdropUrl(tmdbMovie.backdrop_path),
             country: tmdbMovie.production_countries && tmdbMovie.production_countries[0] 
                 ? tmdbMovie.production_countries[0].name 
@@ -303,19 +313,50 @@ class TMDBService {
             18: 'drama',
             10751: 'family',
             14: 'fantasy',
-            36: 'history',
+            36: 'drama',  // history -> drama
             27: 'horror',
-            10402: 'music',
+            10402: 'drama',  // music -> drama
             9648: 'mystery',
             10749: 'romance',
             878: 'sci-fi',
-            10770: 'tv-movie',
+            10770: 'drama',  // tv-movie -> drama
             53: 'thriller',
-            10752: 'war',
-            37: 'western'
+            10752: 'action',  // war -> action
+            37: 'action'  // western -> action
         };
         
-        return genreMap[genreId] || 'other';
+        return genreMap[genreId] || 'drama';
+    }
+    
+    /**
+     * Map TMDB genre name to our allowed genre names
+     */
+    mapGenreName(genreName) {
+        const genreNameMap = {
+            'action': 'action',
+            'adventure': 'adventure',
+            'animation': 'animation',
+            'comedy': 'comedy',
+            'crime': 'crime',
+            'documentary': 'documentary',
+            'drama': 'drama',
+            'family': 'family',
+            'fantasy': 'fantasy',
+            'history': 'drama',
+            'horror': 'horror',
+            'music': 'drama',
+            'mystery': 'mystery',
+            'romance': 'romance',
+            'science fiction': 'sci-fi',
+            'sci-fi': 'sci-fi',
+            'tv movie': 'drama',
+            'thriller': 'thriller',
+            'war': 'action',
+            'western': 'action'
+        };
+        
+        const normalized = genreName.toLowerCase();
+        return genreNameMap[normalized] || 'drama';
     }
 
     /**
