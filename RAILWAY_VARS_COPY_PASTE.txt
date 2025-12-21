@@ -1,0 +1,94 @@
+=================================================================
+RAILWAY ENVIRONMENT VARIABLES - COPY & PASTE
+=================================================================
+
+INSTRUCTIONS:
+1. Copy all variables below
+2. Go to Railway Dashboard → Your Service → Variables tab
+3. Click "Raw Editor" button
+4. Paste all variables
+5. UPDATE the last 3 variables with your actual values
+6. Click "Update Variables"
+
+=================================================================
+COPY EVERYTHING BELOW THIS LINE:
+=================================================================
+
+NODE_ENV=production
+PORT=5000
+JWT_SECRET=e89b4372c354b732f99c0ab2937c11f0373b7af49c1f58b919bc907a1388750e4c00ccf1f6fcd06b9811016339280e0bf4eae247b666f4415fb9031cb34637c2
+JWT_EXPIRES_IN=7d
+JWT_REFRESH_EXPIRES_IN=30d
+SESSION_SECRET=939350ab881352d73aea3d67053f04dfb00cd4e8058675d83611f42f4ac6849b
+GOOGLE_CLIENT_ID=573762962600-nr77v5emb2spn7aleg9p2l7c0d6be3a9.apps.googleusercontent.com
+TRUST_PROXY=true
+ENABLE_RATE_LIMITING=true
+ENABLE_LOGGING=true
+ENABLE_MONITORING=true
+LOG_LEVEL=info
+RATE_LIMIT_WINDOW=15
+RATE_LIMIT_MAX_REQUESTS=100
+
+=================================================================
+⚠️ UPDATE THESE 3 VARIABLES WITH YOUR ACTUAL VALUES:
+=================================================================
+
+MONGODB_URI=REPLACE_WITH_YOUR_MONGODB_CONNECTION_STRING
+ALLOWED_ORIGINS=REPLACE_WITH_YOUR_NETLIFY_URL
+CLIENT_URL=REPLACE_WITH_YOUR_NETLIFY_URL
+
+=================================================================
+MONGODB OPTIONS:
+=================================================================
+
+Option A: Railway MongoDB Plugin
+---------------------------------
+1. Railway Dashboard → New → Database → Add MongoDB
+2. Railway creates MONGO_URL automatically
+3. Replace the MONGODB_URI line above with:
+   MONGODB_URI=${{MONGO_URL}}
+
+Option B: MongoDB Atlas (Recommended)
+--------------------------------------
+1. Go to: https://cloud.mongodb.com
+2. Create free M0 cluster
+3. Create database user (save password!)
+4. Network Access → Add IP: 0.0.0.0/0
+5. Get connection string
+6. Format: mongodb+srv://username:password@cluster.mongodb.net/luganda-movies?retryWrites=true&w=majority
+7. Replace MONGODB_URI value above with your connection string
+
+=================================================================
+NETLIFY URL:
+=================================================================
+
+1. Go to: https://app.netlify.com
+2. Click your site
+3. Copy the URL (e.g., https://luganda-movies.netlify.app)
+4. Replace ALLOWED_ORIGINS and CLIENT_URL values above
+
+Example:
+ALLOWED_ORIGINS=https://luganda-movies.netlify.app,https://www.luganda-movies.netlify.app
+CLIENT_URL=https://luganda-movies.netlify.app
+
+=================================================================
+VERIFICATION:
+=================================================================
+
+After adding variables, Railway will redeploy automatically.
+
+Test with:
+curl https://your-railway-url.up.railway.app/api/health
+
+Expected: {"status":"healthy",...}
+
+=================================================================
+GENERATED SECRETS INFO:
+=================================================================
+
+JWT_SECRET: 128 characters, cryptographically secure
+SESSION_SECRET: 64 characters, cryptographically secure
+
+These are production-ready and secure. Do NOT change them.
+
+=================================================================
