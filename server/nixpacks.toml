@@ -1,11 +1,8 @@
 [phases.setup]
-nixPkgs = ["nodejs-22_x"]
+nixPkgs = ["nodejs"]
 
 [phases.install]
 cmds = ["npm install"]
-
-[phases.build]
-cmds = ["echo 'No build step needed'"]
 
 [start]
 cmd = "node server.js"
