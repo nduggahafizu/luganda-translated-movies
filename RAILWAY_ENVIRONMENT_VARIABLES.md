@@ -24,10 +24,16 @@ TRUST_PROXY=true
 ENABLE_RATE_LIMITING=true
 ENABLE_LOGGING=true
 ENABLE_MONITORING=true
+ENABLE_CACHING=false
 LOG_LEVEL=info
 RATE_LIMIT_WINDOW=15
 RATE_LIMIT_MAX_REQUESTS=100
+REDIS_HOST=
+REDIS_PORT=
+REDIS_PASSWORD=
 ```
+
+> ℹ️ Leave `ENABLE_CACHING=false` unless you have a Redis instance configured. If you later set it to `true`, make sure `REDIS_HOST`, `REDIS_PORT`, and (optionally) `REDIS_PASSWORD` point to your Redis service.
 
 ### 🔄 VARIABLES YOU MUST UPDATE
 
