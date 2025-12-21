@@ -37,7 +37,7 @@ const Config = (function() {
         // Feature Flags
         ENABLE_GOOGLE_AUTH: true,
         ENABLE_OFFLINE_MODE: true, // Work without backend
-        ENABLE_SAMPLE_DATA: true,  // Use sample data as fallback
+        ENABLE_SAMPLE_DATA: false,  // Disabled - use real data from backend only
 
         // Timeouts
         API_TIMEOUT: 10000, // 10 seconds
