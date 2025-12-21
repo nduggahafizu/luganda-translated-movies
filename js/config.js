@@ -19,7 +19,7 @@ const Config = (function() {
         // Backend API URL
         BACKEND_URL: isLocalhost 
             ? 'http://localhost:5000'
-            : 'https://luganda-movies-api.onrender.com', // Update with your actual backend URL
+            : 'https://YOUR_RAILWAY_URL_HERE.up.railway.app', // Replace with your Railway backend URL
 
         // Google OAuth Client ID
         GOOGLE_CLIENT_ID: '573762962600-nr77v5emb2spn7aleg9p2l7c0d6be3a9.apps.googleusercontent.com',
