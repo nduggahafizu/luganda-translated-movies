@@ -7,21 +7,26 @@ INSTRUCTIONS:
 2. Go to Railway Dashboard → Your Service → Variables tab
 3. Click "Raw Editor" button
 4. Paste all variables
-5. UPDATE the last 3 variables with your actual values
+5. UPDATE the values marked below with your actual configuration
 6. Click "Update Variables"
 
 =================================================================
 COPY EVERYTHING BELOW THIS LINE:
 =================================================================
 
+# Core server settings
 NODE_ENV=production
 PORT=5000
+TRUST_PROXY=true
+
+# Authentication & sessions
 JWT_SECRET=e89b4372c354b732f99c0ab2937c11f0373b7af49c1f58b919bc907a1388750e4c00ccf1f6fcd06b9811016339280e0bf4eae247b666f4415fb9031cb34637c2
 JWT_EXPIRES_IN=7d
 JWT_REFRESH_EXPIRES_IN=30d
 SESSION_SECRET=939350ab881352d73aea3d67053f04dfb00cd4e8058675d83611f42f4ac6849b
 GOOGLE_CLIENT_ID=573762962600-nr77v5emb2spn7aleg9p2l7c0d6be3a9.apps.googleusercontent.com
-TRUST_PROXY=true
+
+# Rate limiting & monitoring
 ENABLE_RATE_LIMITING=true
 ENABLE_LOGGING=true
 ENABLE_MONITORING=true
@@ -29,10 +34,13 @@ LOG_LEVEL=info
 RATE_LIMIT_WINDOW=15
 RATE_LIMIT_MAX_REQUESTS=100
 
-=================================================================
-⚠️ UPDATE THESE 3 VARIABLES WITH YOUR ACTUAL VALUES:
-=================================================================
+# Caching (optional - leave disabled unless you have Redis)
+ENABLE_CACHING=false
+REDIS_HOST=
+REDIS_PORT=
+REDIS_PASSWORD=
 
+# Update these with your values BEFORE saving
 MONGODB_URI=REPLACE_WITH_YOUR_MONGODB_CONNECTION_STRING
 ALLOWED_ORIGINS=REPLACE_WITH_YOUR_NETLIFY_URL
 CLIENT_URL=REPLACE_WITH_YOUR_NETLIFY_URL
@@ -70,6 +78,16 @@ NETLIFY URL:
 Example:
 ALLOWED_ORIGINS=https://luganda-movies.netlify.app,https://www.luganda-movies.netlify.app
 CLIENT_URL=https://luganda-movies.netlify.app
+
+=================================================================
+REDIS / CACHING NOTES:
+=================================================================
+
+- Leave ENABLE_CACHING=false unless you have a Redis instance.
+- If you enable caching (set ENABLE_CACHING=true):
+  • Provide REDIS_HOST, REDIS_PORT, and (if needed) REDIS_PASSWORD
+  • Railway Redis plugin automatically sets REDIS_URL; use the values provided
+  • Without Redis, the server runs normally — caching is optional
 
 =================================================================
 VERIFICATION:
