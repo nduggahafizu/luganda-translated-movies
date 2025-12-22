@@ -39,7 +39,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.20.4",
     "morgan": "^1.10.0",
-    "nodemailer": "^6.9.7",
+    "nodemailer": "^7.0.12",
     "redis": "^5.10.0",
     "response-time": "^2.3.4",
     "stripe": "^14.25.0",

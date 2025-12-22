@@ -126,10 +126,7 @@ async function addMovie() {
         
         // Connect to MongoDB
         console.log('Connecting to MongoDB...');
-        await mongoose.connect(MONGODB_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
+        await mongoose.connect(MONGODB_URI, );
         console.log('✓ Connected to MongoDB\n');
         
         // Load the model
