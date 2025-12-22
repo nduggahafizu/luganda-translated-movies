@@ -125,26 +125,18 @@ app.use('/api/', generalLimiter);
 // Static files
 app.use('/uploads', express.static('uploads'));
 
-// Database connection
+// Database connection with fallback support
+const dbManager = require('./config/database');
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/luganda-movies';
 
-mongoose.connect(MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
-.then(() => {
-    console.log('✅ MongoDB Connected Successfully');
-    console.log(`📦 Database: ${MONGODB_URI}`);
-})
-.catch((err) => {
-    console.error('⚠️  MongoDB Connection Warning:', err.message);
-    console.log('⚠️  Server will continue without MongoDB');
-    console.log('⚠️  Some features may not work until MongoDB is connected');
-    console.log('');
-    console.log('💡 To fix this:');
-    console.log('   1. Start MongoDB: net start MongoDB');
-    console.log('   2. Or use MongoDB Atlas (cloud): Update MONGODB_URI in .env');
-    console.log('');
+// Connect to database (with fallback to in-memory mode)
+dbManager.connect(MONGODB_URI).then((connected) => {
+    if (!connected) {
+        console.log('⚠️  Running in IN-MEMORY mode');
+        console.log('⚠️  Data will not persist between restarts\n');
+    }
+}).catch((err) => {
+    console.error('❌ Database initialization error:', err);
 });
 
 // Session middleware for watch progress and playlists
@@ -191,7 +183,12 @@ app.post('/api/auth/refresh', refreshTokenHandler);
 app.get('/api/health', async (req, res) => {
     try {
         const health = await getHealthCheck();
-        res.json(health);
+        const dbStatus = dbManager.getStatus();
+        
+        res.json({
+            ...health,
+            database: dbStatus
+        });
     } catch (error) {
         res.status(500).json({
             status: 'error',
