@@ -1,10 +1,56 @@
 const LugandaMovie = require('../models/LugandaMovie');
+const dbManager = require('../config/database');
 
 // @desc    Get all Luganda movies
 // @route   GET /api/luganda-movies
 // @access  Public
 exports.getAllMovies = async (req, res) => {
     try {
+        // Check if using in-memory mode
+        if (dbManager.isInMemoryMode()) {
+            const store = dbManager.getInMemoryStore();
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 20;
+            const skip = (page - 1) * limit;
+
+            let movies = store.lugandaMovies.filter(m => m.status === 'published');
+
+            // Apply filters
+            if (req.query.genre) {
+                movies = movies.filter(m => m.genres && m.genres.includes(req.query.genre));
+            }
+            if (req.query.year) {
+                movies = movies.filter(m => m.year === parseInt(req.query.year));
+            }
+            if (req.query.vjName) {
+                const vjName = req.query.vjName.toLowerCase();
+                movies = movies.filter(m => m.vjName && m.vjName.toLowerCase().includes(vjName));
+            }
+
+            // Sorting
+            if (req.query.sort === 'popular') {
+                movies.sort((a, b) => (b.views || 0) - (a.views || 0));
+            } else if (req.query.sort === 'rating') {
+                movies.sort((a, b) => (b.rating?.userRating || 0) - (a.rating?.userRating || 0));
+            } else if (req.query.sort === 'title') {
+                movies.sort((a, b) => (a.lugandaTitle || '').localeCompare(b.lugandaTitle || ''));
+            }
+
+            const total = movies.length;
+            const paginatedMovies = movies.slice(skip, skip + limit);
+
+            return res.status(200).json({
+                success: true,
+                count: paginatedMovies.length,
+                total,
+                page,
+                pages: Math.ceil(total / limit),
+                data: paginatedMovies,
+                inMemoryMode: true
+            });
+        }
+
+        // MongoDB mode
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 20;
         const skip = (page - 1) * limit;
@@ -70,6 +116,31 @@ exports.getAllMovies = async (req, res) => {
 // @access  Public
 exports.getMovie = async (req, res) => {
     try {
+        // Check if using in-memory mode
+        if (dbManager.isInMemoryMode()) {
+            const store = dbManager.getInMemoryStore();
+            const movie = store.lugandaMovies.find(m => 
+                m._id === req.params.id || m.slug === req.params.id
+            );
+
+            if (!movie) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Movie not found'
+                });
+            }
+
+            // Increment views
+            movie.views = (movie.views || 0) + 1;
+
+            return res.status(200).json({
+                success: true,
+                data: movie,
+                inMemoryMode: true
+            });
+        }
+
+        // MongoDB mode
         let movie;
         
         // Check if it's a MongoDB ID or slug
@@ -158,6 +229,24 @@ exports.searchMovies = async (req, res) => {
 exports.getTrending = async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 10;
+
+        // Check if using in-memory mode
+        if (dbManager.isInMemoryMode()) {
+            const store = dbManager.getInMemoryStore();
+            const movies = store.lugandaMovies
+                .filter(m => m.status === 'published' && m.trending)
+                .sort((a, b) => (b.views || 0) - (a.views || 0))
+                .slice(0, limit);
+
+            return res.status(200).json({
+                success: true,
+                count: movies.length,
+                data: movies,
+                inMemoryMode: true
+            });
+        }
+
+        // MongoDB mode
         const movies = await LugandaMovie.getTrending(limit);
 
         res.status(200).json({
@@ -180,6 +269,24 @@ exports.getTrending = async (req, res) => {
 exports.getFeatured = async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 10;
+
+        // Check if using in-memory mode
+        if (dbManager.isInMemoryMode()) {
+            const store = dbManager.getInMemoryStore();
+            const movies = store.lugandaMovies
+                .filter(m => m.status === 'published' && m.featured)
+                .sort((a, b) => new Date(b.translationDate) - new Date(a.translationDate))
+                .slice(0, limit);
+
+            return res.status(200).json({
+                success: true,
+                count: movies.length,
+                data: movies,
+                inMemoryMode: true
+            });
+        }
+
+        // MongoDB mode
         const movies = await LugandaMovie.getFeatured(limit);
 
         res.status(200).json({
@@ -247,6 +354,47 @@ exports.getByVJ = async (req, res) => {
 // @access  Public
 exports.getAllVJs = async (req, res) => {
     try {
+        // Check if using in-memory mode
+        if (dbManager.isInMemoryMode()) {
+            const store = dbManager.getInMemoryStore();
+            const vjMap = {};
+
+            store.lugandaMovies
+                .filter(m => m.status === 'published')
+                .forEach(movie => {
+                    if (!vjMap[movie.vjName]) {
+                        vjMap[movie.vjName] = {
+                            _id: movie.vjName,
+                            movieCount: 0,
+                            avgRating: 0,
+                            totalViews: 0,
+                            ratings: []
+                        };
+                    }
+                    vjMap[movie.vjName].movieCount++;
+                    vjMap[movie.vjName].totalViews += movie.views || 0;
+                    if (movie.rating && movie.rating.translationRating) {
+                        vjMap[movie.vjName].ratings.push(movie.rating.translationRating);
+                    }
+                });
+
+            const vjs = Object.values(vjMap).map(vj => {
+                vj.avgRating = vj.ratings.length > 0
+                    ? vj.ratings.reduce((a, b) => a + b, 0) / vj.ratings.length
+                    : 0;
+                delete vj.ratings;
+                return vj;
+            }).sort((a, b) => b.movieCount - a.movieCount);
+
+            return res.status(200).json({
+                success: true,
+                count: vjs.length,
+                data: vjs,
+                inMemoryMode: true
+            });
+        }
+
+        // MongoDB mode
         const vjs = await LugandaMovie.aggregate([
             { $match: { status: 'published' } },
             {
