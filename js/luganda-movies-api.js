@@ -358,9 +358,34 @@ const SAMPLE_LUGANDA_MOVIES = [
         trending: true
     },
     
-    // Additional Popular Movies
+    // VJ Jingo Movies
     {
         _id: '11',
+        originalTitle: 'Baby\'s Day Out',
+        lugandaTitle: 'Baby\'s Day Out (Luganda)',
+        vjName: 'VJ Jingo',
+        year: 1994,
+        genres: ['comedy', 'family', 'adventure'],
+        rating: {
+            imdb: 6.2,
+            userRating: 7.5,
+            translationRating: 4.7
+        },
+        video: {
+            quality: 'hd'
+        },
+        poster: 'https://image.tmdb.org/t/p/w500/uKQB3HjGLGKyYqxwGlz5l8p5Yvz.jpg',
+        description: 'Three bumbling criminals kidnap a baby for ransom, but the clever infant escapes and embarks on an adventurous day exploring the city. The baby\'s innocent journey through Chicago becomes a hilarious chase as the incompetent kidnappers try to recapture him.',
+        vjId: 'vj-jingo',
+        translationQuality: 4.7,
+        views: 18750,
+        featured: true,
+        trending: true
+    },
+    
+    // Additional Popular Movies
+    {
+        _id: '12',
         originalTitle: 'Fast & Furious 9',
         lugandaTitle: 'Fast & Furious 9 (Luganda)',
         vjName: 'VJ Junior',
@@ -383,7 +408,7 @@ const SAMPLE_LUGANDA_MOVIES = [
         trending: false
     },
     {
-        _id: '12',
+        _id: '13',
         originalTitle: 'Black Panther',
         lugandaTitle: 'Black Panther (Luganda)',
         vjName: 'VJ Emmy',
