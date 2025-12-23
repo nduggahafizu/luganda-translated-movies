@@ -1,10 +1,72 @@
 const express = require('express');
 const router = express.Router();
 const VJ = require('../models/VJ');
+const dbManager = require('../config/database');
 
 // Get all VJs
 router.get('/', async (req, res) => {
     try {
+        // Check if using in-memory mode
+        if (dbManager.isInMemoryMode()) {
+            const store = dbManager.getInMemoryStore();
+            const vjMap = {};
+
+            // Build VJ list from movies
+            store.lugandaMovies
+                .filter(m => m.status === 'published')
+                .forEach(movie => {
+                    if (!vjMap[movie.vjName]) {
+                        vjMap[movie.vjName] = {
+                            _id: movie.vjId || movie.vjName.toLowerCase().replace(/\s+/g, '-'),
+                            name: movie.vjName,
+                            slug: movie.vjId || movie.vjName.toLowerCase().replace(/\s+/g, '-'),
+                            movieCount: 0,
+                            totalViews: 0,
+                            totalLikes: 0,
+                            ratings: [],
+                            status: 'active',
+                            verified: true,
+                            featured: false,
+                            popular: false
+                        };
+                    }
+                    vjMap[movie.vjName].movieCount++;
+                    vjMap[movie.vjName].totalViews += movie.views || 0;
+                    vjMap[movie.vjName].totalLikes += movie.likes || 0;
+                    if (movie.rating && movie.rating.translationRating) {
+                        vjMap[movie.vjName].ratings.push(movie.rating.translationRating);
+                    }
+                });
+
+            const vjs = Object.values(vjMap).map(vj => {
+                vj.rating = {
+                    overall: vj.ratings.length > 0
+                        ? vj.ratings.reduce((a, b) => a + b, 0) / vj.ratings.length
+                        : 0,
+                    count: vj.ratings.length
+                };
+                delete vj.ratings;
+                
+                // Mark popular VJs
+                if (vj.movieCount >= 3 || vj.totalViews >= 30000) {
+                    vj.popular = true;
+                }
+                
+                return vj;
+            }).sort((a, b) => b.movieCount - a.movieCount);
+
+            return res.json({
+                success: true,
+                count: vjs.length,
+                total: vjs.length,
+                page: 1,
+                pages: 1,
+                data: vjs,
+                inMemoryMode: true
+            });
+        }
+
+        // MongoDB mode
         const { 
             status = 'active',
             verified,
