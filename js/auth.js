@@ -3,9 +3,9 @@
    Features: Google Sign-In, Remember Me, Persistent Login
    =================================== */
 
-// Configuration
-const API_URL = 'http://localhost:5000/api'; // Backend URL (change to production URL when deploying)
-const GOOGLE_CLIENT_ID = '573762962600-nr77v5emb2spn7aleg9p2l7c0d6be3a9.apps.googleusercontent.com'; // Your Google Client ID
+// Configuration - Uses centralized config
+const API_URL = API_CONFIG.API_ENDPOINTS.AUTH;
+const GOOGLE_CLIENT_ID = API_CONFIG.GOOGLE_CLIENT_ID;
 
 // Initialize Google Sign-In
 function initGoogleSignIn() {

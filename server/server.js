@@ -61,7 +61,12 @@ const corsOptions = {
     origin: function (origin, callback) {
         const allowedOrigins = process.env.ALLOWED_ORIGINS 
             ? process.env.ALLOWED_ORIGINS.split(',')
-            : ['http://localhost:3000', 'http://localhost:5000'];
+            : [
+                'http://localhost:3000', 
+                'http://localhost:5000',
+                'https://watch.unrulymovies.com',
+                'https://unrulymovies.com'
+              ];
         
         // Allow requests with no origin (mobile apps, Postman, etc.)
         if (!origin) return callback(null, true);
