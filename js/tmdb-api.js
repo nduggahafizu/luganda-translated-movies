@@ -5,8 +5,8 @@
 
 class TMDBApiClient {
     constructor() {
-        // Use environment variable or default to localhost
-        this.baseUrl = process.env.API_URL || 'http://localhost:5000';
+        // Use centralized config
+        this.baseUrl = API_CONFIG.BASE_URL;
         this.apiPath = '/api/tmdb';
     }
 

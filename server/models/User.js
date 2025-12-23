@@ -138,12 +138,12 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Hash password before saving
+// Hash password before saving (only for local users)
 userSchema.pre('save', async function(next) {
-    if (!this.isModified('password')) {
+    if (!this.isModified('password') || this.provider === 'google') {
         return next();
     }
-    
+
     const salt = await bcrypt.genSalt(parseInt(process.env.BCRYPT_ROUNDS) || 10);
     this.password = await bcrypt.hash(this.password, salt);
     next();
