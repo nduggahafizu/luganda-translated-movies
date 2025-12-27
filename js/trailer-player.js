@@ -155,7 +155,9 @@ class TrailerPlayer {
         
         // Create iframe
         const iframe = document.createElement('iframe');
-        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+        // Include origin param so YouTube widget API postMessage target matches the page origin
+        const origin = encodeURIComponent(window.location.origin || window.location.href);
+        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&origin=${origin}`;
         iframe.width = '100%';
         iframe.height = '100%';
         iframe.frameBorder = '0';
