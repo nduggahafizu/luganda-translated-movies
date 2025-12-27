@@ -86,6 +86,9 @@ app.use(helmet({
                 "'self'",
                 "https://image.tmdb.org",
                 "https://luganda-translated-movies-production.up.railway.app",
+                "https://watch.unrulymovies.com",
+                "https://unrulymovies.com",
+                "https://*.netlify.app",
                 "https://www.youtube.com",
                 "https://s.ytimg.com",
                 "https://www.googleapis.com",
@@ -135,11 +138,18 @@ const corsOptions = {
         // Allow requests with no origin (mobile apps, Postman, etc.)
         if (!origin) return callback(null, true);
         
-        if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
+        // Allow explicit matches
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            return callback(null, true);
         }
+
+        // Allow Netlify preview URLs and Railway preview URLs (flexible for deploy previews)
+        if (origin.includes('netlify.app') || origin.includes('up.railway.app') || process.env.NODE_ENV === 'development') {
+            return callback(null, true);
+        }
+
+        // Deny by default
+        return callback(new Error('Not allowed by CORS'));
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
