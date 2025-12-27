@@ -345,7 +345,8 @@
 
     <script>
         // Configuration
-        const API_URL = 'https://watch.unrulymovies.com/api'; // Change to your backend URL
+        // Use centralized API config (defined in js/config.js) so production/dev URLs stay in sync
+        const API_URL = API_CONFIG.BASE_URL + '/api';
         const STRIPE_PUBLIC_KEY = 'pk_test_your_key'; // Add your Stripe public key
         
         // Get plan details from URL
