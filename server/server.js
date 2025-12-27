@@ -44,16 +44,80 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            styleSrc: ["'self'", "'unsafe-inline'"],
-            scriptSrc: ["'self'"],
-            imgSrc: ["'self'", "data:", "https:"],
+            scriptSrc: [
+                "'self'", 
+                "'unsafe-inline'", 
+                "'unsafe-eval'",
+                "https://vjs.zencdn.net",
+                "https://www.youtube.com",
+                "https://s.ytimg.com",
+                "https://pagead2.googlesyndication.com",
+                "https://googleads.g.doubleclick.net",
+                "https://www.googletagservices.com",
+                "https://adservice.google.com",
+                "https://tpc.googlesyndication.com",
+                "https://ep2.adtrafficquality.google",
+                "https://accounts.google.com",
+                "https://apis.google.com",
+                "https://fonts.googleapis.com",
+                "https://fonts.gstatic.com",
+                "https://*.googleapis.com",
+                "https://*.google.com",
+                "https://*.doubleclick.net",
+                "blob:"
+            ],
+            styleSrc: [
+                "'self'", 
+                "'unsafe-inline'", 
+                "https://fonts.googleapis.com", 
+                "https://vjs.zencdn.net"
+            ],
+            imgSrc: [
+                "'self'", 
+                "data:", 
+                "https:", 
+                "blob:",
+                "https://image.tmdb.org",
+                "https://pagead2.googlesyndication.com",
+                "https://*.google.com",
+                "https://*.doubleclick.net"
+            ],
+            connectSrc: [
+                "'self'",
+                "https://image.tmdb.org",
+                "https://luganda-translated-movies-production.up.railway.app",
+                "https://www.youtube.com",
+                "https://s.ytimg.com",
+                "https://www.googleapis.com",
+                "https://accounts.google.com",
+                "https://pagead2.googlesyndication.com",
+                "https://ep1.adtrafficquality.google",
+                "https://ep2.adtrafficquality.google",
+                "https://googleads.g.doubleclick.net",
+                "https://www.googletagservices.com",
+                "https://*.googleapis.com",
+                "https://*.google.com"
+            ],
+            frameSrc: [
+                "'self'",
+                "https://www.youtube.com",
+                "https://accounts.google.com",
+                "https://googleads.g.doubleclick.net"
+            ],
+            fontSrc: [
+                "'self'",
+                "data:",
+                "https://fonts.gstatic.com"
+            ],
         }
     },
     hsts: {
         maxAge: 31536000,
         includeSubDomains: true,
         preload: true
-    }
+    },
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
 // Enhanced CORS configuration
@@ -81,9 +145,16 @@ const corsOptions = {
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     exposedHeaders: ['X-Response-Time'],
-    maxAge: 86400 // 24 hours
+    maxAge: 86400, // 24 hours
+    preflightContinue: false,
+    optionsSuccessStatus: 204
 };
+
+// Apply CORS middleware
 app.use(cors(corsOptions));
+
+// Explicit OPTIONS handler for preflight requests
+app.options('*', cors(corsOptions));
 
 // Body parser middleware
 app.use(express.json({ limit: '10mb' }));
