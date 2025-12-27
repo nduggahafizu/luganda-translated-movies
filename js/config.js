@@ -16,10 +16,12 @@ const Config = (function() {
 
     // API Configuration
     const API_CONFIG = {
-        // Backend API URL
+        // Backend API URL - Auto-detect based on hostname
         BACKEND_URL: isLocalhost 
             ? 'http://localhost:5000'
-            : 'https://luganda-movies-api.onrender.com', // Update with your actual backend URL
+            : (window.location.hostname === 'watch.unrulymovies.com' 
+                ? 'https://luganda-translated-movies-production.up.railway.app'
+                : 'https://luganda-movies-api.onrender.com'), // Fallback to Render
 
         // Google OAuth Client ID
         GOOGLE_CLIENT_ID: '573762962600-nr77v5emb2spn7aleg9p2l7c0d6be3a9.apps.googleusercontent.com',
