@@ -8,7 +8,9 @@ const API_CONFIG = (function() {
 
     // Detect environment
     const hostname = window.location.hostname;
-    const isProduction = hostname === 'watch.unrulymovies.com' || hostname === 'unrulymovies.com';
+    const isProduction = hostname === 'watch.unrulymovies.com' ||
+                        hostname === 'unrulymovies.com' ||
+                        hostname.includes('netlify.app'); // Include Netlify previews as production
     const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
 
     // Backend URLs
