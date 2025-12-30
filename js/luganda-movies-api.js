@@ -11,7 +11,11 @@ const LugandaMoviesAPI = (function() {
     // Helper function for API calls
     async function apiCall(endpoint, options = {}) {
         try {
-            const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+            // Remove trailing slash from API_BASE_URL and leading slash from endpoint to avoid double slashes
+            const base = API_BASE_URL.replace(/\/$/, '');
+            const path = endpoint.replace(/^\//, '');
+            const url = `${base}/${path}`;
+            const response = await fetch(url, {
                 headers: {
                     'Content-Type': 'application/json',
                     ...options.headers
