@@ -53,7 +53,8 @@ const LugandaMoviesAPI = (function() {
 
         // Get trending movies
         getTrending: async function(limit = 10) {
-            return await apiCall(`/trending?limit=${limit}`);
+            // Fallback to latest since /trending does not exist in backend
+            return await apiCall(`/latest?limit=${limit}`);
         },
 
         // Get featured movies
