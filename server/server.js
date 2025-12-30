@@ -126,18 +126,23 @@ app.use(helmet({
 // Enhanced CORS configuration
 const corsOptions = {
     origin: function (origin, callback) {
-        const allowedOrigins = process.env.ALLOWED_ORIGINS 
-            ? process.env.ALLOWED_ORIGINS.split(',')
+        // Always allow production domains
+        const productionOrigins = [
+            'https://watch.unrulymovies.com',
+            'https://unrulymovies.com'
+        ];
+
+        const allowedOrigins = process.env.ALLOWED_ORIGINS
+            ? [...process.env.ALLOWED_ORIGINS.split(','), ...productionOrigins]
             : [
-                'http://localhost:3000', 
+                'http://localhost:3000',
                 'http://localhost:5000',
-                'https://watch.unrulymovies.com',
-                'https://unrulymovies.com'
+                ...productionOrigins
               ];
-        
+
         // Allow requests with no origin (mobile apps, Postman, etc.)
         if (!origin) return callback(null, true);
-        
+
         // Allow explicit matches
         if (allowedOrigins.indexOf(origin) !== -1) {
             return callback(null, true);
