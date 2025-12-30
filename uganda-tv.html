@@ -432,32 +432,65 @@
     <script src="js/main.js"></script>
     <script src="js/uganda-tv-api.js"></script>
     <script>
-        // Handle TV station player
-        document.querySelectorAll('.watch-btn').forEach(button => {
-            button.addEventListener('click', function(e) {
-                // Prevent default navigation
-                e.preventDefault();
-                
-                // Get station ID from href
-                const href = this.getAttribute('href');
+        // Enhance TV station cards with actual logo images if available
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.tv-station-card').forEach(card => {
+                const watchBtn = card.querySelector('.watch-btn');
+                const img = card.querySelector('.tv-station-thumbnail img');
+                if (!watchBtn || !img) return;
+                const href = watchBtn.getAttribute('href');
                 const urlParams = new URLSearchParams(href.split('?')[1]);
                 const stationId = urlParams.get('station');
-                
-                // Get stream URL from API
-                UgandaTvApi.getStreamUrl(stationId).then(streamUrl => {
-                    if (streamUrl) {
-                        // Navigate to player with stream URL
-                        window.location.href = `player.html?station=${stationId}&stream=${encodeURIComponent(streamUrl)}`;
-                    } else {
-                        alert('Stream not available at the moment. Please try again later.');
+                if (!stationId) return;
+                // Try to get logo from API config
+                let logoUrl = null;
+                if (window.UgandaTvApi && window.UgandaTvApi.getAllStreamUrls) {
+                    // TV_API_CONFIG is not exposed, so fetch via script
+                    try {
+                        // Try to access logos via UgandaTvApi (if exported in future)
+                        // Fallback to hardcoded path
+                        logoUrl = `assets/tv-logos/${stationId}.png`;
+                    } catch (e) {
+                        logoUrl = `assets/tv-logos/${stationId}.png`;
                     }
-                }).catch(error => {
-                    console.error('Error getting stream URL:', error);
-                    alert('Error accessing stream. Please try again later.');
+                } else {
+                    logoUrl = `assets/tv-logos/${stationId}.png`;
+                }
+                // Only update if not already a Wikipedia or custom logo
+                if (!img.src.includes('wikipedia.org')) {
+                    img.src = logoUrl;
+                    img.onerror = function() {
+                        // fallback to placeholder if logo not found
+                        this.onerror = null;
+                        this.src = this.getAttribute('data-fallback') || this.src;
+                    };
+                }
+            });
+
+            // Handle TV station player
+            document.querySelectorAll('.watch-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    // Prevent default navigation
+                    e.preventDefault();
+                    // Get station ID from href
+                    const href = this.getAttribute('href');
+                    const urlParams = new URLSearchParams(href.split('?')[1]);
+                    const stationId = urlParams.get('station');
+                    // Get stream URL from API
+                    UgandaTvApi.getStreamUrl(stationId).then(streamUrl => {
+                        if (streamUrl) {
+                            // Navigate to player with stream URL
+                            window.location.href = `player.html?station=${stationId}&stream=${encodeURIComponent(streamUrl)}`;
+                        } else {
+                            alert('Stream not available at the moment. Please try again later.');
+                        }
+                    }).catch(error => {
+                        console.error('Error getting stream URL:', error);
+                        alert('Error accessing stream. Please try again later.');
+                    });
+                    // Analytics tracking
+                    console.log('User clicked to watch:', stationId);
                 });
-                
-                // Analytics tracking
-                console.log('User clicked to watch:', stationId);
             });
         });
     </script>

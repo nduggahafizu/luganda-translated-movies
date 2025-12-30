@@ -418,13 +418,13 @@
     </div>
 
     <script src="js/main.js"></script>
-        <script src="js/config.js"></script>
-        <script>
-        // Google Sign-In integration for register page
+    <script src="js/config.js"></script>
+    <script>
+    // Google Sign-In integration for register page
+    document.addEventListener('DOMContentLoaded', function() {
         const GOOGLE_CLIENT_ID = window.API_CONFIG ? window.API_CONFIG.GOOGLE_CLIENT_ID : undefined;
         const API_URL = window.API_CONFIG ? window.API_CONFIG.API_ENDPOINTS.AUTH : '';
         function handleGoogleSignIn(response) {
-            // Send Google token to backend for registration/login
             fetch(`${API_URL}/google`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -433,7 +433,6 @@
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    // Registration/login successful
                     window.location.href = '/';
                 } else {
                     alert(data.message || 'Google sign-in failed');
@@ -443,20 +442,18 @@
                 alert('Error signing in with Google');
             });
         }
-        function initGoogleSignIn() {
-            if (typeof google !== 'undefined' && google.accounts) {
-                google.accounts.id.initialize({
-                    client_id: GOOGLE_CLIENT_ID,
-                    callback: handleGoogleSignIn
-                });
-                const googleBtnDiv = document.getElementById('google-signin-btn');
-                if (googleBtnDiv) {
-                    google.accounts.id.renderButton(googleBtnDiv, { theme: 'outline', size: 'large', width: '100%' });
-                }
+        if (typeof google !== 'undefined' && google.accounts) {
+            google.accounts.id.initialize({
+                client_id: GOOGLE_CLIENT_ID,
+                callback: handleGoogleSignIn
+            });
+            const googleBtnDiv = document.getElementById('google-signin-btn');
+            if (googleBtnDiv) {
+                google.accounts.id.renderButton(googleBtnDiv, { theme: 'outline', size: 'large', width: '100%' });
             }
         }
-        window.addEventListener('DOMContentLoaded', initGoogleSignIn);
-        </script>
+    });
+    </script>
     <script>
         function togglePassword(inputId, iconId) {
             const passwordInput = document.getElementById(inputId);
