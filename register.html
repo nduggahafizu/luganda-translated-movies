@@ -422,10 +422,10 @@
         <script>
         // Google Sign-In integration for register page
         const GOOGLE_CLIENT_ID = window.API_CONFIG ? window.API_CONFIG.GOOGLE_CLIENT_ID : undefined;
-        const API_URL = window.API_CONFIG ? window.API_CONFIG.API_URL : '';
+        const API_URL = window.API_CONFIG ? window.API_CONFIG.API_ENDPOINTS.AUTH : '';
         function handleGoogleSignIn(response) {
             // Send Google token to backend for registration/login
-            fetch(`${API_URL}/auth/google`, {
+            fetch(`${API_URL}/google`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ credential: response.credential })
