@@ -1,55 +1,29 @@
 const express = require('express');
 const router = express.Router();
-const {
-    getAllMovies,
-    getMovie,
-    searchMovies,
-    getTrending,
-    getFeatured,
-    getLatest,
-    getByVJ,
-    getAllVJs,
-    rateMovie,
-    rateTranslation,
-    createMovie,
-    updateMovie,
-    deleteMovie,
-    getStreamUrl
-} = require('../controllers/lugandaMovieController');
+const LugandaMovie = require('../models/LugandaMovie');
 
-// Import auth middleware (if exists)
-// const { protect, authorize } = require('../middleware/auth');
+// GET /api/luganda-movies/latest
+router.get('/latest', async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', 'https://watch.unrulymovies.com');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-// Public routes
-router.get('/', getAllMovies);
-router.get('/search', searchMovies);
-router.get('/trending', getTrending);
-router.get('/featured', getFeatured);
-router.get('/latest', getLatest);
-router.get('/vjs', getAllVJs);
-router.get('/vj/:vjName', getByVJ);
-router.get('/:id', getMovie);
-
-// Protected routes (require authentication)
-// Uncomment when auth middleware is ready
-// router.post('/:id/rate', protect, rateMovie);
-// router.post('/:id/rate-translation', protect, rateTranslation);
-// router.get('/:id/stream', protect, getStreamUrl);
-
-// Temporary public access for development
-router.post('/:id/rate', rateMovie);
-router.post('/:id/rate-translation', rateTranslation);
-router.get('/:id/stream', getStreamUrl);
-
-// Admin routes (require authentication and admin role)
-// Uncomment when auth middleware is ready
-// router.post('/', protect, authorize('admin'), createMovie);
-// router.put('/:id', protect, authorize('admin'), updateMovie);
-// router.delete('/:id', protect, authorize('admin'), deleteMovie);
-
-// Temporary public access for development
-router.post('/', createMovie);
-router.put('/:id', updateMovie);
-router.delete('/:id', deleteMovie);
+    try {
+        const limit = parseInt(req.query.limit) || 10;
+        const movies = await LugandaMovie.find({}).sort({ createdAt: -1 }).limit(limit);
+        res.json({
+            status: 'success',
+            data: movies,
+            count: movies.length
+        });
+    } catch (error) {
+        console.error('Error fetching latest movies:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch latest movies'
+        });
+    }
+});
 
 module.exports = router;
