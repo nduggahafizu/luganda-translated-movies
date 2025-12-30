@@ -1,4 +1,10 @@
-[
+// Node.js script to add movies with VJ and TMDB poster
+// Requires TMDB API key in environment variable TMDB_API_KEY
+const fs = require('fs');
+const https = require('https');
+const path = require('path');
+
+const MOVIES = [
   { "title": "Tommy Boy", "vj": "Vj Emmy" },
   { "title": "To the Limit", "vj": "Vj Emmy" },
   { "title": "Secret Admirer", "vj": "Vj Emmy" },
@@ -30,4 +36,43 @@
   { "title": "Chasing in the Wild", "vj": "VJ BONNY" },
   { "title": "Dear X", "vj": "VJ LIGHT" },
   { "title": "Last Samurai Standing", "vj": "VJ ICE P" }
-]
+];
+
+const TMDB_API_KEY = process.env.TMDB_API_KEY;
+if (!TMDB_API_KEY) {
+  console.error('TMDB_API_KEY not set in environment.');
+  process.exit(1);
+}
+
+function searchTMDB(title) {
+  return new Promise((resolve) => {
+    const url = `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(title)}`;
+    https.get(url, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          if (json.results && json.results.length > 0) {
+            resolve(json.results[0].poster_path ? `https://image.tmdb.org/t/p/w500${json.results[0].poster_path}` : null);
+          } else {
+            resolve(null);
+          }
+        } catch {
+          resolve(null);
+        }
+      });
+    }).on('error', () => resolve(null));
+  });
+}
+
+(async () => {
+  const results = [];
+  for (const movie of MOVIES) {
+    const poster = await searchTMDB(movie.title);
+    results.push({ ...movie, poster });
+    console.log(`${movie.title} (${movie.vj}): ${poster ? poster : 'No poster found'}`);
+  }
+  fs.writeFileSync('playlist-data.json', JSON.stringify(results, null, 2));
+  console.log('playlist-data.json updated.');
+})();
