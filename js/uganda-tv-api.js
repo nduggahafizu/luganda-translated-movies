@@ -10,7 +10,22 @@ const TV_API_CONFIG = {
     // Base URLs for different APIs
     iptv_org: "https://iptv-org.github.io/api/streams.json",
     freeiptvAPI: "https://iptv-org.github.io/iptv/countries/ug.m3u",
-    
+
+    // Logo image URLs for each station (prefer local assets, fallback to Wikipedia)
+    logos: {
+        "ntv-uganda": "assets/tv-logos/ntv-uganda.png",
+        "nbs-tv": "assets/tv-logos/nbs-tv.png",
+        "ubc-tv": "assets/tv-logos/ubc-tv.png",
+        "bukedde-tv": "assets/tv-logos/bukedde-tv.png",
+        "urban-tv": "assets/tv-logos/urban-tv.png",
+        "spark-tv": "assets/tv-logos/spark-tv.png",
+        "tv-west": "assets/tv-logos/tv-west.png",
+        "salt-tv": "assets/tv-logos/salt-tv.png",
+        "tv-east": "assets/tv-logos/tv-east.png",
+        "bbs-tv": "assets/tv-logos/bbs-tv.png",
+        "tv-north": "assets/tv-logos/tv-north.png",
+        "wan-luo-tv": "assets/tv-logos/wan-luo-tv.png"
+    },
     // YouTube channels for stations that broadcast live on YouTube
     youtubeChannels: {
         "ntv-uganda": "UCwga1dPCqBddbtq5KYRii2g",
