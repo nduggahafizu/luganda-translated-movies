@@ -1,6 +1,6 @@
 const winston = require('winston');
-const DailyRotateFile = require('winston-daily-rotate-file');
 const path = require('path');
+const fs = require('fs');
 
 // Define log format
 const logFormat = winston.format.combine(
@@ -10,7 +10,7 @@ const logFormat = winston.format.combine(
     winston.format.json()
 );
 
-// Console format for development
+// Console format
 const consoleFormat = winston.format.combine(
     winston.format.colorize(),
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
@@ -23,60 +23,52 @@ const consoleFormat = winston.format.combine(
     })
 );
 
-// Create logs directory if it doesn't exist
-const logsDir = path.join(__dirname, '../logs');
+// Create transports array - always include console
+const transports = [
+    new winston.transports.Console({
+        format: consoleFormat
+    })
+];
 
-// Daily rotate file transport for all logs
-const fileRotateTransport = new DailyRotateFile({
-    filename: path.join(logsDir, 'application-%DATE%.log'),
-    datePattern: 'YYYY-MM-DD',
-    maxSize: '20m',
-    maxFiles: '14d',
-    format: logFormat
-});
-
-// Daily rotate file transport for error logs
-const errorRotateTransport = new DailyRotateFile({
-    filename: path.join(logsDir, 'error-%DATE%.log'),
-    datePattern: 'YYYY-MM-DD',
-    level: 'error',
-    maxSize: '20m',
-    maxFiles: '30d',
-    format: logFormat
-});
+// Only add file transports in development (Railway has ephemeral filesystem)
+if (process.env.NODE_ENV !== 'production') {
+    try {
+        const DailyRotateFile = require('winston-daily-rotate-file');
+        const logsDir = path.join(__dirname, '../logs');
+        
+        // Create logs directory if it doesn't exist
+        if (!fs.existsSync(logsDir)) {
+            fs.mkdirSync(logsDir, { recursive: true });
+        }
+        
+        transports.push(
+            new DailyRotateFile({
+                filename: path.join(logsDir, 'application-%DATE%.log'),
+                datePattern: 'YYYY-MM-DD',
+                maxSize: '20m',
+                maxFiles: '14d',
+                format: logFormat
+            }),
+            new DailyRotateFile({
+                filename: path.join(logsDir, 'error-%DATE%.log'),
+                datePattern: 'YYYY-MM-DD',
+                level: 'error',
+                maxSize: '20m',
+                maxFiles: '30d',
+                format: logFormat
+            })
+        );
+    } catch (err) {
+        console.log('⚠️  File logging disabled:', err.message);
+    }
+}
 
 // Create Winston logger
 const logger = winston.createLogger({
     level: process.env.LOG_LEVEL || 'info',
     format: logFormat,
-    transports: [
-        fileRotateTransport,
-        errorRotateTransport
-    ],
-    exceptionHandlers: [
-        new DailyRotateFile({
-            filename: path.join(logsDir, 'exceptions-%DATE%.log'),
-            datePattern: 'YYYY-MM-DD',
-            maxSize: '20m',
-            maxFiles: '30d'
-        })
-    ],
-    rejectionHandlers: [
-        new DailyRotateFile({
-            filename: path.join(logsDir, 'rejections-%DATE%.log'),
-            datePattern: 'YYYY-MM-DD',
-            maxSize: '20m',
-            maxFiles: '30d'
-        })
-    ]
+    transports
 });
-
-// Add console transport in development
-if (process.env.NODE_ENV !== 'production') {
-    logger.add(new winston.transports.Console({
-        format: consoleFormat
-    }));
-}
 
 // Express middleware for request logging
 const requestLogger = (req, res, next) => {

@@ -225,6 +225,10 @@ app.use('/uploads', express.static('uploads'));
 // Database connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/luganda-movies';
 
+// Debug: Log environment variable presence (not the actual value for security)
+console.log(`🔧 MONGODB_URI from env: ${process.env.MONGODB_URI ? 'SET (' + MONGODB_URI.substring(0, 30) + '...)' : 'NOT SET - using default'}`);
+console.log(`🔧 NODE_ENV: ${process.env.NODE_ENV || 'not set'}`);
+
 mongoose.connect(MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
