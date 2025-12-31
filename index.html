@@ -1062,17 +1062,23 @@
             container.innerHTML = '';
             
             movies.forEach(movie => {
+                // Handle missing fields with defaults
+                const quality = movie.video?.quality || 'HD';
+                const rating = movie.rating?.translationRating || movie.rating?.userRating || 4.0;
+                const posterUrl = movie.poster || 'https://placehold.co/300x450/1a1a2e/7CFC00?text=No+Poster';
+                const vjName = movie.vjName || 'Unknown';
+                
                 const movieCard = `
                     <div class="col">
                         <div class="list-movie position-relative">
                             <a href="player.html?id=${movie._id}" class="list-media">
                                 <div class="list-media-attr">
-                                    <div class="quality">${movie.video.quality.toUpperCase()}</div>
+                                    <div class="quality">${quality.toUpperCase()}</div>
                                     <div class="imdb">
-                                        <span>${movie.rating.translationRating.toFixed(1)}</span>
+                                        <span>${rating.toFixed(1)}</span>
                                         <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
                                             <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" 
-                                                    stroke-dasharray="${movie.rating.translationRating * 20} 100" 
+                                                    stroke-dasharray="${rating * 20} 100" 
                                                     stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
                                         </svg>
                                     </div>
@@ -1082,11 +1088,11 @@
                                         <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                     </svg>
                                 </div>
-                                <div class="media media-cover" style="background-image: url('${movie.poster}');"></div>
+                                <div class="media media-cover" style="background-image: url('${posterUrl}');" onerror="this.style.backgroundImage='url(https://placehold.co/300x450/1a1a2e/7CFC00?text=No+Poster)'"></div>
                             </a>
                             <div class="list-caption">
-                                <a href="player.html?id=${movie._id}" class="list-title">${movie.originalTitle}</a>
-                                <a href="#" class="list-category">VJ ${movie.vjName}</a>
+                                <a href="player.html?id=${movie._id}" class="list-title">${movie.originalTitle || movie.lugandaTitle || 'Unknown Title'}</a>
+                                <a href="#" class="list-category">VJ ${vjName}</a>
                             </div>
                         </div>
                     </div>
