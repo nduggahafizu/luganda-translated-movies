@@ -40,7 +40,7 @@ async function handleGoogleSignIn(response) {
         showLoading(true);
         
         // Send Google token to backend
-        const res = await fetch(`${API_URL}/auth/google`, {
+        const res = await fetch(`${API_URL}/google`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -187,7 +187,7 @@ async function registerWithEmail(fullName, email, password) {
     try {
         showLoading(true);
         
-        const response = await fetch(`${API_URL}/auth/register`, {
+        const response = await fetch(`${API_URL}/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

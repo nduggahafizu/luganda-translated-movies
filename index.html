@@ -1,20 +1,101 @@
 <!DOCTYPE html>  
 <html lang="en">
 <head>
-    <title>Luganda Movies - Watch Luganda Translated Movies by Uganda's Top VJs</title>
+    <title>Unruly Movies - Luganda Translated Movies by Uganda's Licensed VJs | By Nduga Hafizu</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Luganda Movies - Watch your favorite international movies translated to Luganda by Uganda's best VJs. Stream thousands of VJ movies in HD quality.">
+    <meta name="description" content="Unruly Movies - Uganda's legitimate platform for Luganda VJ translations. Watch movies translated by licensed Video Jockeys. Developed by Nduga Hafizu.">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="robots" content="index,follow" />
+    <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#7CFC00">
     <meta name="HandheldFriendly" content="True">
     <meta http-equiv="cleartype" content="on">
+    <meta name="author" content="Nduga Hafizu">
+    <meta name="keywords" content="Luganda movies, VJ translations, Uganda entertainment, Nduga Hafizu, licensed VJ, Luganda translation platform">
+    <link rel="canonical" href="https://watch.unrulymovies.com/">
     <meta name="google-adsense-account" content="ca-pub-1904736753681797">
-    <meta name="google-site-verification" content="ZETgIS2RUYfcmNN7z0_OCZ7CjNP4LbfPI-F1MD7uiyY" />
+    <meta name="google-site-verification" content="ZETgIS2RUYfcmNN7z0_OCZ7CjNP4LbfPI-F1MD7uiyY">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://watch.unrulymovies.com/">
+    <meta property="og:title" content="Unruly Movies - Luganda VJ Translations Platform">
+    <meta property="og:description" content="Uganda's legitimate platform for Luganda VJ translations. Watch movies translated by licensed Video Jockeys.">
+    <meta property="og:site_name" content="Unruly Movies">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Unruly Movies - Luganda VJ Translations">
+    <meta name="twitter:description" content="Uganda's legitimate platform for Luganda VJ translations by licensed Video Jockeys.">
+    
+    <!-- Schema.org structured data for Organization -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Unruly Movies",
+        "alternateName": ["Luganda Movies", "UnrulyMovies"],
+        "url": "https://watch.unrulymovies.com",
+        "description": "Uganda's premier legitimate platform for Luganda-translated movies featuring licensed Video Jockeys (VJs)",
+        "inLanguage": ["en", "lg"],
+        "publisher": {
+            "@type": "Organization",
+            "name": "Unruly Movies",
+            "founder": {
+                "@type": "Person",
+                "name": "Nduga Hafizu",
+                "jobTitle": "Founder & Developer",
+                "nationality": "Ugandan"
+            },
+            "foundingDate": "2024",
+            "areaServed": {
+                "@type": "Country",
+                "name": "Uganda"
+            }
+        },
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://watch.unrulymovies.com/search.html?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+    
+    <!-- Schema.org for VideoGallery/Entertainment -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "EntertainmentBusiness",
+        "name": "Unruly Movies",
+        "description": "Legitimate Ugandan entertainment platform showcasing Luganda translations by licensed Video Jockeys",
+        "url": "https://watch.unrulymovies.com",
+        "founder": "Nduga Hafizu",
+        "areaServed": "Uganda",
+        "serviceType": "Video Streaming - Luganda VJ Translations",
+        "priceRange": "Free",
+        "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Luganda Translated Movies",
+            "itemListElement": [
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Luganda VJ Movie Translations",
+                        "description": "Movies translated to Luganda by licensed Ugandan Video Jockeys"
+                    }
+                }
+            ]
+        }
+    }
+    </script>
 
     <!-- Favicon -->
     <link rel="shortcut icon" href="assets/images/favicon.png">
+    <link rel="apple-touch-icon" href="assets/images/icons/icon-192x192.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
     
     <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
@@ -704,7 +785,15 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="footer-text my-3">
-                            2025 Luganda Movies. All rights reserved.
+                            <div style="margin-bottom: 15px;">
+                                <a href="terms.html" style="margin: 0 10px; color: #888;">Terms of Service</a> |
+                                <a href="privacy.html" style="margin: 0 10px; color: #888;">Privacy Policy</a> |
+                                <a href="dmca.html" style="margin: 0 10px; color: #888;">DMCA</a> |
+                                <a href="about.html" style="margin: 0 10px; color: #888;">About Us</a> |
+                                <a href="contact.html" style="margin: 0 10px; color: #888;">Contact</a>
+                            </div>
+                            &copy; 2025 <strong>Unruly Movies</strong>. Developed by <strong>Nduga Hafizu</strong>. All rights reserved.<br>
+                            <small style="color: #666;">A legitimate Ugandan platform for Luganda VJ translations by licensed Video Jockeys.</small>
                         </div>
                     </div>
                 </div>
@@ -999,6 +1088,24 @@
                     </div>
                 `;
                 container.innerHTML += movieCard;
+            });
+        }
+    </script>
+    
+    <!-- Social Sharing -->
+    <script src="js/social-share.js"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registered:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
             });
         }
     </script>

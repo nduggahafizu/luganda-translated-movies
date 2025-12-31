@@ -18,9 +18,29 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, 'Please provide a password'],
+        required: function() {
+            // Password is only required for non-Google users
+            return !this.googleId && this.provider !== 'google';
+        },
         minlength: [8, 'Password must be at least 8 characters'],
         select: false
+    },
+    googleId: {
+        type: String,
+        default: null
+    },
+    provider: {
+        type: String,
+        enum: ['local', 'google'],
+        default: 'local'
+    },
+    profileImage: {
+        type: String,
+        default: null
+    },
+    verified: {
+        type: Boolean,
+        default: false
     },
     avatar: {
         type: String,
@@ -68,6 +88,10 @@ const userSchema = new mongoose.Schema({
             type: Date,
             default: Date.now
         }
+    }],
+    favorites: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'LugandaMovie'
     }],
     watchHistory: [{
         contentType: {

@@ -111,11 +111,27 @@ exports.login = async (req, res) => {
             });
         }
 
+        // Check if user is a Google user (no password)
+        if (user.provider === 'google' || user.googleId) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'This account uses Google Sign-In. Please use the Google button to login.'
+            });
+        }
+
         // Check if user is active
         if (!user.isActive) {
             return res.status(401).json({
                 status: 'error',
                 message: 'Your account has been deactivated. Please contact support.'
+            });
+        }
+
+        // Check if user has a password (local account)
+        if (!user.password) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'Invalid email or password'
             });
         }
 
