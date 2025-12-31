@@ -26,6 +26,12 @@ const moviesApiRoutes = require('./routes/movies-api');
 const watchProgressRoutes = require('./routes/watch-progress');
 const playlistRoutes = require('./routes/playlist');
 const tmdbProxyRoutes = require('./routes/tmdb-proxy');
+const reviewsRoutes = require('./routes/reviews');
+const commentsRoutes = require('./routes/comments');
+const notificationsRoutes = require('./routes/notifications');
+const statsRoutes = require('./routes/stats');
+const usersRoutes = require('./routes/users');
+const adminRoutes = require('./routes/admin');
 
 // Initialize Express app
 const app = express();
@@ -265,6 +271,12 @@ app.use('/api/movies', cache(300), moviesApiRoutes); // Cache for 5 minutes
 app.use('/api/watch-progress', watchProgressRoutes);
 app.use('/api/playlist', playlistRoutes);
 app.use('/api/tmdb', cache(600), tmdbProxyRoutes); // TMDB proxy with 10 min cache
+app.use('/api/reviews', reviewsRoutes);
+app.use('/api/comments', commentsRoutes);
+app.use('/api/notifications', notificationsRoutes);
+app.use('/api/stats', statsRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Token refresh endpoint
 app.post('/api/auth/refresh', refreshTokenHandler);

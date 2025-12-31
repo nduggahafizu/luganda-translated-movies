@@ -417,41 +417,15 @@
         </div>
     </div>
 
-    <script src="js/main.js"></script>
+    <!-- API Configuration (must load first) -->
     <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
     <script>
-    // Google Sign-In integration for register page
+    // Google Sign-In integration for register page - now using auth.js functions
     document.addEventListener('DOMContentLoaded', function() {
-        const GOOGLE_CLIENT_ID = window.API_CONFIG ? window.API_CONFIG.GOOGLE_CLIENT_ID : undefined;
-        const API_URL = window.API_CONFIG ? window.API_CONFIG.API_ENDPOINTS.AUTH : '';
-        function handleGoogleSignIn(response) {
-            fetch(`${API_URL}/google`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ credential: response.credential })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.href = '/';
-                } else {
-                    alert(data.message || 'Google sign-in failed');
-                }
-            })
-            .catch(() => {
-                alert('Error signing in with Google');
-            });
-        }
-        if (typeof google !== 'undefined' && google.accounts) {
-            google.accounts.id.initialize({
-                client_id: GOOGLE_CLIENT_ID,
-                callback: handleGoogleSignIn
-            });
-            const googleBtnDiv = document.getElementById('google-signin-btn');
-            if (googleBtnDiv) {
-                google.accounts.id.renderButton(googleBtnDiv, { theme: 'outline', size: 'large', width: '100%' });
-            }
-        }
+        // Google Sign-In is handled by auth.js - initGoogleSignIn()
+        // No additional code needed here as auth.js is loaded
     });
     </script>
     <script>
@@ -559,15 +533,13 @@
             }
             
             if (isValid) {
-                // Simulate successful registration
+                // Call the actual registration API
                 const submitBtn = document.getElementById('submitBtn');
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Creating Account...';
                 
-                setTimeout(() => {
-                    alert('Account created successfully! Redirecting to login...');
-                    window.location.href = 'login.html';
-                }, 1500);
+                // Call registerWithEmail from auth.js
+                registerWithEmail(fullname.value.trim(), email.value.trim(), password.value);
             }
         });
     </script>

@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Admin Dashboard - Unruly Movies</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <link rel="shortcut icon" href="assets/images/favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { box-sizing: border-box; }
+        
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .admin-sidebar {
+            width: 260px;
+            background: var(--background-light);
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .admin-logo img {
+            height: 35px;
+        }
+        
+        .admin-logo span {
+            font-size: 12px;
+            background: var(--primary-color);
+            color: #000;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .admin-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .admin-nav li {
+            margin-bottom: 5px;
+        }
+        
+        .admin-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .admin-nav a:hover, .admin-nav a.active {
+            background: rgba(124, 252, 0, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .admin-nav svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .nav-section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin: 25px 0 10px;
+            padding-left: 15px;
+            letter-spacing: 1px;
+        }
+        
+        .admin-main {
+            flex: 1;
+            margin-left: 260px;
+            padding: 30px;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .admin-title {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .admin-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .btn-admin {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: var(--primary-color);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-admin:hover {
+            background: #9dff44;
+            transform: translateY(-2px);
+        }
+        
+        .btn-admin.secondary {
+            background: var(--background-light);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: var(--background-light);
+            border-radius: 15px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-color);
+        }
+        
+        .stat-card.blue::before { background: #00d9ff; }
+        .stat-card.orange::before { background: #ff9f43; }
+        .stat-card.purple::before { background: #a855f7; }
+        .stat-card.red::before { background: #ef4444; }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(124, 252, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        
+        .stat-card.blue .stat-icon { background: rgba(0, 217, 255, 0.1); }
+        .stat-card.orange .stat-icon { background: rgba(255, 159, 67, 0.1); }
+        .stat-card.purple .stat-icon { background: rgba(168, 85, 247, 0.1); }
+        .stat-card.red .stat-icon { background: rgba(239, 68, 68, 0.1); }
+        
+        .stat-icon svg {
+            width: 24px;
+            height: 24px;
+            color: var(--primary-color);
+        }
+        
+        .stat-card.blue .stat-icon svg { color: #00d9ff; }
+        .stat-card.orange .stat-icon svg { color: #ff9f43; }
+        .stat-card.purple .stat-icon svg { color: #a855f7; }
+        .stat-card.red .stat-icon svg { color: #ef4444; }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .stat-change {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #22c55e;
+        }
+        
+        .stat-change.down { color: #ef4444; }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+        
+        .panel {
+            background: var(--background-light);
+            border-radius: 15px;
+            padding: 25px;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .panel-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        /* Chart placeholder */
+        .chart-container {
+            height: 300px;
+            background: var(--background-dark);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+        }
+        
+        /* Recent Activity */
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .activity-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            background: var(--background-dark);
+            border-radius: 10px;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(124, 252, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .activity-icon svg {
+            width: 18px;
+            height: 18px;
+            color: var(--primary-color);
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .activity-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        /* Data Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th, .data-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .data-table th {
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+        
+        .data-table tr:hover {
+            background: var(--background-dark);
+        }
+        
+        .movie-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .movie-cell img {
+            width: 45px;
+            height: 65px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+        
+        .movie-cell-info {
+            flex: 1;
+        }
+        
+        .movie-cell-title {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .movie-cell-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-badge.active {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+        }
+        
+        .status-badge.pending {
+            background: rgba(255, 159, 67, 0.1);
+            color: #ff9f43;
+        }
+        
+        .status-badge.inactive {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+        
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            background: var(--background-dark);
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            background: var(--primary-color);
+            color: #000;
+        }
+        
+        .action-btn.delete:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .quick-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 20px;
+            background: var(--background-dark);
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .quick-action:hover {
+            background: rgba(124, 252, 0, 0.1);
+            transform: translateY(-3px);
+        }
+        
+        .quick-action svg {
+            width: 24px;
+            height: 24px;
+            color: var(--primary-color);
+        }
+        
+        .quick-action span {
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        /* Top Movies */
+        .top-movie {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .top-movie:last-child {
+            border-bottom: none;
+        }
+        
+        .top-movie-rank {
+            width: 25px;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+        
+        .top-movie img {
+            width: 40px;
+            height: 55px;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+        
+        .top-movie-info {
+            flex: 1;
+        }
+        
+        .top-movie-title {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+        
+        .top-movie-views {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                display: none;
+            }
+            
+            .admin-main {
+                margin-left: 0;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <img src="assets/images/logo.png" alt="Unruly Movies">
+                <span>Admin</span>
+            </div>
+            
+            <nav>
+                <ul class="admin-nav">
+                    <li>
+                        <a href="admin.html" class="active">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="9"></rect>
+                                <rect x="14" y="3" width="7" height="5"></rect>
+                                <rect x="14" y="12" width="7" height="9"></rect>
+                                <rect x="3" y="16" width="7" height="5"></rect>
+                            </svg>
+                            Dashboard
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="nav-section-title">Content</div>
+                <ul class="admin-nav">
+                    <li>
+                        <a href="admin-movies.html">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                                <line x1="7" y1="2" x2="7" y2="22"></line>
+                                <line x1="17" y1="2" x2="17" y2="22"></line>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                            </svg>
+                            Movies
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-vjs.html">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            VJ Translators
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-genres.html">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
+                            </svg>
+                            Genres
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="nav-section-title">Users</div>
+                <ul class="admin-nav">
+                    <li>
+                        <a href="admin-users.html">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            All Users
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-reviews.html">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            </svg>
+                            Reviews
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-comments.html">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            Comments
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="nav-section-title">System</div>
+                <ul class="admin-nav">
+                    <li>
+                        <a href="admin-analytics.html">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="20" x2="18" y2="10"></line>
+                                <line x1="12" y1="20" x2="12" y2="4"></line>
+                                <line x1="6" y1="20" x2="6" y2="14"></line>
+                            </svg>
+                            Analytics
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-settings.html">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
+                            Settings
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <div class="admin-header">
+                <h1 class="admin-title">Dashboard</h1>
+                <div class="admin-actions">
+                    <a href="admin-movies.html?action=add" class="btn-admin">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add Movie
+                    </a>
+                    <a href="index.html" class="btn-admin secondary" target="_blank">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        View Site
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                            <line x1="7" y1="2" x2="7" y2="22"></line>
+                            <line x1="17" y1="2" x2="17" y2="22"></line>
+                        </svg>
+                    </div>
+                    <div class="stat-value" id="totalMovies">0</div>
+                    <div class="stat-label">Total Movies</div>
+                    <span class="stat-change" id="moviesChange">+0 this month</span>
+                </div>
+                
+                <div class="stat-card blue">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <div class="stat-value" id="totalUsers">0</div>
+                    <div class="stat-label">Total Users</div>
+                    <span class="stat-change" id="usersChange">+0 this month</span>
+                </div>
+                
+                <div class="stat-card orange">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </div>
+                    <div class="stat-value" id="monthlyViews">0</div>
+                    <div class="stat-label">Monthly Views</div>
+                    <span class="stat-change" id="viewsChange">+0%</span>
+                </div>
+                
+                <div class="stat-card purple">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                    </div>
+                    <div class="stat-value" id="totalReviews">0</div>
+                    <div class="stat-label">Total Reviews</div>
+                    <span class="stat-change" id="reviewsChange">+0 this month</span>
+                </div>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="content-grid">
+                <!-- Left Column -->
+                <div>
+                    <!-- Views Chart -->
+                    <div class="panel" style="margin-bottom: 25px;">
+                        <div class="panel-header">
+                            <h2 class="panel-title">Views Overview</h2>
+                            <select class="filter-select" style="width: auto; background: var(--background-dark);" onchange="updateChart(this.value)">
+                                <option value="7">Last 7 days</option>
+                                <option value="30" selected>Last 30 days</option>
+                                <option value="90">Last 90 days</option>
+                            </select>
+                        </div>
+                        <div class="chart-container" id="viewsChart">
+                            <canvas id="chartCanvas"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Recent Movies -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2 class="panel-title">Recent Movies</h2>
+                            <a href="admin-movies.html" class="panel-link">View All</a>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Movie</th>
+                                    <th>VJ</th>
+                                    <th>Views</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentMoviesTable">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; color: var(--text-secondary);">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div>
+                    <!-- Quick Actions -->
+                    <div class="panel" style="margin-bottom: 25px;">
+                        <div class="panel-header">
+                            <h2 class="panel-title">Quick Actions</h2>
+                        </div>
+                        <div class="quick-actions">
+                            <a href="admin-movies.html?action=add" class="quick-action">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                <span>Add Movie</span>
+                            </a>
+                            <a href="admin-vjs.html?action=add" class="quick-action">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="8.5" cy="7" r="4"></circle>
+                                    <line x1="20" y1="8" x2="20" y2="14"></line>
+                                    <line x1="23" y1="11" x2="17" y2="11"></line>
+                                </svg>
+                                <span>Add VJ</span>
+                            </a>
+                            <a href="admin-notifications.html?action=broadcast" class="quick-action">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                                </svg>
+                                <span>Send Notification</span>
+                            </a>
+                            <a href="admin-analytics.html" class="quick-action">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                                </svg>
+                                <span>View Analytics</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Top Movies -->
+                    <div class="panel" style="margin-bottom: 25px;">
+                        <div class="panel-header">
+                            <h2 class="panel-title">Top Movies This Week</h2>
+                        </div>
+                        <div id="topMoviesList">
+                            <div style="text-align: center; color: var(--text-secondary); padding: 20px;">Loading...</div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2 class="panel-title">Recent Activity</h2>
+                        </div>
+                        <div class="activity-list" id="activityList">
+                            <div style="text-align: center; color: var(--text-secondary); padding: 20px;">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        const API_URL = API_CONFIG.API_URL;
+
+        // Check admin authentication
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'login.html?redirect=admin.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) throw new Error('Not authenticated');
+                
+                const data = await response.json();
+                
+                if (data.data.user.role !== 'admin') {
+                    alert('Access denied. Admin privileges required.');
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                loadDashboardData();
+            } catch (error) {
+                console.error('Auth error:', error);
+                window.location.href = 'login.html?redirect=admin.html';
+            }
+        });
+
+        async function loadDashboardData() {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            
+            try {
+                // Load statistics
+                const statsResponse = await fetch(`${API_URL}/stats/admin/overview`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const statsData = await statsResponse.json();
+                
+                if (statsData.status === 'success') {
+                    document.getElementById('totalMovies').textContent = formatNumber(statsData.data.totals.movies);
+                    document.getElementById('totalUsers').textContent = formatNumber(statsData.data.totals.users);
+                    document.getElementById('monthlyViews').textContent = formatNumber(statsData.data.monthly.totalViews);
+                    document.getElementById('totalReviews').textContent = formatNumber(statsData.data.totals.reviews);
+                    document.getElementById('usersChange').textContent = `+${statsData.data.newUsers} this month`;
+                    
+                    // Render chart
+                    renderChart(statsData.data.dailyStats);
+                }
+
+                // Load recent movies
+                const moviesResponse = await fetch(`${API_URL}/luganda-movies?limit=5&sort=newest`);
+                const moviesData = await moviesResponse.json();
+                
+                if (moviesData.data?.movies) {
+                    renderRecentMovies(moviesData.data.movies);
+                }
+
+                // Load top movies
+                const topResponse = await fetch(`${API_URL}/stats/trending?days=7&limit=5`);
+                const topData = await topResponse.json();
+                
+                if (topData.data?.movies) {
+                    renderTopMovies(topData.data.movies);
+                }
+
+                // Render activity (placeholder)
+                renderActivity();
+                
+            } catch (error) {
+                console.error('Load dashboard data error:', error);
+            }
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            }
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num?.toString() || '0';
+        }
+
+        function renderRecentMovies(movies) {
+            const table = document.getElementById('recentMoviesTable');
+            
+            table.innerHTML = movies.map(movie => `
+                <tr>
+                    <td>
+                        <div class="movie-cell">
+                            <img src="${movie.poster || 'assets/images/placeholder.jpg'}" alt="${movie.title}" onerror="this.src='assets/images/placeholder.jpg'">
+                            <div class="movie-cell-info">
+                                <div class="movie-cell-title">${movie.title}</div>
+                                <div class="movie-cell-meta">${movie.year || 'N/A'}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${movie.vj || 'Unknown'}</td>
+                    <td>${formatNumber(movie.views || 0)}</td>
+                    <td><span class="status-badge active">Active</span></td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn" onclick="editMovie('${movie._id}')" title="Edit">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </button>
+                            <button class="action-btn delete" onclick="deleteMovie('${movie._id}')" title="Delete">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderTopMovies(movies) {
+            const list = document.getElementById('topMoviesList');
+            
+            list.innerHTML = movies.map((item, index) => `
+                <div class="top-movie">
+                    <div class="top-movie-rank">${index + 1}</div>
+                    <img src="${item.movie?.poster || 'assets/images/placeholder.jpg'}" alt="${item.movie?.title}" onerror="this.src='assets/images/placeholder.jpg'">
+                    <div class="top-movie-info">
+                        <div class="top-movie-title">${item.movie?.title || 'Unknown'}</div>
+                        <div class="top-movie-views">${formatNumber(item.totalViews)} views</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderActivity() {
+            const list = document.getElementById('activityList');
+            
+            // Placeholder activity data
+            const activities = [
+                { title: 'New user registered', time: '5 minutes ago', icon: 'user' },
+                { title: 'Movie "Fast X" was added', time: '1 hour ago', icon: 'movie' },
+                { title: 'New review submitted', time: '2 hours ago', icon: 'star' },
+                { title: '50 new views recorded', time: '3 hours ago', icon: 'eye' }
+            ];
+            
+            const icons = {
+                user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>',
+                movie: '<rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line>',
+                star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>',
+                eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>'
+            };
+            
+            list.innerHTML = activities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            ${icons[activity.icon]}
+                        </svg>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">${activity.title}</div>
+                        <div class="activity-time">${activity.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderChart(dailyStats) {
+            const container = document.getElementById('viewsChart');
+            
+            if (!dailyStats || dailyStats.length === 0) {
+                container.innerHTML = '<p>No data available</p>';
+                return;
+            }
+            
+            // Simple bar chart using CSS
+            const maxViews = Math.max(...dailyStats.map(d => d.views));
+            
+            container.innerHTML = `
+                <div style="display: flex; align-items: flex-end; height: 100%; width: 100%; padding: 20px; gap: 5px;">
+                    ${dailyStats.slice(-14).map(day => `
+                        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%;">
+                            <div style="width: 100%; background: var(--primary-color); border-radius: 4px 4px 0 0; min-height: 5px; height: ${(day.views / maxViews) * 200}px; transition: height 0.3s ease;"></div>
+                            <div style="font-size: 10px; color: var(--text-secondary); margin-top: 5px; transform: rotate(-45deg); white-space: nowrap;">${day._id.split('-').slice(1).join('/')}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function editMovie(movieId) {
+            window.location.href = `admin-movies.html?action=edit&id=${movieId}`;
+        }
+
+        async function deleteMovie(movieId) {
+            if (!confirm('Are you sure you want to delete this movie?')) return;
+            
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            
+            try {
+                const response = await fetch(`${API_URL}/luganda-movies/${movieId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    loadDashboardData();
+                } else {
+                    alert('Failed to delete movie');
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+                alert('Error deleting movie');
+            }
+        }
+
+        function updateChart(days) {
+            // Reload data with new timeframe
+            loadDashboardData();
+        }
+    </script>
+</body>
+</html>
