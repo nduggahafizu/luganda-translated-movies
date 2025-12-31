@@ -1,41 +1,73 @@
 const Redis = require('ioredis');
 
-// Redis client configuration
-const redisClient = new Redis({
-    host: process.env.REDIS_HOST || 'localhost',
-    port: process.env.REDIS_PORT || 6379,
-    password: process.env.REDIS_PASSWORD || undefined,
-    retryStrategy: (times) => {
-        const delay = Math.min(times * 50, 2000);
-        return delay;
-    },
-    maxRetriesPerRequest: 3
-});
-
-// Redis connection event handlers
-redisClient.on('connect', () => {
-    console.log('✅ Redis connected successfully');
-});
-
-redisClient.on('error', (err) => {
-    console.error('⚠️  Redis connection error:', err.message);
-    console.log('⚠️  Server will continue without caching');
-});
-
-redisClient.on('ready', () => {
-    console.log('✅ Redis is ready to accept commands');
-});
-
-// Check if Redis is available
+// Redis client configuration with lazy connect (won't block startup)
+let redisClient = null;
 let isRedisAvailable = false;
-redisClient.ping()
-    .then(() => {
-        isRedisAvailable = true;
-    })
-    .catch(() => {
-        isRedisAvailable = false;
-        console.log('⚠️  Redis not available - caching disabled');
-    });
+
+// Initialize Redis only if REDIS_HOST is configured
+const initRedis = () => {
+    const redisUrl = process.env.REDIS_URL || process.env.REDIS_HOST;
+    
+    if (!redisUrl) {
+        console.log('⚠️  Redis not configured - caching disabled');
+        console.log('   Set REDIS_URL or REDIS_HOST environment variable to enable caching');
+        return null;
+    }
+
+    try {
+        const client = new Redis(process.env.REDIS_URL || {
+            host: process.env.REDIS_HOST || 'localhost',
+            port: process.env.REDIS_PORT || 6379,
+            password: process.env.REDIS_PASSWORD || undefined,
+            lazyConnect: true, // Don't connect automatically
+            retryStrategy: (times) => {
+                if (times > 3) {
+                    console.log('⚠️  Redis connection failed after 3 retries - caching disabled');
+                    return null; // Stop retrying
+                }
+                const delay = Math.min(times * 100, 2000);
+                return delay;
+            },
+            maxRetriesPerRequest: 1,
+            enableOfflineQueue: false // Don't queue commands when disconnected
+        });
+
+        // Redis connection event handlers
+        client.on('connect', () => {
+            console.log('✅ Redis connected successfully');
+            isRedisAvailable = true;
+        });
+
+        client.on('error', (err) => {
+            console.error('⚠️  Redis error:', err.message);
+            isRedisAvailable = false;
+        });
+
+        client.on('close', () => {
+            console.log('⚠️  Redis connection closed');
+            isRedisAvailable = false;
+        });
+
+        client.on('ready', () => {
+            console.log('✅ Redis is ready to accept commands');
+            isRedisAvailable = true;
+        });
+
+        // Try to connect (non-blocking)
+        client.connect().catch((err) => {
+            console.log('⚠️  Redis connection failed:', err.message);
+            isRedisAvailable = false;
+        });
+
+        return client;
+    } catch (error) {
+        console.log('⚠️  Redis initialization error:', error.message);
+        return null;
+    }
+};
+
+// Initialize Redis client
+redisClient = initRedis();
 
 /**
  * Cache middleware for GET requests
@@ -43,8 +75,8 @@ redisClient.ping()
  */
 const cache = (duration = 300) => {
     return async (req, res, next) => {
-        // Only cache GET requests
-        if (req.method !== 'GET' || !isRedisAvailable) {
+        // Only cache GET requests and only if Redis is available
+        if (req.method !== 'GET' || !isRedisAvailable || !redisClient) {
             return next();
         }
 
@@ -66,14 +98,16 @@ const cache = (duration = 300) => {
 
             // Override res.json to cache the response
             res.json = (data) => {
-                // Cache the response
-                redisClient.setex(key, duration, JSON.stringify(data))
-                    .then(() => {
-                        console.log(`💾 Cached: ${key} (${duration}s)`);
-                    })
-                    .catch((err) => {
-                        console.error('Cache set error:', err.message);
-                    });
+                // Cache the response (only if Redis is still available)
+                if (redisClient && isRedisAvailable) {
+                    redisClient.setex(key, duration, JSON.stringify(data))
+                        .then(() => {
+                            console.log(`💾 Cached: ${key} (${duration}s)`);
+                        })
+                        .catch((err) => {
+                            console.error('Cache set error:', err.message);
+                        });
+                }
 
                 // Send the response
                 return originalJson(data);
@@ -92,7 +126,7 @@ const cache = (duration = 300) => {
  * @param {string} pattern - Redis key pattern (e.g., 'cache:*', 'cache:/api/movies*')
  */
 const clearCache = async (pattern = 'cache:*') => {
-    if (!isRedisAvailable) {
+    if (!isRedisAvailable || !redisClient) {
         return { success: false, message: 'Redis not available' };
     }
 
@@ -115,7 +149,7 @@ const clearCache = async (pattern = 'cache:*') => {
  * @param {string} key - Specific cache key to clear
  */
 const clearCacheKey = async (key) => {
-    if (!isRedisAvailable) {
+    if (!isRedisAvailable || !redisClient) {
         return { success: false, message: 'Redis not available' };
     }
 
@@ -133,8 +167,8 @@ const clearCacheKey = async (key) => {
  * Get cache statistics
  */
 const getCacheStats = async () => {
-    if (!isRedisAvailable) {
-        return { available: false };
+    if (!isRedisAvailable || !redisClient) {
+        return { available: false, message: 'Redis not configured or unavailable' };
     }
 
     try {
@@ -156,6 +190,6 @@ module.exports = {
     clearCache,
     clearCacheKey,
     getCacheStats,
-    redisClient,
+    redisClient: redisClient,
     isRedisAvailable: () => isRedisAvailable
 };
