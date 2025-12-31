@@ -11,20 +11,20 @@ const TV_API_CONFIG = {
     iptv_org: "https://iptv-org.github.io/api/streams.json",
     freeiptvAPI: "https://iptv-org.github.io/iptv/countries/ug.m3u",
 
-    // Logo image URLs for each station (prefer local assets, fallback to Wikipedia)
+    // Logo image URLs for each station (prefer local assets, fallback to placehold.co)
     logos: {
-        "ntv-uganda": "assets/tv-logos/ntv-uganda.png",
-        "nbs-tv": "assets/tv-logos/nbs-tv.png",
-        "ubc-tv": "assets/tv-logos/ubc-tv.png",
-        "bukedde-tv": "assets/tv-logos/bukedde-tv.png",
-        "urban-tv": "assets/tv-logos/urban-tv.png",
-        "spark-tv": "assets/tv-logos/spark-tv.png",
-        "tv-west": "assets/tv-logos/tv-west.png",
+        "ntv-uganda": "https://placehold.co/400x225/7CFC00/000000?text=NTV+Uganda",
+        "nbs-tv": "https://placehold.co/400x225/FF6B00/FFFFFF?text=NBS+TV",
+        "ubc-tv": "https://placehold.co/400x225/0066CC/FFFFFF?text=UBC+TV",
+        "bukedde-tv": "https://placehold.co/400x225/CC0000/FFFFFF?text=Bukedde+TV",
+        "urban-tv": "https://placehold.co/400x225/9900CC/FFFFFF?text=Urban+TV",
+        "spark-tv": "https://placehold.co/400x225/FF1493/FFFFFF?text=Spark+TV",
+        "tv-west": "https://placehold.co/400x225/006633/FFFFFF?text=TV+West",
         "salt-tv": "assets/tv-logos/salt-tv.png",
-        "tv-east": "assets/tv-logos/tv-east.png",
-        "bbs-tv": "assets/tv-logos/bbs-tv.png",
-        "tv-north": "assets/tv-logos/tv-north.png",
-        "wan-luo-tv": "assets/tv-logos/wan-luo-tv.png"
+        "tv-east": "https://placehold.co/400x225/FF8C00/FFFFFF?text=TV+East",
+        "bbs-tv": "https://placehold.co/400x225/FFD700/000000?text=BBS+TV",
+        "tv-north": "https://placehold.co/400x225/008B8B/FFFFFF?text=TV+North",
+        "wan-luo-tv": "https://placehold.co/400x225/800080/FFFFFF?text=Wan+Luo+TV"
     },
     // YouTube channels for stations that broadcast live on YouTube
     youtubeChannels: {
