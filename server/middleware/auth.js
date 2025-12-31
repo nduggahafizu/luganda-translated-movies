@@ -1,6 +1,9 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+// JWT Configuration with defaults (must match authController)
+const JWT_SECRET = process.env.JWT_SECRET || 'unruly-movies-jwt-secret-key-2024';
+
 // Protect routes - verify JWT token
 exports.protect = async (req, res, next) => {
     try {
@@ -21,7 +24,7 @@ exports.protect = async (req, res, next) => {
 
         try {
             // Verify token
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            const decoded = jwt.verify(token, JWT_SECRET);
 
             // Get user from token
             req.user = await User.findById(decoded.id);
