@@ -4,7 +4,8 @@ const ViewStats = require('../models/ViewStats');
 const LugandaMovie = require('../models/LugandaMovie');
 const Review = require('../models/Review');
 const User = require('../models/User');
-const { protect, adminOnly } = require('../middleware/auth');
+const { protect } = require('../middleware/auth');
+const { adminOnly } = require('../middleware/adminAuth');
 const crypto = require('crypto');
 
 // Record a view (public endpoint)
