@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken');
 const { logger } = require('./logger');
 
-// JWT Secret from environment or default
-const JWT_SECRET = process.env.JWT_SECRET || 'luganda-movies-jwt-secret-key-change-in-production';
+// JWT Secret from environment or default (must match authController and auth middleware)
+const JWT_SECRET = process.env.JWT_SECRET || 'unruly-movies-jwt-secret-key-2024';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '30d';
 
