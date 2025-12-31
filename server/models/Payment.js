@@ -89,7 +89,6 @@ const paymentSchema = new mongoose.Schema({
 
 // Index for faster queries
 paymentSchema.index({ user: 1, createdAt: -1 });
-paymentSchema.index({ transactionId: 1 });
 paymentSchema.index({ status: 1 });
 paymentSchema.index({ 'paymentDetails.pesapalTrackingId': 1 });
 paymentSchema.index({ 'paymentDetails.stripePaymentIntentId': 1 });
