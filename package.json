@@ -1,8 +1,18 @@
 {
+  "name": "luganda-movies",
+  "version": "1.0.0",
+  "description": "Luganda Movies - VJ Translation Platform",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "cd server && npm run dev",
+    "check:api": "bash ./scripts/check_api_proxy.sh",
+    "postinstall": "cd server && npm install"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "mongodb": "^7.0.0"
-  }
-  ,"scripts": {
-    "check:api": "bash ./scripts/check_api_proxy.sh"
   }
 }
