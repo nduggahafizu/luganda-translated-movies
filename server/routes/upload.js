@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs').promises;
 const gcsService = require('../services/googleCloudStorage');
 const LugandaMovie = require('../models/LugandaMovie');
-const auth = require('../middleware/auth');
+const { protect: auth } = require('../middleware/auth');
 
 // Configure multer for file uploads (temporary storage)
 const upload = multer({

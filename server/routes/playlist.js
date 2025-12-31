@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth');
 
 // In-memory storage for playlists (replace with database in production)
 // Structure: { userId: { playlistId: { name, movies: [], createdAt, updatedAt } } }
