@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth');
+const { protect: auth } = require('../middleware/auth');
 const { adminOnly } = require('../middleware/adminAuth');
 const User = require('../models/User');
 const LugandaMovie = require('../models/LugandaMovie');
