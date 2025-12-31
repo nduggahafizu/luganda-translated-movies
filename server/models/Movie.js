@@ -211,7 +211,6 @@ movieSchema.statics.searchMovies = function(query, filters = {}) {
 
 // Indexes for better query performance
 movieSchema.index({ title: 'text', description: 'text', tags: 'text' });
-movieSchema.index({ slug: 1 });
 movieSchema.index({ genres: 1 });
 movieSchema.index({ year: -1 });
 movieSchema.index({ views: -1 });

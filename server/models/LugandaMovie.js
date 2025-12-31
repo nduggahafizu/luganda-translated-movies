@@ -384,7 +384,6 @@ lugandaMovieSchema.statics.searchMovies = function(query, filters = {}) {
 
 // Indexes for better query performance
 lugandaMovieSchema.index({ originalTitle: 'text', lugandaTitle: 'text', description: 'text', tags: 'text', vjName: 'text' });
-lugandaMovieSchema.index({ slug: 1 });
 lugandaMovieSchema.index({ genres: 1 });
 lugandaMovieSchema.index({ year: -1 });
 lugandaMovieSchema.index({ views: -1 });
