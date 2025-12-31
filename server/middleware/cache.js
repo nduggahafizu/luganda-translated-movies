@@ -1,73 +1,53 @@
-const Redis = require('ioredis');
-
-// Redis client configuration with lazy connect (won't block startup)
+// Redis client configuration - DISABLED unless explicitly configured
 let redisClient = null;
 let isRedisAvailable = false;
 
-// Initialize Redis only if REDIS_HOST is configured
-const initRedis = () => {
-    const redisUrl = process.env.REDIS_URL || process.env.REDIS_HOST;
-    
-    if (!redisUrl) {
-        console.log('⚠️  Redis not configured - caching disabled');
-        console.log('   Set REDIS_URL or REDIS_HOST environment variable to enable caching');
-        return null;
-    }
+// Only initialize Redis if REDIS_URL is explicitly set
+const REDIS_URL = process.env.REDIS_URL;
 
+if (REDIS_URL) {
     try {
-        const client = new Redis(process.env.REDIS_URL || {
-            host: process.env.REDIS_HOST || 'localhost',
-            port: process.env.REDIS_PORT || 6379,
-            password: process.env.REDIS_PASSWORD || undefined,
-            lazyConnect: true, // Don't connect automatically
-            retryStrategy: (times) => {
-                if (times > 3) {
-                    console.log('⚠️  Redis connection failed after 3 retries - caching disabled');
-                    return null; // Stop retrying
-                }
-                const delay = Math.min(times * 100, 2000);
-                return delay;
-            },
+        const Redis = require('ioredis');
+        redisClient = new Redis(REDIS_URL, {
+            lazyConnect: true,
             maxRetriesPerRequest: 1,
-            enableOfflineQueue: false // Don't queue commands when disconnected
+            retryStrategy: (times) => {
+                if (times > 2) {
+                    console.log('⚠️  Redis: Max retries reached, disabling cache');
+                    isRedisAvailable = false;
+                    return null;
+                }
+                return Math.min(times * 100, 1000);
+            },
+            enableOfflineQueue: false
         });
 
-        // Redis connection event handlers
-        client.on('connect', () => {
-            console.log('✅ Redis connected successfully');
+        redisClient.on('connect', () => {
+            console.log('✅ Redis connected');
             isRedisAvailable = true;
         });
 
-        client.on('error', (err) => {
-            console.error('⚠️  Redis error:', err.message);
+        redisClient.on('error', () => {
             isRedisAvailable = false;
         });
 
-        client.on('close', () => {
-            console.log('⚠️  Redis connection closed');
+        redisClient.on('close', () => {
             isRedisAvailable = false;
         });
 
-        client.on('ready', () => {
-            console.log('✅ Redis is ready to accept commands');
-            isRedisAvailable = true;
-        });
-
-        // Try to connect (non-blocking)
-        client.connect().catch((err) => {
-            console.log('⚠️  Redis connection failed:', err.message);
+        redisClient.connect().catch(() => {
             isRedisAvailable = false;
         });
-
-        return client;
-    } catch (error) {
-        console.log('⚠️  Redis initialization error:', error.message);
-        return null;
+    } catch (err) {
+        console.log('⚠️  Redis init failed:', err.message);
+        redisClient = null;
     }
-};
+} else {
+    console.log('ℹ️  Redis not configured (REDIS_URL not set) - caching disabled');
+}
 
 // Initialize Redis client
-redisClient = initRedis();
+// redisClient is already set above
 
 /**
  * Cache middleware for GET requests
