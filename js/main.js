@@ -5,6 +5,49 @@
 (function() {
     'use strict';
 
+    // ===================================
+    // Global Image Error Handler
+    // ===================================
+    // Handle broken images site-wide
+    document.addEventListener('error', function(e) {
+        if (e.target.tagName === 'IMG') {
+            const img = e.target;
+            const alt = img.alt || 'Image';
+            // Generate colorful placeholder based on alt text
+            const colors = ['7CFC00', 'FF6B6B', '4ECDC4', 'FFE66D', 'A855F7', 'EC4899', '06B6D4', 'F97316'];
+            const colorIndex = alt.length % colors.length;
+            const color = colors[colorIndex];
+            const displayText = alt.substring(0, 15);
+            img.src = `https://placehold.co/300x450/1a1a2e/${color}?text=${encodeURIComponent(displayText)}`;
+            img.onerror = null; // Prevent infinite loop
+        }
+    }, true);
+
+    // Handle broken background images for media-cover divs
+    function handleBrokenBackgroundImages() {
+        const mediaCoverElements = document.querySelectorAll('.media-cover, .media-slide');
+        mediaCoverElements.forEach(el => {
+            const style = el.style.backgroundImage;
+            if (style && style.includes('url(')) {
+                const urlMatch = style.match(/url\(['"]?([^'"]+)['"]?\)/);
+                if (urlMatch && urlMatch[1] && urlMatch[1].includes('tmdb.org')) {
+                    const img = new Image();
+                    img.onerror = function() {
+                        // Generate placeholder
+                        const colors = ['7CFC00', 'FF6B6B', '4ECDC4', 'FFE66D', 'A855F7'];
+                        const colorIndex = Math.floor(Math.random() * colors.length);
+                        const color = colors[colorIndex];
+                        el.style.backgroundImage = `url('https://placehold.co/300x450/1a1a2e/${color}?text=Movie')`;
+                    };
+                    img.src = urlMatch[1];
+                }
+            }
+        });
+    }
+
+    // Run after DOM is fully loaded
+    setTimeout(handleBrokenBackgroundImages, 500);
+
     // DOM Elements
     const body = document.body;
     const menuBtn = document.querySelector('.menu');
