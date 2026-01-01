@@ -520,14 +520,23 @@
                 return;
             }
             
-            moviesToRender.forEach(movie => {
+            // Build all cards first
+            let cardsHTML = '';
+            const posterData = [];
+            
+            moviesToRender.forEach((movie, index) => {
                 // Handle missing fields with defaults
                 const quality = movie.video?.quality || 'HD';
                 const rating = movie.rating?.translationRating || movie.rating?.userRating || 4.0;
                 const fallbackPoster = getPlaceholderPoster(movie.originalTitle, movie.year);
                 const posterUrl = movie.poster || fallbackPoster;
                 const vjName = movie.vjName || 'Unknown';
-                const movieId = movie._id;
+                const posterId = `poster-${index}`;
+                
+                // Store poster data for later loading
+                if (movie.poster) {
+                    posterData.push({ posterId, posterUrl: movie.poster, fallbackPoster });
+                }
                 
                 const movieCard = `
                     <div class="list-movie position-relative">
@@ -548,7 +557,7 @@
                                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                 </svg>
                             </div>
-                            <div class="media media-cover" id="poster-${movieId}" style="background-image: url('${fallbackPoster}');"></div>
+                            <div class="media media-cover" id="${posterId}" style="background-image: url('${fallbackPoster}');"></div>
                         </a>
                         <div class="list-caption">
                             <a href="player.html?id=${movie._id}" class="list-title">${movie.originalTitle || movie.lugandaTitle || 'Unknown Title'}</a>
@@ -574,16 +583,21 @@
                         </div>
                     </div>
                 `;
-                grid.innerHTML += movieCard;
-                
-                // Load poster image with fallback after card is added to DOM
-                if (movie.poster) {
-                    const posterElement = document.getElementById(`poster-${movieId}`);
-                    if (posterElement) {
-                        loadPosterImage(movie.poster, posterElement, fallbackPoster);
-                    }
-                }
+                cardsHTML += movieCard;
             });
+            
+            // Add all cards to DOM at once
+            grid.innerHTML = cardsHTML;
+            
+            // Now load posters with validation (after DOM is updated)
+            setTimeout(() => {
+                posterData.forEach(({ posterId, posterUrl, fallbackPoster }) => {
+                    const posterElement = document.getElementById(posterId);
+                    if (posterElement) {
+                        loadPosterImage(posterUrl, posterElement, fallbackPoster);
+                    }
+                });
+            }, 100);
         }
 
 // Initial load from API
