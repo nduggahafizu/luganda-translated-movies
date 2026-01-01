@@ -576,10 +576,7 @@ async function seedMovies() {
         const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/luganda-movies';
         console.log('📦 Connecting to MongoDB...');
         
-        await mongoose.connect(mongoUri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
+        await mongoose.connect(mongoUri);
         
         console.log('✅ Connected to MongoDB');
         

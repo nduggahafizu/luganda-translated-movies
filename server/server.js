@@ -158,10 +158,7 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/lugand
 console.log(`🔧 MONGODB_URI from env: ${process.env.MONGODB_URI ? 'SET (' + MONGODB_URI.substring(0, 30) + '...)' : 'NOT SET - using default'}`);
 console.log(`🔧 NODE_ENV: ${process.env.NODE_ENV || 'not set'}`);
 
-mongoose.connect(MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+mongoose.connect(MONGODB_URI)
 .then(() => {
     console.log('✅ MongoDB Connected Successfully');
     console.log(`📦 Database: ${MONGODB_URI}`);
@@ -179,15 +176,30 @@ mongoose.connect(MONGODB_URI, {
 
 // Session middleware for watch progress and playlists
 const session = require('express-session');
-app.use(session({
+const MongoStore = require('connect-mongo');
+
+// Configure session store - use MongoDB in production, memory in development
+const sessionConfig = {
     secret: process.env.SESSION_SECRET || 'luganda-movies-secret-key',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: { 
         secure: process.env.NODE_ENV === 'production',
         maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
     }
-}));
+};
+
+// Use MongoDB store in production to avoid memory leaks
+if (process.env.NODE_ENV === 'production' && process.env.MONGODB_URI) {
+    sessionConfig.store = MongoStore.create({
+        mongoUrl: MONGODB_URI,
+        ttl: 30 * 24 * 60 * 60, // 30 days
+        autoRemove: 'native'
+    });
+    console.log('📦 Using MongoDB session store');
+}
+
+app.use(session(sessionConfig));
 
 // Swagger API Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {

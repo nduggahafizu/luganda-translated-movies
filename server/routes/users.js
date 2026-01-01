@@ -309,13 +309,15 @@ router.get('/profile', auth, async (req, res) => {
 // @access  Private
 router.put('/profile', auth, async (req, res) => {
     try {
-        const { name, email, avatar, phone } = req.body;
+        const { fullName, name, email, avatar, phone, language } = req.body;
         
         const updateData = {};
-        if (name) updateData.name = name;
-        if (email) updateData.email = email;
+        // Support both fullName and name for backwards compatibility
+        if (fullName) updateData.fullName = fullName;
+        else if (name) updateData.fullName = name;
         if (avatar) updateData.avatar = avatar;
         if (phone) updateData.phone = phone;
+        if (language) updateData['preferences.language'] = language;
         
         const user = await User.findByIdAndUpdate(
             req.user.id,
@@ -330,6 +332,26 @@ router.put('/profile', auth, async (req, res) => {
         });
     } catch (error) {
         console.error('Error updating profile:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Server error'
+        });
+    }
+});
+
+// @route   DELETE /api/users/account
+// @desc    Delete user account
+// @access  Private
+router.delete('/account', auth, async (req, res) => {
+    try {
+        await User.findByIdAndDelete(req.user.id);
+        
+        res.json({
+            status: 'success',
+            message: 'Account deleted successfully'
+        });
+    } catch (error) {
+        console.error('Error deleting account:', error);
         res.status(500).json({
             status: 'error',
             message: 'Server error'
