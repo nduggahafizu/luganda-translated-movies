@@ -249,7 +249,8 @@ async function addMovies() {
                 video: {
                     provider: 'local',
                     quality: 'hd',
-                    format: 'mp4'
+                    format: 'mp4',
+                    originalVideoPath: 'local'
                 },
                 requiredPlan: Math.random() > 0.7 ? 'premium' : 'free',
                 ageRating: 'PG-13'
