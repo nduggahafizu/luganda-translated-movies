@@ -308,8 +308,8 @@
                     <label for="password" class="form-label">Password</label>
                     <div class="password-toggle">
                         <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required autocomplete="current-password">
-                        <button type="button" class="password-toggle-btn" onclick="togglePassword()">
-                            <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <button type="button" class="password-toggle-btn" onclick="togglePassword()" aria-label="Toggle password visibility" title="Show/hide password">
+                            <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                 <circle cx="12" cy="12" r="3"></circle>
                             </svg>
@@ -325,7 +325,7 @@
                     <a href="#" class="form-link">Forgot Password?</a>
                 </div>
                 
-                <button type="submit" class="btn-submit">Login</button>
+                <button type="submit" class="btn-submit" id="submitBtn" data-original-text="Login">Login</button>
             </form>
             
             <div class="divider">
@@ -364,15 +364,24 @@
             alert(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login would be implemented here`);
         }
         
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const rememberMe = document.getElementById('remember').checked;
+            const submitBtn = document.getElementById('submitBtn');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Logging in...';
             
             // Call login function from auth.js
-            loginWithEmail(email, password, rememberMe);
+            try {
+                await loginWithEmail(email, password, rememberMe);
+            } catch (error) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Login';
+            }
         });
     </script>
 </body>
