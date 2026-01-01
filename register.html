@@ -363,8 +363,8 @@
                     <label for="password" class="form-label">Password</label>
                     <div class="password-toggle">
                         <input type="password" id="password" name="password" class="form-control" placeholder="Create a password" required>
-                        <button type="button" class="password-toggle-btn" onclick="togglePassword('password', 'eyeIcon1')">
-                            <svg id="eyeIcon1" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <button type="button" class="password-toggle-btn" onclick="togglePassword('password', 'eyeIcon1')" aria-label="Toggle password visibility" title="Show/hide password">
+                            <svg id="eyeIcon1" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                 <circle cx="12" cy="12" r="3"></circle>
                             </svg>
@@ -373,15 +373,15 @@
                     <div class="password-strength">
                         <div class="password-strength-bar" id="strengthBar"></div>
                     </div>
-                    <div class="error-message" id="passwordError">Password must be at least 8 characters</div>
+                    <div class="error-message" id="passwordError">Password must be at least 8 characters with uppercase, lowercase, and number</div>
                 </div>
                 
                 <div class="form-group">
                     <label for="confirmPassword" class="form-label">Confirm Password</label>
                     <div class="password-toggle">
                         <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Confirm your password" required>
-                        <button type="button" class="password-toggle-btn" onclick="togglePassword('confirmPassword', 'eyeIcon2')">
-                            <svg id="eyeIcon2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <button type="button" class="password-toggle-btn" onclick="togglePassword('confirmPassword', 'eyeIcon2')" aria-label="Toggle confirm password visibility" title="Show/hide password">
+                            <svg id="eyeIcon2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                 <circle cx="12" cy="12" r="3"></circle>
                             </svg>
@@ -393,11 +393,11 @@
                 <div class="form-checkbox">
                     <input type="checkbox" id="terms" name="terms" required>
                     <label for="terms">
-                        I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                        I agree to the <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a>
                     </label>
                 </div>
                 
-                <button type="submit" class="btn-submit" id="submitBtn">Create Account</button>
+                <button type="submit" class="btn-submit" id="submitBtn" data-original-text="Create Account">Create Account</button>
             </form>
             
             <div class="divider">
@@ -473,7 +473,7 @@
         });
         
         // Form validation
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             let isValid = true;
@@ -503,11 +503,13 @@
                 emailError.classList.remove('show');
             }
             
-            // Password validation
+            // Password validation (must match backend requirements)
             const password = document.getElementById('password');
             const passwordError = document.getElementById('passwordError');
-            if (password.value.length < 8) {
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+            if (!passwordRegex.test(password.value)) {
                 password.classList.add('error');
+                passwordError.textContent = 'Password must be at least 8 characters with uppercase, lowercase, and number';
                 passwordError.classList.add('show');
                 isValid = false;
             } else {
@@ -540,8 +542,14 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Creating Account...';
                 
-                // Call registerWithEmail from auth.js
-                registerWithEmail(fullname.value.trim(), email.value.trim(), password.value);
+                // Call registerWithEmail from auth.js and handle errors
+                try {
+                    await registerWithEmail(fullname.value.trim(), email.value.trim(), password.value);
+                } catch (error) {
+                    // Re-enable button on error
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Create Account';
+                }
             }
         });
     </script>

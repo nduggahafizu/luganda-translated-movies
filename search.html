@@ -547,6 +547,7 @@
                 <div class="search-header">
                     <form class="search-form" onsubmit="performSearch(event)">
                         <div class="search-input-wrapper">
+                            <label for="searchInput" class="visually-hidden">Search movies, VJs, genres</label>
                             <svg class="search-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -562,7 +563,7 @@
                 <div class="filters-section">
                     <div class="filters-row">
                         <div class="filter-group">
-                            <label class="filter-label">Genre</label>
+                            <label class="filter-label" for="genreFilter">Genre</label>
                             <select class="filter-select" id="genreFilter" onchange="applyFilters()">
                                 <option value="">All Genres</option>
                                 <option value="action">Action</option>
@@ -576,13 +577,13 @@
                             </select>
                         </div>
                         <div class="filter-group">
-                            <label class="filter-label">VJ Translator</label>
+                            <label class="filter-label" for="vjFilter">VJ Translator</label>
                             <select class="filter-select" id="vjFilter" onchange="applyFilters()">
                                 <option value="">All VJs</option>
                             </select>
                         </div>
                         <div class="filter-group">
-                            <label class="filter-label">Year</label>
+                            <label class="filter-label" for="yearFilter">Year</label>
                             <select class="filter-select" id="yearFilter" onchange="applyFilters()">
                                 <option value="">All Years</option>
                                 <option value="2024">2024</option>
@@ -595,7 +596,7 @@
                             </select>
                         </div>
                         <div class="filter-group">
-                            <label class="filter-label">Sort By</label>
+                            <label class="filter-label" for="sortFilter">Sort By</label>
                             <select class="filter-select" id="sortFilter" onchange="applyFilters()">
                                 <option value="relevance">Most Relevant</option>
                                 <option value="newest">Newest First</option>
