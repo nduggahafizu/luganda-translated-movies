@@ -7,38 +7,21 @@ mongoose.connect(process.env.MONGODB_URI).then(async () => {
   console.log('Connected!');
   const Movie = require('../models/Movie');
   
-  // Add Predator: Badlands (2025)
-  const predatorExists = await Movie.findOne({ title: 'Predator: Badlands' });
-  if (!predatorExists) {
-    const predator = new Movie({
-      title: 'Predator: Badlands',
-      slug: 'predator-badlands',
-      description: 'A woman escapes with a group of convicts from an off-world prison colony. As they make their way through the badlands, the fugitives become the prey of a merciless alien hunter.',
-      year: 2025,
-      duration: 120,
-      rating: { imdb: 0, userRating: 0, totalRatings: 0 },
-      genres: ['sci-fi', 'action', 'thriller'],
-      cast: [],
-      director: 'Dan Trachtenberg',
-      language: 'English',
-      country: 'USA',
-      poster: 'https://image.tmdb.org/t/p/w500/hgiv4xaF2NsNYGr6mwh7hIuOlEE.jpg',
-      backdrop: 'https://image.tmdb.org/t/p/original/sNaVDdm7QLDfZMCCNSKjEJvP7W2.jpg',
-      video: {
-        url: 'https://streamtape.com/e/01Jewvl11Jibre3/Predator.Badlands.part_01.mkv.mp4',
-        quality: 'hd',
-        size: 0,
-        duration: 0
-      },
-      vj: { name: 'VJ Junior', isVerified: true },
-      status: 'published',
-      views: 0,
-      featured: false
-    });
-    await predator.save();
-    console.log('Added: Predator: Badlands');
+  // Update Predator: Badlands video URL (VJ Emmy version)
+  const predatorUpdate = await Movie.findOneAndUpdate(
+    { slug: { $regex: /predator.*badlands/i } },
+    { 
+      $set: { 
+        'video.url': 'https://streamtape.com/e/01Jewvl11Jibre3/Predator.Badlands.part_01.mkv.mp4',
+        'video.quality': 'hd'
+      }
+    },
+    { new: true }
+  );
+  if (predatorUpdate) {
+    console.log('Updated Predator Badlands video URL:', predatorUpdate.title);
   } else {
-    console.log('Predator: Badlands already exists');
+    console.log('Predator Badlands not found in database');
   }
   
   // Add Now You See Me (2013)
