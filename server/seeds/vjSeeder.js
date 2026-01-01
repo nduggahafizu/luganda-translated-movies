@@ -390,10 +390,7 @@ const vjs = [
 async function seedVJs() {
     try {
         // Connect to MongoDB
-        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/luganda-movies', {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
+        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/luganda-movies');
 
         console.log('Connected to MongoDB');
 

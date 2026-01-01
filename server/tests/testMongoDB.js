@@ -16,11 +16,9 @@ async function testMongoDBConnection() {
         }
         
         console.log('Connecting to MongoDB Atlas...');
-        console.log(`URI: ${mongoUri.replace(/:[^:@]+@/, ':****@')}`); // Hide password in logs
+        console.log(`URI: ${mongoUri.replace(/:[^:@]+@/, ':****@')}`);
         
         await mongoose.connect(mongoUri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
             serverSelectionTimeoutMS: 5000
         });
         
