@@ -1,6 +1,6 @@
 // Service Worker for Unruly Movies PWA
-const CACHE_NAME = 'unruly-movies-v1';
-const DYNAMIC_CACHE = 'unruly-dynamic-v1';
+const CACHE_NAME = 'unruly-movies-v2';
+const DYNAMIC_CACHE = 'unruly-dynamic-v2';
 
 // Files to cache immediately
 const STATIC_ASSETS = [
@@ -63,14 +63,13 @@ self.addEventListener('fetch', event => {
     // Skip non-GET requests
     if (request.method !== 'GET') return;
     
-    // Skip cross-origin requests except images
-    if (url.origin !== location.origin && !url.href.includes('image.tmdb.org')) {
-        return;
+    // ALWAYS bypass service worker for API requests - fetch fresh data
+    if (url.pathname.startsWith('/api/') || url.hostname.includes('railway.app')) {
+        return; // Let browser handle it directly, no caching
     }
     
-    // Skip API requests for fresh data
-    if (url.pathname.startsWith('/api/')) {
-        event.respondWith(networkFirst(request));
+    // Skip cross-origin requests except images
+    if (url.origin !== location.origin && !url.href.includes('image.tmdb.org')) {
         return;
     }
     
