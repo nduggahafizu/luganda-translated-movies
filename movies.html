@@ -489,6 +489,28 @@
             loadMovies(params);
         }
 
+        // Helper function to generate placeholder poster URL based on movie title
+        function getPlaceholderPoster(title, year) {
+            const colors = ['7CFC00', 'FF6B6B', '4ECDC4', 'FFE66D', 'A855F7', 'EC4899', '06B6D4', 'F97316'];
+            const colorIndex = (title || '').length % colors.length;
+            const color = colors[colorIndex];
+            const displayTitle = (title || 'Movie').substring(0, 20);
+            const displayYear = year || '';
+            return `https://placehold.co/300x450/1a1a2e/${color}?text=${encodeURIComponent(displayTitle)}%0A${displayYear}`;
+        }
+
+        // Function to load and validate poster image
+        function loadPosterImage(posterUrl, imgElement, fallbackUrl) {
+            const img = new Image();
+            img.onload = function() {
+                imgElement.style.backgroundImage = `url('${posterUrl}')`;
+            };
+            img.onerror = function() {
+                imgElement.style.backgroundImage = `url('${fallbackUrl}')`;
+            };
+            img.src = posterUrl;
+        }
+
         function renderMovies(moviesToRender) {
             const grid = document.getElementById('moviesGrid');
             grid.innerHTML = '';
@@ -502,8 +524,10 @@
                 // Handle missing fields with defaults
                 const quality = movie.video?.quality || 'HD';
                 const rating = movie.rating?.translationRating || movie.rating?.userRating || 4.0;
-                const posterUrl = movie.poster || 'https://placehold.co/300x450/1a1a2e/7CFC00?text=No+Poster';
+                const fallbackPoster = getPlaceholderPoster(movie.originalTitle, movie.year);
+                const posterUrl = movie.poster || fallbackPoster;
                 const vjName = movie.vjName || 'Unknown';
+                const movieId = movie._id;
                 
                 const movieCard = `
                     <div class="list-movie position-relative">
@@ -524,7 +548,7 @@
                                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                 </svg>
                             </div>
-                            <div class="media media-cover" style="background-image: url('${posterUrl}');" onerror="this.style.backgroundImage='url(https://placehold.co/300x450/1a1a2e/7CFC00?text=No+Poster)'"></div>
+                            <div class="media media-cover" id="poster-${movieId}" style="background-image: url('${fallbackPoster}');"></div>
                         </a>
                         <div class="list-caption">
                             <a href="player.html?id=${movie._id}" class="list-title">${movie.originalTitle || movie.lugandaTitle || 'Unknown Title'}</a>
@@ -551,6 +575,14 @@
                     </div>
                 `;
                 grid.innerHTML += movieCard;
+                
+                // Load poster image with fallback after card is added to DOM
+                if (movie.poster) {
+                    const posterElement = document.getElementById(`poster-${movieId}`);
+                    if (posterElement) {
+                        loadPosterImage(movie.poster, posterElement, fallbackPoster);
+                    }
+                }
             });
         }
 
