@@ -88,6 +88,39 @@
     // ===================================
     // Mobile Search Toggle
     // ===================================
+    const mobileSearchBtn = document.getElementById('mobileSearchBtn');
+    const mobileSearchForm = document.getElementById('mobileSearchForm');
+    const mobileSearchInput = document.getElementById('mobileSearchInput');
+    const mobileSearchClose = document.getElementById('mobileSearchClose');
+    
+    if (mobileSearchBtn && mobileSearchForm) {
+        // Open mobile search
+        mobileSearchBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            mobileSearchForm.classList.add('active');
+            if (mobileSearchInput) {
+                setTimeout(() => mobileSearchInput.focus(), 100);
+            }
+        });
+        
+        // Close mobile search
+        if (mobileSearchClose) {
+            mobileSearchClose.addEventListener('click', function(e) {
+                e.preventDefault();
+                mobileSearchForm.classList.remove('active');
+            });
+        }
+        
+        // Close on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && mobileSearchForm.classList.contains('active')) {
+                mobileSearchForm.classList.remove('active');
+            }
+        });
+    }
+    
+    // Legacy search toggle (for other pages)
     if (searchBtn && headerSearch) {
         searchBtn.addEventListener('click', function() {
             headerSearch.classList.toggle('active');
