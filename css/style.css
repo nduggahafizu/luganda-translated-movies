@@ -1,12 +1,12 @@
 /* ===================================
    Unruly Movies - Main Stylesheet
-   Primary Color: Light Green (#7CFC00)
+   Primary Color: Soft Green (#66BB6A)
    =================================== */
 
 :root {
-    --primary-color: #7CFC00;
-    --primary-dark: #5CB300;
-    --primary-light: #9FFF33;
+    --primary-color: #66BB6A;
+    --primary-dark: #4CAF50;
+    --primary-light: #81C784;
     --secondary-color: #00D9FF;
     --background-dark: #0a0a0a;
     --background-light: #1a1a1a;
@@ -276,7 +276,7 @@ img {
 .btn-register:hover {
     background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(124, 252, 0, 0.3);
+    box-shadow: 0 5px 15px rgba(102, 187, 106, 0.3);
 }
 
 /* ===================================
@@ -319,9 +319,20 @@ img {
 .nav {
     list-style: none;
     padding: 0 15px;
+    margin-bottom: 20px;
 }
 
 .nav li {
+    margin-bottom: 3px;
+}
+
+.nav li.nav-header {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    padding: 15px 15px 8px;
     margin-bottom: 5px;
 }
 
@@ -329,9 +340,9 @@ img {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 15px;
+    padding: 10px 15px;
     border-radius: 8px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     transition: all 0.3s ease;
 }
@@ -342,7 +353,7 @@ img {
 }
 
 .nav li.active a {
-    background: linear-gradient(135deg, rgba(124, 252, 0, 0.15), rgba(124, 252, 0, 0.05));
+    background: linear-gradient(135deg, rgba(102, 187, 106, 0.15), rgba(102, 187, 106, 0.05));
     color: var(--primary-color);
     border-left: 3px solid var(--primary-color);
 }

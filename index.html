@@ -7,7 +7,7 @@
     <meta name="description" content="Unruly Movies - Uganda's legitimate platform for Luganda VJ translations. Watch movies translated by licensed Video Jockeys. Developed by Nduga Hafizu.">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#7CFC00">
+    <meta name="theme-color" content="#66BB6A">
     <meta name="HandheldFriendly" content="True">
     <meta http-equiv="cleartype" content="on">
     <meta name="author" content="Nduga Hafizu">
@@ -171,13 +171,13 @@
                     <!-- Mobile Search Form (Hidden by default) -->
                     <form class="mobile-search-form" id="mobileSearchForm" method="get" action="search.html">
                         <input type="text" name="q" placeholder="Search movies, VJs..." class="mobile-search-input" id="mobileSearchInput" required>
-                        <button type="submit" class="mobile-search-submit">
+                        <button type="submit" class="mobile-search-submit" title="Search">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <path d="m21 21-4.35-4.35"></path>
                             </svg>
                         </button>
-                        <button type="button" class="mobile-search-close" id="mobileSearchClose">
+                        <button type="button" class="mobile-search-close" id="mobileSearchClose" title="Close search">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <line x1="18" y1="6" x2="6" y2="18"></line>
                                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -287,7 +287,9 @@
                         </svg>
                     </button>
                     
+                    <!-- Main Navigation -->
                     <ul class="nav">
+                        <li class="nav-header">Menu</li>
                         <li class="active">
                             <a href="index.html">
                                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -304,23 +306,42 @@
                                     <line x1="7" y1="2" x2="7" y2="22"></line>
                                     <line x1="17" y1="2" x2="17" y2="22"></line>
                                     <line x1="2" y1="12" x2="22" y2="12"></line>
-                                    <line x1="2" y1="7" x2="7" y2="7"></line>
-                                    <line x1="2" y1="17" x2="7" y2="17"></line>
-                                    <line x1="17" y1="17" x2="22" y2="17"></line>
-                                    <line x1="17" y1="7" x2="22" y2="7"></line>
                                 </svg>
                                 Movies
                             </a>
                         </li>
                         <li>
-                            <a href="vjs.html">
+                            <a href="series.html">
                                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="12" cy="7" r="4"></circle>
+                                    <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                                    <polyline points="17 2 12 7 7 2"></polyline>
                                 </svg>
-                                VJ Translators
+                                TV Shows
                             </a>
                         </li>
+                        <li>
+                            <a href="trending.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                    <polyline points="17 6 23 6 23 12"></polyline>
+                                </svg>
+                                Trending
+                            </a>
+                        </li>
+                        <li>
+                            <a href="uganda-tv.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                                    <polyline points="17 2 12 7 7 2"></polyline>
+                                </svg>
+                                TV Channels
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <!-- Discovery Section -->
+                    <ul class="nav">
+                        <li class="nav-header">Discovery</li>
                         <li>
                             <a href="genres.html">
                                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -329,24 +350,141 @@
                                     <rect x="14" y="14" width="7" height="7"></rect>
                                     <rect x="3" y="14" width="7" height="7"></rect>
                                 </svg>
-                                Genres
+                                Categories
                             </a>
                         </li>
                         <li>
-                            <a href="uganda-tv.html">
+                            <a href="vjs.html">
                                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
-                                    <line x1="2" y1="12" x2="22" y2="12"></line>
-                                    <line x1="12" y1="7" x2="12" y2="22"></line>
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                                 </svg>
-                                Uganda TV
+                                VJ Translators
+                            </a>
+                        </li>
+                        <li>
+                            <a href="search.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <path d="m21 21-4.35-4.35"></path>
+                                </svg>
+                                Search
                             </a>
                         </li>
                     </ul>
-
-                    <ul class="nav-trend d-none d-lg-block" id="trendingSidebar">
-                        <li class="nav-header">Trending VJ Movies</li>
-                        <!-- Will be loaded dynamically -->
+                    
+                    <!-- VJ Translators -->
+                    <ul class="nav">
+                        <li class="nav-header">Popular VJs</li>
+                        <li>
+                            <a href="vj.html?name=VJ Junior">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                </svg>
+                                VJ Junior
+                            </a>
+                        </li>
+                        <li>
+                            <a href="vj.html?name=VJ Ice P">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                </svg>
+                                VJ Ice P
+                            </a>
+                        </li>
+                        <li>
+                            <a href="vj.html?name=VJ Emmy">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                </svg>
+                                VJ Emmy
+                            </a>
+                        </li>
+                        <li>
+                            <a href="vj.html?name=VJ Jingo">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                </svg>
+                                VJ Jingo
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <!-- Account Section -->
+                    <ul class="nav">
+                        <li class="nav-header">Account</li>
+                        <li>
+                            <a href="subscribe.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                                    <path d="M2 17l10 5 10-5"></path>
+                                    <path d="M2 12l10 5 10-5"></path>
+                                </svg>
+                                Subscribe
+                            </a>
+                        </li>
+                        <li>
+                            <a href="dashboard.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="14" width="7" height="7"></rect>
+                                    <rect x="3" y="14" width="7" height="7"></rect>
+                                </svg>
+                                My Dashboard
+                            </a>
+                        </li>
+                        <li id="sidebarLoginItem">
+                            <a href="login.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                                    <polyline points="10 17 15 12 10 7"></polyline>
+                                    <line x1="15" y1="12" x2="3" y2="12"></line>
+                                </svg>
+                                Login / Register
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <!-- Help Section -->
+                    <ul class="nav">
+                        <li class="nav-header">Help</li>
+                        <li>
+                            <a href="contact.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                    <polyline points="22,6 12,13 2,6"></polyline>
+                                </svg>
+                                Contact Us
+                            </a>
+                        </li>
+                        <li>
+                            <a href="about.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                                About Us
+                            </a>
+                        </li>
+                        <li>
+                            <a href="terms.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                </svg>
+                                Terms & Privacy
+                            </a>
+                        </li>
                     </ul>
                 </div>
 
