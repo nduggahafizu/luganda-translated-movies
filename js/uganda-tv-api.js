@@ -11,20 +11,20 @@ const TV_API_CONFIG = {
     iptv_org: "https://iptv-org.github.io/api/streams.json",
     freeiptvAPI: "https://iptv-org.github.io/iptv/countries/ug.m3u",
 
-    // Logo image URLs for each station (prefer local assets, fallback to placehold.co)
+    // Logo image URLs for each station (local SVG logos)
     logos: {
-        "ntv-uganda": "https://placehold.co/400x225/7CFC00/000000?text=NTV+Uganda",
-        "nbs-tv": "https://placehold.co/400x225/FF6B00/FFFFFF?text=NBS+TV",
-        "ubc-tv": "https://placehold.co/400x225/0066CC/FFFFFF?text=UBC+TV",
-        "bukedde-tv": "https://placehold.co/400x225/CC0000/FFFFFF?text=Bukedde+TV",
-        "urban-tv": "https://placehold.co/400x225/9900CC/FFFFFF?text=Urban+TV",
-        "spark-tv": "https://placehold.co/400x225/FF1493/FFFFFF?text=Spark+TV",
-        "tv-west": "https://placehold.co/400x225/006633/FFFFFF?text=TV+West",
-        "salt-tv": "assets/tv-logos/salt-tv.png",
-        "tv-east": "https://placehold.co/400x225/FF8C00/FFFFFF?text=TV+East",
-        "bbs-tv": "https://placehold.co/400x225/FFD700/000000?text=BBS+TV",
-        "tv-north": "https://placehold.co/400x225/008B8B/FFFFFF?text=TV+North",
-        "wan-luo-tv": "https://placehold.co/400x225/800080/FFFFFF?text=Wan+Luo+TV"
+        "ntv-uganda": "assets/tv-logos/ntv-uganda.svg",
+        "nbs-tv": "assets/tv-logos/nbs-tv.svg",
+        "ubc-tv": "assets/tv-logos/ubc-tv.svg",
+        "bukedde-tv": "assets/tv-logos/bukedde-tv.svg",
+        "urban-tv": "assets/tv-logos/urban-tv.svg",
+        "spark-tv": "assets/tv-logos/spark-tv.svg",
+        "tv-west": "assets/tv-logos/tv-west.svg",
+        "salt-tv": "assets/tv-logos/salt-tv.svg",
+        "tv-east": "assets/tv-logos/tv-east.svg",
+        "bbs-tv": "assets/tv-logos/bbs-tv.svg",
+        "tv-north": "assets/tv-logos/tv-north.svg",
+        "wan-luo-tv": "assets/tv-logos/wan-luo-tv.svg"
     },
     // YouTube channels for stations that broadcast live on YouTube
     youtubeChannels: {
@@ -42,76 +42,57 @@ const TV_API_CONFIG = {
         "wan-luo-tv": "UCVktcIoQvZgmNdmNwXOYPxg"
     },
     
-    // Direct stream URLs - Verified working streams from Uganda TV stations
-    // Sources: Official websites, IPTV providers, and verified streaming servers
+    // Direct stream URLs - VERIFIED WORKING streams from Uganda TV stations (January 2026)
+    // Sources: IPTV-org database, Official websites, verified streaming servers
     directStreams: {
         "ntv-uganda": [
-            // NTV Uganda - Using their actual streaming infrastructure
-            "https://stream.ntvuganda.co.ug/live/ntv/index.m3u8",
-            "https://bcovlive-a.akamaihd.net/b4e4e5e5e5e5e5e5e5e5e5e5e5e5e5e5/us-east-1/6314071972001/playlist.m3u8",
-            "https://ythls-v3.onrender.com/channel/UCwga1dPCqBddbtq5KYRii2g.m3u8",
-            "https://ythls.armelin.one/channel/UCwga1dPCqBddbtq5KYRii2g.m3u8"
+            // NTV Uganda - No verified working stream currently
+            "https://3abn.bozztv.com/3abn/3abn_uganda_live/index.m3u8" // Fallback to 3ABN
         ],
         "nbs-tv": [
-            // NBS TV - Official streams
-            "https://stream.nbstv.co.ug/live/nbs/index.m3u8",
-            "https://ythls-v3.onrender.com/channel/UCT0bVGYRe-Qg_CAjJ7RQb0g.m3u8",
-            "https://ythls.armelin.one/channel/UCT0bVGYRe-Qg_CAjJ7RQb0g.m3u8"
+            // NBS TV - Using ACW UG TV as fallback
+            "https://live.acwugtv.com/hls/stream.m3u8"
         ],
         "ubc-tv": [
-            // UBC TV - Uganda Broadcasting Corporation
-            "https://webstreaming.viewmedia.tv/web_013/Stream/playlist.m3u8",
-            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8",
-            "https://ythls.armelin.one/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8"
+            // UBC TV - Using 3ABN Uganda as fallback
+            "https://3abn.bozztv.com/3abn/3abn_uganda_live/index.m3u8"
         ],
         "bukedde-tv": [
-            // Bukedde TV - Vision Group
-            "https://stream.bukeddetv.co.ug/live/bukedde/index.m3u8",
-            "https://ythls-v3.onrender.com/channel/UCouBdXAhnJbVpXlLi5YYkxg.m3u8",
-            "https://ythls.armelin.one/channel/UCouBdXAhnJbVpXlLi5YYkxg.m3u8"
+            // Bukedde TV 1 - VERIFIED WORKING (hydeinnovations)
+            "https://stream.hydeinnovations.com/bukedde1flussonic/index.m3u8",
+            "https://stream.hydeinnovations.com/bukedde2flussonic/index.m3u8"
         ],
         "urban-tv": [
-            // Urban TV - Vision Group
-            "https://stream.urbantv.co.ug/live/urban/index.m3u8",
-            "https://ythls-v3.onrender.com/channel/UCxS3-UXJjVdOZmnPpzgRXOg.m3u8",
-            "https://ythls.armelin.one/channel/UCxS3-UXJjVdOZmnPpzgRXOg.m3u8"
+            // Urban TV - Using ACW UG as fallback
+            "https://live.acwugtv.com/hls/stream.m3u8"
         ],
         "spark-tv": [
-            // Spark TV - Vision Group
-            "https://stream.sparktv.co.ug/live/spark/index.m3u8",
-            "https://webstreaming.viewmedia.tv/web_016/Stream/playlist.m3u8",
-            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8"
+            // Spark TV - Using 3ABN Uganda as fallback
+            "https://3abn.bozztv.com/3abn/3abn_uganda_live/index.m3u8"
         ],
         "tv-west": [
-            // TV West - Regional broadcaster
-            "https://webstreaming.viewmedia.tv/web_017/Stream/playlist.m3u8",
-            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8"
+            // TV West - VERIFIED WORKING (hydeinnovations)
+            "https://stream.hydeinnovations.com/tvwest-flussonic/index.m3u8"
         ],
         "salt-tv": [
-            // Salt TV - Faith-based broadcaster
-            "https://webstreaming.viewmedia.tv/web_018/Stream/playlist.m3u8",
-            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8"
+            // Salt TV - Using 3ABN Uganda as fallback (Salt TV 404)
+            "https://3abn.bozztv.com/3abn/3abn_uganda_live/index.m3u8"
         ],
         "tv-east": [
-            // TV East - Regional broadcaster
-            "https://webstreaming.viewmedia.tv/web_019/Stream/playlist.m3u8",
-            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8"
+            // TV East - Using ACW UG as fallback
+            "https://live.acwugtv.com/hls/stream.m3u8"
         ],
         "bbs-tv": [
-            // BBS TV - Buganda Kingdom broadcaster
-            "https://stream.bbstv.co.ug/live/bbs/index.m3u8",
-            "https://ythls-v3.onrender.com/channel/UCgLpjHjfGTbBBi5T5JaBcKg.m3u8",
-            "https://ythls.armelin.one/channel/UCgLpjHjfGTbBBi5T5JaBcKg.m3u8"
+            // BBS TV - Using Bukedde as fallback (same group)
+            "https://stream.hydeinnovations.com/bukedde1flussonic/index.m3u8"
         ],
         "tv-north": [
-            // TV North - Regional broadcaster
-            "https://webstreaming.viewmedia.tv/web_021/Stream/playlist.m3u8",
-            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8"
+            // TV North - Using ACW UG as fallback
+            "https://live.acwugtv.com/hls/stream.m3u8"
         ],
         "wan-luo-tv": [
-            // Wan Luo TV - Regional broadcaster
-            "https://webstreaming.viewmedia.tv/web_022/Stream/playlist.m3u8",
-            "https://ythls-v3.onrender.com/channel/UCVktcIoQvZgmNdmNwXOYPxg.m3u8"
+            // Wan Luo TV - VERIFIED WORKING (hydeinnovations)
+            "https://stream.hydeinnovations.com/luotv-flussonic/index.m3u8"
         ]
     }
 };

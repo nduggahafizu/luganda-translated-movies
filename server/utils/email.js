@@ -1,11 +1,22 @@
 const nodemailer = require('nodemailer');
 
+// Check if email is configured
+const isEmailConfigured = () => {
+    return process.env.EMAIL_HOST && 
+           process.env.EMAIL_USER && 
+           process.env.EMAIL_PASSWORD;
+};
+
 // Create transporter
 const createTransporter = () => {
+    if (!isEmailConfigured()) {
+        return null;
+    }
+    
     return nodemailer.createTransport({
         host: process.env.EMAIL_HOST,
-        port: process.env.EMAIL_PORT,
-        secure: false,
+        port: process.env.EMAIL_PORT || 587,
+        secure: process.env.EMAIL_PORT === '465',
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASSWORD
@@ -16,10 +27,19 @@ const createTransporter = () => {
 // Send email function
 exports.sendEmail = async (options) => {
     try {
+        // Skip if email not configured (development mode)
+        if (!isEmailConfigured()) {
+            console.log('📧 Email skipped (not configured):', {
+                to: options.to,
+                subject: options.subject
+            });
+            return { messageId: 'email-not-configured', skipped: true };
+        }
+        
         const transporter = createTransporter();
 
         const mailOptions = {
-            from: `Unruly Movies <${process.env.EMAIL_FROM}>`,
+            from: `Unruly Movies <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
             to: options.to,
             subject: options.subject,
             html: options.html,
@@ -31,6 +51,11 @@ exports.sendEmail = async (options) => {
         return info;
     } catch (error) {
         console.error('Email error:', error);
+        // Don't throw in development - just log the error
+        if (process.env.NODE_ENV !== 'production') {
+            console.log('📧 Email failed but continuing (dev mode)');
+            return { messageId: 'email-failed', error: error.message };
+        }
         throw error;
     }
 };
