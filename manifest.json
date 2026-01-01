@@ -1,0 +1,66 @@
+{
+    "name": "Unruly Movies - Luganda VJ Translations",
+    "short_name": "Unruly Movies",
+    "description": "A legitimate Ugandan platform for Luganda translated movies by licensed Video Jockeys (VJs). Developed by Nduga Hafizu.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0d0d0d",
+    "theme_color": "#7CFC00",
+    "orientation": "any",
+    "icons": [
+        {
+            "src": "assets/images/logo.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "assets/images/logo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "assets/images/screenshots/home.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Home page showing featured movies"
+        },
+        {
+            "src": "assets/images/screenshots/movies.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Movies catalog"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Browse Movies",
+            "short_name": "Movies",
+            "description": "Browse all Luganda movies",
+            "url": "/movies.html"
+        },
+        {
+            "name": "My Watchlist",
+            "short_name": "Watchlist",
+            "description": "View your saved movies",
+            "url": "/dashboard.html"
+        },
+        {
+            "name": "Search",
+            "short_name": "Search",
+            "description": "Search for movies",
+            "url": "/search.html"
+        }
+    ],
+    "categories": ["entertainment", "video"],
+    "lang": "en",
+    "dir": "ltr",
+    "prefer_related_applications": false,
+    "related_applications": [],
+    "scope": "/"
+}

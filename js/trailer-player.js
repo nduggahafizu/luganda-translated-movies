@@ -159,8 +159,7 @@ class TrailerPlayer {
         iframe.width = '100%';
         iframe.height = '100%';
         iframe.frameBorder = '0';
-        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-        iframe.allowFullscreen = true;
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen';
 
         // Clear and add iframe
         playerDiv.innerHTML = '';

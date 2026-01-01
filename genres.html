@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Movie Genres - Browse by Category | Unruly Movies</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Browse Luganda translated movies by genre - Action, Comedy, Drama, Horror, Romance and more. Find your favorite movie category.">
+    <meta name="theme-color" content="#7CFC00">
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .genres-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+        .genre-card {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border-radius: 16px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(124, 252, 0, 0.1);
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+        }
+        .genre-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(124, 252, 0, 0.2);
+            border-color: rgba(124, 252, 0, 0.4);
+        }
+        .genre-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+        }
+        .genre-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 6px;
+            text-transform: capitalize;
+        }
+        .genre-count {
+            color: #7CFC00;
+            font-size: 0.9rem;
+        }
+        .page-header {
+            text-align: center;
+            padding: 40px 0;
+        }
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #7CFC00, #00d4aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .page-header p {
+            color: #888;
+            font-size: 1.1rem;
+        }
+
+        /* Genre Movies Section */
+        .genre-movies-section {
+            display: none;
+            padding: 40px 0;
+        }
+        .genre-movies-section.active {
+            display: block;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .section-title {
+            font-size: 1.8rem;
+            color: #fff;
+        }
+        .back-btn {
+            padding: 10px 24px;
+            background: transparent;
+            border: 2px solid #7CFC00;
+            color: #7CFC00;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .back-btn:hover {
+            background: #7CFC00;
+            color: #1a1a2e;
+        }
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+        .movie-card {
+            background: #1a1a2e;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        .movie-card:hover {
+            transform: translateY(-8px);
+        }
+        .movie-poster {
+            aspect-ratio: 2/3;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .movie-poster::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+        }
+        .movie-quality {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #7CFC00;
+            color: #1a1a2e;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .movie-rating {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: #7CFC00;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .movie-info {
+            padding: 12px;
+        }
+        .movie-title {
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .movie-vj {
+            color: #7CFC00;
+            font-size: 0.8rem;
+        }
+        .loading-spinner {
+            text-align: center;
+            padding: 60px;
+            color: #888;
+            grid-column: 1/-1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-logo">
+                <a href="index.html">
+                    <img src="assets/images/logo.png" alt="Unruly Movies" height="40">
+                </a>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html">Home</a>
+                <a href="movies.html">Movies</a>
+                <a href="vjs.html">VJ Translators</a>
+                <a href="genres.html" class="active">Genres</a>
+                <a href="uganda-tv.html">Uganda TV</a>
+            </nav>
+            <div class="header-actions">
+                <a href="search.html" class="btn-icon" title="Search">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Genres Grid Section -->
+            <section id="genresSection">
+                <div class="page-header">
+                    <h1>🎭 Movie Genres</h1>
+                    <p>Browse movies by your favorite category</p>
+                </div>
+                <div id="genresGrid" class="genres-grid">
+                    <div class="loading-spinner">Loading genres...</div>
+                </div>
+            </section>
+
+            <!-- Genre Movies Section (Hidden by default) -->
+            <section id="genreMoviesSection" class="genre-movies-section">
+                <div class="section-header">
+                    <h2 class="section-title"><span id="selectedGenreName">Action</span> Movies</h2>
+                    <button class="back-btn" onclick="showAllGenres()">← All Genres</button>
+                </div>
+                <div id="genreMoviesGrid" class="movies-grid">
+                    <div class="loading-spinner">Loading movies...</div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Unruly Movies. All rights reserved. Developed by Nduga Hafizu</p>
+        </div>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script>
+        // Genre icons mapping
+        const genreIcons = {
+            action: '💥',
+            adventure: '🗺️',
+            animation: '🎨',
+            comedy: '😂',
+            crime: '🔫',
+            documentary: '📹',
+            drama: '🎭',
+            family: '👨‍👩‍👧‍👦',
+            fantasy: '🧙',
+            history: '📜',
+            horror: '👻',
+            music: '🎵',
+            mystery: '🔍',
+            romance: '💕',
+            'sci-fi': '🚀',
+            thriller: '😱',
+            war: '⚔️',
+            western: '🤠',
+            default: '🎬'
+        };
+
+        // Load genres on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check URL for pre-selected genre
+            const urlParams = new URLSearchParams(window.location.search);
+            const preSelectedGenre = urlParams.get('genre');
+            
+            await loadGenres();
+            
+            if (preSelectedGenre) {
+                showGenreMovies(preSelectedGenre);
+            }
+        });
+
+        async function loadGenres() {
+            const genresGrid = document.getElementById('genresGrid');
+            
+            try {
+                const response = await fetch(`${API_CONFIG.API_ENDPOINTS.LUGANDA_MOVIES}/genres`);
+                const data = await response.json();
+                
+                if (data.status === 'success' && data.data.length > 0) {
+                    renderGenres(data.data);
+                } else {
+                    genresGrid.innerHTML = '<p style="text-align: center; color: #888; grid-column: 1/-1;">No genres found.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading genres:', error);
+                genresGrid.innerHTML = '<p style="text-align: center; color: #888; grid-column: 1/-1;">Failed to load genres. Please try again later.</p>';
+            }
+        }
+
+        function renderGenres(genres) {
+            const genresGrid = document.getElementById('genresGrid');
+            
+            genresGrid.innerHTML = genres.map(genre => {
+                const icon = genreIcons[genre.toLowerCase()] || genreIcons.default;
+                return `
+                    <a href="javascript:void(0)" onclick="showGenreMovies('${genre}')" class="genre-card">
+                        <div class="genre-icon">${icon}</div>
+                        <div class="genre-name">${genre}</div>
+                    </a>
+                `;
+            }).join('');
+        }
+
+        async function showGenreMovies(genre) {
+            // Hide genres, show movies
+            document.getElementById('genresSection').style.display = 'none';
+            document.getElementById('genreMoviesSection').classList.add('active');
+            document.getElementById('selectedGenreName').textContent = genre.charAt(0).toUpperCase() + genre.slice(1);
+            
+            const moviesGrid = document.getElementById('genreMoviesGrid');
+            moviesGrid.innerHTML = '<div class="loading-spinner">Loading movies...</div>';
+            
+            try {
+                const response = await fetch(`${API_CONFIG.API_ENDPOINTS.LUGANDA_MOVIES}/genre/${encodeURIComponent(genre)}?limit=30`);
+                const data = await response.json();
+                
+                if (data.status === 'success' && data.data.length > 0) {
+                    renderMovies(data.data);
+                } else {
+                    moviesGrid.innerHTML = '<p style="text-align: center; color: #888; grid-column: 1/-1;">No movies found in this genre.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading genre movies:', error);
+                moviesGrid.innerHTML = '<p style="text-align: center; color: #888; grid-column: 1/-1;">Failed to load movies. Please try again later.</p>';
+            }
+            
+            // Update URL
+            history.pushState(null, '', `?genre=${encodeURIComponent(genre)}`);
+        }
+
+        function showAllGenres() {
+            document.getElementById('genresSection').style.display = 'block';
+            document.getElementById('genreMoviesSection').classList.remove('active');
+            history.pushState(null, '', window.location.pathname);
+        }
+
+        function renderMovies(movies) {
+            const moviesGrid = document.getElementById('genreMoviesGrid');
+            
+            moviesGrid.innerHTML = movies.map(movie => {
+                const poster = movie.poster || `https://placehold.co/300x450/1a1a2e/7CFC00?text=${encodeURIComponent(movie.originalTitle || 'Movie')}`;
+                const quality = movie.video?.quality?.toUpperCase() || 'HD';
+                const rating = movie.rating?.userRating || movie.rating?.imdb || 0;
+                const vjName = movie.vjName || 'Unknown';
+                
+                return `
+                    <a href="player.html?id=${movie._id}" class="movie-card">
+                        <div class="movie-poster" style="background-image: url('${poster}')">
+                            <span class="movie-quality">${quality}</span>
+                            <span class="movie-rating">★ ${rating.toFixed(1)}</span>
+                        </div>
+                        <div class="movie-info">
+                            <div class="movie-title">${movie.originalTitle || movie.lugandaTitle}</div>
+                            <div class="movie-vj">VJ ${vjName}</div>
+                        </div>
+                    </a>
+                `;
+            }).join('');
+        }
+    </script>
+</body>
+</html>

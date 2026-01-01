@@ -1,3 +1,33 @@
-{
-  "name": "My Favorites"
-}
+[
+  { "title": "Tommy Boy", "vj": "Vj Emmy" },
+  { "title": "To the Limit", "vj": "Vj Emmy" },
+  { "title": "Secret Admirer", "vj": "Vj Emmy" },
+  { "title": "Prom Night", "vj": "Vj Emmy" },
+  { "title": "Hunting Jessica Brok", "vj": "VJ ICE P" },
+  { "title": "Desert Lone Hero", "vj": "VJ ICE P" },
+  { "title": "Cobra", "vj": "VJ EMMY" },
+  { "title": "Madharaasi", "vj": "Vj ICE P" },
+  { "title": "Office Christmas Party", "vj": "Vj Junior" },
+  { "title": "Now You See Me 3: Now You Don't", "vj": "VJ JUNIOR" },
+  { "title": "Basic Instinct", "vj": "Vj Junior" },
+  { "title": "A Christmas Treasure", "vj": "Vj Junior" },
+  { "title": "Welcome Home Roscoe Jenkins", "vj": "Vj Junior" },
+  { "title": "Waiting to Exhale", "vj": "Vj Junior" },
+  { "title": "Sisu 2: Road to Revenge", "vj": "VJ JUNIOR" },
+  { "title": "Margaux", "vj": "Vj Junior" },
+  { "title": "Predator: Badlands", "vj": "VJ EMMY" },
+  { "title": "Muzzle: City of Wolves", "vj": "VJ EMMY" },
+  { "title": "Dracula", "vj": "Vj Emmy" },
+  { "title": "A Jazzman's Blues", "vj": "Vj Junior" },
+  { "title": "The Thomas Crown Affair", "vj": "Vj Junior" },
+  { "title": "Walking on Thin Ice", "vj": "VJ FREDY" },
+  { "title": "Alex Rider", "vj": "Vj Ice P" },
+  { "title": "Mr. Queen", "vj": "VJ Sammy" },
+  { "title": "Coyote", "vj": "Vj Baros" },
+  { "title": "Man vs Baby", "vj": "VJ JUNIOR" },
+  { "title": "Rabbit Hole", "vj": "Vj Junior" },
+  { "title": "Genie, Make a Wish", "vj": "Vj M.K" },
+  { "title": "Chasing in the Wild", "vj": "VJ BONNY" },
+  { "title": "Dear X", "vj": "VJ LIGHT" },
+  { "title": "Last Samurai Standing", "vj": "VJ ICE P" }
+]

@@ -26,6 +26,13 @@ const moviesApiRoutes = require('./routes/movies-api');
 const watchProgressRoutes = require('./routes/watch-progress');
 const playlistRoutes = require('./routes/playlist');
 const tmdbProxyRoutes = require('./routes/tmdb-proxy');
+const reviewsRoutes = require('./routes/reviews');
+const commentsRoutes = require('./routes/comments');
+const notificationsRoutes = require('./routes/notifications');
+const statsRoutes = require('./routes/stats');
+const usersRoutes = require('./routes/users');
+const adminRoutes = require('./routes/admin');
+const tvRoutes = require('./routes/tv');
 
 // Initialize Express app
 const app = express();
@@ -39,46 +46,65 @@ app.use(responseTime());
 // Metrics tracking
 app.use(metricsMiddleware);
 
-// Security middleware with enhanced configuration
+// Security middleware with CSP disabled for development
 app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            styleSrc: ["'self'", "'unsafe-inline'"],
-            scriptSrc: ["'self'"],
-            imgSrc: ["'self'", "data:", "https:"],
-        }
-    },
+    contentSecurityPolicy: false,  // CSP disabled to allow all external resources
     hsts: {
         maxAge: 31536000,
         includeSubDomains: true,
         preload: true
-    }
+    },
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
 // Enhanced CORS configuration
 const corsOptions = {
     origin: function (origin, callback) {
-        const allowedOrigins = process.env.ALLOWED_ORIGINS 
+        // Always allow production domains and all subdomains
+        const productionRegex = /^https:\/\/(.+\.)?(unrulymovies\.com|watch\.unrulymovies\.com)$/;
+        const allowedOrigins = process.env.ALLOWED_ORIGINS
             ? process.env.ALLOWED_ORIGINS.split(',')
-            : ['http://localhost:3000', 'http://localhost:5000'];
-        
+            : [
+                'http://localhost:3000',
+                'http://localhost:5000'
+              ];
+
         // Allow requests with no origin (mobile apps, Postman, etc.)
         if (!origin) return callback(null, true);
-        
-        if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
+
+        // Allow explicit matches
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            return callback(null, true);
         }
+
+        // Allow all subdomains of unrulymovies.com and watch.unrulymovies.com
+        if (productionRegex.test(origin)) {
+            return callback(null, true);
+        }
+
+        // Allow Netlify preview URLs and Railway preview URLs (flexible for deploy previews)
+        if (origin.includes('netlify.app') || origin.includes('up.railway.app') || process.env.NODE_ENV === 'development') {
+            return callback(null, true);
+        }
+
+        // Deny by default
+        return callback(new Error('Not allowed by CORS'));
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     exposedHeaders: ['X-Response-Time'],
-    maxAge: 86400 // 24 hours
+    maxAge: 86400, // 24 hours
+    preflightContinue: false,
+    optionsSuccessStatus: 204
 };
+
+// Apply CORS middleware
 app.use(cors(corsOptions));
+
+// Explicit OPTIONS handler for preflight requests
+app.options('*', cors(corsOptions));
 
 // Body parser middleware
 app.use(express.json({ limit: '10mb' }));
@@ -116,7 +142,7 @@ const createRateLimiter = (windowMinutes, maxRequests) => {
 
 // Apply different rate limits to different routes
 const generalLimiter = createRateLimiter(15, 100); // 100 requests per 15 minutes
-const authLimiter = createRateLimiter(15, 5);      // 5 requests per 15 minutes for auth
+const authLimiter = createRateLimiter(15, 50);     // 50 requests per 15 minutes for auth (increased for development)
 const apiLimiter = createRateLimiter(1, 30);       // 30 requests per minute for API
 
 app.use('/api/auth', authLimiter);
@@ -128,10 +154,11 @@ app.use('/uploads', express.static('uploads'));
 // Database connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/luganda-movies';
 
-mongoose.connect(MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+// Debug: Log environment variable presence (not the actual value for security)
+console.log(`🔧 MONGODB_URI from env: ${process.env.MONGODB_URI ? 'SET (' + MONGODB_URI.substring(0, 30) + '...)' : 'NOT SET - using default'}`);
+console.log(`🔧 NODE_ENV: ${process.env.NODE_ENV || 'not set'}`);
+
+mongoose.connect(MONGODB_URI)
 .then(() => {
     console.log('✅ MongoDB Connected Successfully');
     console.log(`📦 Database: ${MONGODB_URI}`);
@@ -149,15 +176,37 @@ mongoose.connect(MONGODB_URI, {
 
 // Session middleware for watch progress and playlists
 const session = require('express-session');
-app.use(session({
+
+// Configure session store - use MongoDB in production, memory in development
+const sessionConfig = {
     secret: process.env.SESSION_SECRET || 'luganda-movies-secret-key',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: { 
         secure: process.env.NODE_ENV === 'production',
         maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
     }
-}));
+};
+
+// Use MongoDB store in production to avoid memory leaks
+if (process.env.NODE_ENV === 'production' && process.env.MONGODB_URI) {
+    try {
+        const MongoStore = require('connect-mongo');
+        // Handle both default export and named export patterns
+        const Store = MongoStore.default || MongoStore;
+        sessionConfig.store = Store.create({
+            mongoUrl: MONGODB_URI,
+            ttl: 30 * 24 * 60 * 60, // 30 days
+            autoRemove: 'native'
+        });
+        console.log('📦 Using MongoDB session store');
+    } catch (err) {
+        console.warn('⚠️ Could not initialize MongoDB session store:', err.message);
+        console.warn('⚠️ Falling back to MemoryStore (not recommended for production)');
+    }
+}
+
+app.use(session(sessionConfig));
 
 // Swagger API Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
@@ -174,6 +223,13 @@ app.use('/api/movies', cache(300), moviesApiRoutes); // Cache for 5 minutes
 app.use('/api/watch-progress', watchProgressRoutes);
 app.use('/api/playlist', playlistRoutes);
 app.use('/api/tmdb', cache(600), tmdbProxyRoutes); // TMDB proxy with 10 min cache
+app.use('/api/reviews', reviewsRoutes);
+app.use('/api/comments', commentsRoutes);
+app.use('/api/notifications', notificationsRoutes);
+app.use('/api/stats', statsRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/tv', cache(600), tvRoutes); // TV stations with 10 min cache
 
 // Token refresh endpoint
 app.post('/api/auth/refresh', refreshTokenHandler);

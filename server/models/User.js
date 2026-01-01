@@ -18,9 +18,34 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, 'Please provide a password'],
+        required: function() {
+            // Password is only required for non-Google users
+            return !this.googleId && this.provider !== 'google';
+        },
         minlength: [8, 'Password must be at least 8 characters'],
         select: false
+    },
+    googleId: {
+        type: String,
+        default: null
+    },
+    provider: {
+        type: String,
+        enum: ['local', 'google'],
+        default: 'local'
+    },
+    profileImage: {
+        type: String,
+        default: null
+    },
+    phone: {
+        type: String,
+        default: null,
+        trim: true
+    },
+    verified: {
+        type: Boolean,
+        default: false
     },
     avatar: {
         type: String,
@@ -68,6 +93,10 @@ const userSchema = new mongoose.Schema({
             type: Date,
             default: Date.now
         }
+    }],
+    favorites: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'LugandaMovie'
     }],
     watchHistory: [{
         contentType: {
@@ -138,12 +167,12 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Hash password before saving
+// Hash password before saving (only for local users)
 userSchema.pre('save', async function(next) {
-    if (!this.isModified('password')) {
+    if (!this.isModified('password') || this.provider === 'google') {
         return next();
     }
-    
+
     const salt = await bcrypt.genSalt(parseInt(process.env.BCRYPT_ROUNDS) || 10);
     this.password = await bcrypt.hash(this.password, salt);
     next();

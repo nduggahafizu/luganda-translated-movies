@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Search Movies - Unruly Movies</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Search for Luganda translated movies, VJ translators, and genres">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#7CFC00">
+    <meta name="google-adsense-account" content="ca-pub-1904736753681797">
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
+    <link rel="shortcut icon" type="image/png" href="/assets/images/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        .search-page {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .search-header {
+            margin-bottom: 40px;
+        }
+        
+        .search-form {
+            display: flex;
+            gap: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .search-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 18px 20px 18px 55px;
+            background: var(--background-light);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            color: var(--text-primary);
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(124, 252, 0, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+        
+        .search-btn {
+            padding: 18px 40px;
+            background: var(--primary-color);
+            border: none;
+            border-radius: 15px;
+            color: #000;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .search-btn:hover {
+            background: #9dff44;
+            transform: translateY(-2px);
+        }
+        
+        .filters-section {
+            background: var(--background-light);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .filters-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+        
+        .filter-select {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--background-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .active-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        .filter-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: rgba(124, 252, 0, 0.1);
+            border: 1px solid var(--primary-color);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--primary-color);
+        }
+        
+        .filter-tag button {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .results-count {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+        
+        .results-count strong {
+            color: var(--text-primary);
+        }
+        
+        .view-toggle {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .view-btn {
+            padding: 10px;
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .view-btn:hover, .view-btn.active {
+            background: var(--primary-color);
+            color: #000;
+            border-color: var(--primary-color);
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 25px;
+        }
+        
+        .results-grid.list-view {
+            grid-template-columns: 1fr;
+        }
+        
+        .movie-card {
+            background: var(--background-light);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .movie-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .movie-poster {
+            position: relative;
+            aspect-ratio: 2/3;
+        }
+        
+        .movie-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .movie-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .movie-card:hover .movie-overlay {
+            opacity: 1;
+        }
+        
+        .play-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+        
+        .movie-card:hover .play-btn {
+            transform: translateY(0);
+        }
+        
+        .play-btn svg {
+            width: 24px;
+            height: 24px;
+            color: #000;
+            margin-left: 3px;
+        }
+        
+        .movie-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 5px 10px;
+            background: var(--primary-color);
+            color: #000;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 5px;
+        }
+        
+        .movie-rating {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 10px;
+            background: rgba(0,0,0,0.7);
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .movie-rating svg {
+            width: 14px;
+            height: 14px;
+            color: #ffc107;
+        }
+        
+        .movie-info {
+            padding: 15px;
+        }
+        
+        .movie-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .movie-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .movie-vj {
+            color: var(--primary-color);
+        }
+        
+        /* List View Styles */
+        .results-grid.list-view .movie-card {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .results-grid.list-view .movie-poster {
+            width: 150px;
+            flex-shrink: 0;
+            aspect-ratio: 2/3;
+        }
+        
+        .results-grid.list-view .movie-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .results-grid.list-view .movie-title {
+            font-size: 20px;
+            white-space: normal;
+        }
+        
+        .results-grid.list-view .movie-description {
+            display: block;
+            margin-top: 10px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-top: 10px;
+            z-index: 100;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .search-suggestions.active {
+            display: block;
+        }
+        
+        .suggestion-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 15px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        
+        .suggestion-item:hover {
+            background: var(--background-dark);
+        }
+        
+        .suggestion-poster {
+            width: 40px;
+            height: 60px;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+        
+        .suggestion-info {
+            flex: 1;
+        }
+        
+        .suggestion-title {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .suggestion-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .no-results svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .no-results h3 {
+            font-size: 22px;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        
+        .trending-searches {
+            margin-top: 40px;
+            text-align: center;
+        }
+        
+        .trending-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+        
+        .trending-tags {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .trending-tag {
+            padding: 10px 20px;
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            color: var(--text-primary);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .trending-tag:hover {
+            background: var(--primary-color);
+            color: #000;
+            border-color: var(--primary-color);
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 50px;
+        }
+        
+        .page-btn {
+            padding: 12px 18px;
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .page-btn:hover, .page-btn.active {
+            background: var(--primary-color);
+            color: #000;
+            border-color: var(--primary-color);
+        }
+        
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        @media (max-width: 768px) {
+            .search-form {
+                flex-direction: column;
+            }
+            
+            .filter-group {
+                min-width: 100%;
+            }
+            
+            .results-grid.list-view .movie-card {
+                flex-direction: column;
+            }
+            
+            .results-grid.list-view .movie-poster {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <a class="skip-link" href="#maincontent">Skip to content</a>
+
+    <div class="container">
+        <div class="app">
+            <!-- Header -->
+            <div class="app-header">
+                <div class="navbar navbar-expand-lg">
+                    <div class="menu d-md-none d-block" data-toggle="modal" data-target="#aside">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </div>
+                    <div class="app-navbar">
+                        <a href="index.html" class="navbar-brand">
+                            <img src="assets/images/logo.png" alt="Luganda Movies" width="180" height="50">
+                        </a>
+                    </div>
+                    <ul class="navbar-nav navbar-user ml-auto align-items-center text-nowrap">
+                        <li class="nav-item">
+                            <a class="nav-link" href="movies.html">Movies</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="vjs.html">VJs</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <main id="maincontent" class="search-page">
+                <!-- Search Header -->
+                <div class="search-header">
+                    <form class="search-form" onsubmit="performSearch(event)">
+                        <div class="search-input-wrapper">
+                            <label for="searchInput" class="visually-hidden">Search movies, VJs, genres</label>
+                            <svg class="search-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <input type="text" class="search-input" id="searchInput" placeholder="Search movies, VJs, genres..." autocomplete="off">
+                            <div class="search-suggestions" id="searchSuggestions"></div>
+                        </div>
+                        <button type="submit" class="search-btn">Search</button>
+                    </form>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters-section">
+                    <div class="filters-row">
+                        <div class="filter-group">
+                            <label class="filter-label" for="genreFilter">Genre</label>
+                            <select class="filter-select" id="genreFilter" onchange="applyFilters()">
+                                <option value="">All Genres</option>
+                                <option value="action">Action</option>
+                                <option value="comedy">Comedy</option>
+                                <option value="drama">Drama</option>
+                                <option value="horror">Horror</option>
+                                <option value="romance">Romance</option>
+                                <option value="thriller">Thriller</option>
+                                <option value="sci-fi">Sci-Fi</option>
+                                <option value="adventure">Adventure</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label" for="vjFilter">VJ Translator</label>
+                            <select class="filter-select" id="vjFilter" onchange="applyFilters()">
+                                <option value="">All VJs</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label" for="yearFilter">Year</label>
+                            <select class="filter-select" id="yearFilter" onchange="applyFilters()">
+                                <option value="">All Years</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                                <option value="2022">2022</option>
+                                <option value="2021">2021</option>
+                                <option value="2020">2020</option>
+                                <option value="2019">2019</option>
+                                <option value="2018">2018</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label" for="sortFilter">Sort By</label>
+                            <select class="filter-select" id="sortFilter" onchange="applyFilters()">
+                                <option value="relevance">Most Relevant</option>
+                                <option value="newest">Newest First</option>
+                                <option value="oldest">Oldest First</option>
+                                <option value="rating">Highest Rated</option>
+                                <option value="popular">Most Popular</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="active-filters" id="activeFilters"></div>
+                </div>
+
+                <!-- Results Header -->
+                <div class="results-header" id="resultsHeader" style="display: none;">
+                    <div class="results-count" id="resultsCount">
+                        Showing <strong>0</strong> results
+                    </div>
+                    <div class="view-toggle">
+                        <button class="view-btn active" id="gridViewBtn" onclick="setView('grid')" title="Grid View">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
+                            </svg>
+                        </button>
+                        <button class="view-btn" id="listViewBtn" onclick="setView('list')" title="List View">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="8" y1="6" x2="21" y2="6"></line>
+                                <line x1="8" y1="12" x2="21" y2="12"></line>
+                                <line x1="8" y1="18" x2="21" y2="18"></line>
+                                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Ad Banner - Below Results Header -->
+                <div class="ad-container" style="margin: 20px auto; max-width: 728px; text-align: center;">
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-1904736753681797"
+                         data-ad-slot="auto"
+                         data-ad-format="horizontal"
+                         data-full-width-responsive="true"></ins>
+                    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+                </div>
+
+                <!-- Results Grid -->
+                <div class="results-grid" id="resultsGrid">
+                    <!-- Trending Searches (shown when no search) -->
+                    <div class="no-results" id="initialState">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <h3>Search for Movies</h3>
+                        <p>Find your favorite Luganda translated movies, VJ translators, and more</p>
+                        
+                        <div class="trending-searches">
+                            <p class="trending-title">Trending Searches</p>
+                            <div class="trending-tags" id="trendingTags">
+                                <a href="#" class="trending-tag" onclick="searchFor('Action')">Action</a>
+                                <a href="#" class="trending-tag" onclick="searchFor('VJ Ice P')">VJ Ice P</a>
+                                <a href="#" class="trending-tag" onclick="searchFor('2024')">2024 Movies</a>
+                                <a href="#" class="trending-tag" onclick="searchFor('Horror')">Horror</a>
+                                <a href="#" class="trending-tag" onclick="searchFor('VJ Emmy')">VJ Emmy</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" id="pagination" style="display: none;"></div>
+            </main>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        const API_URL = API_CONFIG.API_ENDPOINTS.LUGANDA_MOVIES;
+        let currentPage = 1;
+        let currentView = 'grid';
+        let searchTimeout = null;
+        let totalResults = 0;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load VJs for filter
+            loadVJs();
+            
+            // Check URL params
+            const params = new URLSearchParams(window.location.search);
+            const query = params.get('q');
+            if (query) {
+                document.getElementById('searchInput').value = query;
+                performSearch();
+            }
+
+            // Setup live search
+            document.getElementById('searchInput').addEventListener('input', handleSearchInput);
+        });
+
+        async function loadVJs() {
+            try {
+                const response = await fetch(`${API_URL}/vjs`);
+                const data = await response.json();
+                
+                const vjSelect = document.getElementById('vjFilter');
+                if (data.data?.vjs) {
+                    data.data.vjs.forEach(vj => {
+                        const option = document.createElement('option');
+                        option.value = vj._id;
+                        option.textContent = vj.name;
+                        vjSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Load VJs error:', error);
+            }
+        }
+
+        function handleSearchInput(e) {
+            const query = e.target.value.trim();
+            
+            clearTimeout(searchTimeout);
+            
+            if (query.length >= 2) {
+                searchTimeout = setTimeout(() => showSuggestions(query), 300);
+            } else {
+                hideSuggestions();
+            }
+        }
+
+        async function showSuggestions(query) {
+            try {
+                const response = await fetch(`${API_URL}/search?q=${encodeURIComponent(query)}&limit=5`);
+                const data = await response.json();
+                
+                const suggestions = document.getElementById('searchSuggestions');
+                const movies = data.data || [];
+                
+                if (movies.length > 0) {
+                    suggestions.innerHTML = movies.map(movie => `
+                        <div class="suggestion-item" onclick="selectSuggestion('${movie._id}', '${(movie.originalTitle || movie.title || '').replace(/'/g, "\\'")}')">
+                            <img src="${movie.poster || 'https://placehold.co/50x75/1a1a2e/7CFC00?text=Movie'}" alt="${movie.originalTitle || movie.title}" class="suggestion-poster">
+                            <div class="suggestion-info">
+                                <div class="suggestion-title">${movie.originalTitle || movie.title}</div>
+                                <div class="suggestion-meta">${movie.year || ''} ${movie.vjName ? '• VJ ' + movie.vjName : ''}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                    suggestions.classList.add('active');
+                } else {
+                    hideSuggestions();
+                }
+            } catch (error) {
+                console.error('Suggestions error:', error);
+            }
+        }
+
+        function hideSuggestions() {
+            document.getElementById('searchSuggestions').classList.remove('active');
+        }
+
+        function selectSuggestion(movieId, title) {
+            window.location.href = `player.html?id=${movieId}`;
+        }
+
+        async function performSearch(event) {
+            if (event) event.preventDefault();
+            
+            hideSuggestions();
+            
+            const query = document.getElementById('searchInput').value.trim();
+            const genre = document.getElementById('genreFilter').value;
+            const vj = document.getElementById('vjFilter').value;
+            const year = document.getElementById('yearFilter').value;
+            const sort = document.getElementById('sortFilter').value;
+            
+            // Update URL
+            const url = new URL(window.location);
+            url.searchParams.set('q', query);
+            window.history.pushState({}, '', url);
+            
+            // Show loading
+            const resultsGrid = document.getElementById('resultsGrid');
+            resultsGrid.innerHTML = '<div class="no-results"><p>Searching...</p></div>';
+            document.getElementById('resultsHeader').style.display = 'flex';
+            document.getElementById('initialState')?.remove();
+            
+            try {
+                // Build search URL - use /search endpoint for queries, or main endpoint for browsing
+                let apiUrl;
+                if (query) {
+                    apiUrl = `${API_URL}/search?q=${encodeURIComponent(query)}&page=${currentPage}&limit=20`;
+                } else {
+                    apiUrl = `${API_URL}?page=${currentPage}&limit=20`;
+                }
+                
+                if (genre) apiUrl += `&genre=${genre}`;
+                if (vj) apiUrl += `&vj=${vj}`;
+                if (year) apiUrl += `&year=${year}`;
+                if (sort) apiUrl += `&sort=${sort}`;
+                
+                console.log('Searching with URL:', apiUrl);
+                
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                
+                // Handle both response formats (data.data or data.data.movies)
+                const movies = data.data?.movies || data.data || [];
+                
+                if (movies.length > 0) {
+                    totalResults = data.data?.pagination?.total || data.count || movies.length;
+                    document.getElementById('resultsCount').innerHTML = `Showing <strong>${totalResults}</strong> results for "${query || 'All Movies'}"`;
+                    
+                    renderResults(movies);
+                    renderPagination(data.data?.pagination);
+                } else {
+                    resultsGrid.innerHTML = `
+                        <div class="no-results" style="grid-column: 1/-1;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <h3>No Results Found</h3>
+                            <p>We couldn't find any movies matching "${query}"</p>
+                            <p style="margin-top: 15px;">Try different keywords or check the spelling</p>
+                        </div>
+                    `;
+                    document.getElementById('pagination').style.display = 'none';
+                }
+                
+                updateActiveFilters();
+            } catch (error) {
+                console.error('Search error:', error);
+                resultsGrid.innerHTML = '<div class="no-results" style="grid-column: 1/-1;"><p>Error performing search. Please try again.</p></div>';
+            }
+        }
+
+        function renderResults(movies) {
+            const resultsGrid = document.getElementById('resultsGrid');
+            resultsGrid.className = `results-grid ${currentView === 'list' ? 'list-view' : ''}`;
+            
+            resultsGrid.innerHTML = movies.map(movie => {
+                const title = movie.originalTitle || movie.title || 'Unknown Movie';
+                const posterUrl = movie.poster || `https://placehold.co/300x450/1a1a2e/7CFC00?text=${encodeURIComponent(title.substring(0,15))}`;
+                const rating = movie.rating?.userRating || movie.rating?.imdb || null;
+                const vjName = movie.vjName || movie.vj || '';
+                const description = movie.overview || movie.description || '';
+                
+                return `
+                <div class="movie-card">
+                    <div class="movie-poster">
+                        <a href="player.html?id=${movie._id}">
+                            <img src="${posterUrl}" alt="${title}" loading="lazy" onerror="this.src='https://placehold.co/300x450/1a1a2e/7CFC00?text=Movie'">
+                        </a>
+                        <div class="movie-badge">${movie.video?.quality?.toUpperCase() || 'HD'}</div>
+                        ${rating ? `
+                            <div class="movie-rating">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                </svg>
+                                ${rating.toFixed(1)}
+                            </div>
+                        ` : ''}
+                        <div class="movie-overlay">
+                            <button class="play-btn" onclick="window.location.href='player.html?id=${movie._id}'">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="movie-info">
+                        <div class="movie-title">${title}</div>
+                        <div class="movie-meta">
+                            <span>${movie.year || ''}</span>
+                            ${vjName ? `<span class="movie-vj">VJ ${vjName}</span>` : ''}
+                        </div>
+                        ${currentView === 'list' && description ? `
+                            <div class="movie-description">${description.substring(0, 150)}...</div>
+                        ` : ''}
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function renderPagination(pagination) {
+            const paginationEl = document.getElementById('pagination');
+            
+            if (!pagination || pagination.pages <= 1) {
+                paginationEl.style.display = 'none';
+                return;
+            }
+            
+            paginationEl.style.display = 'flex';
+            
+            let html = '';
+            
+            // Previous button
+            html += `<button class="page-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>`;
+            
+            // Page numbers
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(pagination.pages, currentPage + 2);
+            
+            if (startPage > 1) {
+                html += `<button class="page-btn" onclick="goToPage(1)">1</button>`;
+                if (startPage > 2) html += `<span class="page-btn" style="border: none;">...</span>`;
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+            }
+            
+            if (endPage < pagination.pages) {
+                if (endPage < pagination.pages - 1) html += `<span class="page-btn" style="border: none;">...</span>`;
+                html += `<button class="page-btn" onclick="goToPage(${pagination.pages})">${pagination.pages}</button>`;
+            }
+            
+            // Next button
+            html += `<button class="page-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === pagination.pages ? 'disabled' : ''}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>`;
+            
+            paginationEl.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            performSearch();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function setView(view) {
+            currentView = view;
+            
+            document.getElementById('gridViewBtn').classList.toggle('active', view === 'grid');
+            document.getElementById('listViewBtn').classList.toggle('active', view === 'list');
+            
+            const resultsGrid = document.getElementById('resultsGrid');
+            resultsGrid.classList.toggle('list-view', view === 'list');
+        }
+
+        function applyFilters() {
+            currentPage = 1;
+            performSearch();
+        }
+
+        function updateActiveFilters() {
+            const filtersEl = document.getElementById('activeFilters');
+            const filters = [];
+            
+            const genre = document.getElementById('genreFilter');
+            if (genre.value) {
+                filters.push({ label: genre.options[genre.selectedIndex].text, type: 'genre' });
+            }
+            
+            const vj = document.getElementById('vjFilter');
+            if (vj.value) {
+                filters.push({ label: vj.options[vj.selectedIndex].text, type: 'vj' });
+            }
+            
+            const year = document.getElementById('yearFilter');
+            if (year.value) {
+                filters.push({ label: year.value, type: 'year' });
+            }
+            
+            filtersEl.innerHTML = filters.map(f => `
+                <span class="filter-tag">
+                    ${f.label}
+                    <button onclick="clearFilter('${f.type}')">&times;</button>
+                </span>
+            `).join('');
+        }
+
+        function clearFilter(type) {
+            document.getElementById(`${type}Filter`).value = '';
+            applyFilters();
+        }
+
+        function searchFor(query) {
+            document.getElementById('searchInput').value = query;
+            performSearch();
+            return false;
+        }
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-input-wrapper')) {
+                hideSuggestions();
+            }
+        });
+    </script>
+</body>
+</html>

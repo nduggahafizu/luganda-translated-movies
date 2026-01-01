@@ -5,10 +5,53 @@
 (function() {
     'use strict';
 
+    // ===================================
+    // Global Image Error Handler
+    // ===================================
+    // Handle broken images site-wide
+    document.addEventListener('error', function(e) {
+        if (e.target.tagName === 'IMG') {
+            const img = e.target;
+            const alt = img.alt || 'Image';
+            // Generate colorful placeholder based on alt text
+            const colors = ['7CFC00', 'FF6B6B', '4ECDC4', 'FFE66D', 'A855F7', 'EC4899', '06B6D4', 'F97316'];
+            const colorIndex = alt.length % colors.length;
+            const color = colors[colorIndex];
+            const displayText = alt.substring(0, 15);
+            img.src = `https://placehold.co/300x450/1a1a2e/${color}?text=${encodeURIComponent(displayText)}`;
+            img.onerror = null; // Prevent infinite loop
+        }
+    }, true);
+
+    // Handle broken background images for media-cover divs
+    function handleBrokenBackgroundImages() {
+        const mediaCoverElements = document.querySelectorAll('.media-cover, .media-slide');
+        mediaCoverElements.forEach(el => {
+            const style = el.style.backgroundImage;
+            if (style && style.includes('url(')) {
+                const urlMatch = style.match(/url\(['"]?([^'"]+)['"]?\)/);
+                if (urlMatch && urlMatch[1] && urlMatch[1].includes('tmdb.org')) {
+                    const img = new Image();
+                    img.onerror = function() {
+                        // Generate placeholder
+                        const colors = ['7CFC00', 'FF6B6B', '4ECDC4', 'FFE66D', 'A855F7'];
+                        const colorIndex = Math.floor(Math.random() * colors.length);
+                        const color = colors[colorIndex];
+                        el.style.backgroundImage = `url('https://placehold.co/300x450/1a1a2e/${color}?text=Movie')`;
+                    };
+                    img.src = urlMatch[1];
+                }
+            }
+        });
+    }
+
+    // Run after DOM is fully loaded
+    setTimeout(handleBrokenBackgroundImages, 500);
+
     // DOM Elements
     const body = document.body;
-    const menuBtn = document.querySelector('.menu');
-    const sidebar = document.querySelector('.app-aside');
+    const menuBtn = document.getElementById('menuToggle') || document.querySelector('.menu');
+    const sidebar = document.getElementById('aside') || document.querySelector('.app-aside');
     const searchBtn = document.querySelector('.search-btn');
     const headerSearch = document.querySelector('.header-search');
     const scrollUpBtn = document.querySelector('.scroll-up');
@@ -17,9 +60,21 @@
     // Mobile Menu Toggle
     // ===================================
     if (menuBtn && sidebar) {
-        menuBtn.addEventListener('click', function() {
+        menuBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             sidebar.classList.toggle('show');
             body.style.overflow = sidebar.classList.contains('show') ? 'hidden' : '';
+            console.log('Menu clicked, sidebar show:', sidebar.classList.contains('show'));
+        });
+        
+        // Also handle keyboard accessibility
+        menuBtn.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                sidebar.classList.toggle('show');
+                body.style.overflow = sidebar.classList.contains('show') ? 'hidden' : '';
+            }
         });
 
         // Close sidebar when clicking outside
@@ -45,6 +100,39 @@
     // ===================================
     // Mobile Search Toggle
     // ===================================
+    const mobileSearchBtn = document.getElementById('mobileSearchBtn');
+    const mobileSearchForm = document.getElementById('mobileSearchForm');
+    const mobileSearchInput = document.getElementById('mobileSearchInput');
+    const mobileSearchClose = document.getElementById('mobileSearchClose');
+    
+    if (mobileSearchBtn && mobileSearchForm) {
+        // Open mobile search
+        mobileSearchBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            mobileSearchForm.classList.add('active');
+            if (mobileSearchInput) {
+                setTimeout(() => mobileSearchInput.focus(), 100);
+            }
+        });
+        
+        // Close mobile search
+        if (mobileSearchClose) {
+            mobileSearchClose.addEventListener('click', function(e) {
+                e.preventDefault();
+                mobileSearchForm.classList.remove('active');
+            });
+        }
+        
+        // Close on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && mobileSearchForm.classList.contains('active')) {
+                mobileSearchForm.classList.remove('active');
+            }
+        });
+    }
+    
+    // Legacy search toggle (for other pages)
     if (searchBtn && headerSearch) {
         searchBtn.addEventListener('click', function() {
             headerSearch.classList.toggle('active');

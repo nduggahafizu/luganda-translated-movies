@@ -3,17 +3,23 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { sendEmail } = require('../utils/email');
 
+// JWT Configuration with defaults
+const JWT_SECRET = process.env.JWT_SECRET || 'unruly-movies-jwt-secret-key-2024';
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'unruly-movies-jwt-refresh-secret-2024';
+const JWT_EXPIRE = process.env.JWT_EXPIRE || '7d';
+const JWT_REFRESH_EXPIRE = process.env.JWT_REFRESH_EXPIRE || '30d';
+
 // Generate JWT Token
 const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRES_IN || '7d'
+    return jwt.sign({ id }, JWT_SECRET, {
+        expiresIn: JWT_EXPIRE
     });
 };
 
 // Generate Refresh Token
 const generateRefreshToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '30d'
+    return jwt.sign({ id }, JWT_REFRESH_SECRET, {
+        expiresIn: JWT_REFRESH_EXPIRE
     });
 };
 
@@ -111,11 +117,27 @@ exports.login = async (req, res) => {
             });
         }
 
+        // Check if user is a Google user (no password)
+        if (user.provider === 'google' || user.googleId) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'This account uses Google Sign-In. Please use the Google button to login.'
+            });
+        }
+
         // Check if user is active
         if (!user.isActive) {
             return res.status(401).json({
                 status: 'error',
                 message: 'Your account has been deactivated. Please contact support.'
+            });
+        }
+
+        // Check if user has a password (local account)
+        if (!user.password) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'Invalid email or password'
             });
         }
 
