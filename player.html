@@ -144,6 +144,31 @@
             --plyr-menu-border-color: #333;
         }
         
+        /* Embed Container Styles */
+        #embedContainer {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: var(--player-radius);
+            overflow: hidden;
+        }
+        
+        #embedContainer iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        @media (max-width: 767px) {
+            #embedContainer {
+                border-radius: 0;
+            }
+        }
+        
         .plyr--full-ui input[type=range] {
             color: var(--plyr-color-main);
         }
@@ -895,9 +920,22 @@
 
     <!-- Video Player -->
     <div class="player-wrapper" id="playerWrapper">
-        <video id="player" playsinline controls crossorigin>
+        <!-- Native Video Player (for direct video files) -->
+        <video id="player" playsinline controls crossorigin style="display: none;">
             <source src="" type="video/mp4">
         </video>
+        
+        <!-- Embed Player Container (for Streamtape, etc.) -->
+        <div id="embedContainer" style="display: none; width: 100%; aspect-ratio: 16/9; background: #000;">
+            <iframe 
+                id="embedPlayer" 
+                src="" 
+                frameborder="0" 
+                allowfullscreen 
+                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                style="width: 100%; height: 100%;">
+            </iframe>
+        </div>
         
         <div class="loading-overlay" id="loadingOverlay">
             <div class="spinner"></div>
@@ -1025,49 +1063,61 @@
     <script>
         // Initialize Plyr
         const video = document.getElementById('player');
+        const embedContainer = document.getElementById('embedContainer');
+        const embedPlayer = document.getElementById('embedPlayer');
         const loadingOverlay = document.getElementById('loadingOverlay');
-        
-        const player = new Plyr(video, {
-            controls: [
-                'play-large',
-                'rewind',
-                'play',
-                'fast-forward',
-                'progress',
-                'current-time',
-                'duration',
-                'mute',
-                'volume',
-                'captions',
-                'settings',
-                'pip',
-                'airplay',
-                'fullscreen'
-            ],
-            settings: ['captions', 'quality', 'speed'],
-            speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
-            keyboard: { focused: true, global: true },
-            tooltips: { controls: true, seek: true },
-            seekTime: 10,
-            invertTime: false,
-            toggleInvert: true,
-            displayDuration: true,
-            ratio: '16:9'
-        });
+        let player = null;
+        let isEmbedMode = false;
 
         // Get URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const movieId = urlParams.get('id');
         const streamUrl = urlParams.get('stream');
+        const embedUrl = urlParams.get('embed');
         const isSeries = urlParams.has('series');
         const isStation = urlParams.has('station');
+
+        // Initialize Plyr only for native video
+        function initPlyr() {
+            if (player) return player;
+            
+            player = new Plyr(video, {
+                controls: [
+                    'play-large',
+                    'rewind',
+                    'play',
+                    'fast-forward',
+                    'progress',
+                    'current-time',
+                    'duration',
+                    'mute',
+                    'volume',
+                    'captions',
+                    'settings',
+                    'pip',
+                    'airplay',
+                    'fullscreen'
+                ],
+                settings: ['captions', 'quality', 'speed'],
+                speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
+                keyboard: { focused: true, global: true },
+                tooltips: { controls: true, seek: true },
+                seekTime: 10,
+                invertTime: false,
+                toggleInvert: true,
+                displayDuration: true,
+                ratio: '16:9'
+            });
+            
+            return player;
+        }
 
         // Load movie data
         async function loadMovieData() {
             try {
                 if (movieId) {
                     const apiUrl = typeof API_CONFIG !== 'undefined' 
-                        ? API_CONFIG.API_URL 
+                        ? API_CONFIG.BASE_URL 
                         : 'https://luganda-translated-movies-production.up.railway.app';
                     
                     const response = await fetch(`${apiUrl}/api/luganda-movies/${movieId}`);
@@ -1076,9 +1126,23 @@
                     if (data.status === 'success' && data.data) {
                         const movie = data.data;
                         updateMovieInfo(movie);
-                        loadVideoSource(movie.video?.url || movie.streamUrl);
+                        
+                        // Check for embed URL first (Streamtape, etc.)
+                        if (movie.video?.embedUrl || movie.video?.streamtapeId) {
+                            const embedSrc = movie.video.embedUrl || 
+                                `https://streamtape.com/e/${movie.video.streamtapeId}`;
+                            loadEmbedVideo(embedSrc);
+                        } else {
+                            // Fall back to direct video URL
+                            loadVideoSource(movie.video?.url || movie.video?.originalVideoPath || movie.streamUrl);
+                        }
+                        
                         loadRelatedMovies(movie.genres?.[0] || 'action');
                     }
+                } else if (embedUrl) {
+                    // Direct embed URL from query param
+                    loadEmbedVideo(embedUrl);
+                    document.getElementById('movieTitle').textContent = urlParams.get('title') || 'Now Playing';
                 } else if (streamUrl) {
                     loadVideoSource(streamUrl);
                     document.getElementById('movieTitle').textContent = urlParams.get('movie') || urlParams.get('station') || 'Now Playing';
@@ -1097,6 +1161,52 @@
                 loadVideoSource('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
                 document.getElementById('movieTitle').textContent = 'Demo Video';
             }
+        }
+
+        // Load embed video (Streamtape, etc.)
+        function loadEmbedVideo(url) {
+            isEmbedMode = true;
+            
+            // Hide native player, show embed container
+            video.style.display = 'none';
+            if (player) {
+                player.destroy();
+                player = null;
+            }
+            embedContainer.style.display = 'block';
+            
+            // Set the embed URL
+            embedPlayer.src = url;
+            
+            // Hide loading when iframe loads
+            embedPlayer.onload = () => {
+                loadingOverlay.style.display = 'none';
+            };
+            
+            // Fallback hide loading after timeout
+            setTimeout(() => {
+                loadingOverlay.style.display = 'none';
+            }, 3000);
+            
+            console.log('📺 Playing embed video:', url);
+        }
+
+        // Convert Streamtape URL to embed URL
+        function getStreamtapeEmbedUrl(url) {
+            if (!url) return null;
+            
+            // If already an embed URL, return as is
+            if (url.includes('/e/')) return url;
+            
+            // Extract video ID from various Streamtape URL formats
+            // https://streamtape.com/v/VIDEOID/title
+            // https://streamtape.to/v/VIDEOID/title
+            const match = url.match(/streamtape\.(com|to|net)\/v\/([a-zA-Z0-9]+)/);
+            if (match) {
+                return `https://streamtape.com/e/${match[2]}`;
+            }
+            
+            return url;
         }
 
         // Update movie information on page
@@ -1149,6 +1259,23 @@
                 loadingOverlay.style.display = 'none';
                 return;
             }
+            
+            // Check if it's a Streamtape or other embed URL
+            if (url.includes('streamtape.') || url.includes('doodstream.') || 
+                url.includes('filemoon.') || url.includes('/e/') || url.includes('/embed/')) {
+                const embedSrc = getStreamtapeEmbedUrl(url);
+                loadEmbedVideo(embedSrc);
+                return;
+            }
+            
+            isEmbedMode = false;
+            
+            // Show native player, hide embed
+            video.style.display = 'block';
+            embedContainer.style.display = 'none';
+            
+            // Initialize Plyr
+            initPlyr();
             
             // Check if HLS stream
             if (url.includes('.m3u8')) {

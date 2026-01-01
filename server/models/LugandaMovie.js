@@ -160,6 +160,20 @@ const lugandaMovieSchema = new mongoose.Schema({
             type: String,
             default: null
         },
+        // Embed URLs for external video hosts (Streamtape, etc.)
+        embedUrl: {
+            type: String,
+            default: null
+        },
+        streamtapeId: {
+            type: String,
+            default: null
+        },
+        provider: {
+            type: String,
+            enum: ['local', 'streamtape', 'doodstream', 'filemoon', 'other'],
+            default: 'local'
+        },
         quality: {
             type: String,
             enum: ['sd', 'hd', '4k'],
