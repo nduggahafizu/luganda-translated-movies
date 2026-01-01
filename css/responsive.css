@@ -113,7 +113,7 @@
     
     .mobile-search-input:focus {
         border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(124, 252, 0, 0.2);
+        box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.2);
     }
     
     .mobile-search-input::placeholder {
