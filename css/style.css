@@ -1,12 +1,12 @@
 /* ===================================
    Unruly Movies - Main Stylesheet
-   Primary Color: Light Green (#7CFC00)
+   Primary Color: Soft Green (#66BB6A)
    =================================== */
 
 :root {
-    --primary-color: #7CFC00;
-    --primary-dark: #5CB300;
-    --primary-light: #9FFF33;
+    --primary-color: #66BB6A;
+    --primary-dark: #4CAF50;
+    --primary-light: #81C784;
     --secondary-color: #00D9FF;
     --background-dark: #0a0a0a;
     --background-light: #1a1a1a;
@@ -14,6 +14,20 @@
     --text-secondary: #b3b3b3;
     --border-color: #2a2a2a;
     --hover-bg: #252525;
+}
+
+/* Accessibility - Screen reader only */
+.visually-hidden,
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
 }
 
 * {
@@ -181,6 +195,77 @@ img {
     color: var(--primary-color);
 }
 
+/* User Dropdown */
+.user-dropdown {
+    position: relative;
+}
+
+.user-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+}
+
+.user-btn:hover {
+    background-color: var(--hover-bg);
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary-color);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    min-width: 180px;
+    background-color: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 8px 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.user-dropdown:hover .dropdown-menu,
+.user-dropdown:focus-within .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: var(--hover-bg);
+    color: var(--primary-color);
+}
+
+.dropdown-item svg {
+    flex-shrink: 0;
+}
+
 .btn-register {
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
     color: #000;
@@ -191,7 +276,7 @@ img {
 .btn-register:hover {
     background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(124, 252, 0, 0.3);
+    box-shadow: 0 5px 15px rgba(102, 187, 106, 0.3);
 }
 
 /* ===================================
@@ -234,9 +319,20 @@ img {
 .nav {
     list-style: none;
     padding: 0 15px;
+    margin-bottom: 20px;
 }
 
 .nav li {
+    margin-bottom: 3px;
+}
+
+.nav li.nav-header {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    padding: 15px 15px 8px;
     margin-bottom: 5px;
 }
 
@@ -244,9 +340,9 @@ img {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 15px;
+    padding: 10px 15px;
     border-radius: 8px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     transition: all 0.3s ease;
 }
@@ -257,7 +353,7 @@ img {
 }
 
 .nav li.active a {
-    background: linear-gradient(135deg, rgba(124, 252, 0, 0.15), rgba(124, 252, 0, 0.05));
+    background: linear-gradient(135deg, rgba(102, 187, 106, 0.15), rgba(102, 187, 106, 0.05));
     color: var(--primary-color);
     border-left: 3px solid var(--primary-color);
 }

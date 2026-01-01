@@ -1,32 +1,33 @@
 const jwt = require('jsonwebtoken');
 const { logger } = require('./logger');
 
-// JWT Secret from environment or default
-const JWT_SECRET = process.env.JWT_SECRET || 'luganda-movies-jwt-secret-key-change-in-production';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
-const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '30d';
+// JWT Secret from environment or default (must match authController and auth middleware)
+const JWT_SECRET = process.env.JWT_SECRET || 'unruly-movies-jwt-secret-key-2024';
+// No expiry for persistent login
+const JWT_EXPIRES_IN = null;
+const JWT_REFRESH_EXPIRES_IN = null;
 
 /**
- * Generate JWT access token
+ * Generate JWT access token (no expiry for persistent login)
  * @param {Object} payload - User data to encode in token
  * @returns {string} JWT token
  */
 const generateAccessToken = (payload) => {
     return jwt.sign(payload, JWT_SECRET, {
-        expiresIn: JWT_EXPIRES_IN,
         issuer: 'luganda-movies-api'
+        // No expiresIn = token never expires
     });
 };
 
 /**
- * Generate JWT refresh token
+ * Generate JWT refresh token (no expiry)
  * @param {Object} payload - User data to encode in token
  * @returns {string} JWT refresh token
  */
 const generateRefreshToken = (payload) => {
     return jwt.sign(payload, JWT_SECRET, {
-        expiresIn: JWT_REFRESH_EXPIRES_IN,
         issuer: 'luganda-movies-api'
+        // No expiresIn = token never expires
     });
 };
 
@@ -45,7 +46,7 @@ const generateTokens = (user) => {
     return {
         accessToken: generateAccessToken(payload),
         refreshToken: generateRefreshToken(payload),
-        expiresIn: JWT_EXPIRES_IN
+        expiresIn: 'never'
     };
 };
 

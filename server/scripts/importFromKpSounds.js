@@ -16,10 +16,7 @@ require('dotenv').config();
 // Connect to MongoDB
 async function connectDB() {
     try {
-        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/luganda-movies', {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
+        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/luganda-movies');
         console.log('✅ MongoDB Connected');
     } catch (error) {
         console.error('❌ MongoDB Connection Error:', error.message);

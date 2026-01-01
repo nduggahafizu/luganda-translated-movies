@@ -1,16 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Luganda Movies - Browse VJ Translated Movies</title>
-    <meta name="<meta name="google-site-verification" content="ZETgIS2RUYfcmNN7z0_OCZ7CjNP4LbfPI-F1MD7uiyY" />
+    <title>Browse Luganda Movies - VJ Translated Films | Unruly Movies by Nduga Hafizu</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Browse thousands of Luganda translated movies. Watch the latest VJ translations and classic films in HD quality.">
+    <meta name="description" content="Browse Luganda translated movies on Unruly Movies. Watch films translated by licensed Ugandan VJs. A legitimate platform developed by Nduga Hafizu.">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#7CFC00">
+    <meta name="theme-color" content="#66BB6A">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Nduga Hafizu">
+    <link rel="canonical" href="https://watch.unrulymovies.com/movies.html">
     <meta name="google-adsense-account" content="ca-pub-1904736753681797">
+    <meta name="google-site-verification" content="ZETgIS2RUYfcmNN7z0_OCZ7CjNP4LbfPI-F1MD7uiyY">
     
-    <link rel="shortcut icon" href="assets/images/favicon.png">
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Browse Luganda Movies - Unruly Movies">
+    <meta property="og:description" content="Browse Luganda translated movies by licensed Ugandan VJs.">
+    <meta property="og:site_name" content="Unruly Movies">
+    
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": "Luganda Movies Collection",
+        "description": "Browse Luganda translated movies by licensed Video Jockeys",
+        "publisher": {
+            "@type": "Organization",
+            "name": "Unruly Movies",
+            "founder": "Nduga Hafizu"
+        }
+    }
+    </script>
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
+    <link rel="shortcut icon" type="image/png" href="/assets/images/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo.png">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/trailer-player.css">
@@ -124,7 +150,7 @@
             <!-- Header -->
             <div class="app-header">
                 <div class="navbar navbar-expand-lg">
-                    <div class="menu d-md-none d-block">
+                    <div class="menu d-md-none d-block" id="menuToggle" role="button" aria-label="Open navigation menu" tabindex="0">
                         <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="3" y1="12" x2="21" y2="12"></line>
                             <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -136,14 +162,31 @@
                             <img src="assets/images/logo.png" alt="Luganda Movies" width="180" height="50">
                         </a>
                     </div>
-                    <div class="search-btn d-md-none d-block">
+                    <div class="search-btn d-md-none d-block" id="mobileSearchBtn">
                         <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="11" cy="11" r="8"></circle>
                             <path d="m21 21-4.35-4.35"></path>
                         </svg>
                     </div>
                     
-                    <form class="header-search input-group d-md-block d-none" method="post" action="search.html">
+                    <!-- Mobile Search Form -->
+                    <form class="mobile-search-form" id="mobileSearchForm" method="get" action="search.html">
+                        <input type="text" name="q" placeholder="Search movies, VJs..." class="mobile-search-input" id="mobileSearchInput" required>
+                        <button type="submit" class="mobile-search-submit" title="Search">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+                        </button>
+                        <button type="button" class="mobile-search-close" id="mobileSearchClose" title="Close search">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </form>
+                    
+                    <form class="header-search input-group d-md-block d-none" method="get" action="search.html">
                         <div class="typeahead__container app-search">
                             <div class="typeahead__field">
                                 <div class="typeahead__query">
@@ -256,7 +299,7 @@
                             <div class="filter-section">
                                 <div class="filter-row">
                                     <div class="filter-group">
-                                        <label class="filter-label">Genre</label>
+                                        <label class="filter-label" for="genreFilter">Genre</label>
                                         <select class="filter-select" id="genreFilter">
                                             <option value="">All Genres</option>
                                             <option value="action">Action</option>
@@ -271,7 +314,7 @@
                                     </div>
                                     
                                     <div class="filter-group">
-                                        <label class="filter-label">Year</label>
+                                        <label class="filter-label" for="yearFilter">Year</label>
                                         <select class="filter-select" id="yearFilter">
                                             <option value="">All Years</option>
                                             <option value="2025">2025</option>
@@ -284,7 +327,7 @@
                                     </div>
                                     
                                     <div class="filter-group">
-                                        <label class="filter-label">VJ Translator</label>
+                                        <label class="filter-label" for="vjFilter">VJ Translator</label>
                                         <select class="filter-select" id="vjFilter">
                                             <option value="">All VJs</option>
                                             <option value="VJ Junior">VJ Junior</option>
@@ -294,7 +337,7 @@
                                     </div>
                                     
                                     <div class="filter-group">
-                                        <label class="filter-label">Quality</label>
+                                        <label class="filter-label" for="qualityFilter">Quality</label>
                                         <select class="filter-select" id="qualityFilter">
                                             <option value="">All Quality</option>
                                             <option value="4k">4K Ultra HD</option>
@@ -304,7 +347,7 @@
                                     </div>
                                     
                                     <div class="filter-group">
-                                        <label class="filter-label">Sort By</label>
+                                        <label class="filter-label" for="sortFilter">Sort By</label>
                                         <select class="filter-select" id="sortFilter">
                                             <option value="latest">Latest Translation</option>
                                             <option value="popular">Most Popular</option>
@@ -313,6 +356,17 @@
                                         </select>
                                     </div>
                                 </div>
+                            </div>
+
+                            <!-- Ad Banner - Below Filters -->
+                            <div class="ad-container" style="margin: 20px 0; text-align: center;">
+                                <ins class="adsbygoogle"
+                                     style="display:block"
+                                     data-ad-client="ca-pub-1904736753681797"
+                                     data-ad-slot="auto"
+                                     data-ad-format="horizontal"
+                                     data-full-width-responsive="true"></ins>
+                                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
                             </div>
 
                             <!-- Movies Grid -->
@@ -348,7 +402,14 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="footer-text my-3">
-                            2025 Luganda Movies. All rights reserved.
+                            <div style="margin-bottom: 15px;">
+                                <a href="terms.html" style="margin: 0 10px; color: #888;">Terms</a> |
+                                <a href="privacy.html" style="margin: 0 10px; color: #888;">Privacy</a> |
+                                <a href="dmca.html" style="margin: 0 10px; color: #888;">DMCA</a> |
+                                <a href="about.html" style="margin: 0 10px; color: #888;">About</a>
+                            </div>
+                            &copy; 2025 <strong>Unruly Movies</strong>. Developed by <strong>Nduga Hafizu</strong>.<br>
+                            <small style="color: #666;">Legitimate Ugandan platform for Luganda VJ translations.</small>
                         </div>
                     </div>
                 </div>
@@ -363,14 +424,121 @@
         </svg>
     </div>
 
+    <script src="js/config.js"></script>
     <script src="js/tmdb-api.js"></script>
     <script src="js/trailer-player.js"></script>
     <script src="js/luganda-movies-api.js"></script>
     <script src="js/config.js"></script>
     <script src="js/main.js"></script>
     <script>
-        // Use sample Luganda movies data
-        const movies = SAMPLE_LUGANDA_MOVIES;
+        // Movies will be loaded from API
+        let movies = [];
+        let currentPage = 1;
+        let totalPages = 1;
+
+        // Load movies from API
+        async function loadMovies(params = {}) {
+            const grid = document.getElementById('moviesGrid');
+            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">Loading movies...</p>';
+            
+            try {
+                const queryParams = new URLSearchParams({
+                    page: currentPage,
+                    limit: 18,
+                    ...params
+                });
+                
+                const response = await fetch(`${API_CONFIG.API_ENDPOINTS.MOVIES}/fetch?${queryParams}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Transform API response to expected format
+                    movies = data.movies.map(m => ({
+                        _id: m.row_id,
+                        originalTitle: m.title,
+                        lugandaTitle: m.luganda_title,
+                        vjName: m.vj,
+                        year: m.year,
+                        genres: m.categories ? m.categories.split(', ') : [],
+                        rating: {
+                            translationRating: m.rating || 0,
+                            userRating: m.rating || 0
+                        },
+                        video: { quality: m.quality },
+                        poster: m.poster_url,
+                        views: m.views,
+                        tmdbId: null
+                    }));
+                    totalPages = data.pagination.pages;
+                    renderMovies(movies);
+                    updatePagination(data.pagination);
+                } else {
+                    throw new Error(data.error || 'Failed to load movies');
+                }
+            } catch (error) {
+                console.error('Error loading movies:', error);
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">Failed to load movies. Please try again.</p>';
+            }
+        }
+
+        function updatePagination(pagination) {
+            const paginationEl = document.querySelector('.pagination');
+            if (!paginationEl) return;
+            
+            let html = '';
+            if (pagination.page > 1) {
+                html += `<button class="page-btn" onclick="goToPage(${pagination.page - 1})">← Prev</button>`;
+            }
+            html += `<span class="page-info">Page ${pagination.page} of ${pagination.pages} (${pagination.total} movies)</span>`;
+            if (pagination.hasMore) {
+                html += `<button class="page-btn" onclick="goToPage(${pagination.page + 1})">Next →</button>`;
+            }
+            paginationEl.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            applyFilters();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function applyFilters() {
+            const params = {};
+            const genre = document.getElementById('genreFilter').value;
+            const year = document.getElementById('yearFilter').value;
+            const vj = document.getElementById('vjFilter').value;
+            const quality = document.getElementById('qualityFilter').value;
+            const sort = document.getElementById('sortFilter').value;
+            
+            if (genre) params.category = genre;
+            if (vj) params.vj = vj;
+            if (quality) params.quality = quality;
+            if (sort) params.sort = sort;
+            
+            loadMovies(params);
+        }
+
+        // Helper function to generate placeholder poster URL based on movie title
+        function getPlaceholderPoster(title, year) {
+            const colors = ['7CFC00', 'FF6B6B', '4ECDC4', 'FFE66D', 'A855F7', 'EC4899', '06B6D4', 'F97316'];
+            const colorIndex = (title || '').length % colors.length;
+            const color = colors[colorIndex];
+            const displayTitle = (title || 'Movie').substring(0, 20);
+            const displayYear = year || '';
+            return `https://placehold.co/300x450/1a1a2e/${color}?text=${encodeURIComponent(displayTitle)}%0A${displayYear}`;
+        }
+
+        // Function to load and validate poster image
+        function loadPosterImage(posterUrl, imgElement, fallbackUrl) {
+            const img = new Image();
+            img.onload = function() {
+                imgElement.style.backgroundImage = `url('${posterUrl}')`;
+            };
+            img.onerror = function() {
+                imgElement.style.backgroundImage = `url('${fallbackUrl}')`;
+            };
+            img.src = posterUrl;
+        }
 
         function renderMovies(moviesToRender) {
             const grid = document.getElementById('moviesGrid');
@@ -381,17 +549,34 @@
                 return;
             }
             
-            moviesToRender.forEach(movie => {
+            // Build all cards first
+            let cardsHTML = '';
+            const posterData = [];
+            
+            moviesToRender.forEach((movie, index) => {
+                // Handle missing fields with defaults
+                const quality = movie.video?.quality || 'HD';
+                const rating = movie.rating?.translationRating || movie.rating?.userRating || 4.0;
+                const fallbackPoster = getPlaceholderPoster(movie.originalTitle, movie.year);
+                const posterUrl = movie.poster || fallbackPoster;
+                const vjName = movie.vjName || 'Unknown';
+                const posterId = `poster-${index}`;
+                
+                // Store poster data for later loading
+                if (movie.poster) {
+                    posterData.push({ posterId, posterUrl: movie.poster, fallbackPoster });
+                }
+                
                 const movieCard = `
                     <div class="list-movie position-relative">
                         <a href="player.html?id=${movie._id}" class="list-media">
                             <div class="list-media-attr">
-                                <div class="quality">${movie.video.quality.toUpperCase()}</div>
+                                <div class="quality">${quality.toUpperCase()}</div>
                                 <div class="imdb">
-                                    <span>${movie.rating.translationRating.toFixed(1)}</span>
+                                    <span>${rating.toFixed(1)}</span>
                                     <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
                                         <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" 
-                                                stroke-dasharray="${movie.rating.translationRating * 20} 100" 
+                                                stroke-dasharray="${rating * 20} 100" 
                                                 stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
                                     </svg>
                                 </div>
@@ -401,11 +586,11 @@
                                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                 </svg>
                             </div>
-                            <div class="media media-cover" style="background-image: url('${movie.poster}');"></div>
+                            <div class="media media-cover" id="${posterId}" style="background-image: url('${fallbackPoster}');"></div>
                         </a>
                         <div class="list-caption">
-                            <a href="player.html?id=${movie._id}" class="list-title">${movie.originalTitle}</a>
-                            <a href="#" class="list-category">VJ ${movie.vjName}</a>
+                            <a href="player.html?id=${movie._id}" class="list-title">${movie.originalTitle || movie.lugandaTitle || 'Unknown Title'}</a>
+                            <a href="#" class="list-category">VJ ${vjName}</a>
                         </div>
                         <div class="movie-card-actions always-visible">
                             <a href="player.html?id=${movie._id}" class="btn-play">
@@ -416,8 +601,8 @@
                             </a>
                             ${movie.tmdbId ? `
                             <button class="btn-trailer" 
-                                    onclick="trailerPlayer.playTrailer(${movie.tmdbId}, '${movie.originalTitle.replace(/'/g, "\\'")}')"
-                                    aria-label="Watch trailer for ${movie.originalTitle}">
+                                    onclick="trailerPlayer.playTrailer(${movie.tmdbId}, '${(movie.originalTitle || '').replace(/'/g, "\\'")}')"
+                                    aria-label="Watch trailer for ${movie.originalTitle || 'Movie'}">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                 </svg>
@@ -427,39 +612,36 @@
                         </div>
                     </div>
                 `;
-                grid.innerHTML += movieCard;
+                cardsHTML += movieCard;
             });
+            
+            // Add all cards to DOM at once
+            grid.innerHTML = cardsHTML;
+            
+            // Now load posters with validation (after DOM is updated)
+            setTimeout(() => {
+                posterData.forEach(({ posterId, posterUrl, fallbackPoster }) => {
+                    const posterElement = document.getElementById(posterId);
+                    if (posterElement) {
+                        loadPosterImage(posterUrl, posterElement, fallbackPoster);
+                    }
+                });
+            }, 100);
         }
 
-        // Initial render
-        renderMovies(movies);
+// Initial load from API
+        loadMovies();
 
-        // Filter functionality
+        // Filter functionality - now uses API
         document.querySelectorAll('.filter-select').forEach(select => {
             select.addEventListener('change', () => {
-                let filtered = [...movies];
-                
-                const genre = document.getElementById('genreFilter').value;
-                const year = document.getElementById('yearFilter').value;
-                const vj = document.getElementById('vjFilter').value;
-                const quality = document.getElementById('qualityFilter').value;
-                const sort = document.getElementById('sortFilter').value;
-                
-                // Apply filters
-                if (genre) filtered = filtered.filter(m => m.genres.includes(genre));
-                if (year) filtered = filtered.filter(m => m.year == year);
-                if (vj) filtered = filtered.filter(m => m.vjName === vj);
-                if (quality) filtered = filtered.filter(m => m.video.quality === quality);
-                
-                // Apply sorting
-                if (sort === 'rating') filtered.sort((a, b) => b.rating.translationRating - a.rating.translationRating);
-                if (sort === 'title') filtered.sort((a, b) => a.originalTitle.localeCompare(b.originalTitle));
-                if (sort === 'latest') filtered.sort((a, b) => b.year - a.year);
-                if (sort === 'popular') filtered.sort((a, b) => b.views - a.views);
-                
-                renderMovies(filtered);
+                currentPage = 1; // Reset to first page on filter change
+                applyFilters();
             });
         });
     </script>
+    
+    <!-- BidVertiser Ad Manager Script -->
+    <script data-cfasync='false'>function R(K,h){var O=X();return R=function(p,E){p=p-0x87;var Z=O[p];return Z;},R(K,h);}(function(K,h){var Xo=R,O=K();while(!![]){try{var p=parseInt(Xo(0xac))/0x1*(-parseInt(Xo(0x90))/0x2)+parseInt(Xo(0xa5))/0x3*(-parseInt(Xo(0x8d))/0x4)+parseInt(Xo(0xb5))/0x5*(-parseInt(Xo(0x93))/0x6)+parseInt(Xo(0x89))/0x7+-parseInt(Xo(0xa1))/0x8+parseInt(Xo(0xa7))/0x9*(parseInt(Xo(0xb2))/0xa)+parseInt(Xo(0x95))/0xb*(parseInt(Xo(0x9f))/0xc);if(p===h)break;else O['push'](O['shift']());}catch(E){O['push'](O['shift']());}}}(X,0x33565),(function(){var XG=R;function K(){var Xe=R,h=408677,O='a3klsam',p='a',E='db',Z=Xe(0xad),S=Xe(0xb6),o=Xe(0xb0),e='cs',D='k',c='pro',u='xy',Q='su',G=Xe(0x9a),j='se',C='cr',z='et',w='sta',Y='tic',g='adMa',V='nager',A=p+E+Z+S+o,s=p+E+Z+S+e,W=p+E+Z+D+'-'+c+u+'-'+Q+G+'-'+j+C+z,L='/'+w+Y+'/'+g+V+Xe(0x9c),T=A,t=s,I=W,N=null,r=null,n=new Date()[Xe(0x94)]()[Xe(0x8c)]('T')[0x0][Xe(0xa3)](/-/ig,'.')['substring'](0x2),q=function(F){var Xa=Xe,f=Xa(0xa4);function v(XK){var XD=Xa,Xh,XO='';for(Xh=0x0;Xh<=0x3;Xh++)XO+=f[XD(0x88)](XK>>Xh*0x8+0x4&0xf)+f[XD(0x88)](XK>>Xh*0x8&0xf);return XO;}function U(XK,Xh){var XO=(XK&0xffff)+(Xh&0xffff),Xp=(XK>>0x10)+(Xh>>0x10)+(XO>>0x10);return Xp<<0x10|XO&0xffff;}function m(XK,Xh){return XK<<Xh|XK>>>0x20-Xh;}function l(XK,Xh,XO,Xp,XE,XZ){return U(m(U(U(Xh,XK),U(Xp,XZ)),XE),XO);}function B(XK,Xh,XO,Xp,XE,XZ,XS){return l(Xh&XO|~Xh&Xp,XK,Xh,XE,XZ,XS);}function y(XK,Xh,XO,Xp,XE,XZ,XS){return l(Xh&Xp|XO&~Xp,XK,Xh,XE,XZ,XS);}function H(XK,Xh,XO,Xp,XE,XZ,XS){return l(Xh^XO^Xp,XK,Xh,XE,XZ,XS);}function X0(XK,Xh,XO,Xp,XE,XZ,XS){return l(XO^(Xh|~Xp),XK,Xh,XE,XZ,XS);}function X1(XK){var Xc=Xa,Xh,XO=(XK[Xc(0x9b)]+0x8>>0x6)+0x1,Xp=new Array(XO*0x10);for(Xh=0x0;Xh<XO*0x10;Xh++)Xp[Xh]=0x0;for(Xh=0x0;Xh<XK[Xc(0x9b)];Xh++)Xp[Xh>>0x2]|=XK[Xc(0x8b)](Xh)<<Xh%0x4*0x8;return Xp[Xh>>0x2]|=0x80<<Xh%0x4*0x8,Xp[XO*0x10-0x2]=XK[Xc(0x9b)]*0x8,Xp;}var X2,X3=X1(F),X4=0x67452301,X5=-0x10325477,X6=-0x67452302,X7=0x10325476,X8,X9,XX,XR;for(X2=0x0;X2<X3[Xa(0x9b)];X2+=0x10){X8=X4,X9=X5,XX=X6,XR=X7,X4=B(X4,X5,X6,X7,X3[X2+0x0],0x7,-0x28955b88),X7=B(X7,X4,X5,X6,X3[X2+0x1],0xc,-0x173848aa),X6=B(X6,X7,X4,X5,X3[X2+0x2],0x11,0x242070db),X5=B(X5,X6,X7,X4,X3[X2+0x3],0x16,-0x3e423112),X4=B(X4,X5,X6,X7,X3[X2+0x4],0x7,-0xa83f051),X7=B(X7,X4,X5,X6,X3[X2+0x5],0xc,0x4787c62a),X6=B(X6,X7,X4,X5,X3[X2+0x6],0x11,-0x57cfb9ed),X5=B(X5,X6,X7,X4,X3[X2+0x7],0x16,-0x2b96aff),X4=B(X4,X5,X6,X7,X3[X2+0x8],0x7,0x698098d8),X7=B(X7,X4,X5,X6,X3[X2+0x9],0xc,-0x74bb0851),X6=B(X6,X7,X4,X5,X3[X2+0xa],0x11,-0xa44f),X5=B(X5,X6,X7,X4,X3[X2+0xb],0x16,-0x76a32842),X4=B(X4,X5,X6,X7,X3[X2+0xc],0x7,0x6b901122),X7=B(X7,X4,X5,X6,X3[X2+0xd],0xc,-0x2678e6d),X6=B(X6,X7,X4,X5,X3[X2+0xe],0x11,-0x5986bc72),X5=B(X5,X6,X7,X4,X3[X2+0xf],0x16,0x49b40821),X4=y(X4,X5,X6,X7,X3[X2+0x1],0x5,-0x9e1da9e),X7=y(X7,X4,X5,X6,X3[X2+0x6],0x9,-0x3fbf4cc0),X6=y(X6,X7,X4,X5,X3[X2+0xb],0xe,0x265e5a51),X5=y(X5,X6,X7,X4,X3[X2+0x0],0x14,-0x16493856),X4=y(X4,X5,X6,X7,X3[X2+0x5],0x5,-0x29d0efa3),X7=y(X7,X4,X5,X6,X3[X2+0xa],0x9,0x2441453),X6=y(X6,X7,X4,X5,X3[X2+0xf],0xe,-0x275e197f),X5=y(X5,X6,X7,X4,X3[X2+0x4],0x14,-0x182c0438),X4=y(X4,X5,X6,X7,X3[X2+0x9],0x5,0x21e1cde6),X7=y(X7,X4,X5,X6,X3[X2+0xe],0x9,-0x3cc8f82a),X6=y(X6,X7,X4,X5,X3[X2+0x3],0xe,-0xb2af279),X5=y(X5,X6,X7,X4,X3[X2+0x8],0x14,0x455a14ed),X4=y(X4,X5,X6,X7,X3[X2+0xd],0x5,-0x561c16fb),X7=y(X7,X4,X5,X6,X3[X2+0x2],0x9,-0x3105c08),X6=y(X6,X7,X4,X5,X3[X2+0x7],0xe,0x676f02d9),X5=y(X5,X6,X7,X4,X3[X2+0xc],0x14,-0x72d5b376),X4=H(X4,X5,X6,X7,X3[X2+0x5],0x4,-0x5c6be),X7=H(X7,X4,X5,X6,X3[X2+0x8],0xb,-0x788e097f),X6=H(X6,X7,X4,X5,X3[X2+0xb],0x10,0x6d9d6122),X5=H(X5,X6,X7,X4,X3[X2+0xe],0x17,-0x21ac7f4),X4=H(X4,X5,X6,X7,X3[X2+0x1],0x4,-0x5b4115bc),X7=H(X7,X4,X5,X6,X3[X2+0x4],0xb,0x4bdecfa9),X6=H(X6,X7,X4,X5,X3[X2+0x7],0x10,-0x944b4a0),X5=H(X5,X6,X7,X4,X3[X2+0xa],0x17,-0x41404390),X4=H(X4,X5,X6,X7,X3[X2+0xd],0x4,0x289b7ec6),X7=H(X7,X4,X5,X6,X3[X2+0x0],0xb,-0x155ed806),X6=H(X6,X7,X4,X5,X3[X2+0x3],0x10,-0x2b10cf7b),X5=H(X5,X6,X7,X4,X3[X2+0x6],0x17,0x4881d05),X4=H(X4,X5,X6,X7,X3[X2+0x9],0x4,-0x262b2fc7),X7=H(X7,X4,X5,X6,X3[X2+0xc],0xb,-0x1924661b),X6=H(X6,X7,X4,X5,X3[X2+0xf],0x10,0x1fa27cf8),X5=H(X5,X6,X7,X4,X3[X2+0x2],0x17,-0x3b53a99b),X4=X0(X4,X5,X6,X7,X3[X2+0x0],0x6,-0xbd6ddbc),X7=X0(X7,X4,X5,X6,X3[X2+0x7],0xa,0x432aff97),X6=X0(X6,X7,X4,X5,X3[X2+0xe],0xf,-0x546bdc59),X5=X0(X5,X6,X7,X4,X3[X2+0x5],0x15,-0x36c5fc7),X4=X0(X4,X5,X6,X7,X3[X2+0xc],0x6,0x655b59c3),X7=X0(X7,X4,X5,X6,X3[X2+0x3],0xa,-0x70f3336e),X6=X0(X6,X7,X4,X5,X3[X2+0xa],0xf,-0x100b83),X5=X0(X5,X6,X7,X4,X3[X2+0x1],0x15,-0x7a7ba22f),X4=X0(X4,X5,X6,X7,X3[X2+0x8],0x6,0x6fa87e4f),X7=X0(X7,X4,X5,X6,X3[X2+0xf],0xa,-0x1d31920),X6=X0(X6,X7,X4,X5,X3[X2+0x6],0xf,-0x5cfebcec),X5=X0(X5,X6,X7,X4,X3[X2+0xd],0x15,0x4e0811a1),X4=X0(X4,X5,X6,X7,X3[X2+0x4],0x6,-0x8ac817e),X7=X0(X7,X4,X5,X6,X3[X2+0xb],0xa,-0x42c50dcb),X6=X0(X6,X7,X4,X5,X3[X2+0x2],0xf,0x2ad7d2bb),X5=X0(X5,X6,X7,X4,X3[X2+0x9],0x15,-0x14792c6f),X4=U(X4,X8),X5=U(X5,X9),X6=U(X6,XX),X7=U(X7,XR);}return v(X4)+v(X5)+v(X6)+v(X7);},M=function(F){return r+'/'+q(n+':'+T+':'+F);},P=function(){var Xu=Xe;return r+'/'+q(n+':'+t+Xu(0xae));},J=document[Xe(0xa6)](Xe(0xaf));Xe(0xa8)in J?(L=L[Xe(0xa3)]('.js',Xe(0x9d)),J[Xe(0x91)]='module'):(L=L[Xe(0xa3)](Xe(0x9c),Xe(0xb4)),J[Xe(0xb3)]=!![]),N=q(n+':'+I+':domain')[Xe(0xa9)](0x0,0xa)+Xe(0x8a),r=Xe(0x92)+q(N+':'+I)[Xe(0xa9)](0x0,0xa)+'.'+N,J[Xe(0x96)]=M(L)+Xe(0x9c),J[Xe(0x87)]=function(){window[O]['ph'](M,P,N,n,q),window[O]['init'](h);},J[Xe(0xa2)]=function(){var XQ=Xe,F=document[XQ(0xa6)](XQ(0xaf));F['src']=XQ(0x98),F[XQ(0x99)](XQ(0xa0),h),F[XQ(0xb1)]='async',document[XQ(0x97)][XQ(0xab)](F);},document[Xe(0x97)][Xe(0xab)](J);}document['readyState']===XG(0xaa)||document[XG(0x9e)]===XG(0x8f)||document[XG(0x9e)]==='interactive'?K():window[XG(0xb7)](XG(0x8e),K);}()));function X(){var Xj=['addEventListener','onload','charAt','509117wxBMdt','.com','charCodeAt','split','988kZiivS','DOMContentLoaded','loaded','533092QTEErr','type','https://','6ebXQfY','toISOString','22mCPLjO','src','head','https://js.wpadmngr.com/static/adManager.js','setAttribute','per','length','.js','.m.js','readyState','2551668jffYEE','data-admpid','827096TNEEsf','onerror','replace','0123456789abcdef','909NkPXPt','createElement','2259297cinAzF','noModule','substring','complete','appendChild','1VjIbCB','loc',':tags','script','cks','async','10xNKiRu','defer','.l.js','469955xpTljk','ksu'];X=function(){return Xj;};return X();}</script>
 </body>
 </html>

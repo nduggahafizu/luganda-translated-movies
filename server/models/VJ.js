@@ -325,8 +325,6 @@ vjSchema.statics.getBySpecialty = function(specialty) {
 };
 
 // Indexes
-vjSchema.index({ name: 1 });
-vjSchema.index({ slug: 1 });
 vjSchema.index({ status: 1 });
 vjSchema.index({ verified: 1 });
 vjSchema.index({ 'stats.totalViews': -1 });

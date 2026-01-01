@@ -301,7 +301,6 @@ seriesSchema.statics.searchSeries = function(query, filters = {}) {
 
 // Indexes for better query performance
 seriesSchema.index({ title: 'text', description: 'text', tags: 'text' });
-seriesSchema.index({ slug: 1 });
 seriesSchema.index({ genres: 1 });
 seriesSchema.index({ startYear: -1 });
 seriesSchema.index({ views: -1 });

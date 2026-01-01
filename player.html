@@ -1,258 +1,489 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Watch Now - Unruly Movies</title>
+    <title>Watch Now - Unruly Movies | Luganda VJ Translations</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Watch movies and TV shows on Unruly Movies">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#7CFC00">
+    <meta name="description" content="Watch Luganda translated movies on Unruly Movies - A legitimate Ugandan entertainment platform developed by Nduga Hafizu featuring licensed VJs.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#66BB6A">
+    <meta name="author" content="Nduga Hafizu">
+    <meta name="robots" content="noindex">
     <meta name="google-adsense-account" content="ca-pub-1904736753681797">
     
-    <link rel="shortcut icon" href="assets/images/favicon.png">
+    <!-- Open Graph / Social Share Meta -->
+    <meta property="og:type" content="video.movie">
+    <meta property="og:site_name" content="Unruly Movies">
+    <meta property="og:title" content="Watch Now - Unruly Movies">
+    <meta property="og:description" content="Watch Luganda translated movies on Unruly Movies - Legitimate Ugandan platform by Nduga Hafizu">
+    <meta property="og:image" content="">
+    <meta property="og:url" content="">
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
+    <link rel="shortcut icon" type="image/png" href="/assets/images/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo.png">
+    <link rel="apple-touch-icon" href="assets/images/icons/icon-192x192.png">
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Plyr CSS - Legal open-source player -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
+    
+    <!-- Main Styles -->
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/responsive.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
     
     <style>
-        .player-container {
-            background-color: #000;
-            margin-bottom: 30px;
-            border-radius: 15px;
+        /* Player Page Responsive Styles */
+        :root {
+            --player-radius: 12px;
+            --primary-color: #7CFC00;
+            --background-dark: #0a0a0a;
+            --background-light: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --border-color: #333333;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--background-dark);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .player-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.95), transparent);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.3s ease;
+        }
+        
+        .player-header.hidden {
+            transform: translateY(-100%);
+        }
+        
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .back-btn:hover {
+            background: rgba(124, 252, 0, 0.2);
+            color: var(--primary-color);
+        }
+        
+        .header-logo {
+            height: 35px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .header-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .header-btn:hover {
+            background: var(--primary-color);
+            color: #000;
+        }
+        
+        /* Main Player Container */
+        .player-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            background: #000;
+            padding-top: 60px;
+        }
+        
+        /* Plyr Customization */
+        .plyr {
+            --plyr-color-main: #7CFC00;
+            --plyr-video-background: #000;
+            --plyr-menu-background: rgba(26, 26, 26, 0.95);
+            --plyr-menu-color: #fff;
+            --plyr-menu-border-color: #333;
+        }
+        
+        /* Embed Container Styles */
+        #embedContainer {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: var(--player-radius);
             overflow: hidden;
         }
         
-        .video-player {
-            position: relative;
-            width: 100%;
-            padding-bottom: 56.25%; /* 16:9 aspect ratio */
-            background-color: #000;
-        }
-        
-        .video-player video {
+        #embedContainer iframe {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            outline: none;
-        }
-        
-        .player-controls {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-            padding: 20px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .video-player:hover .player-controls {
-            opacity: 1;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 5px;
-            background-color: rgba(255, 255, 255, 0.3);
-            border-radius: 3px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            position: relative;
-        }
-        
-        .progress-filled {
-            height: 100%;
-            background-color: var(--primary-color);
-            border-radius: 3px;
-            width: 0%;
-            transition: width 0.1s ease;
-        }
-        
-        .controls-row {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .control-btn {
-            background: transparent;
             border: none;
-            color: #fff;
-            cursor: pointer;
-            padding: 5px;
-            transition: all 0.3s ease;
         }
         
-        .control-btn:hover {
-            color: var(--primary-color);
-            transform: scale(1.1);
+        @media (max-width: 767px) {
+            #embedContainer {
+                border-radius: 0;
+            }
         }
         
-        .control-btn svg {
-            width: 24px;
-            height: 24px;
+        .plyr--full-ui input[type=range] {
+            color: var(--plyr-color-main);
         }
         
-        .time-display {
-            color: #fff;
-            font-size: 14px;
-            font-weight: 500;
+        .plyr__control--overlaid {
+            background: rgba(124, 252, 0, 0.9);
+            color: #000;
         }
         
-        .volume-control {
+        .plyr__control--overlaid:hover {
+            background: #7CFC00;
+        }
+        
+        .plyr__controls {
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            padding: 20px 15px 15px;
+        }
+        
+        /* Content Section */
+        .content-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Movie Info Card */
+        .movie-info-card {
+            background: var(--background-light);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .movie-header {
             display: flex;
-            align-items: center;
-            gap: 10px;
+            gap: 20px;
+            margin-bottom: 20px;
         }
         
-        .volume-slider {
-            width: 80px;
-            height: 5px;
-            background-color: rgba(255, 255, 255, 0.3);
-            border-radius: 3px;
-            cursor: pointer;
-            position: relative;
+        .movie-poster-small {
+            width: 120px;
+            height: 180px;
+            border-radius: 12px;
+            object-fit: cover;
+            flex-shrink: 0;
+            display: none;
         }
         
-        .volume-filled {
-            height: 100%;
-            background-color: var(--primary-color);
-            border-radius: 3px;
-            width: 100%;
-        }
-        
-        .spacer {
+        .movie-details {
             flex: 1;
-        }
-        
-        .movie-info {
-            background-color: var(--background-light);
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
+            min-width: 0;
         }
         
         .movie-title {
-            font-size: 32px;
+            font-size: clamp(20px, 5vw, 32px);
             font-weight: 700;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
+            line-height: 1.2;
         }
         
         .movie-meta {
             display: flex;
-            gap: 20px;
             flex-wrap: wrap;
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: var(--text-secondary);
+            gap: 12px;
+            margin-bottom: 15px;
         }
         
-        .meta-item {
-            display: flex;
+        .meta-badge {
+            display: inline-flex;
             align-items: center;
             gap: 5px;
-        }
-        
-        .movie-description {
-            line-height: 1.8;
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            font-size: 13px;
             color: var(--text-secondary);
-            margin-bottom: 20px;
         }
         
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .action-btn {
-            padding: 12px 25px;
-            border-radius: 10px;
+        .meta-badge.quality {
+            background: var(--primary-color);
+            color: #000;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        }
+        
+        .meta-badge.rating {
+            background: rgba(255, 215, 0, 0.2);
+            color: #FFD700;
+        }
+        
+        .meta-badge svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        .vj-info {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            padding: 12px 15px;
+            background: rgba(124, 252, 0, 0.1);
+            border: 1px solid rgba(124, 252, 0, 0.3);
+            border-radius: 12px;
+            margin-bottom: 15px;
         }
         
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: #000;
-            border: none;
+        .vj-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+            object-fit: cover;
         }
         
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(124, 252, 0, 0.4);
+        .vj-details {
+            flex: 1;
         }
         
-        .btn-secondary {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
+        .vj-label {
+            font-size: 12px;
+            color: var(--text-secondary);
         }
         
-        .btn-secondary:hover {
-            border-color: var(--primary-color);
+        .vj-name {
+            font-weight: 600;
             color: var(--primary-color);
         }
         
+        .movie-description {
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        
+        .movie-description.collapsed {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .show-more-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-size: 13px;
+            padding: 0;
+            margin-bottom: 15px;
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+        }
+        
+        .action-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: #000;
+        }
+        
+        .btn-primary:hover {
+            background: #9dff44;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(124, 252, 0, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-icon {
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            border-radius: 50%;
+        }
+        
+        /* Episodes Section */
         .episodes-section {
-            background-color: var(--background-light);
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
+            background: var(--background-light);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
         
         .section-title {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
-            margin-bottom: 20px;
+        }
+        
+        .season-select {
+            padding: 10px 15px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
         }
         
         .episodes-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 15px;
         }
         
         .episode-card {
-            background-color: var(--background-dark);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
+            display: flex;
+            gap: 15px;
             padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
         
-        .episode-card:hover {
-            border-color: var(--primary-color);
-            transform: translateY(-2px);
-        }
-        
+        .episode-card:hover,
         .episode-card.active {
             border-color: var(--primary-color);
-            background-color: rgba(124, 252, 0, 0.1);
+            background: rgba(124, 252, 0, 0.05);
+        }
+        
+        .episode-thumb {
+            width: 120px;
+            height: 70px;
+            border-radius: 8px;
+            background: #333;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .episode-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .episode-play-icon {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .episode-card:hover .episode-play-icon {
+            opacity: 1;
+        }
+        
+        .episode-info {
+            flex: 1;
+            min-width: 0;
         }
         
         .episode-number {
             font-size: 12px;
             color: var(--primary-color);
-            font-weight: 700;
-            margin-bottom: 5px;
+            font-weight: 600;
+            margin-bottom: 4px;
         }
         
         .episode-title {
             font-size: 14px;
             font-weight: 600;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .episode-duration {
@@ -260,496 +491,1210 @@
             color: var(--text-secondary);
         }
         
+        /* Related Content */
         .related-section {
             margin-bottom: 30px;
         }
         
-        @media (max-width: 768px) {
-            .movie-title {
-                font-size: 24px;
+        .related-section .section-title {
+            margin-bottom: 20px;
+        }
+        
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .movie-card {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--background-light);
+            transition: transform 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .movie-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .movie-card-poster {
+            position: relative;
+            aspect-ratio: 2/3;
+            overflow: hidden;
+        }
+        
+        .movie-card-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .movie-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent 50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .movie-card:hover .movie-card-overlay {
+            opacity: 1;
+        }
+        
+        .play-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+        }
+        
+        .movie-card-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 4px 8px;
+            background: var(--primary-color);
+            color: #000;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 4px;
+        }
+        
+        .movie-card-info {
+            padding: 12px;
+        }
+        
+        .movie-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .movie-card-vj {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        /* Footer */
+        .player-footer {
+            background: var(--background-light);
+            padding: 30px 20px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        /* Loading State */
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(124, 252, 0, 0.3);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Error State */
+        .error-state {
+            position: absolute;
+            inset: 0;
+            background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .error-icon {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 20px;
+            color: #ff6b6b;
+        }
+        
+        .error-message {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        /* ===============================
+           RESPONSIVE BREAKPOINTS
+           =============================== */
+        
+        /* Large Desktop */
+        @media (min-width: 1400px) {
+            .content-wrapper {
+                max-width: 1600px;
             }
             
-            .movie-info {
-                padding: 20px;
+            .related-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            }
+        }
+        
+        /* Desktop */
+        @media (min-width: 992px) {
+            .movie-poster-small {
+                display: block;
+            }
+            
+            .player-wrapper {
+                max-width: calc(100% - 40px);
+                margin: 0 auto;
+                padding-top: 80px;
+            }
+            
+            .plyr {
+                border-radius: var(--player-radius);
+            }
+            
+            .action-btn:not(.btn-icon) {
+                padding: 14px 24px;
+            }
+        }
+        
+        /* Tablet */
+        @media (min-width: 768px) and (max-width: 991px) {
+            .player-wrapper {
+                padding-top: 70px;
+            }
+            
+            .movie-header {
+                flex-direction: row;
+            }
+            
+            .movie-poster-small {
+                display: block;
+                width: 100px;
+                height: 150px;
+            }
+            
+            .episodes-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .related-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        /* Mobile Landscape */
+        @media (max-width: 767px) and (orientation: landscape) {
+            .player-wrapper {
+                height: 100vh;
+                padding-top: 0;
+            }
+            
+            .player-header {
+                padding: 10px 15px;
+                background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            }
+            
+            .content-wrapper {
+                display: none;
+            }
+            
+            .player-footer {
+                display: none;
+            }
+        }
+        
+        /* Mobile Portrait */
+        @media (max-width: 767px) {
+            .player-header {
+                padding: 10px 15px;
+            }
+            
+            .back-btn span {
+                display: none;
+            }
+            
+            .back-btn {
+                padding: 10px;
+            }
+            
+            .header-logo {
+                height: 28px;
+            }
+            
+            .player-wrapper {
+                padding-top: 55px;
+            }
+            
+            .plyr {
+                border-radius: 0;
+            }
+            
+            .content-wrapper {
+                padding: 15px;
+            }
+            
+            .movie-info-card {
+                padding: 20px 15px;
+                border-radius: 12px;
+            }
+            
+            .movie-header {
+                flex-direction: column;
+            }
+            
+            .movie-title {
+                font-size: 22px;
+            }
+            
+            .meta-badge {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+            
+            .vj-info {
+                padding: 10px 12px;
+            }
+            
+            .vj-avatar {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .action-buttons {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            
+            .action-btn {
+                padding: 12px 15px;
+                font-size: 13px;
+                justify-content: center;
+            }
+            
+            .action-btn.btn-full {
+                grid-column: 1 / -1;
+            }
+            
+            .episodes-section {
+                padding: 15px;
+                border-radius: 12px;
+            }
+            
+            .section-title {
+                font-size: 18px;
             }
             
             .episodes-grid {
                 grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .episode-card {
+                padding: 12px;
+            }
+            
+            .episode-thumb {
+                width: 100px;
+                height: 60px;
+            }
+            
+            .related-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            
+            .movie-card-info {
+                padding: 10px;
+            }
+            
+            .movie-card-title {
+                font-size: 13px;
+            }
+        }
+        
+        /* Small Mobile */
+        @media (max-width: 374px) {
+            .movie-title {
+                font-size: 20px;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .related-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+        }
+        
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .movie-card:hover {
+                transform: none;
+            }
+            
+            .movie-card:active {
+                transform: scale(0.98);
+            }
+            
+            .movie-card-overlay {
+                opacity: 1;
+                background: linear-gradient(to top, rgba(0,0,0,0.7), transparent 70%);
+            }
+            
+            .play-circle {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .episode-play-icon {
+                opacity: 1;
+            }
+        }
+        
+        /* Safe Area for notched devices */
+        @supports (padding: max(0px)) {
+            .player-header {
+                padding-left: max(15px, env(safe-area-inset-left));
+                padding-right: max(15px, env(safe-area-inset-right));
+            }
+            
+            .content-wrapper {
+                padding-left: max(15px, env(safe-area-inset-left));
+                padding-right: max(15px, env(safe-area-inset-right));
+            }
+        }
+        
+        /* Pre-roll Ad Overlay Styles */
+        .preroll-ad-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .preroll-ad-overlay.hidden {
+            display: none;
+        }
+        
+        .ad-label {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .ad-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .skip-ad-container {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1001;
+        }
+        
+        .skip-ad-btn {
+            background: rgba(0,0,0,0.9);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .skip-ad-btn:hover:not(:disabled) {
+            background: var(--primary-color);
+            color: #000;
+            border-color: var(--primary-color);
+        }
+        
+        .skip-ad-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .skip-countdown {
+            background: var(--primary-color);
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: 700;
+            min-width: 24px;
+            text-align: center;
+        }
+        
+        .ad-timer {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        @media (max-width: 768px) {
+            .skip-ad-btn {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+            
+            .skip-ad-container {
+                bottom: 15px;
+                right: 15px;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="app">
-            <!-- Header -->
-            <div class="app-header">
-                <div class="navbar navbar-expand-lg">
-                    <div class="menu d-md-none d-block">
-                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="3" y1="12" x2="21" y2="12"></line>
-                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                            <line x1="3" y1="18" x2="21" y2="18"></line>
-                        </svg>
-                    </div>
-                    <div class="app-navbar">
-                        <a href="index.html" class="navbar-brand">
-                            <img src="assets/images/logo.png" alt="Unruly Movies" width="180" height="50">
-                        </a>
-                    </div>
-                    
-                    <ul class="navbar-nav navbar-user ml-auto align-items-center text-nowrap">
-                        <li class="nav-item">
-                            <a class="nav-link btn-login" href="login.html">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link btn-register" href="register.html">Sign Up</a>
-                        </li>
-                    </ul>
-                </div>
+    <!-- Header -->
+    <header class="player-header" id="playerHeader">
+        <a href="index.html" class="back-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            <span>Back</span>
+        </a>
+        
+        <a href="index.html">
+            <img src="assets/images/logo.png" alt="Unruly Movies" class="header-logo">
+        </a>
+        
+        <div class="header-actions">
+            <button class="header-btn share-btn" aria-label="Share">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="18" cy="5" r="3"></circle>
+                    <circle cx="6" cy="12" r="3"></circle>
+                    <circle cx="18" cy="19" r="3"></circle>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Video Player -->
+    <div class="player-wrapper" id="playerWrapper">
+        <!-- Pre-roll Ad Overlay -->
+        <div class="preroll-ad-overlay" id="prerollAdOverlay">
+            <span class="ad-label">Advertisement</span>
+            <div class="ad-timer" id="adTimer">Ad ends in <span id="adCountdown">15</span>s</div>
+            <div class="ad-content" id="adContent">
+                <!-- Ad will be loaded here -->
             </div>
-
-            <div class="app-wrapper">
-                <!-- Main Content -->
-                <div class="app-container flex-fill" style="max-width: 1400px; margin: 0 auto;">
-                    <div class="container">
-                        <div class="app-content pt-md-3">
-                            
-                            <!-- Video Player -->
-                            <div class="player-container">
-                                <div class="video-player" id="videoPlayer">
-                                    <video id="mainVideo" poster="https://image.tmdb.org/t/p/original/kXfqcdQKsToO0OUXHcrrNCHDBzO.jpg">
-                                        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
-                                        Your browser does not support the video tag.
-                                    </video>
-                                    
-                                    <div class="player-controls">
-                                        <div class="progress-bar" id="progressBar">
-                                            <div class="progress-filled" id="progressFilled"></div>
-                                        </div>
-                                        
-                                        <div class="controls-row">
-                                            <button class="control-btn" id="playPauseBtn" aria-label="Play/Pause" title="Play/Pause">
-                                                <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor">
-                                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                                </svg>
-                                            </button>
-                                            
-                                            <div class="time-display">
-                                                <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
-                                            </div>
-                                            
-                                            <div class="volume-control">
-                                                <button class="control-btn" id="muteBtn" aria-label="Mute/Unmute" title="Mute/Unmute">
-                                                    <svg id="volumeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                                                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                                                    </svg>
-                                                </button>
-                                                <div class="volume-slider" id="volumeSlider">
-                                                    <div class="volume-filled" id="volumeFilled"></div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="spacer"></div>
-                                            
-                                            <button class="control-btn" id="settingsBtn" aria-label="Settings" title="Settings">
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <circle cx="12" cy="12" r="3"></circle>
-                                                    <path d="M12 1v6m0 6v6m-6-6h6m6 0h6"></path>
-                                                </svg>
-                                            </button>
-                                            
-                                            <button class="control-btn" id="fullscreenBtn" aria-label="Fullscreen" title="Fullscreen">
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Movie Info -->
-                            <div class="movie-info">
-                                <h1 class="movie-title" id="movieTitle">Loading...</h1>
-                                
-                                <div class="movie-meta">
-                                    <div class="meta-item">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                                        </svg>
-                                        <span id="movieYear">2024</span>
-                                    </div>
-                                    <div class="meta-item">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <circle cx="12" cy="12" r="10"></circle>
-                                            <polyline points="12 6 12 12 16 14"></polyline>
-                                        </svg>
-                                        <span id="movieDuration">2h 30m</span>
-                                    </div>
-                                    <div class="meta-item">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                        </svg>
-                                        <span id="movieRating">8.5</span>
-                                    </div>
-                                    <div class="meta-item">
-                                        <span class="quality">HD</span>
-                                    </div>
-                                </div>
-                                
-                                <p class="movie-description" id="movieDescription">
-                                    Loading description...
-                                </p>
-                                
-                                <div class="action-buttons">
-                                    <button class="action-btn btn-primary" aria-label="Add to Watchlist" title="Add to Watchlist">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-                                        </svg>
-                                        Add to Watchlist
-                                    </button>
-                                    <button class="action-btn btn-secondary" aria-label="Share" title="Share">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-                                            <polyline points="16 6 12 2 8 6"></polyline>
-                                            <line x1="12" y1="2" x2="12" y2="15"></line>
-                                        </svg>
-                                        Share
-                                    </button>
-                                    <button class="action-btn btn-secondary" aria-label="Download" title="Download">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                            <polyline points="7 10 12 15 17 10"></polyline>
-                                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                                        </svg>
-                                        Download
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Episodes Section (for TV Series) -->
-                            <div class="episodes-section" id="episodesSection" style="display: none;">
-                                <h2 class="section-title">Episodes - Season 1</h2>
-                                <div class="episodes-grid" id="episodesGrid">
-                                    <!-- Episodes will be generated here -->
-                                </div>
-                            </div>
-
-                            <!-- Related Content -->
-                            <div class="related-section">
-                                <div class="app-heading">
-                                    <div class="text">You May Also Like</div>
-                                </div>
-                                <div class="row row-cols-2 row-cols-md-5 list-scrollable">
-                                    <!-- Related content cards -->
-                                    <div class="col">
-                                        <div class="list-movie position-relative">
-                                            <a href="#" class="list-media">
-                                                <div class="list-media-attr">
-                                                    <div class="quality">HD</div>
-                                                </div>
-                                                <div class="play-btn">
-                                                    <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                                    </svg>
-                                                </div>
-                                                <div class="media media-cover" style="background-image: url('https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg');"></div>
-                                            </a>
-                                            <div class="list-caption">
-                                                <a href="#" class="list-title">The Marvels</a>
-                                                <a href="#" class="list-category">Action</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="skip-ad-container">
+                <button class="skip-ad-btn" id="skipAdBtn" disabled>
+                    Skip in <span class="skip-countdown" id="skipCountdown">10</span>
+                </button>
             </div>
-
-            <!-- Footer -->
-            <div class="app-footer">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="footer-text my-3">
-                            2025 Unruly Movies. All rights reserved.
-                        </div>
-                    </div>
-                </div>
-            </div>
+        </div>
+        
+        <!-- Native Video Player (for direct video files) -->
+        <video id="player" playsinline controls crossorigin style="display: none;">
+            <source src="" type="video/mp4">
+        </video>
+        
+        <!-- Embed Player Container (for Streamtape, etc.) -->
+        <div id="embedContainer" style="display: none; width: 100%; aspect-ratio: 16/9; background: #000;">
+            <iframe 
+                id="embedPlayer" 
+                src="" 
+                frameborder="0" 
+                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                style="width: 100%; height: 100%;">
+            </iframe>
+        </div>
+        
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="spinner"></div>
         </div>
     </div>
 
-    <!-- HLS.js for streaming support -->
+    <!-- Content Section -->
+    <div class="content-wrapper">
+        <!-- Ad Banner Below Player -->
+        <div class="ad-container" style="margin: 20px 0; text-align: center;">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-1904736753681797"
+                 data-ad-slot="auto"
+                 data-ad-format="rectangle"
+                 data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+
+        <!-- Movie Info -->
+        <div class="movie-info-card">
+            <div class="movie-header">
+                <img src="" alt="" class="movie-poster-small" id="moviePoster">
+                <div class="movie-details">
+                    <h1 class="movie-title" id="movieTitle">Loading...</h1>
+                    
+                    <div class="movie-meta" id="movieMeta">
+                        <span class="meta-badge quality" id="movieQuality">HD</span>
+                        <span class="meta-badge rating" id="movieRating">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            </svg>
+                            <span>8.5</span>
+                        </span>
+                        <span class="meta-badge" id="movieYear">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            <span>2024</span>
+                        </span>
+                        <span class="meta-badge" id="movieDuration">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            <span>2h 15m</span>
+                        </span>
+                    </div>
+                    
+                    <div class="vj-info" id="vjInfo">
+                        <img src="assets/images/default-avatar.png" alt="VJ" class="vj-avatar" id="vjAvatar">
+                        <div class="vj-details">
+                            <div class="vj-label">Translated by</div>
+                            <div class="vj-name" id="vjName">VJ Junior</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="movie-description collapsed" id="movieDescription">
+                Loading description...
+            </p>
+            <button class="show-more-btn" id="showMoreBtn">Show more</button>
+            
+            <div class="action-buttons">
+                <button class="action-btn btn-primary btn-full" id="watchlistBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Add to Watchlist
+                </button>
+                <button class="action-btn btn-secondary" id="likeBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                    Like
+                </button>
+                <button class="action-btn btn-secondary share-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="18" cy="5" r="3"></circle>
+                        <circle cx="6" cy="12" r="3"></circle>
+                        <circle cx="18" cy="19" r="3"></circle>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                    </svg>
+                    Share
+                </button>
+                <button class="action-btn btn-secondary btn-icon" id="downloadBtn" title="Download">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Episodes Section (for TV Series) -->
+        <div class="episodes-section" id="episodesSection" style="display: none;">
+            <div class="section-header">
+                <h2 class="section-title">Episodes</h2>
+                <select class="season-select" id="seasonSelect">
+                    <option value="1">Season 1</option>
+                </select>
+            </div>
+            <div class="episodes-grid" id="episodesGrid">
+                <!-- Episodes will be generated here -->
+            </div>
+        </div>
+
+        <!-- Related Content -->
+        <section class="related-section">
+            <h2 class="section-title">You May Also Like</h2>
+            
+            <!-- Ad Banner in Related Section -->
+            <div class="ad-container" style="margin: 15px 0; text-align: center;">
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-1904736753681797"
+                     data-ad-slot="auto"
+                     data-ad-format="fluid"
+                     data-ad-layout-key="-fb+5w+4e-db+86"></ins>
+                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+            </div>
+            
+            <div class="related-grid" id="relatedGrid">
+                <!-- Related movies will be loaded here -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="player-footer">
+        <p>&copy; 2025 <strong>Unruly Movies</strong>. Developed by <strong>Nduga Hafizu</strong>.</p>
+        <p style="font-size: 12px; margin-top: 5px; opacity: 0.7;">Legitimate Ugandan platform for Luganda VJ translations</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    
     <script src="js/config.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/uganda-tv-api.js"></script>
+    <script src="js/social-share.js"></script>
+    <script src="js/watchlist-manager.js"></script>
+    
     <script>
+        // Initialize Plyr
+        const video = document.getElementById('player');
+        const embedContainer = document.getElementById('embedContainer');
+        const embedPlayer = document.getElementById('embedPlayer');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        let player = null;
+        let isEmbedMode = false;
+
         // Get URL parameters
         const urlParams = new URLSearchParams(window.location.search);
-        const movieTitle = urlParams.get('movie') || urlParams.get('series') || urlParams.get('station');
+        const movieId = urlParams.get('id');
+        const streamUrl = urlParams.get('stream');
+        const embedUrl = urlParams.get('embed');
         const isSeries = urlParams.has('series');
         const isStation = urlParams.has('station');
-        const streamUrl = urlParams.get('stream');
 
-        // Update page content
-        document.getElementById('movieTitle').textContent = movieTitle || 'Sample Movie';
-        
-        if (isStation) {
-            document.getElementById('movieDescription').textContent = 
-                `Watch ${movieTitle} live. Stay updated with the latest news, entertainment, and programming from Uganda.`;
-            document.getElementById('movieYear').textContent = 'Live';
-            document.getElementById('movieDuration').textContent = '24/7';
-            document.getElementById('movieRating').textContent = 'Live';
+        // Initialize Plyr only for native video
+        function initPlyr() {
+            if (player) return player;
             
-            // Hide episodes section for live TV
-            document.getElementById('episodesSection').style.display = 'none';
-        } else {
-            document.getElementById('movieDescription').textContent = isSeries 
-                ? 'An epic TV series that will keep you on the edge of your seat. Follow the thrilling journey of our heroes as they navigate through challenges and adventures.'
-                : 'An epic cinematic experience that will keep you on the edge of your seat. Immerse yourself in a world of adventure, drama, and unforgettable moments.';
-                
-            // Show episodes section for series
-            if (isSeries) {
-                document.getElementById('episodesSection').style.display = 'block';
-                
-                // Generate sample episodes
-                const episodesGrid = document.getElementById('episodesGrid');
-                for (let i = 1; i <= 10; i++) {
-                    const episodeCard = document.createElement('div');
-                    episodeCard.className = 'episode-card' + (i === 1 ? ' active' : '');
-                    episodeCard.innerHTML = `
-                        <div class="episode-number">Episode ${i}</div>
-                        <div class="episode-title">Episode Title ${i}</div>
-                        <div class="episode-duration">45 min</div>
-                    `;
-                    episodeCard.onclick = () => {
-                        document.querySelectorAll('.episode-card').forEach(card => card.classList.remove('active'));
-                        episodeCard.classList.add('active');
-                        alert(`Playing Episode ${i}`);
-                    };
-                    episodesGrid.appendChild(episodeCard);
+            player = new Plyr(video, {
+                controls: [
+                    'play-large',
+                    'rewind',
+                    'play',
+                    'fast-forward',
+                    'progress',
+                    'current-time',
+                    'duration',
+                    'mute',
+                    'volume',
+                    'captions',
+                    'settings',
+                    'pip',
+                    'airplay',
+                    'fullscreen'
+                ],
+                settings: ['captions', 'quality', 'speed'],
+                speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
+                keyboard: { focused: true, global: true },
+                tooltips: { controls: true, seek: true },
+                seekTime: 10,
+                invertTime: false,
+                toggleInvert: true,
+                displayDuration: true,
+                ratio: '16:9'
+            });
+            
+            return player;
+        }
+
+        // Load movie data
+        async function loadMovieData() {
+            try {
+                if (movieId) {
+                    const apiUrl = typeof API_CONFIG !== 'undefined' 
+                        ? API_CONFIG.BASE_URL 
+                        : 'https://luganda-translated-movies-production.up.railway.app';
+                    
+                    const response = await fetch(`${apiUrl}/api/luganda-movies/${movieId}`);
+                    const data = await response.json();
+                    
+                    if (data.status === 'success' && data.data) {
+                        const movie = data.data;
+                        updateMovieInfo(movie);
+                        
+                        // Check for embed URL first (Streamtape, etc.)
+                        if (movie.video?.embedUrl || movie.video?.streamtapeId) {
+                            const embedSrc = movie.video.embedUrl || 
+                                `https://streamtape.com/e/${movie.video.streamtapeId}`;
+                            loadEmbedVideo(embedSrc);
+                        } else {
+                            // Fall back to direct video URL
+                            loadVideoSource(movie.video?.url || movie.video?.originalVideoPath || movie.streamUrl);
+                        }
+                        
+                        loadRelatedMovies(movie.genres?.[0] || 'action');
+                    }
+                } else if (embedUrl) {
+                    // Direct embed URL from query param
+                    loadEmbedVideo(embedUrl);
+                    document.getElementById('movieTitle').textContent = urlParams.get('title') || 'Now Playing';
+                } else if (streamUrl) {
+                    loadVideoSource(streamUrl);
+                    document.getElementById('movieTitle').textContent = urlParams.get('movie') || urlParams.get('station') || 'Now Playing';
+                    loadingOverlay.style.display = 'none';
+                } else {
+                    // Demo video for testing
+                    loadVideoSource('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
+                    document.getElementById('movieTitle').textContent = 'Demo Video - Big Buck Bunny';
+                    document.getElementById('movieDescription').textContent = 'Big Buck Bunny is a short computer-animated comedy film featuring animals of the forest. This is a demo video to test the player functionality.';
+                    loadingOverlay.style.display = 'none';
                 }
+            } catch (error) {
+                console.error('Error loading movie:', error);
+                loadingOverlay.style.display = 'none';
+                // Load demo video on error
+                loadVideoSource('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
+                document.getElementById('movieTitle').textContent = 'Demo Video';
             }
         }
-        
-        // Set video source if stream URL is provided
-        if (streamUrl) {
-            const video = document.getElementById('mainVideo');
-            const videoPlayer = document.querySelector('.video-player');
+
+        // Load embed video (Streamtape, etc.)
+        function loadEmbedVideo(url) {
+            isEmbedMode = true;
             
-            // Check if it's a YouTube embed URL
-            if (streamUrl.includes('youtube.com/embed')) {
-                console.log('YouTube embed detected, using iframe player');
-                
-                // Hide video element and controls
-                video.style.display = 'none';
-                document.querySelector('.player-controls').style.display = 'none';
-                
-                // Create iframe for YouTube
-                const iframe = document.createElement('iframe');
-                iframe.src = streamUrl;
-                iframe.style.position = 'absolute';
-                iframe.style.top = '0';
-                iframe.style.left = '0';
-                iframe.style.width = '100%';
-                iframe.style.height = '100%';
-                iframe.style.border = 'none';
-                iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-                iframe.allowFullscreen = true;
-                
-                videoPlayer.appendChild(iframe);
-                
-                console.log('YouTube iframe player loaded');
+            // Hide native player, show embed container
+            video.style.display = 'none';
+            if (player) {
+                player.destroy();
+                player = null;
             }
-            // Check if it's an HLS stream
-            else if (streamUrl.includes('.m3u8')) {
-                // Use HLS.js for HLS streams
+            embedContainer.style.display = 'block';
+            
+            // Set the embed URL
+            embedPlayer.src = url;
+            
+            // Hide loading when iframe loads
+            embedPlayer.onload = () => {
+                loadingOverlay.style.display = 'none';
+            };
+            
+            // Fallback hide loading after timeout
+            setTimeout(() => {
+                loadingOverlay.style.display = 'none';
+            }, 3000);
+            
+            console.log('📺 Playing embed video:', url);
+        }
+
+        // Convert Streamtape URL to embed URL
+        function getStreamtapeEmbedUrl(url) {
+            if (!url) return null;
+            
+            // If already an embed URL, return as is
+            if (url.includes('/e/')) return url;
+            
+            // Extract video ID from various Streamtape URL formats
+            // https://streamtape.com/v/VIDEOID/title
+            // https://streamtape.to/v/VIDEOID/title
+            const match = url.match(/streamtape\.(com|to|net)\/v\/([a-zA-Z0-9]+)/);
+            if (match) {
+                return `https://streamtape.com/e/${match[2]}`;
+            }
+            
+            return url;
+        }
+
+        // Update movie information on page
+        function updateMovieInfo(movie) {
+            document.getElementById('movieTitle').textContent = movie.originalTitle || movie.title;
+            document.getElementById('movieDescription').textContent = movie.plot || movie.description || 'No description available.';
+            
+            const poster = document.getElementById('moviePoster');
+            poster.src = movie.poster || 'assets/images/placeholder-poster.jpg';
+            poster.alt = movie.originalTitle || movie.title;
+            
+            // Update meta tags for sharing
+            document.querySelector('meta[property="og:title"]').content = movie.originalTitle || movie.title;
+            document.querySelector('meta[property="og:description"]').content = movie.plot || movie.description || '';
+            document.querySelector('meta[property="og:image"]').content = movie.poster || '';
+            document.querySelector('meta[property="og:url"]').content = window.location.href;
+            document.title = `${movie.originalTitle || movie.title} - Unruly Movies`;
+            
+            // Update badges
+            if (movie.rating?.translationRating) {
+                document.getElementById('movieRating').querySelector('span:last-child').textContent = movie.rating.translationRating.toFixed(1);
+            }
+            if (movie.releaseYear) {
+                document.getElementById('movieYear').querySelector('span:last-child').textContent = movie.releaseYear;
+            }
+            if (movie.video?.quality) {
+                document.getElementById('movieQuality').textContent = movie.video.quality.toUpperCase();
+            }
+            if (movie.video?.duration) {
+                document.getElementById('movieDuration').querySelector('span:last-child').textContent = movie.video.duration;
+            }
+            
+            // Update VJ info
+            if (movie.vjName) {
+                document.getElementById('vjName').textContent = `VJ ${movie.vjName}`;
+            }
+            if (movie.vjAvatar) {
+                document.getElementById('vjAvatar').src = movie.vjAvatar;
+            }
+            
+            // Show episodes section for series
+            if (movie.type === 'series' || isSeries) {
+                loadEpisodes(movie);
+            }
+        }
+
+        // Load video source
+        function loadVideoSource(url) {
+            if (!url) {
+                loadingOverlay.style.display = 'none';
+                return;
+            }
+            
+            // Check if it's a Streamtape or other embed URL
+            if (url.includes('streamtape.') || url.includes('doodstream.') || 
+                url.includes('filemoon.') || url.includes('/e/') || url.includes('/embed/')) {
+                const embedSrc = getStreamtapeEmbedUrl(url);
+                loadEmbedVideo(embedSrc);
+                return;
+            }
+            
+            isEmbedMode = false;
+            
+            // Show native player, hide embed
+            video.style.display = 'block';
+            embedContainer.style.display = 'none';
+            
+            // Initialize Plyr
+            initPlyr();
+            
+            // Check if HLS stream
+            if (url.includes('.m3u8')) {
                 if (Hls.isSupported()) {
                     const hls = new Hls({
                         enableWorker: true,
-                        lowLatencyMode: true,
-                        backBufferLength: 90
+                        lowLatencyMode: true
                     });
                     
-                    hls.loadSource(streamUrl);
+                    hls.loadSource(url);
                     hls.attachMedia(video);
                     
-                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                        console.log('HLS stream loaded successfully');
-                        
-                        // Auto-play for live TV
-                        if (isStation) {
-                            video.play().catch(error => {
-                                console.error('Error auto-playing video:', error);
-                                alert('Click the play button to start watching.');
-                            });
-                        }
+                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                        loadingOverlay.style.display = 'none';
                     });
                     
-                    hls.on(Hls.Events.ERROR, function(event, data) {
-                        console.error('HLS error:', data);
+                    hls.on(Hls.Events.ERROR, (event, data) => {
                         if (data.fatal) {
-                            switch(data.type) {
-                                case Hls.ErrorTypes.NETWORK_ERROR:
-                                    console.error('Network error - trying to recover');
-                                    hls.startLoad();
-                                    break;
-                                case Hls.ErrorTypes.MEDIA_ERROR:
-                                    console.error('Media error - trying to recover');
-                                    hls.recoverMediaError();
-                                    break;
-                                default:
-                                    console.error('Fatal error - cannot recover');
-                                    alert('Error loading stream. The stream may be offline or unavailable.');
-                                    hls.destroy();
-                                    break;
-                            }
+                            loadingOverlay.style.display = 'none';
+                            console.error('HLS Error:', data);
                         }
                     });
                     
-                    // Store hls instance for cleanup
                     window.hlsPlayer = hls;
-                    
                 } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                    // Native HLS support (Safari)
-                    video.src = streamUrl;
-                    video.addEventListener('loadedmetadata', function() {
-                        console.log('Native HLS stream loaded');
-                        if (isStation) {
-                            video.play().catch(error => {
-                                console.error('Error auto-playing video:', error);
-                                alert('Click the play button to start watching.');
-                            });
-                        }
+                    video.src = url;
+                    video.addEventListener('loadedmetadata', () => {
+                        loadingOverlay.style.display = 'none';
                     });
-                } else {
-                    alert('Your browser does not support HLS streaming. Please try a different browser.');
                 }
             } else {
-                // Regular MP4 or other formats
-                const source = document.createElement('source');
-                source.src = streamUrl;
-                source.type = 'video/mp4';
-                
-                // Remove existing sources
-                while (video.firstChild) {
-                    video.removeChild(video.firstChild);
-                }
-                
-                // Add new source
-                video.appendChild(source);
-                video.load();
-                
-                // Auto-play for live TV
-                if (isStation) {
-                    video.play().catch(error => {
-                        console.error('Error auto-playing video:', error);
-                        alert('Click the play button to start watching.');
-                    });
-                }
+                // Regular video file
+                video.src = url;
+                video.addEventListener('loadedmetadata', () => {
+                    loadingOverlay.style.display = 'none';
+                });
+                video.addEventListener('error', () => {
+                    loadingOverlay.style.display = 'none';
+                    console.error('Video load error');
+                });
             }
         }
 
-        // Video Player Controls
-        const video = document.getElementById('mainVideo');
-        const playPauseBtn = document.getElementById('playPauseBtn');
-        const playIcon = document.getElementById('playIcon');
-        const progressBar = document.getElementById('progressBar');
-        const progressFilled = document.getElementById('progressFilled');
-        const currentTimeEl = document.getElementById('currentTime');
-        const durationEl = document.getElementById('duration');
-        const muteBtn = document.getElementById('muteBtn');
-        const volumeSlider = document.getElementById('volumeSlider');
-        const volumeFilled = document.getElementById('volumeFilled');
-        const fullscreenBtn = document.getElementById('fullscreenBtn');
-        const videoPlayer = document.getElementById('videoPlayer');
-
-        // Play/Pause
-        playPauseBtn.addEventListener('click', () => {
-            if (video.paused) {
-                video.play();
-                playIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
-            } else {
-                video.pause();
-                playIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+        // Load episodes for series
+        function loadEpisodes(movie) {
+            const episodesSection = document.getElementById('episodesSection');
+            const episodesGrid = document.getElementById('episodesGrid');
+            
+            episodesSection.style.display = 'block';
+            episodesGrid.innerHTML = '';
+            
+            const episodes = movie.episodes || [];
+            const numEpisodes = episodes.length || 10;
+            
+            for (let i = 0; i < numEpisodes; i++) {
+                const ep = episodes[i] || {};
+                const card = document.createElement('div');
+                card.className = `episode-card ${i === 0 ? 'active' : ''}`;
+                card.innerHTML = `
+                    <div class="episode-thumb">
+                        <img src="${ep.thumbnail || movie.poster || 'assets/images/placeholder-episode.jpg'}" alt="Episode ${i + 1}">
+                        <div class="episode-play-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="episode-info">
+                        <div class="episode-number">Episode ${i + 1}</div>
+                        <div class="episode-title">${ep.title || `Episode ${i + 1}`}</div>
+                        <div class="episode-duration">${ep.duration || '45 min'}</div>
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('.episode-card').forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                    if (ep.url) {
+                        loadVideoSource(ep.url);
+                    }
+                });
+                
+                episodesGrid.appendChild(card);
             }
-        });
-
-        // Update progress bar
-        video.addEventListener('timeupdate', () => {
-            const percent = (video.currentTime / video.duration) * 100;
-            progressFilled.style.width = percent + '%';
-            currentTimeEl.textContent = formatTime(video.currentTime);
-        });
-
-        // Set duration
-        video.addEventListener('loadedmetadata', () => {
-            durationEl.textContent = formatTime(video.duration);
-        });
-
-        // Seek
-        progressBar.addEventListener('click', (e) => {
-            const rect = progressBar.getBoundingClientRect();
-            const percent = (e.clientX - rect.left) / rect.width;
-            video.currentTime = percent * video.duration;
-        });
-
-        // Mute/Unmute
-        muteBtn.addEventListener('click', () => {
-            video.muted = !video.muted;
-            volumeFilled.style.width = video.muted ? '0%' : (video.volume * 100) + '%';
-        });
-
-        // Volume control
-        volumeSlider.addEventListener('click', (e) => {
-            const rect = volumeSlider.getBoundingClientRect();
-            const percent = (e.clientX - rect.left) / rect.width;
-            video.volume = percent;
-            volumeFilled.style.width = (percent * 100) + '%';
-            video.muted = false;
-        });
-
-        // Fullscreen
-        fullscreenBtn.addEventListener('click', () => {
-            if (!document.fullscreenElement) {
-                videoPlayer.requestFullscreen();
-            } else {
-                document.exitFullscreen();
-            }
-        });
-
-        // Format time helper
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
         }
 
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space') {
-                e.preventDefault();
-                playPauseBtn.click();
-            } else if (e.code === 'ArrowRight') {
-                video.currentTime += 10;
-            } else if (e.code === 'ArrowLeft') {
-                video.currentTime -= 10;
-            } else if (e.code === 'KeyF') {
-                fullscreenBtn.click();
-            } else if (e.code === 'KeyM') {
-                muteBtn.click();
+        // Load related movies
+        async function loadRelatedMovies(genre) {
+            const grid = document.getElementById('relatedGrid');
+            
+            try {
+                const apiUrl = typeof API_CONFIG !== 'undefined' 
+                    ? API_CONFIG.API_URL 
+                    : 'https://luganda-translated-movies-production.up.railway.app';
+                
+                const response = await fetch(`${apiUrl}/api/luganda-movies?limit=8`);
+                const data = await response.json();
+                
+                if (data.status === 'success' && data.data) {
+                    grid.innerHTML = data.data.map(movie => `
+                        <a href="player.html?id=${movie._id}" class="movie-card">
+                            <div class="movie-card-poster">
+                                <img src="${movie.poster || 'assets/images/placeholder-poster.jpg'}" alt="${movie.originalTitle}" loading="lazy">
+                                <div class="movie-card-overlay">
+                                    <div class="play-circle">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <span class="movie-card-badge">${movie.video?.quality?.toUpperCase() || 'HD'}</span>
+                            </div>
+                            <div class="movie-card-info">
+                                <div class="movie-card-title">${movie.originalTitle}</div>
+                                <div class="movie-card-vj">VJ ${movie.vjName || 'Unknown'}</div>
+                            </div>
+                        </a>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading related movies:', error);
+                grid.innerHTML = '<p style="color: #888; text-align: center; grid-column: 1/-1;">Unable to load recommendations</p>';
+            }
+        }
+
+        // Show more / Show less description
+        const showMoreBtn = document.getElementById('showMoreBtn');
+        const description = document.getElementById('movieDescription');
+        
+        showMoreBtn.addEventListener('click', () => {
+            description.classList.toggle('collapsed');
+            showMoreBtn.textContent = description.classList.contains('collapsed') ? 'Show more' : 'Show less';
+        });
+
+        // Header hide on scroll
+        let lastScroll = 0;
+        const header = document.getElementById('playerHeader');
+        
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > lastScroll && currentScroll > 100) {
+                header.classList.add('hidden');
+            } else {
+                header.classList.remove('hidden');
+            }
+            
+            lastScroll = currentScroll;
+        });
+
+        // Watchlist button
+        const watchlistBtn = document.getElementById('watchlistBtn');
+        watchlistBtn.addEventListener('click', () => {
+            if (typeof WatchlistManager !== 'undefined') {
+                const movieData = {
+                    id: movieId,
+                    title: document.getElementById('movieTitle').textContent,
+                    poster: document.getElementById('moviePoster').src
+                };
+                WatchlistManager.toggleWatchlist(movieData);
+                
+                const isInList = WatchlistManager.isInWatchlist(movieId);
+                watchlistBtn.innerHTML = isInList ? `
+                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    In Watchlist
+                ` : `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Add to Watchlist
+                `;
             }
         });
+
+        // Initialize
+        loadMovieData();
+
+        // ============================================
+        // PRE-ROLL AD SYSTEM
+        // ============================================
+        const prerollAdOverlay = document.getElementById('prerollAdOverlay');
+        const skipAdBtn = document.getElementById('skipAdBtn');
+        const skipCountdown = document.getElementById('skipCountdown');
+        const adCountdown = document.getElementById('adCountdown');
+        const adContent = document.getElementById('adContent');
+        
+        let adSkipTime = 10; // Seconds before skip is available
+        let adTotalTime = 15; // Total ad duration (user can skip after 10s or wait 15s)
+        let adTimer = null;
+        let skipTimer = null;
+        let adShown = false;
+        
+        // Initialize pre-roll ad
+        function initPrerollAd() {
+            // Check if ad was already shown this session for this movie
+            const adShownKey = `ad_shown_${movieId}`;
+            if (sessionStorage.getItem(adShownKey)) {
+                hidePrerollAd();
+                return;
+            }
+            
+            // Show the ad overlay
+            prerollAdOverlay.classList.remove('hidden');
+            
+            // Start the skip countdown
+            let skipTimeLeft = adSkipTime;
+            let totalTimeLeft = adTotalTime;
+            
+            skipTimer = setInterval(() => {
+                skipTimeLeft--;
+                skipCountdown.textContent = skipTimeLeft;
+                
+                if (skipTimeLeft <= 0) {
+                    clearInterval(skipTimer);
+                    skipAdBtn.disabled = false;
+                    skipAdBtn.innerHTML = `
+                        Skip Ad
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="5 4 15 12 5 20 5 4"></polygon>
+                            <line x1="19" y1="5" x2="19" y2="19"></line>
+                        </svg>
+                    `;
+                }
+            }, 1000);
+            
+            // Ad total duration countdown
+            adTimer = setInterval(() => {
+                totalTimeLeft--;
+                adCountdown.textContent = totalTimeLeft;
+                
+                if (totalTimeLeft <= 0) {
+                    clearInterval(adTimer);
+                    hidePrerollAd();
+                }
+            }, 1000);
+            
+            // Mark ad as shown for this movie
+            sessionStorage.setItem(adShownKey, 'true');
+        }
+        
+        // Hide pre-roll ad and start video
+        function hidePrerollAd() {
+            clearInterval(skipTimer);
+            clearInterval(adTimer);
+            prerollAdOverlay.classList.add('hidden');
+            adShown = true;
+            
+            // Auto-play video after ad (if not embed mode)
+            if (!isEmbedMode && video && video.src) {
+                video.play().catch(e => console.log('Autoplay prevented'));
+            }
+        }
+        
+        // Skip button click
+        skipAdBtn.addEventListener('click', () => {
+            if (!skipAdBtn.disabled) {
+                hidePrerollAd();
+            }
+        });
+        
+        // Initialize ad when page loads (after slight delay)
+        setTimeout(() => {
+            initPrerollAd();
+        }, 500);
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed'));
+            });
+        }
     </script>
 </body>
 </html>

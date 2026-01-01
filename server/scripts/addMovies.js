@@ -9,10 +9,7 @@ const LugandaMovie = require('../models/LugandaMovie');
 const tmdbService = require('../services/tmdbService');
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/unruly-movies', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/unruly-movies');
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
@@ -104,9 +101,12 @@ async function addMovie(movieTitle, vjName, lugandaTitle = null, customData = {}
             
             // Video info (placeholder - will be updated when video is uploaded)
             video: {
-                originalVideoPath: customData.videoPath || null,
+                originalVideoPath: customData.videoPath || customData.embedUrl || 'streamtape',
                 lugandaVideoPath: null,
                 lugandaAudioPath: null,
+                embedUrl: customData.embedUrl || null,
+                streamtapeId: customData.streamtapeId || null,
+                provider: customData.provider || 'local',
                 quality: customData.quality || 'hd',
                 size: 0,
                 duration: movieDetails.runtime || 120,

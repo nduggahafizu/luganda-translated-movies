@@ -3,33 +3,63 @@
    Features: Google Sign-In, Remember Me, Persistent Login
    =================================== */
 
-// Configuration - Uses Config.js for environment-aware URLs
-const API_URL = window.Config ? window.Config.authUrl : 'http://localhost:5000/api/auth';
-const GOOGLE_CLIENT_ID = window.Config ? window.Config.GOOGLE_CLIENT_ID : '573762962600-nr77v5emb2spn7aleg9p2l7c0d6be3a9.apps.googleusercontent.com';
+// Configuration - Uses centralized config
+const API_URL = API_CONFIG.API_ENDPOINTS.AUTH;
+const GOOGLE_CLIENT_ID = API_CONFIG.GOOGLE_CLIENT_ID;
 
-// Initialize Google Sign-In
+// Initialize Google Sign-In with retry logic
+let googleInitRetries = 0;
+const MAX_GOOGLE_RETRIES = 10;
+
 function initGoogleSignIn() {
+    const googleBtnDiv = document.getElementById('google-signin-btn');
+    
+    // Check if Google API is loaded
     if (typeof google !== 'undefined' && google.accounts) {
-        google.accounts.id.initialize({
-            client_id: GOOGLE_CLIENT_ID,
-            callback: handleGoogleSignIn,
-            auto_select: false,
-            cancel_on_tap_outside: true
-        });
-        
-        // Render Google button
+        try {
+            google.accounts.id.initialize({
+                client_id: GOOGLE_CLIENT_ID,
+                callback: handleGoogleSignIn,
+                auto_select: false,
+                cancel_on_tap_outside: true
+            });
+            
+            // Render Google button
+            if (googleBtnDiv) {
+                googleBtnDiv.innerHTML = ''; // Clear any existing content
+                google.accounts.id.renderButton(
+                    googleBtnDiv,
+                    {
+                        theme: 'filled_black',
+                        size: 'large',
+                        width: googleBtnDiv.offsetWidth || 280,
+                        text: 'continue_with',
+                        shape: 'rectangular'
+                    }
+                );
+                console.log('Google Sign-In initialized successfully');
+            }
+        } catch (error) {
+            console.error('Google Sign-In init error:', error);
+            retryGoogleInit();
+        }
+    } else {
+        // Google API not loaded yet, retry
+        retryGoogleInit();
+    }
+}
+
+function retryGoogleInit() {
+    googleInitRetries++;
+    if (googleInitRetries < MAX_GOOGLE_RETRIES) {
+        console.log(`Google API not ready, retrying... (${googleInitRetries}/${MAX_GOOGLE_RETRIES})`);
+        setTimeout(initGoogleSignIn, 500);
+    } else {
+        console.warn('Google Sign-In failed to initialize after max retries');
+        // Show fallback button
         const googleBtnDiv = document.getElementById('google-signin-btn');
         if (googleBtnDiv) {
-            google.accounts.id.renderButton(
-                googleBtnDiv,
-                {
-                    theme: 'filled_black',
-                    size: 'large',
-                    width: '100%',
-                    text: 'continue_with',
-                    shape: 'rectangular'
-                }
-            );
+            googleBtnDiv.innerHTML = '<button type="button" class="social-btn" onclick="location.reload()" style="width:100%;padding:12px;background:#4285f4;color:#fff;border:none;border-radius:8px;cursor:pointer;"><svg style="width:20px;height:20px;margin-right:8px;vertical-align:middle" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>Retry Google Sign-In</button>';
         }
     }
 }
@@ -40,8 +70,7 @@ async function handleGoogleSignIn(response) {
         showLoading(true);
         
         // Send Google token to backend
-        const authUrl = window.Config ? window.Config.getApiUrl('/auth/google') : `${API_URL}/google`;
-        const res = await fetch(authUrl, {
+        const res = await fetch(`${API_URL}/google`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -74,39 +103,25 @@ async function handleGoogleSignIn(response) {
 
 // Save authentication data
 function saveAuthData(token, user, rememberMe = false) {
-    const storage = rememberMe ? localStorage : sessionStorage;
+    // Always save to localStorage for persistence (especially on mobile)
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(user));
     
-    // Save token
-    storage.setItem('token', token);
-    
-    // Save user data
-    storage.setItem('user', JSON.stringify(user));
+    // Also save to sessionStorage as backup
+    sessionStorage.setItem('token', token);
+    sessionStorage.setItem('user', JSON.stringify(user));
     
     // Save remember me preference
-    if (rememberMe) {
-        localStorage.setItem('rememberMe', 'true');
-    }
+    localStorage.setItem('rememberMe', rememberMe ? 'true' : 'false');
     
-    // Set expiry (7 days for remember me, session for regular)
-    if (rememberMe) {
-        const expiryDate = new Date();
-        expiryDate.setDate(expiryDate.getDate() + 7);
-        storage.setItem('tokenExpiry', expiryDate.toISOString());
-    }
+    // No expiry - tokens are permanent
+    localStorage.removeItem('tokenExpiry');
 }
 
 // Get authentication token
 function getAuthToken() {
     // Check localStorage first (remember me)
     let token = localStorage.getItem('token');
-    
-    // Check if token is expired
-    const expiry = localStorage.getItem('tokenExpiry');
-    if (expiry && new Date(expiry) < new Date()) {
-        // Token expired, clear storage
-        clearAuthData();
-        return null;
-    }
     
     // If not in localStorage, check sessionStorage
     if (!token) {
@@ -154,8 +169,7 @@ async function loginWithEmail(email, password, rememberMe) {
     try {
         showLoading(true);
         
-        const loginUrl = window.Config ? window.Config.getApiUrl('/auth/login') : `${API_URL}/login`;
-        const response = await fetch(loginUrl, {
+        const response = await fetch(`${API_URL}/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -189,8 +203,7 @@ async function registerWithEmail(fullName, email, password) {
     try {
         showLoading(true);
         
-        const registerUrl = window.Config ? window.Config.getApiUrl('/auth/register') : `${API_URL}/register`;
-        const response = await fetch(registerUrl, {
+        const response = await fetch(`${API_URL}/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

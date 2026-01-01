@@ -160,6 +160,20 @@ const lugandaMovieSchema = new mongoose.Schema({
             type: String,
             default: null
         },
+        // Embed URLs for external video hosts (Streamtape, etc.)
+        embedUrl: {
+            type: String,
+            default: null
+        },
+        streamtapeId: {
+            type: String,
+            default: null
+        },
+        provider: {
+            type: String,
+            enum: ['local', 'streamtape', 'doodstream', 'filemoon', 'other'],
+            default: 'local'
+        },
         quality: {
             type: String,
             enum: ['sd', 'hd', '4k'],
@@ -384,7 +398,6 @@ lugandaMovieSchema.statics.searchMovies = function(query, filters = {}) {
 
 // Indexes for better query performance
 lugandaMovieSchema.index({ originalTitle: 'text', lugandaTitle: 'text', description: 'text', tags: 'text', vjName: 'text' });
-lugandaMovieSchema.index({ slug: 1 });
 lugandaMovieSchema.index({ genres: 1 });
 lugandaMovieSchema.index({ year: -1 });
 lugandaMovieSchema.index({ views: -1 });

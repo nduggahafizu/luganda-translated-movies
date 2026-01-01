@@ -9,18 +9,34 @@
     <meta name="theme-color" content="#7CFC00">
     <meta name="google-adsense-account" content="ca-pub-1904736753681797">
     
-    <link rel="shortcut icon" href="assets/images/favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
+    <link rel="shortcut icon" type="image/png" href="/assets/images/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo.png">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     
-    <!-- Google Sign-In -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Google Sign-In - Load with onload callback -->
+    <script src="https://accounts.google.com/gsi/client" async defer onload="window.googleApiLoaded = true;"></script>
     
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
     
     <style>
+        /* Google Sign-In Loading State */
+        #google-signin-btn {
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #google-signin-btn:empty::after {
+            content: 'Loading Google Sign-In...';
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
         .auth-container {
             min-height: 100vh;
             display: flex;
@@ -299,15 +315,15 @@
             <form id="loginForm" method="post" action="#">
                 <div class="form-group">
                     <label for="email" class="form-label">Email Address</label>
-                    <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required autocomplete="email">
                 </div>
                 
                 <div class="form-group">
                     <label for="password" class="form-label">Password</label>
                     <div class="password-toggle">
-                        <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
-                        <button type="button" class="password-toggle-btn" onclick="togglePassword()">
-                            <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required autocomplete="current-password">
+                        <button type="button" class="password-toggle-btn" onclick="togglePassword()" aria-label="Toggle password visibility" title="Show/hide password">
+                            <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                 <circle cx="12" cy="12" r="3"></circle>
                             </svg>
@@ -317,13 +333,13 @@
                 
                 <div class="form-options">
                     <label class="form-checkbox">
-                        <input type="checkbox" name="remember">
+                        <input type="checkbox" id="remember" name="remember">
                         <span>Remember me</span>
                     </label>
                     <a href="#" class="form-link">Forgot Password?</a>
                 </div>
                 
-                <button type="submit" class="btn-submit">Login</button>
+                <button type="submit" class="btn-submit" id="submitBtn" data-original-text="Login">Login</button>
             </form>
             
             <div class="divider">
@@ -332,13 +348,6 @@
             
             <div class="social-login">
                 <div id="google-signin-btn" style="width: 100%;"></div>
-                
-                <button class="social-btn" onclick="socialLogin('facebook')">
-                    <svg viewBox="0 0 24 24" fill="#1877F2">
-                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                    </svg>
-                    Facebook
-                </button>
             </div>
             
             <div class="auth-footer">
@@ -347,6 +356,7 @@
         </div>
     </div>
 
+    <!-- API Configuration (must load first) -->
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/main.js"></script>
@@ -368,15 +378,24 @@
             alert(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login would be implemented here`);
         }
         
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const rememberMe = document.getElementById('remember').checked;
+            const submitBtn = document.getElementById('submitBtn');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Logging in...';
             
             // Call login function from auth.js
-            loginWithEmail(email, password, rememberMe);
+            try {
+                await loginWithEmail(email, password, rememberMe);
+            } catch (error) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Login';
+            }
         });
     </script>
 </body>
