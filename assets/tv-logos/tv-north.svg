@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+  <defs>
+    <linearGradient id="northGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00BFFF"/>
+      <stop offset="100%" style="stop-color:#0099CC"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="100" rx="10" fill="#1a1a2e"/>
+  <text x="100" y="45" font-family="Arial Black, sans-serif" font-size="28" font-weight="900" fill="#888" text-anchor="middle">TV</text>
+  <text x="100" y="75" font-family="Arial Black, sans-serif" font-size="28" font-weight="900" fill="url(#northGrad)" text-anchor="middle">NORTH</text>
+</svg>

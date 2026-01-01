@@ -32,6 +32,7 @@ const notificationsRoutes = require('./routes/notifications');
 const statsRoutes = require('./routes/stats');
 const usersRoutes = require('./routes/users');
 const adminRoutes = require('./routes/admin');
+const tvRoutes = require('./routes/tv');
 
 // Initialize Express app
 const app = express();
@@ -281,6 +282,7 @@ app.use('/api/notifications', notificationsRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/tv', cache(600), tvRoutes); // TV stations with 10 min cache
 
 // Token refresh endpoint
 app.post('/api/auth/refresh', refreshTokenHandler);

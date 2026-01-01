@@ -396,13 +396,98 @@
         </svg>
     </div>
 
+    <script src="js/config.js"></script>
     <script src="js/tmdb-api.js"></script>
     <script src="js/trailer-player.js"></script>
     <script src="js/luganda-movies-api.js"></script>
     <script src="js/main.js"></script>
     <script>
-        // Use sample Luganda movies data
-        const movies = SAMPLE_LUGANDA_MOVIES;
+        // Movies will be loaded from API
+        let movies = [];
+        let currentPage = 1;
+        let totalPages = 1;
+
+        // Load movies from API
+        async function loadMovies(params = {}) {
+            const grid = document.getElementById('moviesGrid');
+            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">Loading movies...</p>';
+            
+            try {
+                const queryParams = new URLSearchParams({
+                    page: currentPage,
+                    limit: 18,
+                    ...params
+                });
+                
+                const response = await fetch(`${API_CONFIG.API_ENDPOINTS.MOVIES}/fetch?${queryParams}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Transform API response to expected format
+                    movies = data.movies.map(m => ({
+                        _id: m.row_id,
+                        originalTitle: m.title,
+                        lugandaTitle: m.luganda_title,
+                        vjName: m.vj,
+                        year: m.year,
+                        genres: m.categories ? m.categories.split(', ') : [],
+                        rating: {
+                            translationRating: m.rating || 0,
+                            userRating: m.rating || 0
+                        },
+                        video: { quality: m.quality },
+                        poster: m.poster_url,
+                        views: m.views,
+                        tmdbId: null
+                    }));
+                    totalPages = data.pagination.pages;
+                    renderMovies(movies);
+                    updatePagination(data.pagination);
+                } else {
+                    throw new Error(data.error || 'Failed to load movies');
+                }
+            } catch (error) {
+                console.error('Error loading movies:', error);
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">Failed to load movies. Please try again.</p>';
+            }
+        }
+
+        function updatePagination(pagination) {
+            const paginationEl = document.querySelector('.pagination');
+            if (!paginationEl) return;
+            
+            let html = '';
+            if (pagination.page > 1) {
+                html += `<button class="page-btn" onclick="goToPage(${pagination.page - 1})">← Prev</button>`;
+            }
+            html += `<span class="page-info">Page ${pagination.page} of ${pagination.pages} (${pagination.total} movies)</span>`;
+            if (pagination.hasMore) {
+                html += `<button class="page-btn" onclick="goToPage(${pagination.page + 1})">Next →</button>`;
+            }
+            paginationEl.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            applyFilters();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function applyFilters() {
+            const params = {};
+            const genre = document.getElementById('genreFilter').value;
+            const year = document.getElementById('yearFilter').value;
+            const vj = document.getElementById('vjFilter').value;
+            const quality = document.getElementById('qualityFilter').value;
+            const sort = document.getElementById('sortFilter').value;
+            
+            if (genre) params.category = genre;
+            if (vj) params.vj = vj;
+            if (quality) params.quality = quality;
+            if (sort) params.sort = sort;
+            
+            loadMovies(params);
+        }
 
         function renderMovies(moviesToRender) {
             const grid = document.getElementById('moviesGrid');
@@ -469,33 +554,14 @@
             });
         }
 
-        // Initial render
-        renderMovies(movies);
+// Initial load from API
+        loadMovies();
 
-        // Filter functionality
+        // Filter functionality - now uses API
         document.querySelectorAll('.filter-select').forEach(select => {
             select.addEventListener('change', () => {
-                let filtered = [...movies];
-                
-                const genre = document.getElementById('genreFilter').value;
-                const year = document.getElementById('yearFilter').value;
-                const vj = document.getElementById('vjFilter').value;
-                const quality = document.getElementById('qualityFilter').value;
-                const sort = document.getElementById('sortFilter').value;
-                
-                // Apply filters
-                if (genre) filtered = filtered.filter(m => m.genres.includes(genre));
-                if (year) filtered = filtered.filter(m => m.year == year);
-                if (vj) filtered = filtered.filter(m => m.vjName === vj);
-                if (quality) filtered = filtered.filter(m => m.video.quality === quality);
-                
-                // Apply sorting
-                if (sort === 'rating') filtered.sort((a, b) => b.rating.translationRating - a.rating.translationRating);
-                if (sort === 'title') filtered.sort((a, b) => a.originalTitle.localeCompare(b.originalTitle));
-                if (sort === 'latest') filtered.sort((a, b) => b.year - a.year);
-                if (sort === 'popular') filtered.sort((a, b) => b.views - a.views);
-                
-                renderMovies(filtered);
+                currentPage = 1; // Reset to first page on filter change
+                applyFilters();
             });
         });
     </script>
