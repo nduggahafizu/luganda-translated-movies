@@ -101,9 +101,12 @@ async function addMovie(movieTitle, vjName, lugandaTitle = null, customData = {}
             
             // Video info (placeholder - will be updated when video is uploaded)
             video: {
-                originalVideoPath: customData.videoPath || null,
+                originalVideoPath: customData.videoPath || customData.embedUrl || 'streamtape',
                 lugandaVideoPath: null,
                 lugandaAudioPath: null,
+                embedUrl: customData.embedUrl || null,
+                streamtapeId: customData.streamtapeId || null,
+                provider: customData.provider || 'local',
                 quality: customData.quality || 'hd',
                 size: 0,
                 duration: movieDetails.runtime || 120,
