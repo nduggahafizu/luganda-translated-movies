@@ -332,7 +332,7 @@
                                                 <li data-target="#slider" data-slide-to="2"></li>
                                             </ol>
                                             
-                            <div class="carousel-item active">
+                            <div class="carousel-item active" id="heroSlide1">
                                 <a href="#" class="slide media media-slide" style="background-image: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.3)), url('https://image.tmdb.org/t/p/original/bOFaAXmWWXC3Rbv4u4uM9ZSzRXP.jpg');">
                                     <div class="slide-caption">
                                         <div class="d-flex align-items-center">
@@ -352,7 +352,7 @@
                                 </a>
                             </div>
                                             
-                                            <div class="carousel-item">
+                                            <div class="carousel-item" id="heroSlide2">
                                                 <a href="#" class="slide media media-slide" style="background-image: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.3)), url('https://image.tmdb.org/t/p/original/uxzzxijgPIY7slzFvMotPv8wjKA.jpg');">
                                                     <div class="slide-caption">
                                                         <div class="d-flex align-items-center">
@@ -372,7 +372,7 @@
                                                 </a>
                                             </div>
                                             
-                                            <div class="carousel-item">
+                                            <div class="carousel-item" id="heroSlide3">
                                                 <a href="#" class="slide media media-slide" style="background-image: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.3)), url('https://image.tmdb.org/t/p/original/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg');">
                                                     <div class="slide-caption">
                                                         <div class="d-flex align-items-center">
@@ -409,229 +409,16 @@
                                 </div>
                             </div>
 
-                            <!-- Featured Movie Section -->
+                            <!-- All Movies Section (Newest First) -->
                             <div class="app-section">
                                 <div class="app-heading">
-                                    <div class="text">Featured Movie - VJ Ice P</div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="featured-movie-card">
-                                            <div class="featured-movie-backdrop">
-                                                <img src="https://image.tmdb.org/t/p/original/xXBnM6uSTk6qqCf0SRZKXcga9Ba.jpg" alt="Song of the Assassins Backdrop" loading="lazy">
-                                                <div class="featured-movie-overlay"></div>
-                                            </div>
-                                            <div class="featured-movie-content">
-                                                <div class="featured-movie-poster">
-                                                    <img src="https://image.tmdb.org/t/p/w500/xXBnM6uSTk6qqCf0SRZKXcga9Ba.jpg" alt="Song of the Assassins Poster">
-                                                    <div class="featured-quality-badge">HD</div>
-                                                </div>
-                                                <div class="featured-movie-info">
-                                                    <div class="featured-vj-badge">
-                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                                            <circle cx="12" cy="7" r="4"></circle>
-                                                        </svg>
-                                                        VJ Ice P
-                                                    </div>
-                                                    <h2 class="featured-movie-title">Song of the Assassins</h2>
-                                                    <div class="featured-movie-meta">
-                                                        <span class="meta-item">
-                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                                                <line x1="16" y1="2" x2="16" y2="6"></line>
-                                                                <line x1="8" y1="2" x2="8" y2="6"></line>
-                                                                <line x1="3" y1="10" x2="21" y2="10"></line>
-                                                            </svg>
-                                                            2022
-                                                        </span>
-                                                        <span class="meta-item">
-                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                                            </svg>
-                                                            7.2/10
-                                                        </span>
-                                                        <span class="meta-item">Action, Adventure</span>
-                                                        <span class="meta-item">
-                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                <circle cx="12" cy="12" r="10"></circle>
-                                                                <polyline points="12 6 12 12 16 14"></polyline>
-                                                            </svg>
-                                                            2h 7min
-                                                        </span>
-                                                    </div>
-                                                    <p class="featured-movie-description">
-                                                        After completing his training, an elite young assassin embarks on his first mission and is quickly ensnared in an intricate plot laid by powerful people pulling strings from the shadows. Upon failing to complete the assignment, he is forced to go on the run—from the government and rival assassin groups alike—as he seeks to unmask the players behind the conspiracy.
-                                                    </p>
-                                                    <div class="featured-movie-actions">
-                                                        <button class="btn-play-featured" id="playFeaturedBtn">
-                                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                                            </svg>
-                                                            Watch Now
-                                                        </button>
-                                                        <button class="btn-add-list" title="Add to My List" aria-label="Add to My List">
-                                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                <line x1="12" y1="5" x2="12" y2="19"></line>
-                                                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                                                            </svg>
-                                                            My List
-                                                        </button>
-                                                        <button class="btn-info" title="More Information" aria-label="More Information">
-                                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                <circle cx="12" cy="12" r="10"></circle>
-                                                                <path d="M12 16v-4"></path>
-                                                                <path d="M12 8h.01"></path>
-                                                            </svg>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Latest Luganda Movies -->
-                            <div class="app-section">
-                                <div class="app-heading">
-                                    <div class="text">Latest Luganda Translations</div>
+                                    <div class="text">All Movies</div>
                                     <a href="movies.html" class="all">View All</a>
                                 </div>
-                                <div class="row row-cols-2 row-cols-md-5 list-scrollable" id="latestMovies">
-                                    <!-- Movie Card 1 -->
-                                    <div class="col">
-                                        <div class="list-movie position-relative">
-                                            <a href="#" class="list-media">
-                                                <div class="list-media-attr">
-                                                    <div class="quality">HD</div>
-                                                    <div class="imdb">
-                                                        <span>8.5</span>
-                                                        <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
-                                                            <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" stroke-dasharray="85 100" stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                                <div class="play-btn">
-                                                    <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                                    </svg>
-                                                </div>
-                                                <div class="media media-cover" style="background-image: url('https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg');"></div>
-                                            </a>
-                                            <div class="list-caption">
-                                                <a href="#" class="list-title">The Marvels</a>
-                                                <a href="#" class="list-category">Action</a>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Movie Card 2 -->
-                                    <div class="col">
-                                        <div class="list-movie position-relative">
-                                            <a href="#" class="list-media">
-                                                <div class="list-media-attr">
-                                                    <div class="quality">4K</div>
-                                                    <div class="imdb">
-                                                        <span>7.9</span>
-                                                        <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
-                                                            <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" stroke-dasharray="79 100" stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                                <div class="play-btn">
-                                                    <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                                    </svg>
-                                                </div>
-                                                <div class="media media-cover" style="background-image: url('https://image.tmdb.org/t/p/w500/vZloFAK7NmvMGKE7VkF5UHaz0I.jpg');"></div>
-                                            </a>
-                                            <div class="list-caption">
-                                                <a href="#" class="list-title">Wonka</a>
-                                                <a href="#" class="list-category">Fantasy</a>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Movie Card 3 -->
-                                    <div class="col">
-                                        <div class="list-movie position-relative">
-                                            <a href="#" class="list-media">
-                                                <div class="list-media-attr">
-                                                    <div class="quality">HD</div>
-                                                    <div class="imdb">
-                                                        <span>8.1</span>
-                                                        <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
-                                                            <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" stroke-dasharray="81 100" stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                                <div class="play-btn">
-                                                    <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                                    </svg>
-                                                </div>
-                                                <div class="media media-cover" style="background-image: url('https://image.tmdb.org/t/p/w500/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg');"></div>
-                                            </a>
-                                            <div class="list-caption">
-                                                <a href="#" class="list-title">Avatar: The Way of Water</a>
-                                                <a href="#" class="list-category">Sci-Fi</a>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Movie Card 4 -->
-                                    <div class="col">
-                                        <div class="list-movie position-relative">
-                                            <a href="#" class="list-media">
-                                                <div class="list-media-attr">
-                                                    <div class="quality">HD</div>
-                                                    <div class="imdb">
-                                                        <span>7.5</span>
-                                                        <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
-                                                            <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" stroke-dasharray="75 100" stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                                <div class="play-btn">
-                                                    <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                                    </svg>
-                                                </div>
-                                                <div class="media media-cover" style="background-image: url('https://image.tmdb.org/t/p/w500/r2J02Z2OpNTctfOSN1Ydgii51I3.jpg');"></div>
-                                            </a>
-                                            <div class="list-caption">
-                                                <a href="#" class="list-title">Guardians of the Galaxy Vol. 3</a>
-                                                <a href="#" class="list-category">Action</a>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Movie Card 5 -->
-                                    <div class="col">
-                                        <div class="list-movie position-relative">
-                                            <a href="#" class="list-media">
-                                                <div class="list-media-attr">
-                                                    <div class="quality">4K</div>
-                                                    <div class="imdb">
-                                                        <span>8.3</span>
-                                                        <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
-                                                            <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" stroke-dasharray="83 100" stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                                <div class="play-btn">
-                                                    <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                                    </svg>
-                                                </div>
-                                                <div class="media media-cover" style="background-image: url('https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg');"></div>
-                                            </a>
-                                            <div class="list-caption">
-                                                <a href="#" class="list-title">Spider-Man: Across the Spider-Verse</a>
-                                                <a href="#" class="list-category">Animation</a>
-                                            </div>
-                                        </div>
+                                <div class="row row-cols-2 row-cols-md-5 list-scrollable" id="allMovies">
+                                    <!-- Movies will be loaded here dynamically -->
+                                    <div class="col-12 text-center py-5">
+                                        <p style="color: #888;">Loading movies...</p>
                                     </div>
                                 </div>
                             </div>
@@ -1014,46 +801,79 @@
             try {
                 // Try to fetch from backend API first
                 try {
-                    // Fetch latest movies from backend (sorted by newest first)
-                    const latestResponse = await LugandaMoviesAPI.getLatest(10);
-                    const latestMovies = latestResponse.data || latestResponse.movies || [];
+                    // Fetch ALL movies from backend (sorted by newest first - createdAt descending)
+                    const allMoviesResponse = await LugandaMoviesAPI.getLatest(20);
+                    const allMovies = allMoviesResponse.data || allMoviesResponse.movies || [];
                     
-                    // Fetch trending/popular movies
-                    const trendingResponse = await LugandaMoviesAPI.getTrending(10);
-                    const popularMovies = trendingResponse.data || trendingResponse.movies || [];
-                    
-                    // Render latest movies (newest first from backend)
-                    if (latestMovies.length > 0) {
-                        renderMovies(latestMovies.slice(0, 5), 'latestMovies');
-                    } else {
-                        // Fallback to sample data if no movies in database
-                        console.log('No movies in database, using sample data');
-                        renderMovies(SAMPLE_LUGANDA_MOVIES.slice(0, 5), 'latestMovies');
-                    }
-                    
-                    // Render popular movies
-                    if (popularMovies.length > 0) {
+                    // Render all movies (newest first from backend)
+                    if (allMovies.length > 0) {
+                        renderMovies(allMovies, 'allMovies');
+                        
+                        // Update hero slider with first 3 movies
+                        updateHeroSlider(allMovies.slice(0, 3));
+                        
+                        // Also populate popular movies section
+                        const popularMovies = [...allMovies].sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0));
                         renderMovies(popularMovies.slice(0, 5), 'popularMovies');
                     } else {
-                        // Fallback to sample data sorted by views
-                        const samplePopular = SAMPLE_LUGANDA_MOVIES.slice(0, 5).sort((a, b) => b.views - a.views);
-                        renderMovies(samplePopular, 'popularMovies');
+                        // Show message if no movies
+                        document.getElementById('allMovies').innerHTML = `
+                            <div class="col-12 text-center py-5">
+                                <p style="color: #888;">No movies available yet. Check back soon!</p>
+                            </div>
+                        `;
                     }
                     
                 } catch (apiError) {
-                    console.log('Backend API not available, using sample data:', apiError.message);
-                    // Fallback to sample data if backend is not running
-                    const latestMovies = SAMPLE_LUGANDA_MOVIES.slice(0, 5);
-                    const popularMovies = SAMPLE_LUGANDA_MOVIES.slice(0, 5).sort((a, b) => b.views - a.views);
-                    
-                    renderMovies(latestMovies, 'latestMovies');
-                    renderMovies(popularMovies, 'popularMovies');
+                    console.log('Backend API not available:', apiError.message);
+                    document.getElementById('allMovies').innerHTML = `
+                        <div class="col-12 text-center py-5">
+                            <p style="color: #888;">Unable to load movies. Please try again later.</p>
+                        </div>
+                    `;
                 }
                 
             } catch (error) {
                 console.error('Error loading movies:', error);
             }
         });
+        
+        // Update hero slider with actual movies from database
+        function updateHeroSlider(movies) {
+            if (!movies || movies.length === 0) return;
+            
+            movies.forEach((movie, index) => {
+                const slideId = `heroSlide${index + 1}`;
+                const slide = document.getElementById(slideId);
+                if (!slide) return;
+                
+                const backdrop = movie.backdrop || movie.poster || 'https://image.tmdb.org/t/p/original/bOFaAXmWWXC3Rbv4u4uM9ZSzRXP.jpg';
+                const year = movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : (movie.year || '2024');
+                const vjName = movie.lugandaTranslation?.translatedBy || movie.vjName || 'Unruly Movies';
+                const title = movie.title || movie.originalTitle || 'Unknown Movie';
+                const description = movie.overview || movie.description || 'Watch this amazing movie in Luganda translation.';
+                
+                // Update the slide link and background
+                const slideLink = slide.querySelector('.slide');
+                if (slideLink) {
+                    slideLink.href = `player.html?id=${movie._id}`;
+                    slideLink.style.backgroundImage = `linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.3)), url('${backdrop}')`;
+                }
+                
+                // Update slide content
+                const vjElement = slide.querySelector('.imdb');
+                if (vjElement) vjElement.textContent = `VJ: ${vjName}`;
+                
+                const yearElement = slide.querySelector('.slide-header > div:nth-child(2)');
+                if (yearElement) yearElement.textContent = year;
+                
+                const titleElement = slide.querySelector('.title');
+                if (titleElement) titleElement.textContent = title;
+                
+                const descElement = slide.querySelector('.description');
+                if (descElement) descElement.textContent = description.substring(0, 200) + (description.length > 200 ? '...' : '');
+            });
+        }
         
         // Helper function to generate placeholder poster URL based on movie title
         function getPlaceholderPoster(title, year) {
