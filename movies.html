@@ -162,12 +162,29 @@
                             <img src="assets/images/logo.png" alt="Luganda Movies" width="180" height="50">
                         </a>
                     </div>
-                    <div class="search-btn d-md-none d-block">
+                    <div class="search-btn d-md-none d-block" id="mobileSearchBtn">
                         <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="11" cy="11" r="8"></circle>
                             <path d="m21 21-4.35-4.35"></path>
                         </svg>
                     </div>
+                    
+                    <!-- Mobile Search Form -->
+                    <form class="mobile-search-form" id="mobileSearchForm" method="get" action="search.html">
+                        <input type="text" name="q" placeholder="Search movies, VJs..." class="mobile-search-input" id="mobileSearchInput" required>
+                        <button type="submit" class="mobile-search-submit">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+                        </button>
+                        <button type="button" class="mobile-search-close" id="mobileSearchClose">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </form>
                     
                     <form class="header-search input-group d-md-block d-none" method="get" action="search.html">
                         <div class="typeahead__container app-search">
@@ -339,6 +356,17 @@
                                         </select>
                                     </div>
                                 </div>
+                            </div>
+
+                            <!-- Ad Banner - Below Filters -->
+                            <div class="ad-container" style="margin: 20px 0; text-align: center;">
+                                <ins class="adsbygoogle"
+                                     style="display:block"
+                                     data-ad-client="ca-pub-1904736753681797"
+                                     data-ad-slot="auto"
+                                     data-ad-format="horizontal"
+                                     data-full-width-responsive="true"></ins>
+                                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
                             </div>
 
                             <!-- Movies Grid -->

@@ -16,13 +16,27 @@
     <link rel="stylesheet" href="css/responsive.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     
-    <!-- Google Sign-In -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Google Sign-In - Load with onload callback -->
+    <script src="https://accounts.google.com/gsi/client" async defer onload="window.googleApiLoaded = true;"></script>
     
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
     
     <style>
+        /* Google Sign-In Loading State */
+        #google-signin-btn {
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #google-signin-btn:empty::after {
+            content: 'Loading Google Sign-In...';
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
         .auth-container {
             min-height: 100vh;
             display: flex;
