@@ -56,8 +56,7 @@ router.get('/:id', async (req, res) => {
         }
         
         // Increment view count
-        movie.viewCount = (movie.viewCount || 0) + 1;
-        await movie.save();
+        await movie.incrementViews();
         
         res.json({
             status: 'success',
