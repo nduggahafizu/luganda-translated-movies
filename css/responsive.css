@@ -47,17 +47,52 @@
         height: 35px;
     }
     
-    /* Hide desktop nav items on mobile */
+    /* Adjust navbar for mobile */
     .navbar-user {
-        gap: 5px;
+        gap: 3px;
+        margin-left: auto;
     }
     
+    /* Hide text labels on mobile, show icons */
     .navbar-user .nav-link span {
         display: none !important;
     }
     
     .navbar-user .nav-link {
-        padding: 8px;
+        padding: 6px 8px;
+    }
+    
+    /* Keep login button visible and styled on mobile */
+    .navbar-user .btn-login {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    
+    /* User dropdown mobile styles */
+    .user-dropdown {
+        position: relative;
+    }
+    
+    .user-avatar {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .user-btn {
+        padding: 4px 8px !important;
+    }
+    
+    .dropdown-menu {
+        right: 0;
+        left: auto;
+        min-width: 150px;
+    }
+    
+    /* Hide some nav items on very small screens */
+    @media (max-width: 400px) {
+        .navbar-user .nav-item:not(#loginBtn):not(#userMenu) {
+            display: none;
+        }
     }
     
     .header-search {
