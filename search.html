@@ -668,7 +668,7 @@
 
     <script src="js/config.js"></script>
     <script>
-        const API_URL = API_CONFIG.API_URL;
+        const API_URL = API_CONFIG.API_ENDPOINTS.LUGANDA_MOVIES;
         let currentPage = 1;
         let currentView = 'grid';
         let searchTimeout = null;
@@ -724,18 +724,19 @@
 
         async function showSuggestions(query) {
             try {
-                const response = await fetch(`${API_URL}/luganda-movies?search=${encodeURIComponent(query)}&limit=5`);
+                const response = await fetch(`${API_URL}/search?q=${encodeURIComponent(query)}&limit=5`);
                 const data = await response.json();
                 
                 const suggestions = document.getElementById('searchSuggestions');
+                const movies = data.data || [];
                 
-                if (data.data?.movies?.length > 0) {
-                    suggestions.innerHTML = data.data.movies.map(movie => `
-                        <div class="suggestion-item" onclick="selectSuggestion('${movie._id}', '${movie.title.replace(/'/g, "\\'")}')">
-                            <img src="${movie.poster || 'assets/images/placeholder.jpg'}" alt="${movie.title}" class="suggestion-poster">
+                if (movies.length > 0) {
+                    suggestions.innerHTML = movies.map(movie => `
+                        <div class="suggestion-item" onclick="selectSuggestion('${movie._id}', '${(movie.originalTitle || movie.title || '').replace(/'/g, "\\'")}')">
+                            <img src="${movie.poster || 'https://placehold.co/50x75/1a1a2e/7CFC00?text=Movie'}" alt="${movie.originalTitle || movie.title}" class="suggestion-poster">
                             <div class="suggestion-info">
-                                <div class="suggestion-title">${movie.title}</div>
-                                <div class="suggestion-meta">${movie.year || ''} ${movie.vj ? '• VJ ' + movie.vj : ''}</div>
+                                <div class="suggestion-title">${movie.originalTitle || movie.title}</div>
+                                <div class="suggestion-meta">${movie.year || ''} ${movie.vjName ? '• VJ ' + movie.vjName : ''}</div>
                             </div>
                         </div>
                     `).join('');
@@ -779,23 +780,33 @@
             document.getElementById('initialState')?.remove();
             
             try {
-                let apiUrl = `${API_URL}/luganda-movies?page=${currentPage}&limit=20`;
+                // Build search URL - use /search endpoint for queries, or main endpoint for browsing
+                let apiUrl;
+                if (query) {
+                    apiUrl = `${API_URL}/search?q=${encodeURIComponent(query)}&page=${currentPage}&limit=20`;
+                } else {
+                    apiUrl = `${API_URL}?page=${currentPage}&limit=20`;
+                }
                 
-                if (query) apiUrl += `&search=${encodeURIComponent(query)}`;
                 if (genre) apiUrl += `&genre=${genre}`;
                 if (vj) apiUrl += `&vj=${vj}`;
                 if (year) apiUrl += `&year=${year}`;
                 if (sort) apiUrl += `&sort=${sort}`;
                 
+                console.log('Searching with URL:', apiUrl);
+                
                 const response = await fetch(apiUrl);
                 const data = await response.json();
                 
-                if (data.data?.movies?.length > 0) {
-                    totalResults = data.data.pagination?.total || data.data.movies.length;
+                // Handle both response formats (data.data or data.data.movies)
+                const movies = data.data?.movies || data.data || [];
+                
+                if (movies.length > 0) {
+                    totalResults = data.data?.pagination?.total || data.count || movies.length;
                     document.getElementById('resultsCount').innerHTML = `Showing <strong>${totalResults}</strong> results for "${query || 'All Movies'}"`;
                     
-                    renderResults(data.data.movies);
-                    renderPagination(data.data.pagination);
+                    renderResults(movies);
+                    renderPagination(data.data?.pagination);
                 } else {
                     resultsGrid.innerHTML = `
                         <div class="no-results" style="grid-column: 1/-1;">
@@ -822,19 +833,26 @@
             const resultsGrid = document.getElementById('resultsGrid');
             resultsGrid.className = `results-grid ${currentView === 'list' ? 'list-view' : ''}`;
             
-            resultsGrid.innerHTML = movies.map(movie => `
+            resultsGrid.innerHTML = movies.map(movie => {
+                const title = movie.originalTitle || movie.title || 'Unknown Movie';
+                const posterUrl = movie.poster || `https://placehold.co/300x450/1a1a2e/7CFC00?text=${encodeURIComponent(title.substring(0,15))}`;
+                const rating = movie.rating?.userRating || movie.rating?.imdb || null;
+                const vjName = movie.vjName || movie.vj || '';
+                const description = movie.overview || movie.description || '';
+                
+                return `
                 <div class="movie-card">
                     <div class="movie-poster">
                         <a href="player.html?id=${movie._id}">
-                            <img src="${movie.poster || 'assets/images/placeholder.jpg'}" alt="${movie.title}" loading="lazy" onerror="this.src='assets/images/placeholder.jpg'">
+                            <img src="${posterUrl}" alt="${title}" loading="lazy" onerror="this.src='https://placehold.co/300x450/1a1a2e/7CFC00?text=Movie'">
                         </a>
-                        <div class="movie-badge">HD</div>
-                        ${movie.rating ? `
+                        <div class="movie-badge">${movie.video?.quality?.toUpperCase() || 'HD'}</div>
+                        ${rating ? `
                             <div class="movie-rating">
                                 <svg viewBox="0 0 24 24" fill="currentColor">
                                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                                 </svg>
-                                ${movie.rating.toFixed(1)}
+                                ${rating.toFixed(1)}
                             </div>
                         ` : ''}
                         <div class="movie-overlay">
@@ -846,17 +864,17 @@
                         </div>
                     </div>
                     <div class="movie-info">
-                        <div class="movie-title">${movie.title}</div>
+                        <div class="movie-title">${title}</div>
                         <div class="movie-meta">
                             <span>${movie.year || ''}</span>
-                            ${movie.vj ? `<span class="movie-vj">VJ ${movie.vj}</span>` : ''}
+                            ${vjName ? `<span class="movie-vj">VJ ${vjName}</span>` : ''}
                         </div>
-                        ${currentView === 'list' && movie.description ? `
-                            <div class="movie-description">${movie.description}</div>
+                        ${currentView === 'list' && description ? `
+                            <div class="movie-description">${description.substring(0, 150)}...</div>
                         ` : ''}
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function renderPagination(pagination) {
