@@ -7,8 +7,8 @@ require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') }
 const mongoose = require('mongoose');
 const axios = require('axios');
 
-// MongoDB connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://nduggahafizu67:hafithu67@hafithu67.nyi9cp3.mongodb.net/luganda-movies?retryWrites=true&w=majority';
+// MongoDB connection - Use production URI
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://nduggahafizu67:nduggahaf67@hafithu67.nyi9cp3.mongodb.net/luganda-movies?retryWrites=true&w=majority';
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
