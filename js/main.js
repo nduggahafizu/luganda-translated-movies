@@ -50,8 +50,8 @@
 
     // DOM Elements
     const body = document.body;
-    const menuBtn = document.querySelector('.menu');
-    const sidebar = document.querySelector('.app-aside');
+    const menuBtn = document.getElementById('menuToggle') || document.querySelector('.menu');
+    const sidebar = document.getElementById('aside') || document.querySelector('.app-aside');
     const searchBtn = document.querySelector('.search-btn');
     const headerSearch = document.querySelector('.header-search');
     const scrollUpBtn = document.querySelector('.scroll-up');
@@ -60,9 +60,21 @@
     // Mobile Menu Toggle
     // ===================================
     if (menuBtn && sidebar) {
-        menuBtn.addEventListener('click', function() {
+        menuBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             sidebar.classList.toggle('show');
             body.style.overflow = sidebar.classList.contains('show') ? 'hidden' : '';
+            console.log('Menu clicked, sidebar show:', sidebar.classList.contains('show'));
+        });
+        
+        // Also handle keyboard accessibility
+        menuBtn.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                sidebar.classList.toggle('show');
+                body.style.overflow = sidebar.classList.contains('show') ? 'hidden' : '';
+            }
         });
 
         // Close sidebar when clicking outside
