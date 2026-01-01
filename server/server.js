@@ -176,7 +176,6 @@ mongoose.connect(MONGODB_URI)
 
 // Session middleware for watch progress and playlists
 const session = require('express-session');
-const MongoStore = require('connect-mongo');
 
 // Configure session store - use MongoDB in production, memory in development
 const sessionConfig = {
@@ -191,12 +190,20 @@ const sessionConfig = {
 
 // Use MongoDB store in production to avoid memory leaks
 if (process.env.NODE_ENV === 'production' && process.env.MONGODB_URI) {
-    sessionConfig.store = MongoStore.create({
-        mongoUrl: MONGODB_URI,
-        ttl: 30 * 24 * 60 * 60, // 30 days
-        autoRemove: 'native'
-    });
-    console.log('📦 Using MongoDB session store');
+    try {
+        const MongoStore = require('connect-mongo');
+        // Handle both default export and named export patterns
+        const Store = MongoStore.default || MongoStore;
+        sessionConfig.store = Store.create({
+            mongoUrl: MONGODB_URI,
+            ttl: 30 * 24 * 60 * 60, // 30 days
+            autoRemove: 'native'
+        });
+        console.log('📦 Using MongoDB session store');
+    } catch (err) {
+        console.warn('⚠️ Could not initialize MongoDB session store:', err.message);
+        console.warn('⚠️ Falling back to MemoryStore (not recommended for production)');
+    }
 }
 
 app.use(session(sessionConfig));
