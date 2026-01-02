@@ -1,0 +1,194 @@
+╔══════════════════════════════════════════════════════════════════════╗
+║                                                                      ║
+║              GOOGLE AUTHENTICATION FLOW DIAGRAM                      ║
+║                                                                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════════════
+
+                    🔐 AUTHENTICATION FLOW
+
+═══════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│  USER                    FRONTEND                  BACKEND          │
+│   │                         │                        │             │
+│   │  1. Opens login page    │                        │             │
+│   ├────────────────────────>│                        │             │
+│   │                         │                        │             │
+│   │  2. Clicks "Sign in     │                        │             │
+│   │     with Google"        │                        │             │
+│   ├────────────────────────>│                        │             │
+│   │                         │                        │             │
+│   │  3. Google popup opens  │                        │             │
+│   │<────────────────────────┤                        │             │
+│   │                         │                        │             │
+│   │  4. Selects account &   │                        │             │
+│   │     grants permissions  │                        │             │
+│   ├────────────────────────>│                        │             │
+│   │                         │                        │             │
+│   │  5. Google returns      │                        │             │
+│   │     ID token            │                        │             │
+│   │<────────────────────────┤                        │             │
+│   │                         │                        │             │
+│   │                         │  6. Send token to      │             │
+│   │                         │     backend            │             │
+│   │                         ├───────────────────────>│             │
+│   │                         │                        │             │
+│   │                         │                        │  7. Verify  │
+│   │                         │                        │     token   │
+│   │                         │                        │     with    │
+│   │                         │                        │     Google  │
+│   │                         │                        │             │
+│   │                         │                        │  8. Create/ │
+│   │                         │                        │     update  │
+│   │                         │                        │     user in │
+│   │                         │                        │     MongoDB │
+│   │                         │                        │             │
+│   │                         │  9. Return JWT token   │             │
+│   │                         │     & user data        │             │
+│   │                         │<───────────────────────┤             │
+│   │                         │                        │             │
+│   │                         │  10. Save token in     │             │
+│   │                         │      localStorage      │             │
+│   │                         │                        │             │
+│   │  11. Show success &     │                        │             │
+│   │      redirect to home   │                        │             │
+│   │<────────────────────────┤                        │             │
+│   │                         │                        │             │
+│   │  12. User is logged in! │                        │             │
+│   │                         │                        │             │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════
+
+                    📋 DETAILED STEPS
+
+═══════════════════════════════════════════════════════════════════════
+
+STEP 1: User Opens Login Page
+├─ URL: http://localhost:8000/login.html
+├─ Page loads with Google Sign-In button
+└─ Google GSI library initializes
+
+STEP 2: User Clicks "Sign in with Google"
+├─ JavaScript calls google.accounts.id.renderButton()
+├─ Google popup window opens
+└─ Shows available Google accounts
+
+STEP 3: User Selects Account
+├─ User clicks on their Google account
+├─ Google shows permissions screen
+└─ User clicks "Continue" or "Allow"
+
+STEP 4: Google Returns ID Token
+├─ Google generates ID token
+├─ Token contains: email, name, picture, googleId
+└─ Token sent to frontend callback function
+
+STEP 5: Frontend Sends Token to Backend
+├─ POST request to /api/auth/google
+├─ Body: { token: "google_id_token" }
+└─ Headers: Content-Type: application/json
+
+STEP 6: Backend Verifies Token
+├─ Uses google-auth-library
+├─ Calls OAuth2Client.verifyIdToken()
+├─ Validates token signature
+└─ Extracts user data from token
+
+STEP 7: Backend Checks/Creates User
+├─ Searches for user by email
+├─ If exists: Updates googleId and profile image
+├─ If new: Creates user with Google data
+└─ Saves to MongoDB
+
+STEP 8: Backend Generates JWT
+├─ Creates JWT with user ID, email, subscription
+├─ Signs with JWT_SECRET
+├─ Sets expiry to 7 days
+└─ Returns token to frontend
+
+STEP 9: Frontend Saves Auth Data
+├─ Saves JWT token to localStorage (if Remember Me)
+├─ Or saves to sessionStorage (temporary)
+├─ Saves user data (name, email, profile image)
+└─ Sets token expiry timestamp
+
+STEP 10: Frontend Redirects
+├─ Shows "Login successful!" notification
+├─ Waits 1 second
+├─ Redirects to homepage
+└─ User is now logged in
+
+STEP 11: Homepage Loads
+├─ Checks for auth token
+├─ Updates UI with user info
+├─ Shows user name in navigation
+└─ Enables protected features
+
+═══════════════════════════════════════════════════════════════════════
+
+                    🔑 KEY COMPONENTS
+
+═══════════════════════════════════════════════════════════════════════
+
+FRONTEND (login.html + js/auth.js):
+├─ Google GSI library loaded
+├─ Google Sign-In button rendered
+├─ handleGoogleSignIn() callback function
+├─ Token sent to backend via fetch()
+└─ Auth data saved in browser storage
+
+BACKEND (server/controllers/googleAuthController.js):
+├─ OAuth2Client from google-auth-library
+├─ verifyIdToken() validates Google token
+├─ User model creates/updates user
+├─ JWT token generated with jsonwebtoken
+└─ Response sent back to frontend
+
+DATABASE (MongoDB):
+├─ Users collection stores user data
+├─ Fields: email, googleId, profileImage, etc.
+├─ Automatic indexing on email
+└─ Subscription data included
+
+═══════════════════════════════════════════════════════════════════════
+
+                    ✅ WHAT'S WORKING
+
+═══════════════════════════════════════════════════════════════════════
+
+  ✅ Google Sign-In button displays on login page
+  ✅ Google popup opens when button clicked
+  ✅ Backend validates Google tokens correctly
+  ✅ Users created/updated in MongoDB
+  ✅ JWT tokens generated and returned
+  ✅ Frontend saves tokens in browser
+  ✅ Auto-redirect after successful login
+  ✅ Protected routes check for authentication
+  ✅ Logout clears tokens and redirects
+  ✅ Remember Me persists login across sessions
+
+═══════════════════════════════════════════════════════════════════════
+
+                    🎯 TO TEST NOW
+
+═══════════════════════════════════════════════════════════════════════
+
+  Simply open in your browser:
+  
+  🌐 http://localhost:8000/login.html
+  
+  And click the "Sign in with Google" button!
+
+  Everything is configured and ready to go! 🚀
+
+═══════════════════════════════════════════════════════════════════════
+
+Status: ✅ READY FOR TESTING
+Date: December 20, 2025
+
+═══════════════════════════════════════════════════════════════════════

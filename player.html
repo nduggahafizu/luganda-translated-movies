@@ -891,113 +891,6 @@
                 padding-right: max(15px, env(safe-area-inset-right));
             }
         }
-        
-        /* Pre-roll Ad Overlay Styles */
-        .preroll-ad-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .preroll-ad-overlay.hidden {
-            display: none;
-        }
-        
-        .ad-label {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: rgba(0,0,0,0.8);
-            color: #fff;
-            padding: 5px 12px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .ad-content {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .skip-ad-container {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1001;
-        }
-        
-        .skip-ad-btn {
-            background: rgba(0,0,0,0.9);
-            color: #fff;
-            border: 1px solid rgba(255,255,255,0.3);
-            padding: 12px 20px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-        }
-        
-        .skip-ad-btn:hover:not(:disabled) {
-            background: var(--primary-color);
-            color: #000;
-            border-color: var(--primary-color);
-        }
-        
-        .skip-ad-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        
-        .skip-countdown {
-            background: var(--primary-color);
-            color: #000;
-            padding: 2px 8px;
-            border-radius: 3px;
-            font-weight: 700;
-            min-width: 24px;
-            text-align: center;
-        }
-        
-        .ad-timer {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(0,0,0,0.8);
-            color: #fff;
-            padding: 8px 15px;
-            border-radius: 4px;
-            font-size: 13px;
-        }
-        
-        @media (max-width: 768px) {
-            .skip-ad-btn {
-                padding: 10px 16px;
-                font-size: 13px;
-            }
-            
-            .skip-ad-container {
-                bottom: 15px;
-                right: 15px;
-            }
-        }
     </style>
 </head>
 
@@ -1030,20 +923,6 @@
 
     <!-- Video Player -->
     <div class="player-wrapper" id="playerWrapper">
-        <!-- Pre-roll Ad Overlay -->
-        <div class="preroll-ad-overlay" id="prerollAdOverlay">
-            <span class="ad-label">Advertisement</span>
-            <div class="ad-timer" id="adTimer">Ad ends in <span id="adCountdown">15</span>s</div>
-            <div class="ad-content" id="adContent">
-                <!-- Ad will be loaded here -->
-            </div>
-            <div class="skip-ad-container">
-                <button class="skip-ad-btn" id="skipAdBtn" disabled>
-                    Skip in <span class="skip-countdown" id="skipCountdown">10</span>
-                </button>
-            </div>
-        </div>
-        
         <!-- Native Video Player (for direct video files) -->
         <video id="player" playsinline controls crossorigin style="display: none;">
             <source src="" type="video/mp4">
@@ -1514,10 +1393,10 @@
             
             try {
                 const apiUrl = typeof API_CONFIG !== 'undefined' 
-                    ? API_CONFIG.API_URL 
+                    ? API_CONFIG.BASE_URL 
                     : 'https://luganda-translated-movies-production.up.railway.app';
                 
-                const response = await fetch(`${apiUrl}/api/luganda-movies?limit=8`);
+                const response = await fetch(`${apiUrl}/api/luganda-movies/latest?limit=8`);
                 const data = await response.json();
                 
                 if (data.status === 'success' && data.data) {
@@ -1600,94 +1479,6 @@
 
         // Initialize
         loadMovieData();
-
-        // ============================================
-        // PRE-ROLL AD SYSTEM
-        // ============================================
-        const prerollAdOverlay = document.getElementById('prerollAdOverlay');
-        const skipAdBtn = document.getElementById('skipAdBtn');
-        const skipCountdown = document.getElementById('skipCountdown');
-        const adCountdown = document.getElementById('adCountdown');
-        const adContent = document.getElementById('adContent');
-        
-        let adSkipTime = 10; // Seconds before skip is available
-        let adTotalTime = 15; // Total ad duration (user can skip after 10s or wait 15s)
-        let adTimer = null;
-        let skipTimer = null;
-        let adShown = false;
-        
-        // Initialize pre-roll ad
-        function initPrerollAd() {
-            // Check if ad was already shown this session for this movie
-            const adShownKey = `ad_shown_${movieId}`;
-            if (sessionStorage.getItem(adShownKey)) {
-                hidePrerollAd();
-                return;
-            }
-            
-            // Show the ad overlay
-            prerollAdOverlay.classList.remove('hidden');
-            
-            // Start the skip countdown
-            let skipTimeLeft = adSkipTime;
-            let totalTimeLeft = adTotalTime;
-            
-            skipTimer = setInterval(() => {
-                skipTimeLeft--;
-                skipCountdown.textContent = skipTimeLeft;
-                
-                if (skipTimeLeft <= 0) {
-                    clearInterval(skipTimer);
-                    skipAdBtn.disabled = false;
-                    skipAdBtn.innerHTML = `
-                        Skip Ad
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="5 4 15 12 5 20 5 4"></polygon>
-                            <line x1="19" y1="5" x2="19" y2="19"></line>
-                        </svg>
-                    `;
-                }
-            }, 1000);
-            
-            // Ad total duration countdown
-            adTimer = setInterval(() => {
-                totalTimeLeft--;
-                adCountdown.textContent = totalTimeLeft;
-                
-                if (totalTimeLeft <= 0) {
-                    clearInterval(adTimer);
-                    hidePrerollAd();
-                }
-            }, 1000);
-            
-            // Mark ad as shown for this movie
-            sessionStorage.setItem(adShownKey, 'true');
-        }
-        
-        // Hide pre-roll ad and start video
-        function hidePrerollAd() {
-            clearInterval(skipTimer);
-            clearInterval(adTimer);
-            prerollAdOverlay.classList.add('hidden');
-            adShown = true;
-            
-            // Auto-play video after ad (if not embed mode)
-            if (!isEmbedMode && video && video.src) {
-                video.play().catch(e => console.log('Autoplay prevented'));
-            }
-        }
-        
-        // Skip button click
-        skipAdBtn.addEventListener('click', () => {
-            if (!skipAdBtn.disabled) {
-                hidePrerollAd();
-            }
-        });
-        
-        // Initialize ad when page loads (after slight delay)
-        setTimeout(() => {
-            initPrerollAd();
-        }, 500);
 
         // Service Worker Registration
         if ('serviceWorker' in navigator) {

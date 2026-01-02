@@ -1,0 +1,10 @@
+# Railway ignore file
+node_modules/
+.env.local
+.env.development
+*.log
+.DS_Store
+tests/
+seeds/
+scripts/
+*.md

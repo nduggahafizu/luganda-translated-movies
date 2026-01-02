@@ -24,10 +24,8 @@ const LugandaMoviesAPI = (function() {
             const response = await fetch(finalUrl, {
                 headers: {
                     'Content-Type': 'application/json',
-                    'Cache-Control': 'no-cache',
                     ...options.headers
                 },
-                cache: 'no-store', // Bypass browser cache
                 ...options
             });
 

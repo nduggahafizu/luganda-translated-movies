@@ -2,17 +2,32 @@ const express = require('express');
 const router = express.Router();
 const LugandaMovie = require('../models/LugandaMovie');
 
-// CORS middleware for all routes
-const setCorsHeaders = (res) => {
-    res.setHeader('Access-Control-Allow-Origin', 'https://watch.unrulymovies.com');
+// CORS middleware for all routes - Dynamic origin support
+const setCorsHeaders = (req, res) => {
+    const origin = req.headers.origin;
+    // Allow requests from unrulymovies.com, netlify.app, railway.app, and localhost
+    const allowedOrigins = [
+        'https://watch.unrulymovies.com',
+        'https://unrulymovies.com',
+        'https://translatedmovies.netlify.app',
+        'http://localhost:3000',
+        'http://localhost:5000'
+    ];
+    
+    if (origin && (allowedOrigins.includes(origin) || origin.includes('netlify.app') || origin.includes('unrulymovies.com'))) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    } else if (!origin) {
+        // Allow requests with no origin (mobile apps, Postman, etc.)
+        res.setHeader('Access-Control-Allow-Origin', '*');
+    }
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cache-Control');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
 };
 
 // GET /api/luganda-movies/latest - Get latest movies
 router.get('/latest', async (req, res) => {
-    setCorsHeaders(res);
+    setCorsHeaders(req, res);
     try {
         const limit = parseInt(req.query.limit) || 10;
         const movies = await LugandaMovie.find({ status: 'published' }).sort({ createdAt: -1 }).limit(limit);
@@ -25,7 +40,7 @@ router.get('/latest', async (req, res) => {
 
 // GET /api/luganda-movies/trending - Get trending movies by views
 router.get('/trending', async (req, res) => {
-    setCorsHeaders(res);
+    setCorsHeaders(req, res);
     try {
         const limit = parseInt(req.query.limit) || 10;
         const movies = await LugandaMovie.find({ status: 'published' })
@@ -40,7 +55,7 @@ router.get('/trending', async (req, res) => {
 
 // GET /api/luganda-movies/featured - Get featured movies
 router.get('/featured', async (req, res) => {
-    setCorsHeaders(res);
+    setCorsHeaders(req, res);
     try {
         const limit = parseInt(req.query.limit) || 10;
         const movies = await LugandaMovie.find({ status: 'published', featured: true })
@@ -55,7 +70,7 @@ router.get('/featured', async (req, res) => {
 
 // GET /api/luganda-movies/genres - Get all unique genres
 router.get('/genres', async (req, res) => {
-    setCorsHeaders(res);
+    setCorsHeaders(req, res);
     try {
         const genres = await LugandaMovie.distinct('genres');
         res.json({ status: 'success', data: genres.filter(g => g) });
@@ -67,7 +82,7 @@ router.get('/genres', async (req, res) => {
 
 // GET /api/luganda-movies/genre/:genre - Get movies by genre
 router.get('/genre/:genre', async (req, res) => {
-    setCorsHeaders(res);
+    setCorsHeaders(req, res);
     try {
         const limit = parseInt(req.query.limit) || 20;
         const genre = req.params.genre.toLowerCase();
@@ -84,7 +99,7 @@ router.get('/genre/:genre', async (req, res) => {
 
 // GET /api/luganda-movies/vjs - Get all VJ translators
 router.get('/vjs', async (req, res) => {
-    setCorsHeaders(res);
+    setCorsHeaders(req, res);
     try {
         const vjs = await LugandaMovie.aggregate([
             { $match: { status: 'published' } },
@@ -105,7 +120,7 @@ router.get('/vjs', async (req, res) => {
 
 // GET /api/luganda-movies/vj/:vjName - Get movies by VJ
 router.get('/vj/:vjName', async (req, res) => {
-    setCorsHeaders(res);
+    setCorsHeaders(req, res);
     try {
         const limit = parseInt(req.query.limit) || 20;
         const vjName = decodeURIComponent(req.params.vjName);
@@ -122,7 +137,7 @@ router.get('/vj/:vjName', async (req, res) => {
 
 // GET /api/luganda-movies/search - Search movies
 router.get('/search', async (req, res) => {
-    setCorsHeaders(res);
+    setCorsHeaders(req, res);
     try {
         const { q, genre, vj, year, limit: limitParam } = req.query;
         const limit = parseInt(limitParam) || 20;
@@ -150,7 +165,7 @@ router.get('/search', async (req, res) => {
 
 // GET /api/luganda-movies/:id - Get single movie by ID (MUST be last route with dynamic param)
 router.get('/:id', async (req, res) => {
-    setCorsHeaders(res);
+    setCorsHeaders(req, res);
     
     try {
         const { id } = req.params;
