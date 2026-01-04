@@ -51,50 +51,48 @@
     // DOM Elements
     const body = document.body;
     const menuBtn = document.getElementById('menuToggle') || document.querySelector('.menu');
-    const sidebar = document.getElementById('aside') || document.querySelector('.app-aside');
+    const navbarNav = document.querySelector('.navbar-nav');
     const searchBtn = document.querySelector('.search-btn');
     const headerSearch = document.querySelector('.header-search');
     const scrollUpBtn = document.querySelector('.scroll-up');
 
     // ===================================
-    // Mobile Menu Toggle
+    // Mobile Menu Toggle (for .navbar-nav)
     // ===================================
-    if (menuBtn && sidebar) {
+    if (menuBtn && navbarNav) {
         menuBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            sidebar.classList.toggle('show');
-            body.style.overflow = sidebar.classList.contains('show') ? 'hidden' : '';
-            console.log('Menu clicked, sidebar show:', sidebar.classList.contains('show'));
+            navbarNav.classList.toggle('open');
+            body.style.overflow = navbarNav.classList.contains('open') ? 'hidden' : '';
         });
-        
-        // Also handle keyboard accessibility
+
+        // Keyboard accessibility
         menuBtn.addEventListener('keypress', function(e) {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                sidebar.classList.toggle('show');
-                body.style.overflow = sidebar.classList.contains('show') ? 'hidden' : '';
+                navbarNav.classList.toggle('open');
+                body.style.overflow = navbarNav.classList.contains('open') ? 'hidden' : '';
             }
         });
 
-        // Close sidebar when clicking outside
+        // Close menu when clicking outside
         document.addEventListener('click', function(e) {
-            if (sidebar.classList.contains('show') &&
-                !sidebar.contains(e.target) &&
+            if (navbarNav.classList.contains('open') &&
+                !navbarNav.contains(e.target) &&
                 !menuBtn.contains(e.target)) {
-                sidebar.classList.remove('show');
+                navbarNav.classList.remove('open');
                 body.style.overflow = '';
             }
         });
 
-        // Close button in sidebar
-        const modalClose = sidebar.querySelector('.modal-close');
-        if (modalClose) {
-            modalClose.addEventListener('click', function() {
-                sidebar.classList.remove('show');
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && navbarNav.classList.contains('open')) {
+                navbarNav.classList.remove('open');
                 body.style.overflow = '';
-            });
-        }
+            }
+        });
     }
 
     // ===================================

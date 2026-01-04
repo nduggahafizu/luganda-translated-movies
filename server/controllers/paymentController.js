@@ -1,4 +1,5 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const { logger } = require('../middleware/logger');
 const axios = require('axios');
 const crypto = require('crypto');
 const Payment = require('../models/Payment');
@@ -68,11 +69,11 @@ exports.createPaymentIntent = async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Payment intent error:', error);
+        logger.error('PaymentIntent error', { error, requestId: req.requestId });
         res.status(500).json({
             status: 'error',
-            message: 'Error creating payment intent',
-            error: error.message
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };
@@ -114,7 +115,7 @@ exports.confirmStripePayment = async (req, res) => {
                     await sendPaymentReceipt(user, payment);
                     await sendSubscriptionEmail(user, payment.subscriptionPlan, payment.amount);
                 } catch (emailError) {
-                    console.error('Email error:', emailError);
+                    logger.error('Payment confirmation email error', { error: emailError, requestId: req.requestId });
                 }
 
                 res.json({
@@ -139,11 +140,11 @@ exports.confirmStripePayment = async (req, res) => {
             });
         }
     } catch (error) {
-        console.error('Confirm payment error:', error);
+        logger.error('ConfirmPayment error', { error, requestId: req.requestId });
         res.status(500).json({
             status: 'error',
-            message: 'Error confirming payment',
-            error: error.message
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };
@@ -233,7 +234,7 @@ exports.initiatePesapalPayment = async (req, res) => {
                 });
             }
         } catch (pesapalError) {
-            console.error('Pesapal API error:', pesapalError);
+            logger.error('Pesapal API error', { error: pesapalError, requestId: req.requestId });
             await payment.markAsFailed('Pesapal connection error');
             
             res.status(500).json({
@@ -243,11 +244,11 @@ exports.initiatePesapalPayment = async (req, res) => {
             });
         }
     } catch (error) {
-        console.error('Initiate Pesapal payment error:', error);
+        logger.error('InitiatePesapalPayment error', { error, requestId: req.requestId });
         res.status(500).json({
             status: 'error',
-            message: 'Error initiating payment',
-            error: error.message
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };
@@ -311,7 +312,7 @@ exports.pesapalCallback = async (req, res) => {
             res.redirect(`${process.env.CLIENT_URL}/payment/pending`);
         }
     } catch (error) {
-        console.error('Pesapal callback error:', error);
+        logger.error('PesapalCallback error', { error, requestId: req.requestId });
         res.redirect(`${process.env.CLIENT_URL}/payment/error`);
     }
 };
@@ -357,7 +358,7 @@ exports.pesapalIPN = async (req, res) => {
 
         res.json({ status: 'success' });
     } catch (error) {
-        console.error('Pesapal IPN error:', error);
+        logger.error('PesapalIPN error', { error, requestId: req.requestId });
         res.status(500).json({ status: 'error' });
     }
 };
@@ -401,8 +402,8 @@ exports.stripeWebhook = async (req, res) => {
 
         res.json({ received: true });
     } catch (error) {
-        console.error('Webhook error:', error);
-        res.status(400).send(`Webhook Error: ${error.message}`);
+        logger.error('StripeWebhook error', { error, requestId: req.requestId });
+        res.status(400).send('Webhook Error');
     }
 };
 
@@ -435,10 +436,11 @@ exports.getPaymentHistory = async (req, res) => {
             }
         });
     } catch (error) {
+        logger.error('GetPaymentHistory error', { error, requestId: req.requestId });
         res.status(500).json({
             status: 'error',
-            message: 'Error fetching payment history',
-            error: error.message
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };
@@ -465,10 +467,11 @@ exports.getPayment = async (req, res) => {
             data: { payment }
         });
     } catch (error) {
+        logger.error('GetPayment error', { error, requestId: req.requestId });
         res.status(500).json({
             status: 'error',
-            message: 'Error fetching payment',
-            error: error.message
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };

@@ -9,6 +9,7 @@ const Review = require('../models/Review');
 const Comment = require('../models/Comment');
 const ViewStats = require('../models/ViewStats');
 const Notification = require('../models/Notification');
+const { validateMovie, validateAdminUserUpdate, validateNotificationBroadcast } = require('../middleware/validation');
 
 // @route   GET /api/admin/dashboard
 // @desc    Get admin dashboard stats
@@ -179,7 +180,7 @@ router.get('/users', [auth, adminOnly], async (req, res) => {
 // @route   PUT /api/admin/users/:id
 // @desc    Update user
 // @access  Admin only
-router.put('/users/:id', [auth, adminOnly], async (req, res) => {
+router.put('/users/:id', [auth, adminOnly, validateAdminUserUpdate], async (req, res) => {
     try {
         const { role, isActive, subscription } = req.body;
         
@@ -311,7 +312,7 @@ router.get('/movies', [auth, adminOnly], async (req, res) => {
 // @route   POST /api/admin/movies
 // @desc    Add new movie
 // @access  Admin only
-router.post('/movies', [auth, adminOnly], async (req, res) => {
+router.post('/movies', [auth, adminOnly, validateMovie], async (req, res) => {
     try {
         const movie = new LugandaMovie(req.body);
         await movie.save();
@@ -342,7 +343,7 @@ router.post('/movies', [auth, adminOnly], async (req, res) => {
 // @route   PUT /api/admin/movies/:id
 // @desc    Update movie
 // @access  Admin only
-router.put('/movies/:id', [auth, adminOnly], async (req, res) => {
+router.put('/movies/:id', [auth, adminOnly, validateMovie], async (req, res) => {
     try {
         const movie = await LugandaMovie.findByIdAndUpdate(
             req.params.id,
@@ -513,7 +514,7 @@ router.get('/analytics', [auth, adminOnly], async (req, res) => {
 // @route   POST /api/admin/notifications/broadcast
 // @desc    Send notification to all users
 // @access  Admin only
-router.post('/notifications/broadcast', [auth, adminOnly], async (req, res) => {
+router.post('/notifications/broadcast', [auth, adminOnly, validateNotificationBroadcast], async (req, res) => {
     try {
         const { title, message, link, image, userFilter } = req.body;
         

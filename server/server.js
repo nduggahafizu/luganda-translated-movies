@@ -2,6 +2,7 @@
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const responseTime = require('response-time');
@@ -10,6 +11,7 @@ require('dotenv').config();
 
 // Import middleware
 const { logger, requestLogger } = require('./middleware/logger');
+const requestIdMiddleware = require('./middleware/requestId');
 const { cache, clearCache, getCacheStats } = require('./middleware/cache');
 const { metricsMiddleware, getHealthCheck, getApiMetrics } = require('./utils/monitoring');
 const { refreshTokenHandler } = require('./middleware/jwtAuth');
@@ -106,13 +108,17 @@ app.use(cors(corsOptions));
 // Explicit OPTIONS handler for preflight requests
 app.options('*', cors(corsOptions));
 
-// Body parser middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+// Body parser middleware with stricter limits
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+// Sanitize data against NoSQL injection
+app.use(mongoSanitize());
 
 // Compression middleware
 app.use(compression());
 
+// Attach requestId to every request
+app.use(requestIdMiddleware);
 // Request logging with Winston
 app.use(requestLogger);
 
@@ -249,10 +255,10 @@ app.get('/api/health', async (req, res) => {
         const health = await getHealthCheck();
         res.json(health);
     } catch (error) {
+        logger.error('Health check error', { error, requestId: req.requestId });
         res.status(500).json({
             status: 'error',
-            message: 'Health check failed',
-            error: error.message
+            message: 'Something went wrong'
         });
     }
 });
@@ -293,10 +299,10 @@ app.get('/api/cache/stats', async (req, res) => {
             cache: stats
         });
     } catch (error) {
+        logger.error('Cache stats error', { error, requestId: req.requestId });
         res.status(500).json({
             status: 'error',
-            message: 'Failed to get cache stats',
-            error: error.message
+            message: 'Something went wrong'
         });
     }
 });
@@ -330,10 +336,10 @@ app.post('/api/cache/clear', async (req, res) => {
             result
         });
     } catch (error) {
+        logger.error('Clear cache error', { error, requestId: req.requestId });
         res.status(500).json({
             status: 'error',
-            message: 'Failed to clear cache',
-            error: error.message
+            message: 'Something went wrong'
         });
     }
 });
@@ -375,12 +381,11 @@ app.use((req, res) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
-    console.error('Error:', err);
-    
+    logger.error('Unhandled error', { error: err, requestId: req.requestId });
     res.status(err.statusCode || 500).json({
         status: 'error',
-        message: err.message || 'Internal server error',
-        ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+        message: 'Something went wrong',
+        requestId: req.requestId
     });
 });
 
