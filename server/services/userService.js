@@ -159,6 +159,17 @@ async function verifyEmail({ token }) {
     return { success: true };
 }
 
+async function updatePassword({ userId, currentPassword, newPassword }) {
+    const user = await User.findById(userId).select('+password');
+    if (!user) return { error: 'User not found' };
+    const isMatch = await user.comparePassword(currentPassword);
+    if (!isMatch) return { error: 'Current password is incorrect' };
+    user.password = newPassword;
+    await user.save();
+    const token = generateToken(user._id);
+    return { token };
+}
+
 async function refreshTokenService({ refreshToken }) {
     try {
         const decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
@@ -168,15 +179,6 @@ async function refreshTokenService({ refreshToken }) {
     } catch (error) {
         return { error: 'Invalid refresh token' };
     }
-}
-    const user = await User.findById(userId).select('+password');
-    if (!user) return { error: 'User not found' };
-    const isMatch = await user.comparePassword(currentPassword);
-    if (!isMatch) return { error: 'Current password is incorrect' };
-    user.password = newPassword;
-    await user.save();
-    const token = generateToken(user._id);
-    return { token };
 }
 
 module.exports = {
