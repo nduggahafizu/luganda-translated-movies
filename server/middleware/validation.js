@@ -1,3 +1,68 @@
+// Admin user update validation
+exports.validateAdminUserUpdate = [
+    body('role')
+        .optional()
+        .isIn(['user', 'admin', 'moderator']).withMessage('Invalid role'),
+    body('isActive')
+        .optional()
+        .isBoolean().withMessage('isActive must be a boolean'),
+    body('subscription')
+        .optional()
+        .isObject().withMessage('Subscription must be an object'),
+    body('subscription.plan')
+        .optional()
+        .isIn(['free', 'basic', 'premium']).withMessage('Invalid subscription plan'),
+    body('subscription.status')
+        .optional()
+        .isIn(['active', 'inactive', 'canceled']).withMessage('Invalid subscription status'),
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Validation failed',
+                errors: errors.array()
+            });
+        }
+        next();
+    }
+];
+
+// Notification broadcast validation
+exports.validateNotificationBroadcast = [
+    body('title')
+        .notEmpty().withMessage('Title is required')
+        .isLength({ max: 200 }).withMessage('Title cannot exceed 200 characters'),
+    body('message')
+        .notEmpty().withMessage('Message is required')
+        .isLength({ max: 2000 }).withMessage('Message cannot exceed 2000 characters'),
+    body('link')
+        .optional()
+        .isURL().withMessage('Link must be a valid URL'),
+    body('image')
+        .optional()
+        .isURL().withMessage('Image must be a valid URL'),
+    body('userFilter')
+        .optional()
+        .isObject().withMessage('userFilter must be an object'),
+    body('userFilter.plan')
+        .optional()
+        .isIn(['free', 'basic', 'premium']).withMessage('Invalid userFilter plan'),
+    body('userFilter.status')
+        .optional()
+        .isIn(['active', 'inactive', 'canceled']).withMessage('Invalid userFilter status'),
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Validation failed',
+                errors: errors.array()
+            });
+        }
+        next();
+    }
+];
 const { body, validationResult } = require('express-validator');
 
 // Validation middleware

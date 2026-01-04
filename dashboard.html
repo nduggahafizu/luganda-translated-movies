@@ -748,10 +748,26 @@
         document.addEventListener('DOMContentLoaded', async () => {
             // Use the getAuthToken function from auth.js for consistency
             const token = getAuthToken();
-            
+            const errorBox = document.createElement('div');
+            errorBox.id = 'dashboardErrorBox';
+            errorBox.style.display = 'none';
+            errorBox.style.background = '#ffeaea';
+            errorBox.style.color = '#b00020';
+            errorBox.style.padding = '16px';
+            errorBox.style.margin = '24px auto';
+            errorBox.style.maxWidth = '480px';
+            errorBox.style.borderRadius = '8px';
+            errorBox.style.textAlign = 'center';
+            errorBox.style.fontWeight = '500';
+            document.body.prepend(errorBox);
+
+            function showDashboardError(msg) {
+                errorBox.textContent = msg;
+                errorBox.style.display = 'block';
+            }
+
             if (!token) {
-                // No token found, redirect to login
-                window.location.href = 'login.html';
+                showDashboardError('You are not logged in. Please <a href="login.html" style="color:#1976d2;text-decoration:underline;">log in</a> to view your dashboard.');
                 return;
             }
 
@@ -765,7 +781,6 @@
                         'Content-Type': 'application/json'
                     }
                 });
-                
                 if (!response.ok) {
                     // Try to get user from localStorage as fallback
                     const storedUser = getCurrentUser();
@@ -778,16 +793,14 @@
                         loadRecommendations();
                         return;
                     }
-                    throw new Error('Not authenticated');
+                    showDashboardError('Could not load your profile. Please log in again.');
+                    return;
                 }
-                
                 const data = await response.json();
                 currentUser = data.data.user;
-                
                 // Update stored user data
                 localStorage.setItem('user', JSON.stringify(currentUser));
                 sessionStorage.setItem('user', JSON.stringify(currentUser));
-                
                 renderUserInfo();
                 loadWatchlist();
                 loadHistory();
@@ -795,8 +808,7 @@
                 loadRecommendations();
             } catch (error) {
                 console.error('Auth error:', error);
-                
-                // Try to use cached user data before redirecting
+                // Try to use cached user data before showing error
                 const storedUser = getCurrentUser();
                 if (storedUser) {
                     currentUser = storedUser;
@@ -807,8 +819,7 @@
                     loadRecommendations();
                     console.log('Using cached user data');
                 } else {
-                    // Only redirect if we have no cached data
-                    window.location.href = 'login.html';
+                    showDashboardError('An error occurred while loading your dashboard. Please try refreshing the page or log in again.');
                 }
             } finally {
                 document.body.classList.remove('loading');

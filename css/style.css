@@ -1,3 +1,77 @@
+/* Responsive Navigation Fixes */
+@media (max-width: 992px) {
+    .navbar-nav {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        width: 100vw;
+        background: var(--background-dark);
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+        padding: 20px 0 40px 0;
+        z-index: 2000;
+        transform: translateY(-120%);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.3s, opacity 0.3s;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+    }
+    .navbar-nav.open {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .nav-item {
+        width: 100%;
+    }
+    .nav-link {
+        width: 100%;
+        justify-content: flex-start;
+        padding: 16px 24px;
+        font-size: 18px;
+        border-radius: 0;
+    }
+    .menu {
+        display: block !important;
+    }
+    .app-navbar {
+        flex: 1;
+    }
+    .header-search {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 5px;
+    }
+    .navbar {
+        padding: 10px 5px;
+    }
+    .navbar-brand img {
+        width: 120px;
+        height: 32px;
+    }
+}
+
+/* Hide menu button on desktop */
+@media (min-width: 993px) {
+    .menu {
+        display: none !important;
+    }
+    .navbar-nav {
+        position: static;
+        flex-direction: row;
+        background: none;
+        transform: none !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        box-shadow: none;
+        padding: 0;
+    }
+}
 /* ===================================
    Unruly Movies - Main Stylesheet
    Primary Color: Soft Green (#66BB6A)
