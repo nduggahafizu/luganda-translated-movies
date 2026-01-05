@@ -1,3 +1,110 @@
+// POST /api/luganda-movies/auto-add - Auto-add a movie using TMDB and S3
+const axios = require('axios');
+router.post('/auto-add', async (req, res) => {
+    setCorsHeaders(req, res);
+    try {
+        const {
+            originalTitle,
+            year,
+            vjName,
+            duration,
+            genres,
+            videoKey,
+            director
+        } = req.body;
+
+        // Fetch TMDB data
+        const tmdbUrl = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.TMDB_API_KEY}&query=${encodeURIComponent(originalTitle)}&year=${year}`;
+        const tmdbRes = await axios.get(tmdbUrl);
+        let tmdbId = '', imdbId = '', poster = '', description = '';
+        if (tmdbRes.data.results && tmdbRes.data.results.length > 0) {
+            const movie = tmdbRes.data.results[0];
+            tmdbId = movie.id;
+            poster = movie.poster_path ? `https://image.tmdb.org/t/p/original${movie.poster_path}` : '';
+            description = movie.overview || '';
+        }
+
+        // Create movie
+        const newMovie = await LugandaMovie.create({
+            originalTitle,
+            vjName,
+            year,
+            duration,
+            description,
+            director,
+            poster,
+            genres,
+            video: {
+                originalVideoPath: `s3://${process.env.AWS_S3_BUCKET}/${videoKey}`,
+                provider: 'aws',
+                format: 'mp4',
+                quality: 'hd'
+            },
+            metaData: {
+                tmdbId,
+                imdbId
+            },
+            status: 'published'
+        });
+
+        res.status(201).json({ status: 'success', data: newMovie });
+    } catch (error) {
+        console.error('Error auto-adding movie:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to auto-add movie', details: error.message });
+    }
+});
+// POST /api/luganda-movies - Add a new Luganda movie (Admin only)
+router.post('/', async (req, res) => {
+    setCorsHeaders(req, res);
+    try {
+        // Example: expects TMDB data, S3 video key, and other required fields in req.body
+        const {
+            originalTitle,
+            lugandaTitle,
+            vjName,
+            year,
+            duration,
+            description,
+            director,
+            poster,
+            genres,
+            videoKey,
+            tmdbId,
+            imdbId
+        } = req.body;
+
+        // S3 video path
+        const originalVideoPath = `s3://${process.env.AWS_S3_BUCKET}/${videoKey}`;
+
+        const newMovie = await LugandaMovie.create({
+            originalTitle,
+            lugandaTitle,
+            vjName,
+            year,
+            duration,
+            description,
+            director,
+            poster,
+            genres,
+            video: {
+                originalVideoPath,
+                provider: 'aws',
+                format: 'mp4',
+                quality: 'hd'
+            },
+            metaData: {
+                tmdbId,
+                imdbId
+            },
+            status: 'published'
+        });
+
+        res.status(201).json({ status: 'success', data: newMovie });
+    } catch (error) {
+        console.error('Error adding movie:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to add movie', details: error.message });
+    }
+});
 const express = require('express');
 const router = express.Router();
 const LugandaMovie = require('../models/LugandaMovie');
