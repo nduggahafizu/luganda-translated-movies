@@ -1,5 +1,32 @@
-// POST /api/luganda-movies/auto-add - Auto-add a movie using TMDB and S3
+const express = require('express');
+const router = express.Router();
+const LugandaMovie = require('../models/LugandaMovie');
 const axios = require('axios');
+
+// CORS middleware for all routes - Dynamic origin support
+const setCorsHeaders = (req, res) => {
+    const origin = req.headers.origin;
+    // Allow requests from unrulymovies.com, netlify.app, railway.app, and localhost
+    const allowedOrigins = [
+        'https://watch.unrulymovies.com',
+        'https://unrulymovies.com',
+        'https://translatedmovies.netlify.app',
+        'http://localhost:3000',
+        'http://localhost:5000'
+    ];
+    
+    if (origin && (allowedOrigins.includes(origin) || origin.includes('netlify.app') || origin.includes('unrulymovies.com'))) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    } else if (!origin) {
+        // Allow requests with no origin (mobile apps, Postman, etc.)
+        res.setHeader('Access-Control-Allow-Origin', '*');
+    }
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cache-Control');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+};
+
+// POST /api/luganda-movies/auto-add - Auto-add a movie using TMDB and S3
 router.post('/auto-add', async (req, res) => {
     setCorsHeaders(req, res);
     try {
