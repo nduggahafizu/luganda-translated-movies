@@ -1,5 +1,6 @@
  const express = require('express');
 const mongoose = require('mongoose');
+const AWS = require('aws-sdk');
 const cors = require('cors');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
@@ -369,6 +370,31 @@ app.get('/', (req, res) => {
             }
         }
     });
+});
+
+// S3 pre-signed video URL endpoint
+app.get('/api/video-url', async (req, res) => {
+    const { key } = req.query;
+    if (!key) return res.status(400).json({ error: 'Missing video key' });
+
+    // Configure AWS SDK (use your credentials and region)
+    const s3 = new AWS.S3({
+        region: process.env.AWS_REGION,
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    });
+
+    const params = {
+        Bucket: process.env.AWS_S3_BUCKET,
+        Key: key,
+        Expires: 3600 // 1 hour
+    };
+    try {
+        const url = s3.getSignedUrl('getObject', params);
+        res.json({ url });
+    } catch (err) {
+        res.status(500).json({ error: 'Could not generate URL', details: err.message });
+    }
 });
 
 // 404 handler
