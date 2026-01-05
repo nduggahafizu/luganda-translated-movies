@@ -1,3 +1,5 @@
+const { body, validationResult } = require('express-validator');
+
 // Admin user update validation
 exports.validateAdminUserUpdate = [
     body('role')
@@ -63,7 +65,6 @@ exports.validateNotificationBroadcast = [
         next();
     }
 ];
-const { body, validationResult } = require('express-validator');
 
 // Validation middleware
 exports.validate = (req, res, next) => {
