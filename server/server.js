@@ -1,6 +1,7 @@
  const express = require('express');
 const mongoose = require('mongoose');
-const AWS = require('aws-sdk');
+const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const cors = require('cors');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
@@ -8,7 +9,8 @@ const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const responseTime = require('response-time');
 const swaggerUi = require('swagger-ui-express');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 // Import middleware
 const { logger, requestLogger } = require('./middleware/logger');
@@ -377,20 +379,22 @@ app.get('/api/video-url', async (req, res) => {
     const { key } = req.query;
     if (!key) return res.status(400).json({ error: 'Missing video key' });
 
-    // Configure AWS SDK (use your credentials and region)
-    const s3 = new AWS.S3({
+    // Configure AWS SDK v3 S3 Client
+    const s3Client = new S3Client({
         region: process.env.AWS_REGION,
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+        credentials: {
+            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+        }
     });
 
-    const params = {
+    const command = new GetObjectCommand({
         Bucket: process.env.AWS_S3_BUCKET,
-        Key: key,
-        Expires: 3600 // 1 hour
-    };
+        Key: key
+    });
+
     try {
-        const url = s3.getSignedUrl('getObject', params);
+        const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 }); // 1 hour
         res.json({ url });
     } catch (err) {
         res.status(500).json({ error: 'Could not generate URL', details: err.message });
