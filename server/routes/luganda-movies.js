@@ -132,32 +132,6 @@ router.post('/', async (req, res) => {
         res.status(500).json({ status: 'error', message: 'Failed to add movie', details: error.message });
     }
 });
-const express = require('express');
-const router = express.Router();
-const LugandaMovie = require('../models/LugandaMovie');
-
-// CORS middleware for all routes - Dynamic origin support
-const setCorsHeaders = (req, res) => {
-    const origin = req.headers.origin;
-    // Allow requests from unrulymovies.com, netlify.app, railway.app, and localhost
-    const allowedOrigins = [
-        'https://watch.unrulymovies.com',
-        'https://unrulymovies.com',
-        'https://translatedmovies.netlify.app',
-        'http://localhost:3000',
-        'http://localhost:5000'
-    ];
-    
-    if (origin && (allowedOrigins.includes(origin) || origin.includes('netlify.app') || origin.includes('unrulymovies.com'))) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-    } else if (!origin) {
-        // Allow requests with no origin (mobile apps, Postman, etc.)
-        res.setHeader('Access-Control-Allow-Origin', '*');
-    }
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cache-Control');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-};
 
 // GET /api/luganda-movies/latest - Get latest movies
 router.get('/latest', async (req, res) => {
