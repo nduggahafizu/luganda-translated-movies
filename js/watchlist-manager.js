@@ -183,7 +183,7 @@ const WatchlistManager = {
         if (!token) return;
         
         try {
-            const response = await fetch(`${API_CONFIG.API_URL}/api/users/preferences`, {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/api/users/preferences`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -228,7 +228,7 @@ const WatchlistManager = {
         if (!token) return;
         
         try {
-            await fetch(`${API_CONFIG.API_URL}/api/users/${type}`, {
+            await fetch(`${API_CONFIG.BASE_URL}/api/users/${type}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -247,7 +247,7 @@ const WatchlistManager = {
         if (!token) return;
         
         try {
-            await fetch(`${API_CONFIG.API_URL}/api/users/${type}/${movieId}`, {
+            await fetch(`${API_CONFIG.BASE_URL}/api/users/${type}/${movieId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -264,7 +264,7 @@ const WatchlistManager = {
         if (!token) return;
         
         try {
-            await fetch(`${API_CONFIG.API_URL}/api/users/history`, {
+            await fetch(`${API_CONFIG.BASE_URL}/api/users/history`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
