@@ -116,6 +116,7 @@
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/trailer-player.css">
     <link rel="stylesheet" href="css/mobile-improvements.css">
+    <link rel="stylesheet" href="css/professional-enhancements.css">
     
     <!-- Preload fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -650,16 +651,21 @@
                             </div>
 
                             <!-- Trending Now Section -->
-                            <div class="app-section">
-                                <div class="app-heading">
-                                    <div class="text">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px; vertical-align: middle; color: #FF6B6B;">
+                            <div class="app-section movie-section">
+                                <div class="section-header">
+                                    <h2>
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" stroke-width="2">
                                             <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
                                             <polyline points="17 6 23 6 23 12"></polyline>
                                         </svg>
                                         Trending Now
-                                    </div>
-                                    <a href="movies.html?sort=trending" class="all">View All</a>
+                                    </h2>
+                                    <a href="movies.html?sort=trending" class="view-all">
+                                        View All
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="9 18 15 12 9 6"></polyline>
+                                        </svg>
+                                    </a>
                                 </div>
                                 <div class="row row-cols-2 row-cols-md-5 list-scrollable" id="trendingMovies">
                                     <!-- Trending movies will be loaded here -->
@@ -670,10 +676,15 @@
                             </div>
 
                             <!-- All Movies Section (Newest First) -->
-                            <div class="app-section">
-                                <div class="app-heading">
-                                    <div class="text">All Movies</div>
-                                    <a href="movies.html" class="all">View All</a>
+                            <div class="app-section movie-section">
+                                <div class="section-header">
+                                    <h2>Latest Releases</h2>
+                                    <a href="movies.html" class="view-all">
+                                        View All
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="9 18 15 12 9 6"></polyline>
+                                        </svg>
+                                    </a>
                                 </div>
                                 <div class="row row-cols-2 row-cols-md-5 list-scrollable" id="allMovies">
                                     <!-- Movies will be loaded here dynamically -->
@@ -684,10 +695,15 @@
                             </div>
 
                             <!-- Popular VJ Movies -->
-                            <div class="app-section">
-                                <div class="app-heading">
-                                    <div class="text">Popular VJ Movies</div>
-                                    <a href="movies.html" class="all">View All</a>
+                            <div class="app-section movie-section">
+                                <div class="section-header">
+                                    <h2>Popular VJ Movies</h2>
+                                    <a href="movies.html?sort=popular" class="view-all">
+                                        View All
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="9 18 15 12 9 6"></polyline>
+                                        </svg>
+                                    </a>
                                 </div>
                                 <div class="row row-cols-2 row-cols-md-5 list-scrollable" id="popularMovies">
                                     <!-- Movies will be loaded dynamically -->
