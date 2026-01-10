@@ -149,98 +149,184 @@ exports.confirmStripePayment = async (req, res) => {
     }
 };
 
+// PesaPal 3.0 API Configuration
+const PESAPAL_CONFIG = {
+    baseUrl: process.env.PESAPAL_ENVIRONMENT === 'live' 
+        ? 'https://pay.pesapal.com/v3'
+        : 'https://cybqa.pesapal.com/pesapalv3',
+    consumerKey: process.env.PESAPAL_CONSUMER_KEY,
+    consumerSecret: process.env.PESAPAL_CONSUMER_SECRET
+};
+
+// Get PesaPal OAuth Token
+let pesapalToken = null;
+let pesapalTokenExpiry = null;
+
+async function getPesapalToken() {
+    // Return cached token if still valid
+    if (pesapalToken && pesapalTokenExpiry && Date.now() < pesapalTokenExpiry) {
+        return pesapalToken;
+    }
+    
+    try {
+        const response = await axios.post(
+            `${PESAPAL_CONFIG.baseUrl}/api/Auth/RequestToken`,
+            {
+                consumer_key: PESAPAL_CONFIG.consumerKey,
+                consumer_secret: PESAPAL_CONFIG.consumerSecret
+            },
+            {
+                headers: { 'Content-Type': 'application/json' }
+            }
+        );
+        
+        if (response.data && response.data.token) {
+            pesapalToken = response.data.token;
+            // Token valid for 5 minutes, cache for 4
+            pesapalTokenExpiry = Date.now() + (4 * 60 * 1000);
+            return pesapalToken;
+        }
+        throw new Error('Failed to get PesaPal token');
+    } catch (error) {
+        logger.error('PesaPal token error', { error: error.message });
+        throw error;
+    }
+}
+
 // @desc    Initiate Pesapal payment (Uganda Mobile Money)
 // @route   POST /api/payments/pesapal/initiate
 // @access  Private
 exports.initiatePesapalPayment = async (req, res) => {
     try {
-        const { subscriptionPlan, subscriptionDuration = 'monthly', phoneNumber, network } = req.body;
+        const { subscriptionPlan, subscriptionDuration = 'monthly', phoneNumber, amount, currency = 'UGX', description } = req.body;
 
-        // Validate network
-        if (!['MTN', 'AIRTEL'].includes(network)) {
+        // Get price in UGX
+        const paymentAmount = amount || SUBSCRIPTION_PRICES[subscriptionPlan]?.[`ugx_${subscriptionDuration}`] || SUBSCRIPTION_PRICES[subscriptionPlan]?.ugx_monthly;
+
+        if (!paymentAmount) {
             return res.status(400).json({
                 status: 'error',
-                message: 'Invalid network. Must be MTN or AIRTEL'
+                message: 'Invalid subscription plan'
             });
         }
 
-        // Get price in UGX
-        const amount = SUBSCRIPTION_PRICES[subscriptionPlan][`ugx_${subscriptionDuration}`];
-
         // Generate unique merchant reference
-        const merchantReference = `UNR-${Date.now()}-${req.user.id}`;
+        const merchantReference = `UNRULY-${Date.now()}-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
 
         // Create payment record
         const payment = await Payment.create({
             user: req.user.id,
             transactionId: merchantReference,
-            amount,
+            amount: paymentAmount,
             currency: 'UGX',
-            paymentMethod: network === 'MTN' ? 'mtn_mobile_money' : 'airtel_money',
+            paymentMethod: 'mobile_money',
             paymentProvider: 'pesapal',
             status: 'pending',
             subscriptionPlan,
             subscriptionDuration,
             paymentDetails: {
                 pesapalMerchantReference: merchantReference,
-                phoneNumber,
-                network,
+                phoneNumber: phoneNumber || '',
                 payerEmail: req.user.email,
                 payerName: req.user.fullName
             }
         });
 
-        // Prepare Pesapal request
-        const pesapalData = {
-            consumer_key: process.env.PESAPAL_CONSUMER_KEY,
-            consumer_secret: process.env.PESAPAL_CONSUMER_SECRET,
-            amount,
-            currency: 'UGX',
-            description: `Unruly Movies ${subscriptionPlan} subscription`,
-            callback_url: `${process.env.CLIENT_URL}/payment/callback`,
-            notification_id: payment._id.toString(),
-            reference: merchantReference,
-            email: req.user.email,
-            phone_number: phoneNumber,
-            payment_method: network === 'MTN' ? 'MTN Mobile Money' : 'Airtel Money'
-        };
-
         try {
-            // Make request to Pesapal API
-            const response = await axios.post(
-                `${process.env.PESAPAL_API_URL}/PostPesapalDirectOrderV4`,
-                pesapalData
+            // Get OAuth token
+            const token = await getPesapalToken();
+            
+            // Register IPN URL first (required by PesaPal 3.0)
+            const ipnUrl = process.env.PESAPAL_IPN_URL || `https://luganda-translated-movies-production.up.railway.app/api/payments/pesapal/ipn`;
+            
+            let ipnId;
+            try {
+                const ipnResponse = await axios.post(
+                    `${PESAPAL_CONFIG.baseUrl}/api/URLSetup/RegisterIPN`,
+                    {
+                        url: ipnUrl,
+                        ipn_notification_type: 'POST'
+                    },
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                );
+                ipnId = ipnResponse.data?.ipn_id;
+            } catch (ipnError) {
+                // IPN might already be registered, try to get existing
+                logger.warn('IPN registration warning', { error: ipnError.message });
+                const ipnListResponse = await axios.get(
+                    `${PESAPAL_CONFIG.baseUrl}/api/URLSetup/GetIpnList`,
+                    {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }
+                );
+                ipnId = ipnListResponse.data?.[0]?.ipn_id;
+            }
+
+            // Submit order to PesaPal
+            const orderData = {
+                id: merchantReference,
+                currency: 'UGX',
+                amount: paymentAmount,
+                description: description || `Unruly Movies ${subscriptionPlan} subscription (${subscriptionDuration})`,
+                callback_url: `https://watch.unrulymovies.com/payment-success.html?ref=${merchantReference}`,
+                notification_id: ipnId,
+                billing_address: {
+                    email_address: req.user.email,
+                    phone_number: phoneNumber || '',
+                    first_name: req.user.fullName?.split(' ')[0] || 'Customer',
+                    last_name: req.user.fullName?.split(' ').slice(1).join(' ') || ''
+                }
+            };
+
+            const orderResponse = await axios.post(
+                `${PESAPAL_CONFIG.baseUrl}/api/Transactions/SubmitOrderRequest`,
+                orderData,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
             );
 
-            if (response.data && response.data.pesapal_tracking_id) {
+            if (orderResponse.data && orderResponse.data.redirect_url) {
                 // Update payment with tracking ID
-                payment.paymentDetails.pesapalTrackingId = response.data.pesapal_tracking_id;
+                payment.paymentDetails.pesapalOrderTrackingId = orderResponse.data.order_tracking_id;
                 await payment.save();
 
                 res.json({
                     status: 'success',
-                    message: 'Payment initiated. Please complete on your phone.',
+                    message: 'Payment initiated successfully',
                     data: {
                         paymentId: payment._id,
-                        trackingId: response.data.pesapal_tracking_id,
-                        redirectUrl: response.data.redirect_url
+                        merchantReference: merchantReference,
+                        orderTrackingId: orderResponse.data.order_tracking_id,
+                        redirectUrl: orderResponse.data.redirect_url
                     }
                 });
             } else {
-                await payment.markAsFailed('Pesapal API error');
-                res.status(500).json({
-                    status: 'error',
-                    message: 'Failed to initiate payment with Pesapal'
-                });
+                throw new Error('No redirect URL received from PesaPal');
             }
         } catch (pesapalError) {
-            logger.error('Pesapal API error', { error: pesapalError, requestId: req.requestId });
-            await payment.markAsFailed('Pesapal connection error');
+            logger.error('PesaPal API error', { 
+                error: pesapalError.message, 
+                response: pesapalError.response?.data,
+                requestId: req.requestId 
+            });
+            
+            payment.status = 'failed';
+            payment.paymentDetails.failureReason = pesapalError.message;
+            await payment.save();
             
             res.status(500).json({
                 status: 'error',
-                message: 'Error connecting to payment gateway',
-                error: pesapalError.message
+                message: 'Error connecting to payment gateway: ' + (pesapalError.response?.data?.message || pesapalError.message),
+                error: pesapalError.response?.data || pesapalError.message
             });
         }
     } catch (error) {
@@ -253,113 +339,165 @@ exports.initiatePesapalPayment = async (req, res) => {
     }
 };
 
-// @desc    Pesapal callback
+// @desc    Pesapal callback (redirect after payment)
 // @route   GET /api/payments/pesapal/callback
 // @access  Public
 exports.pesapalCallback = async (req, res) => {
     try {
-        const { pesapal_merchant_reference, pesapal_transaction_tracking_id } = req.query;
+        const { OrderTrackingId, OrderMerchantReference } = req.query;
+        
+        logger.info('PesaPal callback received', { OrderTrackingId, OrderMerchantReference });
 
-        // Find payment
+        // Find payment by merchant reference or tracking ID
         const payment = await Payment.findOne({
-            'paymentDetails.pesapalMerchantReference': pesapal_merchant_reference
+            $or: [
+                { transactionId: OrderMerchantReference },
+                { 'paymentDetails.pesapalMerchantReference': OrderMerchantReference },
+                { 'paymentDetails.pesapalOrderTrackingId': OrderTrackingId }
+            ]
         });
 
         if (!payment) {
-            return res.redirect(`${process.env.CLIENT_URL}/payment/failed`);
+            logger.warn('Payment not found for callback', { OrderTrackingId, OrderMerchantReference });
+            return res.redirect('https://watch.unrulymovies.com/payment-failed.html');
         }
 
-        // Query Pesapal for payment status
-        const statusResponse = await axios.get(
-            `${process.env.PESAPAL_API_URL}/QueryPaymentStatus`,
-            {
-                params: {
-                    pesapal_merchant_reference,
-                    pesapal_transaction_tracking_id
+        try {
+            // Get token and check transaction status
+            const token = await getPesapalToken();
+            
+            const statusResponse = await axios.get(
+                `${PESAPAL_CONFIG.baseUrl}/api/Transactions/GetTransactionStatus?orderTrackingId=${OrderTrackingId}`,
+                {
+                    headers: { 'Authorization': `Bearer ${token}` }
                 }
+            );
+
+            const statusCode = statusResponse.data?.status_code;
+            logger.info('PesaPal status check', { statusCode, data: statusResponse.data });
+
+            if (statusCode === 1) { // Completed
+                await processSuccessfulPesapalPayment(payment, statusResponse.data);
+                res.redirect(`https://watch.unrulymovies.com/payment-success.html?ref=${OrderMerchantReference}`);
+            } else if (statusCode === 2) { // Failed
+                payment.status = 'failed';
+                payment.paymentDetails.failureReason = statusResponse.data?.message || 'Payment failed';
+                await payment.save();
+                res.redirect('https://watch.unrulymovies.com/payment-failed.html');
+            } else { // Pending
+                res.redirect(`https://watch.unrulymovies.com/payment-pending.html?ref=${OrderMerchantReference}`);
             }
-        );
-
-        const status = statusResponse.data.status;
-
-        if (status === 'COMPLETED') {
-            await payment.markAsCompleted();
-
-            // Update user subscription
-            const user = await User.findById(payment.user);
-            user.subscription.plan = payment.subscriptionPlan;
-            user.subscription.status = 'active';
-            user.subscription.startDate = Date.now();
-            
-            const duration = payment.subscriptionDuration === 'yearly' ? 365 : 30;
-            user.subscription.endDate = new Date(Date.now() + duration * 24 * 60 * 60 * 1000);
-            
-            await user.save();
-
-            // Send emails
-            try {
-                await sendPaymentReceipt(user, payment);
-                await sendSubscriptionEmail(user, payment.subscriptionPlan, payment.amount);
-            } catch (emailError) {
-                console.error('Email error:', emailError);
-            }
-
-            res.redirect(`${process.env.CLIENT_URL}/payment/success?payment=${payment._id}`);
-        } else if (status === 'FAILED') {
-            await payment.markAsFailed('Payment failed');
-            res.redirect(`${process.env.CLIENT_URL}/payment/failed`);
-        } else {
-            res.redirect(`${process.env.CLIENT_URL}/payment/pending`);
+        } catch (statusError) {
+            logger.error('Status check error', { error: statusError.message });
+            res.redirect(`https://watch.unrulymovies.com/payment-pending.html?ref=${OrderMerchantReference}`);
         }
     } catch (error) {
-        logger.error('PesapalCallback error', { error, requestId: req.requestId });
-        res.redirect(`${process.env.CLIENT_URL}/payment/error`);
+        logger.error('PesaPal callback error', { error: error.message });
+        res.redirect('https://watch.unrulymovies.com/payment-failed.html');
     }
 };
 
-// @desc    Pesapal IPN (Instant Payment Notification)
+// Process successful PesaPal payment
+async function processSuccessfulPesapalPayment(payment, transactionData) {
+    if (payment.status === 'completed') return; // Already processed
+    
+    payment.status = 'completed';
+    payment.completedAt = new Date();
+    if (transactionData) {
+        payment.paymentDetails.pesapalConfirmationCode = transactionData.confirmation_code;
+        payment.paymentDetails.paymentMethod = transactionData.payment_method;
+    }
+    await payment.save();
+
+    // Update user subscription
+    const user = await User.findById(payment.user);
+    if (user) {
+        user.subscription.plan = payment.subscriptionPlan;
+        user.subscription.status = 'active';
+        user.subscription.startDate = new Date();
+        
+        const duration = payment.subscriptionDuration === 'yearly' ? 365 : 30;
+        user.subscription.endDate = new Date(Date.now() + duration * 24 * 60 * 60 * 1000);
+        
+        await user.save();
+
+        // Send emails
+        try {
+            await sendPaymentReceipt(user, payment);
+            await sendSubscriptionEmail(user, payment.subscriptionPlan, payment.amount);
+        } catch (emailError) {
+            logger.error('Email error', { error: emailError.message });
+        }
+    }
+}
+
+// @desc    Pesapal IPN (Instant Payment Notification) - PesaPal 3.0
 // @route   POST /api/payments/pesapal/ipn
 // @access  Public
 exports.pesapalIPN = async (req, res) => {
     try {
-        const { pesapal_notification_type, pesapal_transaction_tracking_id, pesapal_merchant_reference } = req.body;
+        const { OrderTrackingId, OrderMerchantReference, OrderNotificationType } = req.body;
+        
+        logger.info('PesaPal IPN received', { OrderTrackingId, OrderMerchantReference, OrderNotificationType });
 
-        if (pesapal_notification_type === 'CHANGE') {
-            // Query payment status
+        // Find payment
+        const payment = await Payment.findOne({
+            $or: [
+                { transactionId: OrderMerchantReference },
+                { 'paymentDetails.pesapalMerchantReference': OrderMerchantReference },
+                { 'paymentDetails.pesapalOrderTrackingId': OrderTrackingId }
+            ]
+        });
+
+        if (!payment) {
+            logger.warn('Payment not found for IPN', { OrderTrackingId, OrderMerchantReference });
+            return res.json({ 
+                orderNotificationType: OrderNotificationType,
+                orderTrackingId: OrderTrackingId,
+                orderMerchantReference: OrderMerchantReference,
+                status: 200
+            });
+        }
+
+        // Get token and check transaction status
+        try {
+            const token = await getPesapalToken();
+            
             const statusResponse = await axios.get(
-                `${process.env.PESAPAL_API_URL}/QueryPaymentStatus`,
+                `${PESAPAL_CONFIG.baseUrl}/api/Transactions/GetTransactionStatus?orderTrackingId=${OrderTrackingId}`,
                 {
-                    params: {
-                        pesapal_merchant_reference,
-                        pesapal_transaction_tracking_id
-                    }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 }
             );
 
-            const payment = await Payment.findOne({
-                'paymentDetails.pesapalMerchantReference': pesapal_merchant_reference
-            });
+            const statusCode = statusResponse.data?.status_code;
+            logger.info('IPN status check', { statusCode, data: statusResponse.data });
 
-            if (payment && statusResponse.data.status === 'COMPLETED') {
-                await payment.markAsCompleted();
-
-                // Update user subscription
-                const user = await User.findById(payment.user);
-                user.subscription.plan = payment.subscriptionPlan;
-                user.subscription.status = 'active';
-                user.subscription.startDate = Date.now();
-                
-                const duration = payment.subscriptionDuration === 'yearly' ? 365 : 30;
-                user.subscription.endDate = new Date(Date.now() + duration * 24 * 60 * 60 * 1000);
-                
-                await user.save();
+            if (statusCode === 1) { // Completed
+                await processSuccessfulPesapalPayment(payment, statusResponse.data);
+                logger.info('Payment completed via IPN', { OrderMerchantReference });
+            } else if (statusCode === 2) { // Failed
+                payment.status = 'failed';
+                payment.paymentDetails.failureReason = statusResponse.data?.message || 'Payment failed';
+                await payment.save();
+                logger.info('Payment failed via IPN', { OrderMerchantReference });
             }
+        } catch (statusError) {
+            logger.error('IPN status check error', { error: statusError.message });
         }
 
-        res.json({ status: 'success' });
+        // Always respond with success to acknowledge receipt
+        res.json({ 
+            orderNotificationType: OrderNotificationType,
+            orderTrackingId: OrderTrackingId,
+            orderMerchantReference: OrderMerchantReference,
+            status: 200
+        });
     } catch (error) {
-        logger.error('PesapalIPN error', { error, requestId: req.requestId });
+        logger.error('PesapalIPN error', { error: error.message });
         res.status(500).json({ status: 'error' });
+    }
+};
     }
 };
 

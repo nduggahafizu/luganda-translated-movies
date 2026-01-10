@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Payment Failed - Unruly Movies</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#7CFC00">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        .failed-container {
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 40px;
+            text-align: center;
+        }
+        .failed-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #ff4444, #cc0000);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+        }
+        .failed-icon svg {
+            width: 50px;
+            height: 50px;
+            stroke: #fff;
+        }
+        .failed-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+        .failed-message {
+            font-size: 18px;
+            color: #aaa;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .error-box {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        .error-code {
+            font-size: 14px;
+            color: #ff6666;
+            margin-bottom: 10px;
+        }
+        .error-reason {
+            font-size: 16px;
+            color: #fff;
+        }
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-retry {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #7CFC00, #5BC200);
+            color: #000;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .btn-retry:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(124, 252, 0, 0.3);
+        }
+        .btn-support {
+            display: inline-block;
+            padding: 15px 40px;
+            background: transparent;
+            border: 2px solid #7CFC00;
+            color: #7CFC00;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .btn-support:hover {
+            background: rgba(124, 252, 0, 0.1);
+        }
+        .help-text {
+            margin-top: 40px;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 10px;
+        }
+        .help-text h3 {
+            color: #fff;
+            margin-bottom: 15px;
+        }
+        .help-text ul {
+            text-align: left;
+            color: #aaa;
+            padding-left: 20px;
+        }
+        .help-text li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="app">
+            <div class="failed-container">
+                <div class="failed-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </div>
+                
+                <h1 class="failed-title">Payment Failed</h1>
+                <p class="failed-message">
+                    We couldn't process your payment. Don't worry, no money was deducted from your account.
+                </p>
+                
+                <div class="error-box">
+                    <div class="error-code" id="errorCode">Error Code: Unknown</div>
+                    <div class="error-reason" id="errorReason">The transaction was not completed.</div>
+                </div>
+                
+                <div class="btn-group">
+                    <a href="payment.html" class="btn-retry">Try Again</a>
+                    <a href="contact.html" class="btn-support">Contact Support</a>
+                </div>
+                
+                <div class="help-text">
+                    <h3>Common reasons for failed payments:</h3>
+                    <ul>
+                        <li>Insufficient funds in your mobile money account</li>
+                        <li>Transaction was cancelled or timed out</li>
+                        <li>Network connectivity issues</li>
+                        <li>Incorrect PIN entered</li>
+                        <li>Daily transaction limit exceeded</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Get error info from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const reason = urlParams.get('reason');
+        const code = urlParams.get('code');
+        
+        if (code) {
+            document.getElementById('errorCode').textContent = `Error Code: ${code}`;
+        }
+        if (reason) {
+            document.getElementById('errorReason').textContent = decodeURIComponent(reason);
+        }
+    </script>
+</body>
+</html>
