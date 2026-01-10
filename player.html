@@ -2071,47 +2071,10 @@
             addEmbedFallbackButton(originalUrl);
         }
         
-        // Add fallback button for embed issues
+        // Add fallback button for embed issues - DISABLED
         function addEmbedFallbackButton(originalUrl) {
-            // Remove existing button if any
-            const existing = document.getElementById('embed-fallback-btn');
-            if (existing) existing.remove();
-            
-            const btn = document.createElement('div');
-            btn.id = 'embed-fallback-btn';
-            btn.style.cssText = `
-                text-align: center;
-                padding: 15px;
-                background: rgba(0,0,0,0.8);
-                margin-top: -5px;
-            `;
-            btn.innerHTML = `
-                <p style="color: #888; font-size: 13px; margin-bottom: 10px;">
-                    Video not playing? Owner may have disabled embedding.
-                </p>
-                <a href="${originalUrl}" target="_blank" rel="noopener" style="
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 8px;
-                    background: linear-gradient(135deg, #7CFC00, #00D9FF);
-                    color: #000;
-                    padding: 12px 24px;
-                    border-radius: 8px;
-                    text-decoration: none;
-                    font-weight: 600;
-                    font-size: 14px;
-                ">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                        <polyline points="15 3 21 3 21 9"/>
-                        <line x1="10" y1="14" x2="21" y2="3"/>
-                    </svg>
-                    Watch on Archive.org
-                </a>
-            `;
-            
-            // Insert after embed container
-            embedContainer.parentNode.insertBefore(btn, embedContainer.nextSibling);
+            // Button removed - users will use direct video player
+            console.log('Embed fallback button disabled');
         }
         
         // Show embed error fallback UI
@@ -2134,28 +2097,10 @@
                         <line x1="15" y1="9" x2="9" y2="15"/>
                         <line x1="9" y1="9" x2="15" y2="15"/>
                     </svg>
-                    <h3 style="color: #fff; font-size: 18px; margin-bottom: 10px;">Embedding Not Allowed</h3>
+                    <h3 style="color: #fff; font-size: 18px; margin-bottom: 10px;">Video Unavailable</h3>
                     <p style="color: #888; font-size: 14px; margin-bottom: 25px; max-width: 400px;">
-                        The video owner has disabled embedding. You can still watch it directly on Archive.org.
+                        This video is temporarily unavailable. Please try another movie or check back later.
                     </p>
-                    <a href="${originalUrl}" target="_blank" rel="noopener" style="
-                        display: inline-flex;
-                        align-items: center;
-                        gap: 10px;
-                        background: linear-gradient(135deg, #7CFC00, #00D9FF);
-                        color: #000;
-                        padding: 14px 28px;
-                        border-radius: 10px;
-                        text-decoration: none;
-                        font-weight: 600;
-                        font-size: 15px;
-                        transition: transform 0.2s;
-                    ">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="5 3 19 12 5 21 5 3"/>
-                        </svg>
-                        Watch on Archive.org
-                    </a>
                 </div>
             `;
         }

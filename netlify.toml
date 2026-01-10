@@ -17,6 +17,8 @@
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+    # Disable COOP to allow Google OAuth popups
+    Cross-Origin-Opener-Policy = "unsafe-none"
     # CSP disabled to allow YouTube embeds and external resources
     Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, PATCH, OPTIONS"

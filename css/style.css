@@ -998,6 +998,7 @@ img {
     box-shadow: 0 2px 8px rgba(124, 252, 0, 0.4);
 }
 
+/* TMDB Rating Badge */
 .imdb {
     position: relative;
     width: 40px;
