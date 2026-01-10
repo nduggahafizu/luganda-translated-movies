@@ -498,8 +498,6 @@ exports.pesapalIPN = async (req, res) => {
         res.status(500).json({ status: 'error' });
     }
 };
-    }
-};
 
 // @desc    Stripe webhook
 // @route   POST /api/payments/stripe/webhook
