@@ -1,3 +1,15 @@
+# Redirect all domains to Netlify domain
+https://unrulymovies.com/* https://translatedmovies.netlify.app/:splat 301!
+http://unrulymovies.com/* https://translatedmovies.netlify.app/:splat 301!
+
+https://www.unrulymovies.com/* https://translatedmovies.netlify.app/:splat 301!
+http://www.unrulymovies.com/* https://translatedmovies.netlify.app/:splat 301!
+
+https://watch.unrulymovies.com/* https://translatedmovies.netlify.app/:splat 301!
+http://watch.unrulymovies.com/* https://translatedmovies.netlify.app/:splat 301!
+
+# API proxy
 /api/* https://luganda-translated-movies-production.up.railway.app/:splat 200
+
 # Redirect all requests to index.html for client-side routing
 /*    /index.html   200
