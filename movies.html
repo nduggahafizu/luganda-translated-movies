@@ -53,133 +53,12 @@
     
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/card-grid.css">
     <link rel="stylesheet" href="css/trailer-player.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
-    
-    <style>
-        .filter-section {
-            background: linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.98) 100%);
-            padding: 28px;
-            border-radius: 20px;
-            margin-bottom: 40px;
-            border: 1px solid rgba(102, 187, 106, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-        
-        .filter-row {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            align-items: flex-end;
-        }
-        
-        .filter-group {
-            flex: 1;
-            min-width: 200px;
-        }
-        
-        .filter-label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: var(--primary-color);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .filter-select {
-            width: 100%;
-            padding: 14px 18px;
-            background-color: rgba(0, 0, 0, 0.4);
-            border: 2px solid transparent;
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2366BB6A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 18px;
-            padding-right: 45px;
-        }
-        
-        .filter-select:hover {
-            border-color: rgba(102, 187, 106, 0.3);
-        }
-        
-        .filter-select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(102, 187, 106, 0.15);
-        }
-        
-        .movies-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 28px;
-            margin-bottom: 50px;
-        }
-        
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
-            margin: 50px 0;
-        }
-        
-        .page-btn {
-            padding: 12px 18px;
-            background: rgba(30, 30, 30, 0.8);
-            border: 2px solid transparent;
-            border-radius: 12px;
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 500;
-        }
-        
-        .page-btn:hover {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #4CAF50 100%);
-            color: #000;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 187, 106, 0.3);
-        }
-        
-        .page-btn.active {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #4CAF50 100%);
-            color: #000;
-            font-weight: 700;
-        }
-        
-        .page-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        @media (max-width: 768px) {
-            .movies-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 18px;
-            }
-            
-            .filter-group {
-                min-width: 100%;
-            }
-            
-            .filter-section {
-                padding: 20px;
-            }
-        }
-    </style>
 </head>
 
 <body>
@@ -331,7 +210,19 @@
                     <div class="container">
                         <div class="app-content pt-md-3">
                             
-                            <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 30px;">Browse Luganda Movies</h1>
+                            <!-- Page Hero -->
+                            <div class="page-hero">
+                                <h1 class="page-hero-title">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                                        <line x1="7" y1="2" x2="7" y2="22"></line>
+                                        <line x1="17" y1="2" x2="17" y2="22"></line>
+                                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                                    </svg>
+                                    Browse Luganda Movies
+                                </h1>
+                                <p class="page-hero-subtitle">Watch your favorite movies with Luganda VJ translations</p>
+                            </div>
                             
                             <!-- Filters -->
                             <div class="filter-section">
@@ -408,7 +299,7 @@
                             </div>
 
                             <!-- Movies Grid -->
-                            <div class="movies-grid" id="moviesGrid">
+                            <div class="card-grid" id="moviesGrid">
                                 <!-- Movie cards will be generated here -->
                             </div>
 
@@ -512,7 +403,11 @@
         // Load movies from API
         async function loadMovies(params = {}) {
             const grid = document.getElementById('moviesGrid');
-            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">Loading movies...</p>';
+            grid.innerHTML = `
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p class="loading-text">Loading movies...</p>
+                </div>`;
             
             try {
                 const queryParams = new URLSearchParams({
@@ -550,7 +445,16 @@
                 }
             } catch (error) {
                 console.error('Error loading movies:', error);
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">Failed to load movies. Please try again.</p>';
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <p class="empty-text">Failed to load movies</p>
+                        <p class="empty-subtext">Please check your connection and try again</p>
+                    </div>`;
             }
         }
 
@@ -618,7 +522,17 @@
             grid.innerHTML = '';
             
             if (moviesToRender.length === 0) {
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">No movies found matching your filters.</p>';
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                            <line x1="7" y1="2" x2="7" y2="22"></line>
+                            <line x1="17" y1="2" x2="17" y2="22"></line>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                        </svg>
+                        <p class="empty-text">No movies found matching your filters</p>
+                        <p class="empty-subtext">Try adjusting your filters or search terms</p>
+                    </div>`;
                 return;
             }
             
@@ -634,6 +548,7 @@
                 const posterUrl = movie.poster || fallbackPoster;
                 const vjName = movie.vjName || 'Unknown';
                 const posterId = `poster-${index}`;
+                const title = movie.originalTitle || movie.lugandaTitle || 'Unknown Title';
                 
                 // Store poster data for later loading
                 if (movie.poster) {
@@ -641,49 +556,34 @@
                 }
                 
                 const movieCard = `
-                    <div class="list-movie position-relative">
-                        <a href="player.html?id=${movie._id}" class="list-media">
-                            <div class="list-media-attr">
-                                <div class="quality">${quality.toUpperCase()}</div>
-                                <div class="imdb">
-                                    <span>${rating.toFixed(1)}</span>
-                                    <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
-                                        <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" 
-                                                stroke-dasharray="${rating * 20} 100" 
-                                                stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
+                    <a href="player.html?id=${movie._id}" class="content-card">
+                        <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
+                            <div class="card-badges">
+                                <span class="card-badge badge-quality">${quality.toUpperCase()}</span>
+                                ${vjName !== 'Unknown' ? `<span class="card-badge badge-vj">VJ ${vjName}</span>` : ''}
+                            </div>
+                            <div class="card-rating">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                </svg>
+                                ${rating.toFixed(1)}
+                            </div>
+                            <div class="play-overlay">
+                                <div class="play-button">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                     </svg>
                                 </div>
                             </div>
-                            <div class="play-btn">
-                                <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                </svg>
+                        </div>
+                        <div class="card-info">
+                            <h3 class="card-title">${title}</h3>
+                            <div class="card-meta">
+                                ${movie.year ? `<span>${movie.year}</span>` : ''}
+                                ${movie.genres && movie.genres.length > 0 ? `<span>${movie.genres[0]}</span>` : ''}
                             </div>
-                            <div class="media media-cover" id="${posterId}" style="background-image: url('${fallbackPoster}');"></div>
-                        </a>
-                        <div class="list-caption">
-                            <a href="player.html?id=${movie._id}" class="list-title">${movie.originalTitle || movie.lugandaTitle || 'Unknown Title'}</a>
-                            <a href="#" class="list-category">VJ ${vjName}</a>
                         </div>
-                        <div class="movie-card-actions always-visible">
-                            <a href="player.html?id=${movie._id}" class="btn-play">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                </svg>
-                                Play Movie
-                            </a>
-                            ${movie.tmdbId ? `
-                            <button class="btn-trailer" 
-                                    onclick="trailerPlayer.playTrailer(${movie.tmdbId}, '${(movie.originalTitle || '').replace(/'/g, "\\'")}')"
-                                    aria-label="Watch trailer for ${movie.originalTitle || 'Movie'}">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                </svg>
-                                Watch Trailer
-                            </button>
-                            ` : ''}
-                        </div>
-                    </div>
+                    </a>
                 `;
                 cardsHTML += movieCard;
             });

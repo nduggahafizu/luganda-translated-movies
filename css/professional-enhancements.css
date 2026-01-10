@@ -429,3 +429,209 @@ input:focus {
         display: none !important;
     }
 }
+
+/* ===================================
+   DESKTOP SPECIFIC ENHANCEMENTS
+   Netflix-Style Professional Layout
+   =================================== */
+
+@media (min-width: 769px) {
+    /* Desktop App Container */
+    .app-content {
+        padding: 30px 0 !important;
+    }
+    
+    /* Desktop Section Spacing */
+    .app-section {
+        margin-bottom: 60px !important;
+    }
+    
+    .movie-section {
+        padding: 0 20px;
+    }
+    
+    /* Desktop Section Headers */
+    .section-header {
+        display: flex !important;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+    }
+    
+    .section-header h2 {
+        font-size: 28px;
+        letter-spacing: -0.5px;
+    }
+    
+    /* Hero Slider Desktop */
+    .app-slider {
+        margin-bottom: 50px;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    
+    .carousel-item .slide {
+        min-height: 500px;
+    }
+    
+    .slide-caption {
+        padding: 60px;
+    }
+    
+    .slide-caption .title {
+        font-size: 48px;
+        font-weight: 800;
+        margin-bottom: 20px;
+    }
+    
+    .slide-caption .description {
+        font-size: 18px;
+        max-width: 600px;
+        line-height: 1.7;
+    }
+    
+    /* Desktop Movie Cards - Enhanced */
+    .list-movie {
+        border-radius: 12px;
+    }
+    
+    .list-caption {
+        padding: 16px !important;
+    }
+    
+    .list-caption .list-title {
+        font-size: 15px !important;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+    
+    .list-caption .list-category {
+        font-size: 13px;
+        opacity: 0.7;
+    }
+    
+    /* Desktop Quality/Rating Badges */
+    .quality {
+        font-size: 11px !important;
+        padding: 4px 10px !important;
+    }
+    
+    .imdb {
+        font-size: 12px !important;
+    }
+    
+    /* Desktop Sidebar */
+    .app-aside {
+        width: 260px;
+        background: linear-gradient(180deg, #0d0d15 0%, #0a0a0f 100%);
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .nav-header {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: rgba(255, 255, 255, 0.4);
+        padding: 20px 20px 10px;
+    }
+    
+    .nav li a {
+        padding: 12px 20px;
+        font-size: 14px;
+        border-radius: 8px;
+        margin: 2px 10px;
+    }
+    
+    .nav li.active a,
+    .nav li a:hover {
+        background: rgba(124, 252, 0, 0.1);
+        color: #7CFC00;
+    }
+    
+    /* Desktop Header */
+    .app-header {
+        background: rgba(10, 10, 15, 0.95);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 0 30px;
+    }
+    
+    .navbar {
+        height: 70px;
+    }
+    
+    .navbar-brand img {
+        height: 45px;
+        width: auto;
+    }
+    
+    .header-search {
+        max-width: 400px;
+        margin: 0 40px;
+    }
+    
+    .header-search input {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 25px;
+        padding: 12px 20px 12px 45px;
+        font-size: 14px;
+    }
+    
+    .header-search input:focus {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(124, 252, 0, 0.3);
+    }
+    
+    /* Desktop Navigation Links */
+    .navbar-nav .nav-link {
+        padding: 10px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 8px;
+        margin: 0 4px;
+    }
+    
+    .navbar-nav .nav-link:hover {
+        background: rgba(124, 252, 0, 0.1);
+        color: #7CFC00;
+    }
+    
+    /* Desktop Footer */
+    .site-footer {
+        background: linear-gradient(180deg, #0a0a0f 0%, #050508 100%);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 60px 0 30px;
+        margin-top: 80px;
+    }
+}
+
+/* Large Desktop Enhancements */
+@media (min-width: 1400px) {
+    .app-content {
+        padding: 40px 0 !important;
+    }
+    
+    .section-header h2 {
+        font-size: 32px;
+    }
+    
+    .carousel-item .slide {
+        min-height: 550px;
+    }
+    
+    .slide-caption .title {
+        font-size: 56px;
+    }
+}
+
+/* Ultra-wide Desktop */
+@media (min-width: 1800px) {
+    .container {
+        max-width: 1700px;
+    }
+    
+    .app-content {
+        padding: 50px 0 !important;
+    }
+}
+

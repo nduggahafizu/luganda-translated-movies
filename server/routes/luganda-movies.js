@@ -382,15 +382,33 @@ router.get('/latest', async (req, res) => {
     }
 });
 
-// GET /api/luganda-movies/trending - Get trending movies by views
+// GET /api/luganda-movies/trending - Get trending movies (marked as trending + by views)
 router.get('/trending', async (req, res) => {
     setCorsHeaders(req, res);
     try {
         const limit = parseInt(req.query.limit) || 10;
-        const movies = await LugandaMovie.find({ status: 'published' })
+        
+        // First get movies marked as trending
+        const markedTrending = await LugandaMovie.find({ 
+            status: 'published', 
+            trending: true 
+        }).sort({ views: -1 }).limit(limit);
+        
+        // If we don't have enough, fill with most viewed
+        if (markedTrending.length < limit) {
+            const markedIds = markedTrending.map(m => m._id);
+            const byViews = await LugandaMovie.find({ 
+                status: 'published',
+                _id: { $nin: markedIds }
+            })
             .sort({ views: -1, 'rating.userRating': -1 })
-            .limit(limit);
-        res.json({ success: true, data: movies, count: movies.length });
+            .limit(limit - markedTrending.length);
+            
+            const combined = [...markedTrending, ...byViews];
+            res.json({ success: true, data: combined, count: combined.length });
+        } else {
+            res.json({ success: true, data: markedTrending, count: markedTrending.length });
+        }
     } catch (error) {
         console.error('Error fetching trending movies:', error);
         res.status(500).json({ success: false, message: 'Failed to fetch trending movies' });

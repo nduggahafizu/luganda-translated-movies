@@ -250,8 +250,8 @@ class UnrulyNotifications {
         const lastCheckTime = parseInt(lastCheck);
         
         try {
-            // Check for new movies
-            const API_BASE = window.API_BASE_URL || 'https://luganda-movies-api.onrender.com/api';
+            // Check for new movies - use Railway API
+            const API_BASE = window.API_BASE_URL || (window.API_CONFIG && window.API_CONFIG.BASE_URL) || 'https://luganda-translated-movies-production.up.railway.app/api';
             const response = await fetch(`${API_BASE}/luganda-movies?limit=5&sort=-createdAt`);
             
             if (response.ok) {
@@ -450,6 +450,25 @@ class UnrulyNotifications {
     disable() {
         localStorage.removeItem('notifications-enabled');
         this.showToast('Notifications disabled', 'info');
+    }
+    
+    // Test notification - call from console: unrulyNotifications.testNotification()
+    testNotification() {
+        if (!this.permissionGranted) {
+            console.log('⚠️ Notifications not permitted. Please enable them first.');
+            this.showToast('Please enable notifications first', 'warning');
+            return;
+        }
+        
+        console.log('🔔 Sending test notification...');
+        this.showNotification({
+            title: '🎬 Test Notification',
+            body: 'If you see this, notifications are working!',
+            icon: '/assets/images/logo.png',
+            tag: 'test-notification',
+            requireInteraction: false
+        });
+        this.showToast('Test notification sent!', 'success');
     }
 }
 

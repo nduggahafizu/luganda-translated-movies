@@ -15,10 +15,10 @@ const API_CONFIG = (function() {
 
     // Backend URLs
     const PRODUCTION_API_URL = 'https://luganda-translated-movies-production.up.railway.app';
-    const DEVELOPMENT_API_URL = 'http://localhost:5000';
+    const DEVELOPMENT_API_URL = 'https://luganda-translated-movies-production.up.railway.app'; // Use production API for local testing
 
     // Select appropriate URL based on environment
-    const BASE_URL = isProduction ? PRODUCTION_API_URL : DEVELOPMENT_API_URL;
+    const BASE_URL = PRODUCTION_API_URL; // Always use production API
 
     return {
         // Base API URL

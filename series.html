@@ -14,121 +14,11 @@
     <link rel="apple-touch-icon" href="/assets/images/logo.png">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/card-grid.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
-    
-    <style>
-        .filter-section {
-            background-color: var(--background-light);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .filter-row {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        
-        .filter-group {
-            flex: 1;
-            min-width: 200px;
-        }
-        
-        .filter-label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-        }
-        
-        .filter-select {
-            width: 100%;
-            padding: 10px 15px;
-            background-color: var(--background-dark);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-size: 14px;
-            cursor: pointer;
-        }
-        
-        .filter-select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-        
-        .series-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 25px;
-            margin-bottom: 50px;
-        }
-        
-        .season-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: rgba(124, 252, 0, 0.9);
-            color: #000;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 11px;
-            font-weight: 700;
-            z-index: 3;
-        }
-        
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin: 40px 0;
-        }
-        
-        .page-btn {
-            padding: 10px 15px;
-            background-color: var(--background-light);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .page-btn:hover {
-            background-color: var(--primary-color);
-            color: #000;
-            border-color: var(--primary-color);
-        }
-        
-        .page-btn.active {
-            background-color: var(--primary-color);
-            color: #000;
-            border-color: var(--primary-color);
-        }
-        
-        .page-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        @media (max-width: 768px) {
-            .series-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 15px;
-            }
-            
-            .filter-group {
-                min-width: 100%;
-            }
-        }
-    </style>
 </head>
 
 <body>
@@ -263,7 +153,17 @@
                     <div class="container">
                         <div class="app-content pt-md-3">
                             
-                            <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 30px;">Browse TV Series</h1>
+                            <!-- Page Hero -->
+                            <div class="page-hero">
+                                <h1 class="page-hero-title">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                                        <polyline points="17 2 12 7 7 2"></polyline>
+                                    </svg>
+                                    Browse TV Series
+                                </h1>
+                                <p class="page-hero-subtitle">Stream your favorite TV shows with Luganda translations</p>
+                            </div>
                             
                             <!-- Filters -->
                             <div class="filter-section">
@@ -316,7 +216,7 @@
                             </div>
 
                             <!-- Series Grid -->
-                            <div class="series-grid" id="seriesGrid">
+                            <div class="card-grid" id="seriesGrid">
                                 <!-- Series cards will be generated here -->
                             </div>
 
@@ -423,13 +323,13 @@
             
             if (!seriesList || seriesList.length === 0) {
                 grid.innerHTML = `
-                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
-                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" style="margin-bottom: 20px;">
+                    <div class="empty-state">
+                        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
                             <polyline points="17 2 12 7 7 2"></polyline>
                         </svg>
-                        <h3 style="color: var(--text-primary); margin-bottom: 10px;">No Series Found</h3>
-                        <p style="color: var(--text-muted);">Try adjusting your filters or check back later.</p>
+                        <p class="empty-text">No Series Found</p>
+                        <p class="empty-subtext">Try adjusting your filters or check back later</p>
                     </div>
                 `;
                 return;
@@ -441,38 +341,39 @@
                 const poster = show.poster || show.thumbnail || 'assets/images/placeholder-movie.jpg';
                 const genre = show.genres?.[0] || 'Drama';
                 const vjName = show.translator?.name || 'VJ';
+                const title = show.title || 'Unknown Title';
+                const year = show.startYear || show.year || '';
                 
                 return `
-                    <div class="list-movie position-relative">
-                        <a href="series-detail.html?id=${show._id || show.slug}" class="list-media">
-                            <div class="season-badge">${seasonCount} Season${seasonCount !== 1 ? 's' : ''}</div>
-                            ${show.status === 'ongoing' ? '<span class="badge-live" style="position: absolute; top: 10px; left: 10px; z-index: 3;">NEW</span>' : ''}
-                            <div class="list-media-attr">
-                                <div class="quality">HD</div>
-                                <div class="imdb">
-                                    <span>${rating.toFixed(1)}</span>
-                                    <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
-                                        <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" 
-                                                stroke-dasharray="${rating * 10} 100" 
-                                                stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
+                    <a href="series-detail.html?id=${show._id || show.slug}" class="content-card">
+                        <div class="card-poster" style="background-image: url('${poster}');">
+                            <div class="card-badges">
+                                <span class="card-badge badge-quality">${seasonCount} Season${seasonCount !== 1 ? 's' : ''}</span>
+                                ${show.status === 'ongoing' ? '<span class="card-badge badge-year">NEW</span>' : ''}
+                                ${vjName !== 'VJ' ? `<span class="card-badge badge-vj">${vjName}</span>` : ''}
+                            </div>
+                            <div class="card-rating">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                </svg>
+                                ${rating.toFixed(1)}
+                            </div>
+                            <div class="play-overlay">
+                                <div class="play-button">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                     </svg>
                                 </div>
                             </div>
-                            <div class="play-btn">
-                                <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                </svg>
-                            </div>
-                            <div class="media media-cover" style="background-image: url('${poster}');"></div>
-                        </a>
-                        <div class="list-caption">
-                            <a href="series-detail.html?id=${show._id || show.slug}" class="list-title">${show.title}</a>
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <a href="genres.html?genre=${genre.toLowerCase()}" class="list-category">${genre}</a>
-                                <span style="font-size: 11px; color: var(--primary-color);">${vjName}</span>
+                        </div>
+                        <div class="card-info">
+                            <h3 class="card-title">${title}</h3>
+                            <div class="card-meta">
+                                ${year ? `<span>${year}</span>` : ''}
+                                <span>${genre}</span>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 `;
             }).join('');
         }
@@ -549,11 +450,10 @@
             
             // Show loading
             grid.innerHTML = `
-                <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
-                    <div class="spinner" style="width: 50px; height: 50px; border: 3px solid var(--border-color); border-top-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-                    <p style="color: var(--text-muted);">Loading series...</p>
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p class="loading-text">Loading series...</p>
                 </div>
-                <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
             `;
             
             const params = {
@@ -574,14 +474,14 @@
             } catch (error) {
                 console.error('Error loading series:', error);
                 grid.innerHTML = `
-                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
-                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" style="margin-bottom: 20px;">
+                    <div class="empty-state">
+                        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <circle cx="12" cy="12" r="10"></circle>
                             <line x1="12" y1="8" x2="12" y2="12"></line>
                             <line x1="12" y1="16" x2="12.01" y2="16"></line>
                         </svg>
-                        <h3 style="color: var(--text-primary); margin-bottom: 10px;">Error Loading Series</h3>
-                        <p style="color: var(--text-muted);">Please try again later.</p>
+                        <p class="empty-text">Error Loading Series</p>
+                        <p class="empty-subtext">Please try again later</p>
                         <button onclick="loadSeries()" class="btn btn-glow" style="margin-top: 20px;">Retry</button>
                     </div>
                 `;
