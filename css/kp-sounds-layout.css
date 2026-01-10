@@ -1,0 +1,493 @@
+/* ===================================
+   KP Sounds Mobile App Layout
+   Horizontal Scrolling Sections
+   Bottom Navigation Bar
+   =================================== */
+
+/* ===== STICKY SEARCH BAR ===== */
+.mobile-search-bar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: #0a0a0f;
+    padding: 12px 16px;
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .mobile-search-bar {
+        display: block;
+    }
+    
+    /* Hide original header on mobile */
+    .app-header {
+        display: none !important;
+    }
+}
+
+.mobile-search-bar input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 25px;
+    padding: 12px 20px 12px 45px;
+    color: #fff;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.mobile-search-bar input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.mobile-search-bar input:focus {
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 2px rgba(124, 252, 0, 0.3);
+}
+
+.mobile-search-bar .search-icon {
+    position: absolute;
+    left: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.5);
+    pointer-events: none;
+}
+
+/* ===== CATEGORY TABS ===== */
+.category-tabs {
+    display: none;
+    padding: 12px 0;
+    background: #0a0a0f;
+    position: sticky;
+    top: 60px;
+    z-index: 999;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+    .category-tabs {
+        display: block;
+    }
+}
+
+.category-tabs-scroll {
+    display: flex;
+    gap: 8px;
+    padding: 0 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.category-tabs-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.category-tab {
+    flex-shrink: 0;
+    padding: 10px 20px;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.category-tab:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.category-tab.active {
+    color: #000;
+    background: #7CFC00;
+    font-weight: 600;
+}
+
+.category-tab-underline {
+    display: none;
+}
+
+.category-tab.active .category-tab-underline {
+    display: block;
+    height: 3px;
+    background: #7CFC00;
+    margin-top: 8px;
+    border-radius: 2px;
+}
+
+/* ===== HORIZONTAL SCROLLING SECTIONS ===== */
+@media (max-width: 768px) {
+    /* Hide grid layout on mobile */
+    .row-cols-2,
+    .row-cols-md-5 {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        gap: 12px !important;
+        padding: 0 16px !important;
+        margin: 0 0 10px 0 !important;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    
+    .row-cols-2::-webkit-scrollbar,
+    .row-cols-md-5::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .row-cols-2 > *,
+    .row-cols-md-5 > *,
+    .row-cols-2 > .col,
+    .row-cols-md-5 > .col {
+        flex: 0 0 auto !important;
+        width: 140px !important;
+        max-width: 140px !important;
+        scroll-snap-align: start;
+    }
+    
+    /* Movie card adjustments for horizontal scroll */
+    .list-movie {
+        border-radius: 8px;
+        height: auto;
+    }
+    
+    .list-media {
+        padding-bottom: 150%;
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .media-body {
+        padding: 8px !important;
+    }
+    
+    .media-body h6,
+    .media-body .title {
+        font-size: 12px !important;
+        line-height: 1.3 !important;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin: 0 !important;
+    }
+    
+    .media-body .meta,
+    .media-body .year {
+        font-size: 10px !important;
+        color: rgba(255, 255, 255, 0.5);
+        margin-top: 4px !important;
+    }
+}
+
+/* ===== SECTION HEADERS - KP SOUNDS STYLE ===== */
+.kp-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 16px 12px;
+    margin: 0;
+}
+
+.kp-section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.kp-section-title .emoji {
+    font-size: 20px;
+}
+
+.kp-section-more {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.3s ease;
+}
+
+.kp-section-more:hover {
+    color: #7CFC00;
+}
+
+/* Hide original section headers on mobile */
+@media (max-width: 768px) {
+    .app-heading,
+    .section-header {
+        display: none !important;
+    }
+    
+    .kp-section-header {
+        display: flex !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .kp-section-header {
+        display: none !important;
+    }
+}
+
+/* ===== LANGUAGE BADGE ===== */
+.language-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    z-index: 5;
+    backdrop-filter: blur(4px);
+}
+
+.language-badge.luganda {
+    background: linear-gradient(135deg, #7CFC00, #32CD32);
+    color: #000;
+}
+
+.language-badge.english {
+    background: rgba(66, 133, 244, 0.9);
+}
+
+.language-badge.hindi {
+    background: rgba(255, 153, 0, 0.9);
+}
+
+/* ===== VJ BADGE ===== */
+.vj-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(0, 0, 0, 0.85);
+    color: #7CFC00;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 600;
+    z-index: 5;
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.vj-badge svg {
+    width: 10px;
+    height: 10px;
+}
+
+/* ===== BOTTOM NAVIGATION BAR ===== */
+.bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, #0a0a0f 0%, rgba(10, 10, 15, 0.98) 100%);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 10000;
+    padding: 8px 0;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+    backdrop-filter: blur(20px);
+}
+
+@media (max-width: 768px) {
+    .bottom-nav {
+        display: block;
+    }
+    
+    /* Add padding to body for bottom nav */
+    body {
+        padding-bottom: 70px !important;
+    }
+    
+    .app-container {
+        padding-bottom: 80px;
+    }
+}
+
+.bottom-nav-items {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 0 10px;
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 10px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 6px 12px;
+    border-radius: 12px;
+    position: relative;
+}
+
+.bottom-nav-item svg {
+    width: 24px;
+    height: 24px;
+    stroke-width: 1.8;
+    transition: all 0.3s ease;
+}
+
+.bottom-nav-item:hover,
+.bottom-nav-item.active {
+    color: #7CFC00;
+}
+
+.bottom-nav-item.active svg {
+    fill: rgba(124, 252, 0, 0.2);
+}
+
+.bottom-nav-item .nav-label {
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+/* Hot badge for Music/Premium */
+.bottom-nav-item .hot-badge {
+    position: absolute;
+    top: 0;
+    right: 4px;
+    background: #FF4444;
+    color: #fff;
+    font-size: 7px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* Premium glow effect */
+.bottom-nav-item.premium-item svg {
+    filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.5));
+}
+
+.bottom-nav-item.premium-item.active {
+    color: #FFD700;
+}
+
+/* ===== HIDE ELEMENTS ON MOBILE ===== */
+@media (max-width: 768px) {
+    /* Hide hero slider on mobile for cleaner look */
+    .app-slider,
+    .carousel {
+        display: none !important;
+    }
+    
+    /* Hide desktop sidebar */
+    .app-aside {
+        transform: translateX(-100%);
+    }
+    
+    /* Hide ad containers between sections on mobile */
+    .ad-container {
+        display: none !important;
+    }
+    
+    /* Adjust main content */
+    .app-content {
+        padding-top: 0 !important;
+    }
+    
+    .app-section {
+        margin-bottom: 10px !important;
+        padding: 0 !important;
+    }
+    
+    /* Hide footer on mobile - bottom nav replaces it */
+    .site-footer,
+    footer {
+        display: none !important;
+    }
+}
+
+/* ===== SMOOTH SCROLLING ===== */
+@media (max-width: 768px) {
+    html {
+        scroll-behavior: smooth;
+    }
+    
+    .app-container {
+        overflow-x: hidden;
+    }
+}
+
+/* ===== PULL TO REFRESH INDICATOR ===== */
+.pull-to-refresh {
+    display: none;
+    text-align: center;
+    padding: 20px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+}
+
+.pull-to-refresh.active {
+    display: block;
+}
+
+.pull-to-refresh svg {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ===== LOADING SKELETON ===== */
+.skeleton-card {
+    background: linear-gradient(90deg, #1a1a25 25%, #252530 50%, #1a1a25 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 8px;
+    width: 140px;
+    height: 240px;
+    flex-shrink: 0;
+}
+
+@keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ===== DARK THEME ENHANCEMENTS ===== */
+@media (max-width: 768px) {
+    body {
+        background: #0a0a0f !important;
+    }
+    
+    .container,
+    .app-container,
+    .app-content {
+        background: #0a0a0f !important;
+    }
+}

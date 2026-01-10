@@ -122,6 +122,7 @@
     <link rel="stylesheet" href="css/mobile-improvements.css">
     <link rel="stylesheet" href="css/professional-enhancements.css">
     <link rel="stylesheet" href="css/adsense-styles.css">
+    <link rel="stylesheet" href="css/kp-sounds-layout.css">
     
     <!-- Preload fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -161,6 +162,29 @@
 
 <body>
     <a class="skip-link" href="#maincontent">Skip to content</a>
+
+    <!-- Mobile Search Bar (KP Sounds Style) -->
+    <div class="mobile-search-bar">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input type="text" placeholder="Search movies, VJs..." id="mobileAppSearch">
+    </div>
+
+    <!-- Category Tabs (KP Sounds Style) -->
+    <nav class="category-tabs">
+        <div class="category-tabs-scroll">
+            <a href="trending.html" class="category-tab active">Trending</a>
+            <a href="vjs.html" class="category-tab">VJs</a>
+            <a href="series.html" class="category-tab">TV/Series</a>
+            <a href="movies.html" class="category-tab">Movies</a>
+            <a href="genres.html?genre=action" class="category-tab">Action</a>
+            <a href="genres.html?genre=comedy" class="category-tab">Comedy</a>
+            <a href="genres.html?genre=drama" class="category-tab">Drama</a>
+            <a href="genres.html?genre=horror" class="category-tab">Horror</a>
+        </div>
+    </nav>
 
     <div class="container">
         <div class="app">
@@ -670,6 +694,11 @@
 
                             <!-- Trending Now Section -->
                             <div class="app-section movie-section">
+                                <!-- KP Sounds Mobile Header -->
+                                <div class="kp-section-header">
+                                    <h2 class="kp-section-title">Trending Now <span class="emoji">🔥</span></h2>
+                                    <a href="movies.html?sort=trending" class="kp-section-more">More ›</a>
+                                </div>
                                 <div class="section-header">
                                     <h2>
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" stroke-width="2">
@@ -708,6 +737,11 @@
 
                             <!-- All Movies Section (Newest First) -->
                             <div class="app-section movie-section">
+                                <!-- KP Sounds Mobile Header -->
+                                <div class="kp-section-header">
+                                    <h2 class="kp-section-title">Latest Releases <span class="emoji">✨</span></h2>
+                                    <a href="movies.html" class="kp-section-more">More ›</a>
+                                </div>
                                 <div class="section-header">
                                     <h2>Latest Releases</h2>
                                     <a href="movies.html" class="view-all">
@@ -727,6 +761,11 @@
 
                             <!-- Popular VJ Movies -->
                             <div class="app-section movie-section">
+                                <!-- KP Sounds Mobile Header -->
+                                <div class="kp-section-header">
+                                    <h2 class="kp-section-title">Popular VJ Movies <span class="emoji">🎬</span></h2>
+                                    <a href="movies.html?sort=popular" class="kp-section-more">More ›</a>
+                                </div>
                                 <div class="section-header">
                                     <h2>Popular VJ Movies</h2>
                                     <a href="movies.html?sort=popular" class="view-all">
@@ -747,6 +786,48 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Bottom Navigation Bar (KP Sounds Style) -->
+            <nav class="bottom-nav">
+                <div class="bottom-nav-items">
+                    <a href="index.html" class="bottom-nav-item active">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                        <span class="nav-label">Home</span>
+                    </a>
+                    <a href="vjs.html" class="bottom-nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        <span class="nav-label">VJs</span>
+                        <span class="hot-badge">HOT</span>
+                    </a>
+                    <a href="subscribe.html" class="bottom-nav-item premium-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                        <span class="nav-label">Premium</span>
+                    </a>
+                    <a href="dashboard.html#watchlist" class="bottom-nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        <span class="nav-label">Watchlist</span>
+                    </a>
+                    <a href="dashboard.html" class="bottom-nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <span class="nav-label">Me</span>
+                    </a>
+                </div>
+            </nav>
 
             <!-- Professional Footer -->
             <footer class="site-footer">
@@ -1750,5 +1831,29 @@
     
     <!-- Live Chat Widget -->
     <script src="js/chat-widget.js"></script>
+    
+    <!-- Mobile App Search Handler -->
+    <script>
+        // Mobile search functionality
+        const mobileAppSearch = document.getElementById('mobileAppSearch');
+        if (mobileAppSearch) {
+            mobileAppSearch.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && this.value.trim()) {
+                    window.location.href = 'search.html?q=' + encodeURIComponent(this.value.trim());
+                }
+            });
+        }
+        
+        // Highlight active bottom nav item
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        document.querySelectorAll('.bottom-nav-item').forEach(item => {
+            const href = item.getAttribute('href').split('#')[0];
+            if (href === currentPage || (currentPage === '' && href === 'index.html')) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    </script>
 </body>
 </html>
