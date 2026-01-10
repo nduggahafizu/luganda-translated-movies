@@ -333,16 +333,18 @@
         min-width: 0 !important;
     }
     
-    /* Row cols override for mobile grid */
+    /* Row cols override for mobile grid - 2 columns on mobile */
     .row-cols-2 {
         display: grid !important;
-        grid-template-columns: repeat(4, 1fr) !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
     }
     
     .row-cols-2 > .col {
         width: 100% !important;
         max-width: 100% !important;
         flex: none !important;
+        padding: 0 !important;
     }
     
     /* Movie cards */

@@ -124,6 +124,11 @@
     box-sizing: border-box;
 }
 
+/* Netflix-style smooth transitions for all interactive elements */
+a, button, .btn, .nav-link, .social-link, .movie-card, .list-movie {
+    transition: all 0.3s ease;
+}
+
 html {
     scroll-behavior: smooth;
 }
@@ -2090,6 +2095,77 @@ progress.movie-progress::-moz-progress-bar {
     padding: 60px 20px 40px;
     max-width: 1400px;
     margin: 0 auto;
+}
+
+/* Footer About Section - What is Unruly */
+.footer-about {
+    background: rgba(124, 252, 0, 0.05);
+    border: 1px solid rgba(124, 252, 0, 0.15);
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 50px;
+    text-align: center;
+}
+
+.footer-about h3 {
+    color: var(--primary-color);
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.footer-about p {
+    color: #aaa;
+    font-size: 14px;
+    line-height: 1.8;
+    max-width: 900px;
+    margin: 0 auto 20px;
+}
+
+.footer-about-links {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.footer-about-links a {
+    display: inline-block;
+    padding: 8px 20px;
+    background: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.footer-about-links a:hover {
+    background: var(--primary-color);
+    color: #000;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .footer-about {
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .footer-about h3 {
+        font-size: 18px;
+    }
+    
+    .footer-about p {
+        font-size: 13px;
+    }
+    
+    .footer-about-links a {
+        padding: 6px 15px;
+        font-size: 12px;
+    }
 }
 
 .footer-grid {
