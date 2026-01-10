@@ -9,6 +9,15 @@
     <meta name="theme-color" content="#7CFC00">
     <meta name="google-adsense-account" content="ca-pub-1904736753681797">
     
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMF82HVT9G"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-HMF82HVT9G');
+    </script>
+    
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
     <link rel="shortcut icon" type="image/png" href="/assets/images/favicon.png">
     <link rel="apple-touch-icon" href="/assets/images/logo.png">
@@ -21,165 +30,259 @@
     
     <style>
         .hero-section {
-            background: linear-gradient(135deg, rgba(124, 252, 0, 0.1), rgba(0, 217, 255, 0.1));
-            padding: 60px 20px;
+            background: linear-gradient(135deg, rgba(124, 252, 0, 0.08), rgba(0, 217, 255, 0.08), rgba(157, 78, 221, 0.05));
+            padding: 50px 20px;
             text-align: center;
-            border-radius: 20px;
+            border-radius: 24px;
             margin-bottom: 40px;
+            border: 1px solid rgba(124, 252, 0, 0.15);
+            position: relative;
+            overflow: hidden;
         }
         
-        /* Stream status indicators */
-        .stream-status {
-            margin-top: 10px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .status-online {
-            color: var(--primary-color);
-            display: inline-flex;
-            align-items: center;
-        }
-        
-        .status-online::before {
-            content: "";
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background-color: var(--primary-color);
-            border-radius: 50%;
-            margin-right: 5px;
-            animation: pulse 1.5s infinite;
-        }
-        
-        .status-offline {
-            color: #ff4444;
-            display: inline-flex;
-            align-items: center;
-        }
-        
-        .status-offline::before {
-            content: "";
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background-color: #ff4444;
-            border-radius: 50%;
-            margin-right: 5px;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 0.5; }
-            50% { opacity: 1; }
-            100% { opacity: 0.5; }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #7CFC00, #00D9FF, transparent);
         }
         
         .hero-section h1 {
             font-size: 36px;
-            font-weight: 800;
-            margin-bottom: 15px;
-            background: linear-gradient(135deg, #7CFC00, #00D9FF);
+            font-weight: 900;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #7CFC00 0%, #00D9FF 50%, #9D4EDD 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            text-shadow: 0 0 30px rgba(124, 252, 0, 0.3);
         }
         
         .hero-section p {
-            font-size: 18px;
-            color: var(--text-secondary);
-            max-width: 700px;
+            font-size: 16px;
+            color: #a0a0a0;
+            max-width: 600px;
             margin: 0 auto;
         }
         
+        /* KPSounds-style TV Poster Grid */
         .tv-stations-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 25px;
-            margin-bottom: 50px;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
         }
         
         .tv-station-card {
-            background-color: var(--background-light);
-            border: 1px solid var(--border-color);
-            border-radius: 15px;
+            background: linear-gradient(145deg, #1a1a2e, #12121a);
+            border: 1px solid rgba(124, 252, 0, 0.1);
+            border-radius: 16px;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
         }
         
         .tv-station-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            border-color: var(--primary-color);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(124, 252, 0, 0.25), 0 0 20px rgba(124, 252, 0, 0.15);
+            border-color: rgba(124, 252, 0, 0.5);
         }
         
-        .tv-station-thumbnail {
-            position: relative;
-            padding-bottom: 56.25%; /* 16:9 aspect ratio */
-            background-color: var(--background-dark);
-        }
-        
-        .tv-station-thumbnail img {
+        .tv-station-card::before {
+            content: '';
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.8) 100%);
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
         
+        .tv-station-card:hover::before {
+            opacity: 1;
+        }
+        
+        /* Poster-style thumbnail */
+        .tv-station-thumbnail {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: linear-gradient(135deg, #0a0a12 0%, #1a1a2e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+        }
+        
+        .tv-station-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+            transition: all 0.3s ease;
+        }
+        
+        .tv-station-card:hover .tv-station-thumbnail img {
+            transform: scale(1.1);
+            filter: drop-shadow(0 8px 20px rgba(124, 252, 0, 0.3));
+        }
+        
+        /* Live badge */
+        .live-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #ff0000, #cc0000);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: livePulse 2s infinite;
+            z-index: 2;
+        }
+        
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        /* Channel info */
         .tv-station-info {
-            padding: 20px;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
         }
         
         .tv-station-name {
-            font-size: 18px;
+            font-size: 14px;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 0;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .tv-station-description {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 15px;
-            line-height: 1.5;
+            display: none;
+        }
+        
+        /* Play overlay on hover */
+        .play-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #7CFC00, #00D9FF);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(124, 252, 0, 0.5);
+        }
+        
+        .play-overlay svg {
+            width: 24px;
+            height: 24px;
+            fill: #000;
+            margin-left: 3px;
+        }
+        
+        .tv-station-card:hover .play-overlay {
+            transform: translate(-50%, -50%) scale(1);
+            box-shadow: 0 8px 30px rgba(124, 252, 0, 0.6);
         }
         
         .watch-btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
-        
-        .watch-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(124, 252, 0, 0.4);
+            display: none; /* Hidden - card itself is clickable */
         }
         
         .section-title {
             font-size: 24px;
-            font-weight: 700;
+            font-weight: 800;
             margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 28px;
+            background: linear-gradient(180deg, #7CFC00, #00D9FF);
+            border-radius: 2px;
+        }
+        
+        /* Channel count badge */
+        .channel-count {
+            background: linear-gradient(135deg, #7CFC00, #00D9FF);
+            color: #000;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-left: auto;
+            box-shadow: 0 2px 10px rgba(124, 252, 0, 0.3);
         }
         
         @media (max-width: 768px) {
             .hero-section h1 {
-                font-size: 28px;
+                font-size: 24px;
             }
             
             .hero-section p {
-                font-size: 16px;
+                font-size: 14px;
             }
             
             .tv-stations-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                gap: 12px;
+            }
+            
+            .tv-station-thumbnail {
+                padding: 20px;
+            }
+            
+            .tv-station-name {
+                font-size: 12px;
+            }
+            
+            .live-badge {
+                font-size: 8px;
+                padding: 3px 6px;
+            }
+            
+            .play-overlay {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .play-overlay svg {
+                width: 18px;
+                height: 18px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .tv-stations-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
             }
         }
     </style>
@@ -263,153 +366,461 @@
                             </div>
 
                             <!-- TV Stations Grid -->
-                            <h2 class="section-title">Popular TV Stations</h2>
+                            <h2 class="section-title">Popular Uganda TV Stations <span class="channel-count">18 Channels</span></h2>
                             <div class="tv-stations-grid">
-                                <!-- NTV Uganda -->
-                                <div class="tv-station-card">
+                                <!-- Salt TV -->
+                                <div class="tv-station-card" data-station="salt-tv">
                                     <div class="tv-station-thumbnail">
-                                        <img src="assets/tv-logos/ntv-uganda.svg" alt="NTV Uganda">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/salt-tv.webp" alt="Salt TV">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
                                     </div>
                                     <div class="tv-station-info">
-                                        <h3 class="tv-station-name">NTV Uganda</h3>
-                                        <p class="tv-station-description">Uganda's leading TV station offering news, entertainment, and sports coverage.</p>
-                                        <a href="player.html?station=ntv-uganda" class="watch-btn">Watch Now</a>
+                                        <h3 class="tv-station-name">Salt TV</h3>
                                     </div>
                                 </div>
                                 
-                                <!-- NBS TV -->
-                                <div class="tv-station-card">
+                                <!-- Bukedde TV 1 -->
+                                <div class="tv-station-card" data-station="bukedde-tv">
                                     <div class="tv-station-thumbnail">
-                                        <img src="assets/tv-logos/nbs-tv.svg" alt="NBS TV">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/bukedde-tv.webp" alt="Bukedde TV 1">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
                                     </div>
                                     <div class="tv-station-info">
-                                        <h3 class="tv-station-name">NBS TV</h3>
-                                        <p class="tv-station-description">A 24-hour news channel with current affairs, business, and entertainment programming.</p>
-                                        <a href="player.html?station=nbs-tv" class="watch-btn">Watch Now</a>
+                                        <h3 class="tv-station-name">Bukedde TV 1</h3>
                                     </div>
                                 </div>
                                 
-                                <!-- UBC TV -->
-                                <div class="tv-station-card">
+                                <!-- Bukedde TV 2 -->
+                                <div class="tv-station-card" data-station="bukedde-tv-2">
                                     <div class="tv-station-thumbnail">
-                                        <img src="assets/tv-logos/ubc-tv.svg" alt="UBC TV">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/bukedde-tv-2.webp" alt="Bukedde TV 2">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
                                     </div>
                                     <div class="tv-station-info">
-                                        <h3 class="tv-station-name">UBC TV</h3>
-                                        <p class="tv-station-description">Uganda's national broadcaster providing news, cultural programs, and sports.</p>
-                                        <a href="player.html?station=ubc-tv" class="watch-btn">Watch Now</a>
+                                        <h3 class="tv-station-name">Bukedde TV 2</h3>
                                     </div>
                                 </div>
                                 
-                                <!-- Bukedde TV -->
-                                <div class="tv-station-card">
+                                <!-- Dream TV -->
+                                <div class="tv-station-card" data-station="dream-tv">
                                     <div class="tv-station-thumbnail">
-                                        <img src="assets/tv-logos/bukedde-tv.svg" alt="Bukedde TV">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/dream-tv.webp" alt="Dream TV">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
                                     </div>
                                     <div class="tv-station-info">
-                                        <h3 class="tv-station-name">Bukedde TV</h3>
-                                        <p class="tv-station-description">Local language TV station broadcasting in Luganda with news and entertainment.</p>
-                                        <a href="player.html?station=bukedde-tv" class="watch-btn">Watch Now</a>
+                                        <h3 class="tv-station-name">Dream TV</h3>
                                     </div>
                                 </div>
                                 
                                 <!-- Urban TV -->
-                                <div class="tv-station-card">
+                                <div class="tv-station-card" data-station="urban-tv">
                                     <div class="tv-station-thumbnail">
-                                        <img src="assets/tv-logos/urban-tv.svg" alt="Urban TV">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/urban-tv.webp" alt="Urban TV">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
                                     </div>
                                     <div class="tv-station-info">
                                         <h3 class="tv-station-name">Urban TV</h3>
-                                        <p class="tv-station-description">Youth-focused TV station with entertainment, music, and lifestyle content.</p>
-                                        <a href="player.html?station=urban-tv" class="watch-btn">Watch Now</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- NTV Uganda -->
+                                <div class="tv-station-card" data-station="ntv-uganda">
+                                    <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/ntv-uganda.webp" alt="NTV Uganda">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">NTV Uganda</h3>
+                                    </div>
+                                </div>
+                                
+                                <!-- NBS TV -->
+                                <div class="tv-station-card" data-station="nbs-tv">
+                                    <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/nbs-tv.svg" alt="NBS TV">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">NBS TV</h3>
+                                    </div>
+                                </div>
+                                
+                                <!-- UBC TV -->
+                                <div class="tv-station-card" data-station="ubc-tv">
+                                    <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/ubc-tv.svg" alt="UBC TV">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">UBC TV</h3>
                                     </div>
                                 </div>
                                 
                                 <!-- Spark TV -->
-                                <div class="tv-station-card">
+                                <div class="tv-station-card" data-station="spark-tv">
                                     <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
                                         <img src="assets/tv-logos/spark-tv.svg" alt="Spark TV">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
                                     </div>
                                     <div class="tv-station-info">
                                         <h3 class="tv-station-name">Spark TV</h3>
-                                        <p class="tv-station-description">Entertainment channel with a focus on women's issues, lifestyle, and local content.</p>
-                                        <a href="player.html?station=spark-tv" class="watch-btn">Watch Now</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Sanyuka TV -->
+                                <div class="tv-station-card" data-station="sanyuka-tv">
+                                    <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/sanyuka-tv.svg" alt="Sanyuka TV">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">Sanyuka TV</h3>
+                                    </div>
+                                </div>
+                                
+                                <!-- Record TV -->
+                                <div class="tv-station-card" data-station="record-tv">
+                                    <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/record-tv.svg" alt="Record TV">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">Record TV</h3>
+                                    </div>
+                                </div>
+                                
+                                <!-- Pearl Magic -->
+                                <div class="tv-station-card" data-station="pearl-magic">
+                                    <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/pearl-magic.svg" alt="Pearl Magic">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">Pearl Magic</h3>
+                                    </div>
+                                </div>
+                                
+                                <!-- Top TV -->
+                                <div class="tv-station-card" data-station="top-tv">
+                                    <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/top-tv.svg" alt="Top TV">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">Top TV</h3>
+                                    </div>
+                                </div>
+                                
+                                <!-- BBS TV -->
+                                <div class="tv-station-card" data-station="bbs-tv">
+                                    <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/bbs-tv.svg" alt="BBS TV">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">BBS TV</h3>
                                     </div>
                                 </div>
                                 
                                 <!-- TV West -->
-                                <div class="tv-station-card">
+                                <div class="tv-station-card" data-station="tv-west">
                                     <div class="tv-station-thumbnail">
-                                        <img src="assets/tv-logos/tv-west.svg" alt="TV West">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/tv-west.webp" alt="TV West">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
                                     </div>
                                     <div class="tv-station-info">
                                         <h3 class="tv-station-name">TV West</h3>
-                                        <p class="tv-station-description">Regional TV station serving western Uganda with local news and programming.</p>
-                                        <a href="player.html?station=tv-west" class="watch-btn">Watch Now</a>
                                     </div>
                                 </div>
                                 
-                                <!-- Salt TV -->
-                                <div class="tv-station-card">
+                                <!-- Kingdom TV -->
+                                <div class="tv-station-card" data-station="kingdom-tv">
                                     <div class="tv-station-thumbnail">
-                                        <img src="assets/tv-logos/salt-tv.svg" alt="Salt TV">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/kingdom-tv.svg" alt="Kingdom TV">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
                                     </div>
                                     <div class="tv-station-info">
-                                        <h3 class="tv-station-name">Salt TV</h3>
-                                        <p class="tv-station-description">Faith-based TV station with religious programming, inspirational content, and family shows.</p>
-                                        <a href="player.html?station=salt-tv" class="watch-btn">Watch Now</a>
+                                        <h3 class="tv-station-name">Kingdom TV</h3>
+                                    </div>
+                                </div>
+                                
+                                <!-- Galaxy TV -->
+                                <div class="tv-station-card" data-station="galaxy-tv">
+                                    <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/galaxy-tv.webp" alt="Galaxy TV">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">Galaxy TV</h3>
+                                    </div>
+                                </div>
+                                
+                                <!-- Jikonkone -->
+                                <div class="tv-station-card" data-station="jikonkone">
+                                    <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/jikonkone.svg" alt="Jikonkone">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">Jikonkone</h3>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Regional TV Stations -->
-                            <h2 class="section-title">Regional TV Stations</h2>
+                            <h2 class="section-title">Regional TV Stations <span class="channel-count">4 Channels</span></h2>
                             <div class="tv-stations-grid">
                                 <!-- TV East -->
-                                <div class="tv-station-card">
+                                <div class="tv-station-card" data-station="tv-east">
                                     <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
                                         <img src="assets/tv-logos/tv-east.svg" alt="TV East">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
                                     </div>
                                     <div class="tv-station-info">
                                         <h3 class="tv-station-name">TV East</h3>
-                                        <p class="tv-station-description">Regional broadcaster serving eastern Uganda with local news and programming.</p>
-                                        <a href="player.html?station=tv-east" class="watch-btn">Watch Now</a>
-                                    </div>
-                                </div>
-                                
-                                <!-- BBS TV -->
-                                <div class="tv-station-card">
-                                    <div class="tv-station-thumbnail">
-                                        <img src="assets/tv-logos/bbs-tv.svg" alt="BBS TV">
-                                    </div>
-                                    <div class="tv-station-info">
-                                        <h3 class="tv-station-name">BBS TV</h3>
-                                        <p class="tv-station-description">Buganda Kingdom's official TV station with cultural programming and local news.</p>
-                                        <a href="player.html?station=bbs-tv" class="watch-btn">Watch Now</a>
                                     </div>
                                 </div>
                                 
                                 <!-- TV North -->
-                                <div class="tv-station-card">
+                                <div class="tv-station-card" data-station="tv-north">
                                     <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
                                         <img src="assets/tv-logos/tv-north.svg" alt="TV North">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
                                     </div>
                                     <div class="tv-station-info">
                                         <h3 class="tv-station-name">TV North</h3>
-                                        <p class="tv-station-description">Regional broadcaster serving northern Uganda with local news and programming.</p>
-                                        <a href="player.html?station=tv-north" class="watch-btn">Watch Now</a>
                                     </div>
                                 </div>
                                 
                                 <!-- Wan Luo TV -->
-                                <div class="tv-station-card">
+                                <div class="tv-station-card" data-station="wan-luo-tv">
                                     <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
                                         <img src="assets/tv-logos/wan-luo-tv.svg" alt="Wan Luo TV">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
                                     </div>
                                     <div class="tv-station-info">
                                         <h3 class="tv-station-name">Wan Luo TV</h3>
-                                        <p class="tv-station-description">Local language TV station broadcasting in Luo with news and cultural programming.</p>
-                                        <a href="player.html?station=wan-luo-tv" class="watch-btn">Watch Now</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Ankole TV -->
+                                <div class="tv-station-card" data-station="ankole-tv">
+                                    <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/ankole-tv.svg" alt="Ankole TV">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">Ankole TV</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- International Channels -->
+                            <h2 class="section-title">International Channels <span class="channel-count">10 Channels</span></h2>
+                            <div class="tv-stations-grid">
+                                <!-- Magic TV -->
+                                <div class="tv-station-card" data-station="magic-tv">
+                                    <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/magic-tv.svg" alt="Magic TV">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">Magic TV</h3>
+                                    </div>
+                                </div>
+                                
+                                <!-- 3ABN -->
+                                <div class="tv-station-card" data-station="3abn">
+                                    <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/3abn.svg" alt="3ABN">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">3ABN</h3>
+                                    </div>
+                                </div>
+                                
+                                <!-- 3ABN Kids -->
+                                <div class="tv-station-card" data-station="3abn-kids">
+                                    <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/3abn-kids.svg" alt="3ABN Kids">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">3ABN Kids</h3>
+                                    </div>
+                                </div>
+                                
+                                <!-- ABN Africa -->
+                                <div class="tv-station-card" data-station="abn-africa">
+                                    <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/abn-africa.svg" alt="ABN Africa">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">ABN Africa</h3>
+                                    </div>
+                                </div>
+                                
+                                <!-- FilmBox Family -->
+                                <div class="tv-station-card" data-station="filmbox-family">
+                                    <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/filmbox-family.webp" alt="FilmBox Family">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">FilmBox Family</h3>
+                                    </div>
+                                </div>
+                                
+                                <!-- 4Music -->
+                                <div class="tv-station-card" data-station="4music">
+                                    <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/4music.svg" alt="4Music">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">4Music</h3>
+                                    </div>
+                                </div>
+                                
+                                <!-- Al Jazeera -->
+                                <div class="tv-station-card" data-station="al-jazeera">
+                                    <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/al-jazeera.webp" alt="Al Jazeera">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">Al Jazeera</h3>
+                                    </div>
+                                </div>
+                                
+                                <!-- CNN -->
+                                <div class="tv-station-card" data-station="cnn">
+                                    <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/cnn.svg" alt="CNN">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">CNN</h3>
+                                    </div>
+                                </div>
+                                
+                                <!-- BBC News -->
+                                <div class="tv-station-card" data-station="bbc-news">
+                                    <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/bbc-news.svg" alt="BBC News">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">BBC News</h3>
+                                    </div>
+                                </div>
+                                
+                                <!-- France 24 -->
+                                <div class="tv-station-card" data-station="france-24">
+                                    <div class="tv-station-thumbnail">
+                                        <span class="live-badge">Live</span>
+                                        <img src="assets/tv-logos/france-24.svg" alt="France 24">
+                                        <div class="play-overlay">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="tv-station-info">
+                                        <h3 class="tv-station-name">France 24</h3>
                                     </div>
                                 </div>
                             </div>
@@ -419,80 +830,64 @@
             </div>
 
             <!-- Footer -->
-            <div class="app-footer">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="footer-text my-3">
-                            2025 Unruly Movies. All rights reserved.
-                        </div>
-                    </div>
+            <footer class="site-footer" style="margin-top: 40px;">
+                <div class="footer-bottom">
+                    <p>Copyright © unruly movies watch 2026</p>
                 </div>
-            </div>
+            </footer>
         </div>
     </div>
 
     <script src="js/main.js"></script>
     <script src="js/uganda-tv-api.js"></script>
     <script>
-        // Enhance TV station cards with actual logo images if available
         document.addEventListener('DOMContentLoaded', function() {
+            // Handle TV station card clicks
             document.querySelectorAll('.tv-station-card').forEach(card => {
-                const watchBtn = card.querySelector('.watch-btn');
-                const img = card.querySelector('.tv-station-thumbnail img');
-                if (!watchBtn || !img) return;
-                const href = watchBtn.getAttribute('href');
-                const urlParams = new URLSearchParams(href.split('?')[1]);
-                const stationId = urlParams.get('station');
-                if (!stationId) return;
-                // Try to get logo from API config
-                let logoUrl = null;
-                if (window.UgandaTvApi && window.UgandaTvApi.getAllStreamUrls) {
-                    // TV_API_CONFIG is not exposed, so fetch via script
-                    try {
-                        // Try to access logos via UgandaTvApi (if exported in future)
-                        // Fallback to hardcoded path
-                        logoUrl = `assets/tv-logos/${stationId}.png`;
-                    } catch (e) {
-                        logoUrl = `assets/tv-logos/${stationId}.png`;
-                    }
-                } else {
-                    logoUrl = `assets/tv-logos/${stationId}.png`;
-                }
-                // Only update if not already a Wikipedia or custom logo
-                if (!img.src.includes('wikipedia.org')) {
-                    img.src = logoUrl;
-                    img.onerror = function() {
-                        // fallback to placeholder if logo not found
-                        this.onerror = null;
-                        this.src = this.getAttribute('data-fallback') || this.src;
-                    };
-                }
-            });
-
-            // Handle TV station player
-            document.querySelectorAll('.watch-btn').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    // Prevent default navigation
-                    e.preventDefault();
-                    // Get station ID from href
-                    const href = this.getAttribute('href');
-                    const urlParams = new URLSearchParams(href.split('?')[1]);
-                    const stationId = urlParams.get('station');
+                card.addEventListener('click', function() {
+                    const stationId = this.dataset.station;
+                    if (!stationId) return;
+                    
+                    // Show loading state
+                    this.style.opacity = '0.7';
+                    this.style.pointerEvents = 'none';
+                    
                     // Get stream URL from API
-                    UgandaTvApi.getStreamUrl(stationId).then(streamUrl => {
-                        if (streamUrl) {
-                            // Navigate to player with stream URL
-                            window.location.href = `player.html?station=${stationId}&stream=${encodeURIComponent(streamUrl)}`;
-                        } else {
-                            alert('Stream not available at the moment. Please try again later.');
-                        }
-                    }).catch(error => {
-                        console.error('Error getting stream URL:', error);
-                        alert('Error accessing stream. Please try again later.');
-                    });
-                    // Analytics tracking
-                    console.log('User clicked to watch:', stationId);
+                    if (window.UgandaTvApi) {
+                        UgandaTvApi.getStreamUrl(stationId).then(streamUrl => {
+                            if (streamUrl) {
+                                window.location.href = `player.html?station=${stationId}&stream=${encodeURIComponent(streamUrl)}`;
+                            } else {
+                                alert('Stream not available at the moment. Please try again later.');
+                                this.style.opacity = '1';
+                                this.style.pointerEvents = 'auto';
+                            }
+                        }).catch(error => {
+                            console.error('Error getting stream URL:', error);
+                            alert('Error accessing stream. Please try again later.');
+                            this.style.opacity = '1';
+                            this.style.pointerEvents = 'auto';
+                        });
+                    } else {
+                        // Fallback if API not loaded
+                        window.location.href = `player.html?station=${stationId}`;
+                    }
                 });
+            });
+            
+            // Handle image errors - fallback to SVG or placeholder
+            document.querySelectorAll('.tv-station-thumbnail img').forEach(img => {
+                img.onerror = function() {
+                    this.onerror = null;
+                    // Try PNG if SVG fails, or vice versa
+                    const currentSrc = this.src;
+                    if (currentSrc.endsWith('.svg')) {
+                        this.src = currentSrc.replace('.svg', '.png');
+                    } else {
+                        // Use placeholder
+                        this.style.opacity = '0.3';
+                    }
+                };
             });
         });
     </script>

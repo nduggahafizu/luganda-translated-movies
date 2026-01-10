@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <linearGradient id="jikGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B35"/>
+      <stop offset="100%" style="stop-color:#F7931E"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" rx="12" fill="#1a1a2e"/>
+  <circle cx="60" cy="50" r="25" fill="url(#jikGrad)"/>
+  <text x="60" y="58" font-family="Arial Black, sans-serif" font-size="14" fill="#1a1a2e" text-anchor="middle" font-weight="bold">JK</text>
+  <text x="60" y="95" font-family="Arial, sans-serif" font-size="10" fill="#ffffff" text-anchor="middle" font-weight="bold">JIKONKONE</text>
+</svg>

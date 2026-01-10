@@ -106,6 +106,209 @@ router.get('/movies/upcoming', async (req, res) => {
     }
 });
 
+// ==========================================
+// TV SERIES ROUTES
+// ==========================================
+
+// Search TV shows
+router.get('/search/tv', async (req, res) => {
+    try {
+        const { query, page, year } = req.query;
+        
+        if (!query) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Search query is required' 
+            });
+        }
+        
+        const results = await tmdbService.searchTVShows(query, page, year);
+        res.json({ success: true, data: results });
+    } catch (error) {
+        console.error('Search TV shows error:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to search TV shows' 
+        });
+    }
+});
+
+// Multi search (movies, TV, people)
+router.get('/search/multi', async (req, res) => {
+    try {
+        const { query, page } = req.query;
+        
+        if (!query) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Search query is required' 
+            });
+        }
+        
+        const results = await tmdbService.searchMulti(query, page);
+        res.json({ success: true, data: results });
+    } catch (error) {
+        console.error('Multi search error:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to search' 
+        });
+    }
+});
+
+// Get popular TV shows
+router.get('/tv/popular', async (req, res) => {
+    try {
+        const { page = 1 } = req.query;
+        const results = await tmdbService.getPopularTVShows(page);
+        res.json({ success: true, data: results });
+    } catch (error) {
+        console.error('Get popular TV shows error:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to fetch popular TV shows' 
+        });
+    }
+});
+
+// Get trending TV shows
+router.get('/tv/trending', async (req, res) => {
+    try {
+        const { timeWindow = 'week', page = 1 } = req.query;
+        const results = await tmdbService.getTrendingTVShows(timeWindow, page);
+        res.json({ success: true, data: results });
+    } catch (error) {
+        console.error('Get trending TV shows error:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to fetch trending TV shows' 
+        });
+    }
+});
+
+// Get top rated TV shows
+router.get('/tv/top-rated', async (req, res) => {
+    try {
+        const { page = 1 } = req.query;
+        const results = await tmdbService.getTopRatedTVShows(page);
+        res.json({ success: true, data: results });
+    } catch (error) {
+        console.error('Get top rated TV shows error:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to fetch top rated TV shows' 
+        });
+    }
+});
+
+// Get currently airing TV shows
+router.get('/tv/on-the-air', async (req, res) => {
+    try {
+        const { page = 1 } = req.query;
+        const results = await tmdbService.getOnTheAirTVShows(page);
+        res.json({ success: true, data: results });
+    } catch (error) {
+        console.error('Get on the air TV shows error:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to fetch on the air TV shows' 
+        });
+    }
+});
+
+// Get TV shows airing today
+router.get('/tv/airing-today', async (req, res) => {
+    try {
+        const { page = 1 } = req.query;
+        const results = await tmdbService.getAiringTodayTVShows(page);
+        res.json({ success: true, data: results });
+    } catch (error) {
+        console.error('Get airing today TV shows error:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to fetch airing today TV shows' 
+        });
+    }
+});
+
+// Get TV show details
+router.get('/tv/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const tvShow = await tmdbService.getTVShowDetails(id);
+        res.json({ success: true, data: tvShow });
+    } catch (error) {
+        console.error('Get TV show details error:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to fetch TV show details' 
+        });
+    }
+});
+
+// Get TV show season details
+router.get('/tv/:id/season/:seasonNumber', async (req, res) => {
+    try {
+        const { id, seasonNumber } = req.params;
+        const season = await tmdbService.getTVSeasonDetails(id, seasonNumber);
+        res.json({ success: true, data: season });
+    } catch (error) {
+        console.error('Get TV season details error:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to fetch TV season details' 
+        });
+    }
+});
+
+// Get TV show episode details
+router.get('/tv/:id/season/:seasonNumber/episode/:episodeNumber', async (req, res) => {
+    try {
+        const { id, seasonNumber, episodeNumber } = req.params;
+        const episode = await tmdbService.getTVEpisodeDetails(id, seasonNumber, episodeNumber);
+        res.json({ success: true, data: episode });
+    } catch (error) {
+        console.error('Get TV episode details error:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to fetch TV episode details' 
+        });
+    }
+});
+
+// Get TV genres
+router.get('/tv/genres', async (req, res) => {
+    try {
+        const genres = await tmdbService.getTVGenres();
+        res.json({ success: true, data: genres });
+    } catch (error) {
+        console.error('Get TV genres error:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to fetch TV genres' 
+        });
+    }
+});
+
+// Discover TV shows with filters
+router.post('/tv/discover', async (req, res) => {
+    try {
+        const filters = req.body;
+        const tvShows = await tmdbService.discoverTVShows(filters);
+        res.json({ success: true, data: tvShows });
+    } catch (error) {
+        console.error('Discover TV shows error:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to discover TV shows' 
+        });
+    }
+});
+
+// ==========================================
+// MOVIE DETAIL ROUTES
+// ==========================================
+
 // Get movie details
 router.get('/movie/:id', async (req, res) => {
     try {

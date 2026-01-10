@@ -20,11 +20,11 @@ router.get('/movie/:movieId', optionalAuth, async (req, res) => {
             parentComment: null,
             isHidden: false
         })
-            .populate('user', 'fullName avatar')
+            .populate('user', 'fullName avatar role')
             .populate({
                 path: 'replies',
                 match: { isHidden: false },
-                populate: { path: 'user', select: 'fullName avatar' },
+                populate: { path: 'user', select: 'fullName avatar role' },
                 options: { limit: 3, sort: { createdAt: 1 } }
             })
             .sort(sortQuery)
@@ -77,7 +77,7 @@ router.get('/:commentId/replies', optionalAuth, async (req, res) => {
             parentComment: commentId,
             isHidden: false
         })
-            .populate('user', 'fullName avatar')
+            .populate('user', 'fullName avatar role')
             .sort({ createdAt: 1 })
             .limit(limit * 1)
             .skip((page - 1) * limit)
@@ -139,7 +139,7 @@ router.post('/', protect, async (req, res) => {
         }
 
         const comment = await Comment.create(commentData);
-        await comment.populate('user', 'fullName avatar');
+        await comment.populate('user', 'fullName avatar role');
 
         res.status(201).json({
             status: 'success',
@@ -171,7 +171,7 @@ router.put('/:commentId', protect, async (req, res) => {
         comment.isEdited = true;
 
         await comment.save();
-        await comment.populate('user', 'fullName avatar');
+        await comment.populate('user', 'fullName avatar role');
 
         res.json({
             status: 'success',

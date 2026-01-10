@@ -4,8 +4,20 @@
     <title>VJ Translators - Luganda Movie Translators | Unruly Movies</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Discover Uganda's best VJ translators - VJ Ice P, VJ Junior, VJ Emmy, VJ Jingo and more. Watch Luganda translated movies by your favorite Video Jockeys.">
+    <meta name="description" content="Catch the latest Tv shows and films narrated , translated and spiced up by best vjs by Upgrading your account to premium plan">
+    <meta name="keywords" content="Katandika Butandisi , translated movies, filimu enjogerere, Veejays(Vjs) in Uganda , Vj Junior,Vj Jingo,Vj Mark ,Omutaka Ice P, KK the Best" />
+    <meta name="author" content="unruly movies">
     <meta name="theme-color" content="#7CFC00">
+    
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMF82HVT9G"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-HMF82HVT9G');
+    </script>
+    
     <link rel="icon" type="image/png" href="/assets/images/favicon.png">
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
@@ -117,6 +129,16 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        .specialty-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(124, 252, 0, 0.15);
+            color: #7CFC00;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin: 2px;
+            text-transform: capitalize;
+        }
     </style>
 </head>
 <body>
@@ -161,13 +183,14 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 Unruly Movies. All rights reserved. Developed by Nduga Hafizu</p>
+    <footer class="site-footer" style="margin-top: 40px;">
+        <div class="footer-bottom">
+            <p>Copyright © unruly movies watch 2026</p>
         </div>
     </footer>
 
     <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/luganda-movies-api.js"></script>
     <script>
         // Load VJs on page load
@@ -175,10 +198,11 @@
             const vjGrid = document.getElementById('vjGrid');
             
             try {
-                const response = await fetch(`${API_CONFIG.API_ENDPOINTS.LUGANDA_MOVIES}/vjs`);
+                // Use the VJs API endpoint
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/vjs`);
                 const data = await response.json();
                 
-                if (data.status === 'success' && data.data.length > 0) {
+                if (data.success && data.data && data.data.length > 0) {
                     renderVJs(data.data);
                 } else {
                     vjGrid.innerHTML = '<p style="text-align: center; color: #888; grid-column: 1/-1;">No VJ translators found.</p>';
@@ -193,16 +217,21 @@
             const vjGrid = document.getElementById('vjGrid');
             
             vjGrid.innerHTML = vjs.map(vj => {
-                const name = vj._id || 'Unknown VJ';
+                const name = vj.name || vj.fullName || 'Unknown VJ';
                 const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2);
-                const movieCount = vj.movieCount || 0;
-                const totalViews = vj.totalViews || 0;
-                const avgRating = vj.avgRating ? vj.avgRating.toFixed(1) : '0.0';
+                const movieCount = vj.stats?.totalMovies || vj.movieCount || 0;
+                const totalViews = vj.stats?.totalViews || vj.totalViews || 0;
+                const avgRating = vj.rating?.overall ? vj.rating.overall.toFixed(1) : (vj.avgRating ? vj.avgRating.toFixed(1) : '0.0');
+                const bio = vj.bio ? vj.bio.substring(0, 80) + '...' : '';
+                const verified = vj.verified ? '<span style="color: #7CFC00; font-size: 0.9rem;"> ✓</span>' : '';
+                const specialties = vj.specialties ? vj.specialties.slice(0, 3).map(s => `<span class="specialty-tag">${s}</span>`).join('') : '';
                 
                 return `
                     <div class="vj-card">
                         <div class="vj-avatar">${initials}</div>
-                        <h3 class="vj-name">${name}</h3>
+                        <h3 class="vj-name">${name}${verified}</h3>
+                        ${bio ? `<p style="color: #aaa; font-size: 0.85rem; margin-bottom: 12px;">${bio}</p>` : ''}
+                        ${specialties ? `<div style="margin-bottom: 12px;">${specialties}</div>` : ''}
                         <div class="vj-stats">
                             <div class="vj-stat">
                                 <div class="vj-stat-value">${movieCount}</div>
@@ -213,7 +242,7 @@
                                 <div class="vj-stat-label">Views</div>
                             </div>
                             <div class="vj-stat">
-                                <div class="vj-stat-value">${avgRating}</div>
+                                <div class="vj-stat-value">⭐ ${avgRating}</div>
                                 <div class="vj-stat-label">Rating</div>
                             </div>
                         </div>
@@ -229,5 +258,8 @@
             return views.toString();
         }
     </script>
+    
+    <!-- Live Chat Widget -->
+    <script src="js/chat-widget.js"></script>
 </body>
 </html>

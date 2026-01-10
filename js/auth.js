@@ -9,10 +9,15 @@ const GOOGLE_CLIENT_ID = API_CONFIG.GOOGLE_CLIENT_ID;
 
 // Initialize Google Sign-In with retry logic
 let googleInitRetries = 0;
-const MAX_GOOGLE_RETRIES = 10;
+const MAX_GOOGLE_RETRIES = 5; // Reduced from 10
 
 function initGoogleSignIn() {
     const googleBtnDiv = document.getElementById('google-signin-btn');
+    
+    // Only try to init Google Sign-In if the button container exists
+    if (!googleBtnDiv) {
+        return; // No Google button on this page, skip silently
+    }
     
     // Check if Google API is loaded
     if (typeof google !== 'undefined' && google.accounts) {
@@ -25,23 +30,21 @@ function initGoogleSignIn() {
             });
             
             // Render Google button
-            if (googleBtnDiv) {
-                googleBtnDiv.innerHTML = ''; // Clear any existing content
-                google.accounts.id.renderButton(
-                    googleBtnDiv,
-                    {
-                        theme: 'filled_black',
-                        size: 'large',
-                        width: googleBtnDiv.offsetWidth || 280,
-                        text: 'continue_with',
-                        shape: 'rectangular'
-                    }
-                );
-                console.log('Google Sign-In initialized successfully');
-            }
+            googleBtnDiv.innerHTML = ''; // Clear any existing content
+            google.accounts.id.renderButton(
+                googleBtnDiv,
+                {
+                    theme: 'filled_black',
+                    size: 'large',
+                    width: googleBtnDiv.offsetWidth || 280,
+                    text: 'continue_with',
+                    shape: 'rectangular'
+                }
+            );
+            console.log('Google Sign-In initialized successfully');
         } catch (error) {
             console.error('Google Sign-In init error:', error);
-            retryGoogleInit();
+            showGoogleFallback(googleBtnDiv);
         }
     } else {
         // Google API not loaded yet, retry
@@ -50,18 +53,36 @@ function initGoogleSignIn() {
 }
 
 function retryGoogleInit() {
+    const googleBtnDiv = document.getElementById('google-signin-btn');
+    if (!googleBtnDiv) return; // No button, skip
+    
     googleInitRetries++;
     if (googleInitRetries < MAX_GOOGLE_RETRIES) {
-        console.log(`Google API not ready, retrying... (${googleInitRetries}/${MAX_GOOGLE_RETRIES})`);
+        // Only log every 2nd retry to reduce console noise
+        if (googleInitRetries % 2 === 0) {
+            console.log(`Google API loading... (${googleInitRetries}/${MAX_GOOGLE_RETRIES})`);
+        }
         setTimeout(initGoogleSignIn, 500);
     } else {
-        console.warn('Google Sign-In failed to initialize after max retries');
-        // Show fallback button
-        const googleBtnDiv = document.getElementById('google-signin-btn');
-        if (googleBtnDiv) {
-            googleBtnDiv.innerHTML = '<button type="button" class="social-btn" onclick="location.reload()" style="width:100%;padding:12px;background:#4285f4;color:#fff;border:none;border-radius:8px;cursor:pointer;"><svg style="width:20px;height:20px;margin-right:8px;vertical-align:middle" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>Retry Google Sign-In</button>';
-        }
+        console.warn('Google Sign-In unavailable - using fallback');
+        showGoogleFallback(googleBtnDiv);
     }
+}
+
+function showGoogleFallback(container) {
+    if (!container) return;
+    container.innerHTML = `
+        <button type="button" class="social-btn google-fallback" onclick="location.reload()" 
+            style="width:100%;padding:12px;background:#4285f4;color:#fff;border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+            <svg style="width:20px;height:20px" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Retry Google Sign-In
+        </button>
+    `;
 }
 
 // Handle Google Sign-In
@@ -103,13 +124,26 @@ async function handleGoogleSignIn(response) {
 
 // Save authentication data
 function saveAuthData(token, user, rememberMe = false) {
+    // Normalize user data to have consistent field names
+    const normalizedUser = {
+        id: user.id || user._id,
+        fullName: user.fullName || user.name || 'User',
+        name: user.fullName || user.name || 'User', // Alias for compatibility
+        email: user.email,
+        picture: user.picture || user.profileImage,
+        profileImage: user.picture || user.profileImage, // Alias for compatibility
+        subscription: user.subscription,
+        verified: user.verified,
+        role: user.role || 'user' // Default to 'user' if not provided
+    };
+    
     // Always save to localStorage for persistence (especially on mobile)
     localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('user', JSON.stringify(normalizedUser));
     
     // Also save to sessionStorage as backup
     sessionStorage.setItem('token', token);
-    sessionStorage.setItem('user', JSON.stringify(user));
+    sessionStorage.setItem('user', JSON.stringify(normalizedUser));
     
     // Save remember me preference
     localStorage.setItem('rememberMe', rememberMe ? 'true' : 'false');
@@ -157,11 +191,15 @@ function clearAuthData() {
 
 // Logout
 function logout() {
+    console.log('Logging out...');
     clearAuthData();
     showNotification('Logged out successfully', 'success');
+    
+    // Use a more reliable redirect
     setTimeout(() => {
-        window.location.href = 'login.html';
-    }, 1000);
+        // Force full page navigation to login
+        window.location.replace('login.html');
+    }, 500);
 }
 
 // Regular email/password login
@@ -237,31 +275,58 @@ function updateAuthUI() {
     const user = getCurrentUser();
     const token = getAuthToken();
     
+    // Get all login/register buttons (might have multiple across pages)
+    const loginBtns = document.querySelectorAll('.btn-login');
+    const registerBtns = document.querySelectorAll('.btn-register');
+    const sidebarLoginItem = document.getElementById('sidebarLoginItem');
+    const userMenu = document.getElementById('userMenu');
+    const navbarUser = document.querySelector('.navbar-user');
+    
     if (user && token) {
-        // User is logged in
-        const loginBtn = document.querySelector('.btn-login');
-        const registerBtn = document.querySelector('.btn-register');
+        // User is logged in - hide login/register buttons
+        loginBtns.forEach(btn => {
+            const parent = btn.closest('.nav-item') || btn.parentElement;
+            if (parent) parent.style.display = 'none';
+        });
+        registerBtns.forEach(btn => {
+            const parent = btn.closest('.nav-item') || btn.parentElement;
+            if (parent) parent.style.display = 'none';
+        });
+        if (sidebarLoginItem) sidebarLoginItem.style.display = 'none';
         
-        if (loginBtn && registerBtn) {
-            // Replace login/register buttons with user menu
-            const navUser = document.querySelector('.navbar-user');
-            if (navUser) {
-                navUser.innerHTML = `
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown">
-                            <div class="avatar avatar-sm">${user.fullName.charAt(0).toUpperCase()}</div>
-                            <span class="d-none d-md-inline ml-2">${user.fullName}</span>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="profile.html">Profile</a>
-                            <a class="dropdown-item" href="subscribe.html">Subscription</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#" onclick="logout(); return false;">Logout</a>
-                        </div>
+        // Show user menu if it exists
+        if (userMenu) userMenu.classList.remove('d-none');
+        
+        // For pages using navbar-user class, replace with user dropdown
+        if (navbarUser && !userMenu) {
+            navbarUser.innerHTML = `
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown">
+                        <div class="avatar avatar-sm" style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7CFC00,#00D9FF);display:flex;align-items:center;justify-content:center;font-weight:bold;color:#000;">${(user.fullName || user.name || 'U').charAt(0).toUpperCase()}</div>
+                        <span class="d-none d-md-inline ml-2">${(user.fullName || user.name || 'User').split(' ')[0]}</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" style="background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);">
+                        <a class="dropdown-item" href="dashboard.html" style="color:#fff;">Dashboard</a>
+                        <a class="dropdown-item" href="profile.html" style="color:#fff;">Profile</a>
+                        <a class="dropdown-item" href="subscribe.html" style="color:#fff;">Subscription</a>
+                        <div class="dropdown-divider" style="border-color:rgba(255,255,255,0.1);"></div>
+                        <a class="dropdown-item" href="#" onclick="logout(); return false;" style="color:#ff6b6b;">Logout</a>
                     </div>
-                `;
-            }
+                </li>
+            `;
         }
+    } else {
+        // User is not logged in - show login/register buttons
+        loginBtns.forEach(btn => {
+            const parent = btn.closest('.nav-item') || btn.parentElement;
+            if (parent) parent.style.display = '';
+        });
+        registerBtns.forEach(btn => {
+            const parent = btn.closest('.nav-item') || btn.parentElement;
+            if (parent) parent.style.display = '';
+        });
+        if (sidebarLoginItem) sidebarLoginItem.style.display = '';
+        if (userMenu) userMenu.classList.add('d-none');
     }
 }
 
@@ -304,15 +369,29 @@ function showNotification(message, type = 'info') {
 
 // Check auth on page load
 document.addEventListener('DOMContentLoaded', function() {
+    // Debug auth state
+    const token = getAuthToken();
+    const user = getCurrentUser();
+    console.log('Auth Debug - Token exists:', !!token);
+    console.log('Auth Debug - User:', user);
+    console.log('Auth Debug - isLoggedIn:', isLoggedIn());
+    console.log('Auth Debug - Current page:', window.location.pathname);
+    
     // Initialize Google Sign-In
     initGoogleSignIn();
     
     // Update UI based on auth state
     updateAuthUI();
     
-    // Redirect if already logged in (for login/register pages)
-    if ((window.location.pathname.includes('login.html') || window.location.pathname.includes('register.html')) && isLoggedIn()) {
+    // Only redirect if user has VALID token AND user data
+    const isOnLoginPage = window.location.pathname.includes('login.html') || window.location.pathname.includes('register.html');
+    const hasValidAuth = token && user && user.email;
+    
+    if (isOnLoginPage && hasValidAuth) {
+        console.log('Auth Debug - Redirecting logged-in user from login page');
         window.location.href = 'index.html';
+    } else if (isOnLoginPage) {
+        console.log('Auth Debug - User NOT logged in, staying on login page');
     }
     
     // Protect pages that require authentication
@@ -331,6 +410,7 @@ document.addEventListener('DOMContentLoaded', function() {
 window.loginWithEmail = loginWithEmail;
 window.registerWithEmail = registerWithEmail;
 window.logout = logout;
+window.clearAuthData = clearAuthData;
 window.isLoggedIn = isLoggedIn;
 window.getCurrentUser = getCurrentUser;
 window.getAuthToken = getAuthToken;

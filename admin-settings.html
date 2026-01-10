@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Settings - Admin | Unruly Movies</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { box-sizing: border-box; }
+        
+        .admin-layout { display: flex; min-height: 100vh; }
+        
+        .admin-sidebar {
+            width: 260px;
+            background: var(--background-light);
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .admin-logo img { height: 35px; }
+        .admin-logo span {
+            font-size: 12px;
+            background: var(--primary-color);
+            color: #000;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .admin-nav { list-style: none; padding: 0; margin: 0; }
+        .admin-nav li { margin-bottom: 5px; }
+        .admin-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .admin-nav a:hover, .admin-nav a.active {
+            background: rgba(124, 252, 0, 0.1);
+            color: var(--primary-color);
+        }
+        .admin-nav svg { width: 20px; height: 20px; }
+        .nav-section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin: 25px 0 10px;
+            padding-left: 15px;
+            letter-spacing: 1px;
+        }
+        
+        .admin-main { flex: 1; margin-left: 260px; padding: 30px; }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .admin-title { font-size: 28px; font-weight: 700; }
+        
+        .settings-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        .tab-btn {
+            padding: 12px 24px;
+            border-radius: 10px 10px 0 0;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .tab-btn:hover, .tab-btn.active {
+            background: rgba(124, 252, 0, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .settings-section {
+            background: var(--background-light);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .section-title { font-size: 18px; font-weight: 600; }
+        .section-desc { font-size: 13px; color: var(--text-secondary); margin-top: 5px; }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--background-dark);
+            color: var(--text-color);
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .form-group .help-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .toggle-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: var(--background-dark);
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .toggle-info { flex: 1; }
+        .toggle-label { font-weight: 500; font-size: 14px; }
+        .toggle-desc { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
+        
+        .toggle {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--border-color);
+            transition: 0.3s;
+            border-radius: 26px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        .toggle input:checked + .toggle-slider {
+            background: var(--primary-color);
+        }
+        .toggle input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+        
+        .api-key-group {
+            display: flex;
+            gap: 10px;
+        }
+        .api-key-group input {
+            flex: 1;
+            font-family: monospace;
+        }
+        .btn-copy {
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--background-dark);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-copy:hover {
+            background: var(--primary-color);
+            color: #000;
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary {
+            padding: 12px 30px;
+            border-radius: 10px;
+            border: none;
+            background: var(--primary-color);
+            color: #000;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .btn-danger {
+            padding: 12px 30px;
+            border-radius: 10px;
+            border: 1px solid #ef4444;
+            background: transparent;
+            color: #ef4444;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-danger:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+        
+        .danger-zone {
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.05);
+        }
+        .danger-zone .section-title { color: #ef4444; }
+        
+        .backup-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .backup-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: var(--background-dark);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .backup-info { }
+        .backup-name { font-weight: 500; font-size: 14px; }
+        .backup-date { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
+        .backup-actions { display: flex; gap: 8px; }
+        .btn-sm {
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        .btn-restore { background: rgba(0, 217, 255, 0.1); color: #00d9ff; }
+        .btn-restore:hover { background: #00d9ff; color: #000; }
+        .btn-delete { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .btn-delete:hover { background: #ef4444; color: #fff; }
+        
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            background: var(--background-light);
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast.error { border-left-color: #ef4444; }
+        
+        @media (max-width: 1024px) {
+            .form-row { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .admin-sidebar { display: none; }
+            .admin-main { margin-left: 0; }
+            .settings-tabs { overflow-x: auto; }
+            .tab-btn { white-space: nowrap; }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <img src="assets/images/logo.png" alt="Unruly Movies">
+                <span>Admin</span>
+            </div>
+            
+            <nav>
+                <ul class="admin-nav">
+                    <li><a href="admin.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="9"></rect>
+                            <rect x="14" y="3" width="7" height="5"></rect>
+                            <rect x="14" y="12" width="7" height="9"></rect>
+                            <rect x="3" y="16" width="7" height="5"></rect>
+                        </svg>
+                        Dashboard
+                    </a></li>
+                </ul>
+                
+                <div class="nav-section-title">Content</div>
+                <ul class="admin-nav">
+                    <li><a href="admin-movies.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                            <line x1="7" y1="2" x2="7" y2="22"></line>
+                            <line x1="17" y1="2" x2="17" y2="22"></line>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                        </svg>
+                        Movies
+                    </a></li>
+                    <li><a href="admin-vjs.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        VJ Translators
+                    </a></li>
+                    <li><a href="admin-genres.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        Genres
+                    </a></li>
+                </ul>
+                
+                <div class="nav-section-title">Users</div>
+                <ul class="admin-nav">
+                    <li><a href="admin-users.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                        </svg>
+                        All Users
+                    </a></li>
+                    <li><a href="admin-reviews.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                        Reviews
+                    </a></li>
+                    <li><a href="admin-comments.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        Comments
+                    </a></li>
+                </ul>
+                
+                <div class="nav-section-title">System</div>
+                <ul class="admin-nav">
+                    <li><a href="admin-requests.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        User Requests
+                    </a></li>
+                    <li><a href="admin-analytics.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                        Analytics
+                    </a></li>
+                    <li><a href="admin-settings.html" class="active">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                        Settings
+                    </a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <div class="admin-header">
+                <h1 class="admin-title">Settings</h1>
+            </div>
+
+            <!-- Tabs -->
+            <div class="settings-tabs">
+                <button class="tab-btn active" onclick="switchTab('general')">General</button>
+                <button class="tab-btn" onclick="switchTab('features')">Features</button>
+                <button class="tab-btn" onclick="switchTab('payments')">Payments</button>
+                <button class="tab-btn" onclick="switchTab('backup')">Backup</button>
+            </div>
+
+            <!-- General Settings -->
+            <div class="tab-content active" id="tab-general">
+                <div class="settings-section">
+                    <div class="section-header">
+                        <div>
+                            <h3 class="section-title">Site Information</h3>
+                            <p class="section-desc">Basic information about your website</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Site Name</label>
+                            <input type="text" id="siteName" value="Unruly Movies">
+                        </div>
+                        <div class="form-group">
+                            <label>Tagline</label>
+                            <input type="text" id="siteTagline" value="Luganda Translated Movies">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Site Description</label>
+                        <textarea id="siteDescription">Watch the best Luganda-translated (VJ) movies online. Stream Hollywood movies with your favorite VJ translators like VJ Jingo, VJ Junior, and VJ Emmie.</textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Contact Email</label>
+                            <input type="email" id="contactEmail" value="support@unrulymovies.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Support Phone</label>
+                            <input type="tel" id="supportPhone" value="+256 700 000 000">
+                        </div>
+                    </div>
+                    
+                    <button class="btn-primary" onclick="saveGeneralSettings()">Save Changes</button>
+                </div>
+
+                <div class="settings-section">
+                    <div class="section-header">
+                        <div>
+                            <h3 class="section-title">Social Media</h3>
+                            <p class="section-desc">Connect your social media accounts</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Facebook</label>
+                            <input type="url" id="facebook" placeholder="https://facebook.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label>Twitter</label>
+                            <input type="url" id="twitter" placeholder="https://twitter.com/...">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Instagram</label>
+                            <input type="url" id="instagram" placeholder="https://instagram.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label>YouTube</label>
+                            <input type="url" id="youtube" placeholder="https://youtube.com/...">
+                        </div>
+                    </div>
+                    
+                    <button class="btn-primary" onclick="saveSocialSettings()">Save Changes</button>
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="tab-content" id="tab-features">
+                <div class="settings-section">
+                    <div class="section-header">
+                        <div>
+                            <h3 class="section-title">Feature Toggles</h3>
+                            <p class="section-desc">Enable or disable site features</p>
+                        </div>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-info">
+                            <div class="toggle-label">User Registration</div>
+                            <div class="toggle-desc">Allow new users to create accounts</div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="featureRegistration" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-info">
+                            <div class="toggle-label">Google Sign-In</div>
+                            <div class="toggle-desc">Allow users to sign in with Google</div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="featureGoogleAuth" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-info">
+                            <div class="toggle-label">Comments</div>
+                            <div class="toggle-desc">Allow users to comment on movies</div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="featureComments" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-info">
+                            <div class="toggle-label">Reviews & Ratings</div>
+                            <div class="toggle-desc">Allow users to rate and review movies</div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="featureReviews" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-info">
+                            <div class="toggle-label">Uganda TV</div>
+                            <div class="toggle-desc">Enable live TV streaming feature</div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="featureTV" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-info">
+                            <div class="toggle-label">Maintenance Mode</div>
+                            <div class="toggle-desc">Show maintenance page to visitors</div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="featureMaintenance">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <button class="btn-primary" onclick="saveFeatureSettings()">Save Changes</button>
+                </div>
+            </div>
+
+            <!-- Payments -->
+            <div class="tab-content" id="tab-payments">
+                <div class="settings-section">
+                    <div class="section-header">
+                        <div>
+                            <h3 class="section-title">Subscription Plans</h3>
+                            <p class="section-desc">Configure subscription pricing</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Basic Plan (Monthly)</label>
+                            <input type="number" id="priceBasic" value="10000" min="0">
+                            <p class="help-text">Price in UGX</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Premium Plan (Monthly)</label>
+                            <input type="number" id="pricePremium" value="25000" min="0">
+                            <p class="help-text">Price in UGX</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Annual Basic</label>
+                            <input type="number" id="priceBasicYearly" value="100000" min="0">
+                            <p class="help-text">Price in UGX (save 17%)</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Annual Premium</label>
+                            <input type="number" id="pricePremiumYearly" value="250000" min="0">
+                            <p class="help-text">Price in UGX (save 17%)</p>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-primary" onclick="savePricingSettings()">Save Changes</button>
+                </div>
+
+                <div class="settings-section">
+                    <div class="section-header">
+                        <div>
+                            <h3 class="section-title">Payment Methods</h3>
+                            <p class="section-desc">Enable payment options</p>
+                        </div>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-info">
+                            <div class="toggle-label">Mobile Money (MTN/Airtel)</div>
+                            <div class="toggle-desc">Accept mobile money payments</div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="paymentMomo" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-info">
+                            <div class="toggle-label">Visa/Mastercard</div>
+                            <div class="toggle-desc">Accept card payments</div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="paymentCard" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backup -->
+            <div class="tab-content" id="tab-backup">
+                <div class="settings-section">
+                    <div class="section-header">
+                        <div>
+                            <h3 class="section-title">Database Backup</h3>
+                            <p class="section-desc">Create and manage database backups</p>
+                        </div>
+                        <button class="btn-primary" onclick="createBackup()">Create Backup</button>
+                    </div>
+                    
+                    <ul class="backup-list">
+                        <li class="backup-item">
+                            <div class="backup-info">
+                                <div class="backup-name">backup_2024_01_15_auto.gz</div>
+                                <div class="backup-date">Jan 15, 2024 at 3:00 AM • 45.2 MB</div>
+                            </div>
+                            <div class="backup-actions">
+                                <button class="btn-sm btn-restore" onclick="restoreBackup('backup_2024_01_15')">Restore</button>
+                                <button class="btn-sm btn-delete" onclick="deleteBackup('backup_2024_01_15')">Delete</button>
+                            </div>
+                        </li>
+                        <li class="backup-item">
+                            <div class="backup-info">
+                                <div class="backup-name">backup_2024_01_08_auto.gz</div>
+                                <div class="backup-date">Jan 8, 2024 at 3:00 AM • 42.8 MB</div>
+                            </div>
+                            <div class="backup-actions">
+                                <button class="btn-sm btn-restore" onclick="restoreBackup('backup_2024_01_08')">Restore</button>
+                                <button class="btn-sm btn-delete" onclick="deleteBackup('backup_2024_01_08')">Delete</button>
+                            </div>
+                        </li>
+                        <li class="backup-item">
+                            <div class="backup-info">
+                                <div class="backup-name">backup_2024_01_01_auto.gz</div>
+                                <div class="backup-date">Jan 1, 2024 at 3:00 AM • 40.1 MB</div>
+                            </div>
+                            <div class="backup-actions">
+                                <button class="btn-sm btn-restore" onclick="restoreBackup('backup_2024_01_01')">Restore</button>
+                                <button class="btn-sm btn-delete" onclick="deleteBackup('backup_2024_01_01')">Delete</button>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="settings-section danger-zone">
+                    <div class="section-header">
+                        <div>
+                            <h3 class="section-title">⚠️ Danger Zone</h3>
+                            <p class="section-desc">Irreversible actions - proceed with caution</p>
+                        </div>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-info">
+                            <div class="toggle-label">Clear All Cache</div>
+                            <div class="toggle-desc">Remove all cached data to free up space</div>
+                        </div>
+                        <button class="btn-danger" onclick="clearCache()">Clear Cache</button>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <div class="toggle-info">
+                            <div class="toggle-label">Reset Site Settings</div>
+                            <div class="toggle-desc">Restore all settings to default values</div>
+                        </div>
+                        <button class="btn-danger" onclick="resetSettings()">Reset All</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script src="js/config.js"></script>
+    <script>
+        const API_URL = API_CONFIG.BASE_URL + '/api';
+        
+        // Get auth headers
+        function getAuthHeaders() {
+            const token = localStorage.getItem('token');
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': token ? `Bearer ${token}` : ''
+            };
+        }
+        
+        // Check admin auth
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token || user.role !== 'admin') {
+                alert('Access denied. Admin only.');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            loadSettings();
+        });
+        
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+        
+        function toggleApiKey(inputId) {
+            const input = document.getElementById(inputId);
+            const btn = event.target;
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = 'Hide';
+            } else {
+                input.type = 'password';
+                btn.textContent = 'Show';
+            }
+        }
+        
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast' + (isError ? ' error' : '');
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        async function loadSettings() {
+            try {
+                const response = await fetch(`${API_URL}/admin/settings`, {
+                    headers: getAuthHeaders()
+                });
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    const settings = data.data;
+                    
+                    // Populate general settings
+                    if (settings.siteName) document.getElementById('siteName').value = settings.siteName;
+                    if (settings.siteTagline) document.getElementById('siteTagline').value = settings.siteTagline;
+                    if (settings.siteDescription) document.getElementById('siteDescription').value = settings.siteDescription;
+                    if (settings.contactEmail) document.getElementById('contactEmail').value = settings.contactEmail;
+                    if (settings.supportPhone) document.getElementById('supportPhone').value = settings.supportPhone;
+                    
+                    // Populate social media settings
+                    if (settings.socialMedia) {
+                        const social = settings.socialMedia;
+                        if (social.youtube) document.getElementById('youtube').value = social.youtube;
+                        if (social.twitter) document.getElementById('twitter').value = social.twitter;
+                        if (social.facebook) document.getElementById('facebook').value = social.facebook;
+                        if (social.instagram) document.getElementById('instagram').value = social.instagram;
+                        if (social.tiktok) document.getElementById('tiktok').value = social.tiktok;
+                    }
+                    
+                    // Populate feature toggles
+                    if (settings.features) {
+                        const features = settings.features;
+                        setToggle('enableRegistration', features.enableRegistration);
+                        setToggle('enableComments', features.enableComments);
+                        setToggle('enableReviews', features.enableReviews);
+                        setToggle('enableDownloads', features.enableDownloads);
+                        setToggle('enableNotifications', features.enableNotifications);
+                        setToggle('enableAds', features.enableAds);
+                        setToggle('maintenanceMode', features.maintenanceMode);
+                    }
+                    
+                    // Populate pricing settings
+                    if (settings.pricing) {
+                        const pricing = settings.pricing;
+                        if (document.getElementById('basicPrice')) document.getElementById('basicPrice').value = pricing.basicPrice || 5000;
+                        if (document.getElementById('premiumPrice')) document.getElementById('premiumPrice').value = pricing.premiumPrice || 15000;
+                        if (document.getElementById('vipPrice')) document.getElementById('vipPrice').value = pricing.vipPrice || 30000;
+                        if (document.getElementById('currency')) document.getElementById('currency').value = pricing.currency || 'UGX';
+                        if (document.getElementById('trialDays')) document.getElementById('trialDays').value = pricing.trialDays || 3;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+                // Load from localStorage as fallback
+                const settings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+                if (settings.siteName) document.getElementById('siteName').value = settings.siteName;
+                if (settings.siteTagline) document.getElementById('siteTagline').value = settings.siteTagline;
+            }
+        }
+        
+        function setToggle(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.checked = value;
+        }
+        
+        async function saveGeneralSettings() {
+            const settings = {
+                siteName: document.getElementById('siteName').value,
+                siteTagline: document.getElementById('siteTagline').value,
+                siteDescription: document.getElementById('siteDescription').value,
+                contactEmail: document.getElementById('contactEmail').value,
+                supportPhone: document.getElementById('supportPhone').value
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/admin/settings/general`, {
+                    method: 'PUT',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(settings)
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('General settings saved successfully!');
+                    // Also save to localStorage as backup
+                    localStorage.setItem('siteSettings', JSON.stringify(settings));
+                } else {
+                    showToast(data.message || 'Failed to save settings', true);
+                }
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                showToast('Failed to save settings. Saved locally.', true);
+                localStorage.setItem('siteSettings', JSON.stringify(settings));
+            }
+        }
+        
+        async function saveSocialSettings() {
+            const settings = {
+                youtube: document.getElementById('youtube')?.value || '',
+                twitter: document.getElementById('twitter')?.value || '',
+                facebook: document.getElementById('facebook')?.value || '',
+                instagram: document.getElementById('instagram')?.value || '',
+                tiktok: document.getElementById('tiktok')?.value || ''
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/admin/settings/social`, {
+                    method: 'PUT',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(settings)
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('Social media settings saved!');
+                } else {
+                    showToast(data.message || 'Failed to save settings', true);
+                }
+            } catch (error) {
+                console.error('Error saving social settings:', error);
+                showToast('Failed to save settings', true);
+            }
+        }
+        
+        async function saveFeatureSettings() {
+            const features = {
+                enableRegistration: document.getElementById('enableRegistration')?.checked ?? true,
+                enableComments: document.getElementById('enableComments')?.checked ?? true,
+                enableReviews: document.getElementById('enableReviews')?.checked ?? true,
+                enableDownloads: document.getElementById('enableDownloads')?.checked ?? false,
+                enableNotifications: document.getElementById('enableNotifications')?.checked ?? true,
+                enableAds: document.getElementById('enableAds')?.checked ?? false,
+                maintenanceMode: document.getElementById('maintenanceMode')?.checked ?? false
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/admin/settings/features`, {
+                    method: 'PUT',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(features)
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('Feature settings saved!');
+                } else {
+                    showToast(data.message || 'Failed to save settings', true);
+                }
+            } catch (error) {
+                console.error('Error saving feature settings:', error);
+                showToast('Failed to save settings', true);
+            }
+        }
+        
+        async function savePricingSettings() {
+            const pricing = {
+                basicPrice: parseInt(document.getElementById('basicPrice')?.value) || 5000,
+                premiumPrice: parseInt(document.getElementById('premiumPrice')?.value) || 15000,
+                vipPrice: parseInt(document.getElementById('vipPrice')?.value) || 30000,
+                currency: document.getElementById('currency')?.value || 'UGX',
+                trialDays: parseInt(document.getElementById('trialDays')?.value) || 3
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/admin/settings/pricing`, {
+                    method: 'PUT',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(pricing)
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('Pricing settings saved!');
+                } else {
+                    showToast(data.message || 'Failed to save settings', true);
+                }
+            } catch (error) {
+                console.error('Error saving pricing settings:', error);
+                showToast('Failed to save settings', true);
+            }
+        }
+        
+        function createBackup() {
+            showToast('Creating backup... This may take a few minutes.');
+            // API call to create backup
+        }
+        
+        function restoreBackup(backupId) {
+            if (confirm('Are you sure you want to restore this backup? Current data will be overwritten.')) {
+                showToast('Restoring backup...');
+            }
+        }
+        
+        function deleteBackup(backupId) {
+            if (confirm('Delete this backup permanently?')) {
+                showToast('Backup deleted');
+            }
+        }
+        
+        function clearCache() {
+            if (confirm('Clear all cached data?')) {
+                localStorage.removeItem('movieCache');
+                sessionStorage.clear();
+                showToast('Cache cleared successfully!');
+            }
+        }
+        
+        function resetSettings() {
+            if (confirm('Reset ALL settings to default? This cannot be undone.')) {
+                localStorage.removeItem('siteSettings');
+                showToast('Settings have been reset', true);
+                setTimeout(() => location.reload(), 1500);
+            }
+        }
+    </script>
+</body>
+</html>

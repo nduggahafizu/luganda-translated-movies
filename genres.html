@@ -6,6 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Browse Luganda translated movies by genre - Action, Comedy, Drama, Horror, Romance and more. Find your favorite movie category.">
     <meta name="theme-color" content="#7CFC00">
+    
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMF82HVT9G"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-HMF82HVT9G');
+    </script>
+    
     <link rel="icon" type="image/png" href="/assets/images/favicon.png">
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
@@ -222,13 +232,14 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 Unruly Movies. All rights reserved. Developed by Nduga Hafizu</p>
+    <footer class="site-footer" style="margin-top: 40px;">
+        <div class="footer-bottom">
+            <p>Copyright © unruly movies watch 2026</p>
         </div>
     </footer>
 
     <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
     <script>
         // Genre icons mapping
         const genreIcons = {

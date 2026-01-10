@@ -137,7 +137,7 @@
             <!-- Header -->
             <div class="app-header">
                 <div class="navbar navbar-expand-lg">
-                    <div class="menu d-md-none d-block">
+                    <div class="menu" id="menuToggle" role="button" aria-label="Open navigation menu" tabindex="0">
                         <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="3" y1="12" x2="21" y2="12"></line>
                             <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -195,7 +195,7 @@
             <div class="app-wrapper">
                 <!-- Sidebar -->
                 <div class="app-aside nav-aside" id="aside">
-                    <button class="modal-close d-md-none d-block" data-dismiss="modal" aria-label="Close menu" title="Close menu">
+                    <button class="modal-close" data-dismiss="modal" aria-label="Close menu" title="Close menu">
                         <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
                             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -343,16 +343,57 @@
                 </div>
             </div>
 
-            <!-- Footer -->
-            <div class="app-footer">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="footer-text my-3">
-                            2025 Unruly Movies. All rights reserved.
+            <!-- Professional Footer -->
+            <footer class="site-footer">
+                <div class="footer-main">
+                    <div class="footer-grid">
+                        <div class="footer-brand">
+                            <a href="index.html" class="footer-logo">
+                                <img src="assets/images/logo.png" alt="Unruly Movies" height="40">
+                            </a>
+                            <p class="footer-tagline">Uganda's premier platform for Luganda VJ translated movies.</p>
+                            <div class="footer-social">
+                                <a href="#" aria-label="Facebook" class="social-link">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                                </a>
+                                <a href="#" aria-label="Twitter" class="social-link">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                                </a>
+                                <a href="#" aria-label="YouTube" class="social-link">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="footer-links">
+                            <h4>Quick Links</h4>
+                            <ul>
+                                <li><a href="index.html">Home</a></li>
+                                <li><a href="movies.html">Browse Movies</a></li>
+                                <li><a href="vjs.html">VJ Translators</a></li>
+                                <li><a href="genres.html">Genres</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-links">
+                            <h4>Legal</h4>
+                            <ul>
+                                <li><a href="terms.html">Terms of Service</a></li>
+                                <li><a href="privacy.html">Privacy Policy</a></li>
+                                <li><a href="dmca.html">DMCA Policy</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-links">
+                            <h4>Company</h4>
+                            <ul>
+                                <li><a href="about.html">About Us</a></li>
+                                <li><a href="contact.html">Contact</a></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
-            </div>
+                <div class="footer-bottom">
+                    <p>Copyright © unruly movies watch 2026</p>
+                </div>
+            </footer>
         </div>
     </div>
 
@@ -363,44 +404,56 @@
         </svg>
     </div>
 
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/series-api.js"></script>
+    <script src="js/notifications.js"></script>
     <script src="js/main.js"></script>
     <script>
-        // Sample series data
-        const series = [
-            { title: "Breaking Bad", year: 2008, genre: "drama", rating: 8.7, seasons: 5, status: "completed", image: "https://image.tmdb.org/t/p/w500/vUUqzWa2LnHIVqkaKVlVGkVcZIW.jpg" },
-            { title: "Stranger Things", year: 2016, genre: "sci-fi", rating: 8.5, seasons: 4, status: "ongoing", image: "https://image.tmdb.org/t/p/w500/9yxep7oJdkj3PLA3XRz0oJd9XnY.jpg" },
-            { title: "The Last of Us", year: 2023, genre: "drama", rating: 8.6, seasons: 1, status: "ongoing", image: "https://image.tmdb.org/t/p/w500/9ijMGlJKqcslswWUzTEwScm82Gs.jpg" },
-            { title: "Wednesday", year: 2022, genre: "comedy", rating: 8.1, seasons: 1, status: "ongoing", image: "https://image.tmdb.org/t/p/w500/9xeEGUZjgiKlI69jwIOi0hjKUIk.jpg" },
-            { title: "Game of Thrones", year: 2011, genre: "fantasy", rating: 8.5, seasons: 8, status: "completed", image: "https://image.tmdb.org/t/p/w500/qmJGd5IfURq8iPQ9KF3les47vFS.jpg" },
-            { title: "The Mandalorian", year: 2019, genre: "sci-fi", rating: 8.4, seasons: 3, status: "ongoing", image: "https://image.tmdb.org/t/p/w500/eU1i6eHXlzMOlEq0ku1Rzq7Y4wA.jpg" },
-            { title: "The Witcher", year: 2019, genre: "fantasy", rating: 7.9, seasons: 3, status: "ongoing", image: "https://image.tmdb.org/t/p/w500/7vjaCdMw15FEbXyLQTVa04URsPm.jpg" },
-            { title: "House of the Dragon", year: 2022, genre: "fantasy", rating: 8.3, seasons: 1, status: "ongoing", image: "https://image.tmdb.org/t/p/w500/z2yahl2uefxDCl0nogcRBstwruJ.jpg" },
-            { title: "The Boys", year: 2019, genre: "action", rating: 8.2, seasons: 3, status: "ongoing", image: "https://image.tmdb.org/t/p/w500/mY7SeH4HFFxW1hiI6cWuwCRKptN.jpg" },
-            { title: "Peaky Blinders", year: 2013, genre: "drama", rating: 8.8, seasons: 6, status: "completed", image: "https://image.tmdb.org/t/p/w500/vUUqzWa2LnHIVqkaKVlVGkVcZIW.jpg" },
-            { title: "The Crown", year: 2016, genre: "drama", rating: 8.6, seasons: 6, status: "completed", image: "https://image.tmdb.org/t/p/w500/1M876KPjulVwppEpldhdc8V4o68.jpg" },
-            { title: "Succession", year: 2018, genre: "drama", rating: 8.9, seasons: 4, status: "completed", image: "https://image.tmdb.org/t/p/w500/7HW47XbkNQ5fiwQFYGWdw9gs144.jpg" },
-            { title: "The Bear", year: 2022, genre: "drama", rating: 8.5, seasons: 2, status: "ongoing", image: "https://image.tmdb.org/t/p/w500/zCH1oHfvn0o5W1KCQU8YqCjjJjR.jpg" },
-            { title: "Yellowstone", year: 2018, genre: "drama", rating: 8.7, seasons: 5, status: "ongoing", image: "https://image.tmdb.org/t/p/w500/peNC0eyc3TQJa6x4TdKcBPNP4t0.jpg" },
-            { title: "Loki", year: 2021, genre: "sci-fi", rating: 8.2, seasons: 2, status: "ongoing", image: "https://image.tmdb.org/t/p/w500/kEl2t3OhXc3Zb9FBh1AuYzRTgZp.jpg" },
-            { title: "Squid Game", year: 2021, genre: "thriller", rating: 8.0, seasons: 1, status: "ongoing", image: "https://image.tmdb.org/t/p/w500/dDlEmu3EZ0Pgg93K2SVNLCjCSvE.jpg" },
-        ];
+        // Series page state
+        let currentPage = 1;
+        let totalPages = 1;
+        let currentFilters = {};
 
-        function renderSeries(seriesToRender) {
+        /**
+         * Render series cards to the grid
+         */
+        function renderSeries(seriesList) {
             const grid = document.getElementById('seriesGrid');
-            grid.innerHTML = '';
             
-            seriesToRender.forEach(show => {
-                const seriesCard = `
+            if (!seriesList || seriesList.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" style="margin-bottom: 20px;">
+                            <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                            <polyline points="17 2 12 7 7 2"></polyline>
+                        </svg>
+                        <h3 style="color: var(--text-primary); margin-bottom: 10px;">No Series Found</h3>
+                        <p style="color: var(--text-muted);">Try adjusting your filters or check back later.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = seriesList.map(show => {
+                const seasonCount = show.seasons ? show.seasons.length : 0;
+                const rating = show.rating?.imdb || show.rating?.userRating || 0;
+                const poster = show.poster || show.thumbnail || 'assets/images/placeholder-movie.jpg';
+                const genre = show.genres?.[0] || 'Drama';
+                const vjName = show.translator?.name || 'VJ';
+                
+                return `
                     <div class="list-movie position-relative">
-                        <a href="player.html?series=${encodeURIComponent(show.title)}" class="list-media">
-                            <div class="season-badge">${show.seasons} Season${show.seasons > 1 ? 's' : ''}</div>
+                        <a href="series-detail.html?id=${show._id || show.slug}" class="list-media">
+                            <div class="season-badge">${seasonCount} Season${seasonCount !== 1 ? 's' : ''}</div>
+                            ${show.status === 'ongoing' ? '<span class="badge-live" style="position: absolute; top: 10px; left: 10px; z-index: 3;">NEW</span>' : ''}
                             <div class="list-media-attr">
                                 <div class="quality">HD</div>
                                 <div class="imdb">
-                                    <span>${show.rating}</span>
+                                    <span>${rating.toFixed(1)}</span>
                                     <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
                                         <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" 
-                                                stroke-dasharray="${show.rating * 10} 100" 
+                                                stroke-dasharray="${rating * 10} 100" 
                                                 stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
                                     </svg>
                                 </div>
@@ -410,42 +463,236 @@
                                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                 </svg>
                             </div>
-                            <div class="media media-cover" style="background-image: url('${show.image}');"></div>
+                            <div class="media media-cover" style="background-image: url('${poster}');"></div>
                         </a>
                         <div class="list-caption">
-                            <a href="player.html?series=${encodeURIComponent(show.title)}" class="list-title">${show.title}</a>
-                            <a href="#" class="list-category">${show.genre.charAt(0).toUpperCase() + show.genre.slice(1)}</a>
+                            <a href="series-detail.html?id=${show._id || show.slug}" class="list-title">${show.title}</a>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <a href="genres.html?genre=${genre.toLowerCase()}" class="list-category">${genre}</a>
+                                <span style="font-size: 11px; color: var(--primary-color);">${vjName}</span>
+                            </div>
                         </div>
                     </div>
                 `;
-                grid.innerHTML += seriesCard;
+            }).join('');
+        }
+
+        /**
+         * Render pagination controls
+         */
+        function renderPagination(pagination) {
+            const container = document.querySelector('.pagination');
+            if (!pagination || pagination.pages <= 1) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            container.style.display = 'flex';
+            currentPage = pagination.page;
+            totalPages = pagination.pages;
+            
+            let paginationHTML = `
+                <button class="page-btn" id="prevPage" ${currentPage === 1 ? 'disabled' : ''} aria-label="Previous page" title="Previous page">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+            `;
+            
+            // Calculate page range to show
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, currentPage + 2);
+            
+            if (startPage > 1) {
+                paginationHTML += `<button class="page-btn" data-page="1">1</button>`;
+                if (startPage > 2) paginationHTML += `<span style="color: var(--text-muted);">...</span>`;
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHTML += `<button class="page-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+            }
+            
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) paginationHTML += `<span style="color: var(--text-muted);">...</span>`;
+                paginationHTML += `<button class="page-btn" data-page="${totalPages}">${totalPages}</button>`;
+            }
+            
+            paginationHTML += `
+                <button class="page-btn" id="nextPage" ${currentPage === totalPages ? 'disabled' : ''} aria-label="Next page" title="Next page">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+            `;
+            
+            container.innerHTML = paginationHTML;
+            
+            // Add pagination event listeners
+            container.querySelectorAll('.page-btn[data-page]').forEach(btn => {
+                btn.addEventListener('click', () => loadSeries(parseInt(btn.dataset.page)));
+            });
+            
+            document.getElementById('prevPage')?.addEventListener('click', () => {
+                if (currentPage > 1) loadSeries(currentPage - 1);
+            });
+            
+            document.getElementById('nextPage')?.addEventListener('click', () => {
+                if (currentPage < totalPages) loadSeries(currentPage + 1);
             });
         }
 
-        // Initial render
-        renderSeries(series);
+        /**
+         * Load series from API
+         */
+        async function loadSeries(page = 1) {
+            const grid = document.getElementById('seriesGrid');
+            
+            // Show loading
+            grid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+                    <div class="spinner" style="width: 50px; height: 50px; border: 3px solid var(--border-color); border-top-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                    <p style="color: var(--text-muted);">Loading series...</p>
+                </div>
+                <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+            `;
+            
+            const params = {
+                page,
+                limit: 20,
+                ...currentFilters
+            };
+            
+            try {
+                const response = await getSeriesWithFallback(params);
+                
+                if (response.success) {
+                    renderSeries(response.data);
+                    renderPagination(response.pagination);
+                } else {
+                    throw new Error('Failed to load series');
+                }
+            } catch (error) {
+                console.error('Error loading series:', error);
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" style="margin-bottom: 20px;">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <h3 style="color: var(--text-primary); margin-bottom: 10px;">Error Loading Series</h3>
+                        <p style="color: var(--text-muted);">Please try again later.</p>
+                        <button onclick="loadSeries()" class="btn btn-glow" style="margin-top: 20px;">Retry</button>
+                    </div>
+                `;
+            }
+        }
 
-        // Filter functionality
-        document.querySelectorAll('.filter-select').forEach(select => {
-            select.addEventListener('change', () => {
-                let filtered = series;
-                
-                const genre = document.getElementById('genreFilter').value;
-                const year = document.getElementById('yearFilter').value;
-                const status = document.getElementById('statusFilter').value;
-                const sort = document.getElementById('sortFilter').value;
-                
-                if (genre) filtered = filtered.filter(s => s.genre === genre);
-                if (year) filtered = filtered.filter(s => s.year == year);
-                if (status) filtered = filtered.filter(s => s.status === status);
-                
-                if (sort === 'rating') filtered.sort((a, b) => b.rating - a.rating);
-                if (sort === 'title') filtered.sort((a, b) => a.title.localeCompare(b.title));
-                if (sort === 'latest') filtered.sort((a, b) => b.year - a.year);
-                
-                renderSeries(filtered);
+        /**
+         * Apply filters
+         */
+        function applyFilters() {
+            const genre = document.getElementById('genreFilter').value;
+            const year = document.getElementById('yearFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const sort = document.getElementById('sortFilter').value;
+            
+            currentFilters = {};
+            if (genre) currentFilters.genre = genre;
+            if (year) currentFilters.year = year;
+            if (status) currentFilters.status = status;
+            if (sort && sort !== 'latest') currentFilters.sort = sort;
+            
+            loadSeries(1);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load initial series
+            loadSeries(1);
+            
+            // Add filter event listeners
+            document.querySelectorAll('.filter-select').forEach(select => {
+                select.addEventListener('change', applyFilters);
             });
+            
+            // Search functionality
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                let searchTimeout;
+                searchInput.addEventListener('input', (e) => {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(async () => {
+                        const query = e.target.value.trim();
+                        if (query.length >= 2) {
+                            try {
+                                // First try local API search
+                                const response = await seriesAPI.searchSeries(query);
+                                if (response.success && response.data && response.data.length > 0) {
+                                    renderSeries(response.data);
+                                    document.querySelector('.pagination').style.display = 'none';
+                                } else {
+                                    // Fall back to TMDB search
+                                    console.log('Local search empty, trying TMDB...');
+                                    const tmdbResponse = await seriesAPI.searchSeriesTMDB(query);
+                                    if (tmdbResponse.success && tmdbResponse.data && tmdbResponse.data.results) {
+                                        // Convert TMDB results to our format
+                                        const tmdbSeries = tmdbResponse.data.results.map(show => ({
+                                            _id: `tmdb-${show.id}`,
+                                            title: show.name,
+                                            startYear: show.first_air_date ? new Date(show.first_air_date).getFullYear() : null,
+                                            genres: show.genre_ids ? show.genre_ids.map(id => mapTMDBGenre(id)) : ['Drama'],
+                                            rating: { imdb: show.vote_average || 0 },
+                                            poster: show.poster_path ? `https://image.tmdb.org/t/p/w500${show.poster_path}` : null,
+                                            backdrop: show.backdrop_path ? `https://image.tmdb.org/t/p/original${show.backdrop_path}` : null,
+                                            description: show.overview,
+                                            status: 'ongoing',
+                                            tmdbId: show.id,
+                                            seasons: []
+                                        }));
+                                        renderSeries(tmdbSeries);
+                                        document.querySelector('.pagination').style.display = 'none';
+                                    } else {
+                                        throw new Error('No results found');
+                                    }
+                                }
+                            } catch (error) {
+                                console.log('Search error, filtering sample data:', error);
+                                const filtered = SAMPLE_SERIES.filter(s => 
+                                    s.title.toLowerCase().includes(query.toLowerCase())
+                                );
+                                renderSeries(filtered);
+                            }
+                        } else if (query.length === 0) {
+                            loadSeries(1);
+                        }
+                    }, 300);
+                });
+            }
         });
+        
+        // Map TMDB genre IDs to names
+        function mapTMDBGenre(genreId) {
+            const genreMap = {
+                10759: 'Action & Adventure',
+                16: 'Animation',
+                35: 'Comedy',
+                80: 'Crime',
+                99: 'Documentary',
+                18: 'Drama',
+                10751: 'Family',
+                10762: 'Kids',
+                9648: 'Mystery',
+                10763: 'News',
+                10764: 'Reality',
+                10765: 'Sci-Fi & Fantasy',
+                10766: 'Soap',
+                10767: 'Talk',
+                10768: 'War & Politics',
+                37: 'Western'
+            };
+            return genreMap[genreId] || 'Drama';
+        }
     </script>
 </body>
 </html>

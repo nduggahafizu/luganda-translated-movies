@@ -28,8 +28,8 @@ async function testPaymentConfig() {
             console.log('\nTo configure PesaPal:');
             console.log('1. Open server/.env file');
             console.log('2. Add these lines:');
-            console.log('   PESAPAL_CONSUMER_KEY=WvGJPVXxUDzwvI3r1kSAkxr7rkrEWWRN');
-            console.log('   PESAPAL_CONSUMER_SECRET=qXoCe4qrb4RzDCr9nDu3y/yvTiU=');
+            console.log('   PESAPAL_CONSUMER_KEY=your_consumer_key_here');
+            console.log('   PESAPAL_CONSUMER_SECRET=your_consumer_secret_here');
             console.log('   PESAPAL_ENVIRONMENT=sandbox');
             console.log('   PESAPAL_IPN_URL=http://localhost:5000/api/payments/pesapal/ipn');
             console.log('3. Restart the server');

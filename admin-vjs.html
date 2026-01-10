@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>VJ Translators - Admin | Unruly Movies</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { box-sizing: border-box; }
+        
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .admin-sidebar {
+            width: 260px;
+            background: var(--background-light);
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .admin-logo img { height: 35px; }
+        .admin-logo span {
+            font-size: 12px;
+            background: var(--primary-color);
+            color: #000;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .admin-nav { list-style: none; padding: 0; margin: 0; }
+        .admin-nav li { margin-bottom: 5px; }
+        .admin-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .admin-nav a:hover, .admin-nav a.active {
+            background: rgba(124, 252, 0, 0.1);
+            color: var(--primary-color);
+        }
+        .admin-nav svg { width: 20px; height: 20px; }
+        .nav-section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin: 25px 0 10px;
+            padding-left: 15px;
+            letter-spacing: 1px;
+        }
+        
+        .admin-main {
+            flex: 1;
+            margin-left: 260px;
+            padding: 30px;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .admin-title { font-size: 28px; font-weight: 700; }
+        
+        .btn-admin {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: var(--primary-color);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .btn-admin:hover { background: #9dff44; transform: translateY(-2px); }
+        .btn-admin.secondary {
+            background: var(--background-light);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: var(--background-light);
+            border-radius: 15px;
+            padding: 25px;
+            position: relative;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+            background: var(--primary-color);
+            border-radius: 15px 0 0 15px;
+        }
+        .stat-card.blue::before { background: #00d9ff; }
+        .stat-card.orange::before { background: #ff9f43; }
+        .stat-card.purple::before { background: #a855f7; }
+        .stat-value { font-size: 32px; font-weight: 700; margin-bottom: 5px; }
+        .stat-label { color: var(--text-secondary); font-size: 14px; }
+        
+        .panel {
+            background: var(--background-light);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .panel-title { font-size: 18px; font-weight: 600; }
+        
+        .search-filter {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            background: var(--background-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        
+        .vj-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .vj-card {
+            background: var(--background-dark);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .vj-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .vj-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            object-fit: cover;
+            border: 3px solid var(--primary-color);
+        }
+        
+        .vj-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .vj-stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 15px 0;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        
+        .vj-stat { text-align: center; }
+        .vj-stat-value { font-weight: 600; color: var(--primary-color); display: block; }
+        
+        .vj-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(124, 252, 0, 0.1);
+            color: var(--primary-color);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+        .vj-badge.popular { background: rgba(255, 159, 67, 0.1); color: #ff9f43; }
+        .vj-badge.new { background: rgba(0, 217, 255, 0.1); color: #00d9ff; }
+        
+        .vj-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .btn-sm {
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        .btn-edit { background: rgba(0, 217, 255, 0.1); color: #00d9ff; }
+        .btn-edit:hover { background: #00d9ff; color: #000; }
+        .btn-delete { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .btn-delete:hover { background: #ef4444; color: #fff; }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active { display: flex; }
+        
+        .modal-content {
+            background: var(--background-light);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .modal-title { font-size: 22px; font-weight: 700; }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 24px;
+        }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--background-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        textarea.form-control { min-height: 100px; resize: vertical; }
+        
+        .avatar-upload {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            object-fit: cover;
+            border: 3px dashed var(--border-color);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        .loading.active { display: block; }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        @media (max-width: 1024px) {
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .admin-sidebar { display: none; }
+            .admin-main { margin-left: 0; }
+            .stats-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <img src="assets/images/logo.png" alt="Unruly Movies">
+                <span>Admin</span>
+            </div>
+            
+            <nav>
+                <ul class="admin-nav">
+                    <li><a href="admin.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="9"></rect>
+                            <rect x="14" y="3" width="7" height="5"></rect>
+                            <rect x="14" y="12" width="7" height="9"></rect>
+                            <rect x="3" y="16" width="7" height="5"></rect>
+                        </svg>
+                        Dashboard
+                    </a></li>
+                </ul>
+                
+                <div class="nav-section-title">Content</div>
+                <ul class="admin-nav">
+                    <li><a href="admin-movies.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                            <line x1="7" y1="2" x2="7" y2="22"></line>
+                            <line x1="17" y1="2" x2="17" y2="22"></line>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                        </svg>
+                        Movies
+                    </a></li>
+                    <li><a href="admin-vjs.html" class="active">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        VJ Translators
+                    </a></li>
+                    <li><a href="admin-genres.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        Genres
+                    </a></li>
+                </ul>
+                
+                <div class="nav-section-title">Users</div>
+                <ul class="admin-nav">
+                    <li><a href="admin-users.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        All Users
+                    </a></li>
+                    <li><a href="admin-reviews.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                        Reviews
+                    </a></li>
+                    <li><a href="admin-comments.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        Comments
+                    </a></li>
+                </ul>
+                
+                <div class="nav-section-title">System</div>
+                <ul class="admin-nav">
+                    <li><a href="admin-requests.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        User Requests
+                    </a></li>
+                    <li><a href="admin-analytics.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                        Analytics
+                    </a></li>
+                    <li><a href="admin-settings.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                        Settings
+                    </a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <div class="admin-header">
+                <h1 class="admin-title">VJ Translators</h1>
+                <button class="btn-admin" onclick="openAddModal()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Add VJ
+                </button>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalVJs">0</div>
+                    <div class="stat-label">Total VJs</div>
+                </div>
+                <div class="stat-card blue">
+                    <div class="stat-value" id="activeVJs">0</div>
+                    <div class="stat-label">Active VJs</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-value" id="totalMovies">0</div>
+                    <div class="stat-label">Total Translations</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="stat-value" id="avgRating">0</div>
+                    <div class="stat-label">Avg Rating</div>
+                </div>
+            </div>
+
+            <!-- VJ List -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">All VJ Translators</h2>
+                </div>
+                
+                <div class="search-filter">
+                    <input type="text" class="search-input" id="searchVJ" placeholder="Search VJs by name..." onkeyup="filterVJs()">
+                </div>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Loading VJs...</p>
+                </div>
+                
+                <div class="vj-grid" id="vjGrid"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal" id="vjModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Add New VJ</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <form id="vjForm" onsubmit="saveVJ(event)">
+                <input type="hidden" id="vjId">
+                
+                <div class="avatar-upload">
+                    <img src="https://placehold.co/100x100/1a1a2e/7CFC00?text=VJ" class="avatar-preview" id="avatarPreview">
+                    <input type="text" class="form-control" id="vjImage" placeholder="Image URL" onchange="previewAvatar()">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">VJ Name *</label>
+                    <input type="text" class="form-control" id="vjName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Slug (URL-friendly name)</label>
+                    <input type="text" class="form-control" id="vjSlug" placeholder="e.g., vj-junior">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" id="vjDescription" placeholder="Short bio about the VJ..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Specialties (comma separated)</label>
+                    <input type="text" class="form-control" id="vjSpecialties" placeholder="e.g., Action, Comedy, Drama">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">YouTube Channel</label>
+                    <input type="url" class="form-control" id="vjYoutube" placeholder="https://youtube.com/...">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select class="form-control" id="vjStatus">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn-admin" style="width: 100%;">
+                    <span id="submitBtnText">Add VJ</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        const API_URL = API_CONFIG.BASE_URL + '/api';
+        let allVJs = [];
+        
+        // Check admin auth
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token || user.role !== 'admin') {
+                alert('Access denied. Admin only.');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            loadVJs();
+        });
+        
+        async function loadVJs() {
+            const loading = document.getElementById('loading');
+            const grid = document.getElementById('vjGrid');
+            
+            loading.classList.add('active');
+            grid.innerHTML = '';
+            
+            try {
+                const response = await fetch(`${API_URL}/vjs`);
+                const data = await response.json();
+                
+                if (data.status === 'success' || data.success) {
+                    allVJs = data.data || [];
+                    renderVJs(allVJs);
+                    updateStats();
+                } else {
+                    grid.innerHTML = '<p style="color: var(--text-secondary); text-align: center; grid-column: 1/-1;">No VJs found</p>';
+                }
+            } catch (error) {
+                console.error('Error loading VJs:', error);
+                grid.innerHTML = '<p style="color: #ef4444; text-align: center; grid-column: 1/-1;">Error loading VJs</p>';
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
+        
+        function renderVJs(vjs) {
+            const grid = document.getElementById('vjGrid');
+            
+            if (vjs.length === 0) {
+                grid.innerHTML = '<p style="color: var(--text-secondary); text-align: center; grid-column: 1/-1;">No VJs found</p>';
+                return;
+            }
+            
+            grid.innerHTML = vjs.map(vj => `
+                <div class="vj-card">
+                    <img src="${vj.image || vj.profileImage || 'https://placehold.co/80x80/1a1a2e/7CFC00?text=' + (vj.name ? vj.name.charAt(0) : 'VJ')}" 
+                         alt="${vj.name}" class="vj-avatar" onerror="this.src='https://placehold.co/80x80/1a1a2e/7CFC00?text=VJ'">
+                    <h3 class="vj-name">${vj.name}</h3>
+                    <span class="vj-badge ${vj.movieCount > 50 ? 'popular' : vj.isNew ? 'new' : ''}">${vj.movieCount > 50 ? 'Popular' : 'Active'}</span>
+                    <div class="vj-stats">
+                        <div class="vj-stat">
+                            <span class="vj-stat-value">${vj.movieCount || 0}</span>
+                            Movies
+                        </div>
+                        <div class="vj-stat">
+                            <span class="vj-stat-value">${vj.rating || '4.5'}</span>
+                            Rating
+                        </div>
+                    </div>
+                    <div class="vj-actions">
+                        <button class="btn-sm btn-edit" onclick="editVJ('${vj._id}')">Edit</button>
+                        <button class="btn-sm btn-delete" onclick="deleteVJ('${vj._id}', '${vj.name}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateStats() {
+            document.getElementById('totalVJs').textContent = allVJs.length;
+            document.getElementById('activeVJs').textContent = allVJs.filter(v => v.status !== 'inactive').length;
+            document.getElementById('totalMovies').textContent = allVJs.reduce((sum, v) => sum + (v.movieCount || 0), 0);
+            
+            const ratings = allVJs.filter(v => v.rating).map(v => parseFloat(v.rating));
+            const avgRating = ratings.length > 0 ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1) : '4.5';
+            document.getElementById('avgRating').textContent = avgRating;
+        }
+        
+        function filterVJs() {
+            const search = document.getElementById('searchVJ').value.toLowerCase();
+            const filtered = allVJs.filter(vj => 
+                vj.name.toLowerCase().includes(search)
+            );
+            renderVJs(filtered);
+        }
+        
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add New VJ';
+            document.getElementById('submitBtnText').textContent = 'Add VJ';
+            document.getElementById('vjForm').reset();
+            document.getElementById('vjId').value = '';
+            document.getElementById('avatarPreview').src = 'https://placehold.co/100x100/1a1a2e/7CFC00?text=VJ';
+            document.getElementById('vjModal').classList.add('active');
+        }
+        
+        function editVJ(id) {
+            const vj = allVJs.find(v => v._id === id);
+            if (!vj) return;
+            
+            document.getElementById('modalTitle').textContent = 'Edit VJ';
+            document.getElementById('submitBtnText').textContent = 'Save Changes';
+            document.getElementById('vjId').value = vj._id;
+            document.getElementById('vjName').value = vj.name || '';
+            document.getElementById('vjSlug').value = vj.slug || '';
+            document.getElementById('vjDescription').value = vj.description || '';
+            document.getElementById('vjImage').value = vj.image || vj.profileImage || '';
+            document.getElementById('vjSpecialties').value = (vj.specialties || []).join(', ');
+            document.getElementById('vjYoutube').value = vj.youtube || '';
+            document.getElementById('vjStatus').value = vj.status || 'active';
+            document.getElementById('avatarPreview').src = vj.image || vj.profileImage || 'https://placehold.co/100x100/1a1a2e/7CFC00?text=VJ';
+            
+            document.getElementById('vjModal').classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('vjModal').classList.remove('active');
+        }
+        
+        function previewAvatar() {
+            const url = document.getElementById('vjImage').value;
+            document.getElementById('avatarPreview').src = url || 'https://placehold.co/100x100/1a1a2e/7CFC00?text=VJ';
+        }
+        
+        async function saveVJ(e) {
+            e.preventDefault();
+            
+            const token = localStorage.getItem('token');
+            const vjId = document.getElementById('vjId').value;
+            const isEdit = !!vjId;
+            
+            const vjData = {
+                name: document.getElementById('vjName').value,
+                slug: document.getElementById('vjSlug').value || document.getElementById('vjName').value.toLowerCase().replace(/\s+/g, '-'),
+                description: document.getElementById('vjDescription').value,
+                image: document.getElementById('vjImage').value,
+                specialties: document.getElementById('vjSpecialties').value.split(',').map(s => s.trim()).filter(s => s),
+                youtube: document.getElementById('vjYoutube').value,
+                status: document.getElementById('vjStatus').value
+            };
+            
+            try {
+                const url = isEdit ? `${API_URL}/vjs/${vjId}` : `${API_URL}/vjs`;
+                const method = isEdit ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(vjData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success' || data.success) {
+                    alert(isEdit ? 'VJ updated successfully!' : 'VJ added successfully!');
+                    closeModal();
+                    loadVJs();
+                } else {
+                    alert(data.message || 'Error saving VJ');
+                }
+            } catch (error) {
+                console.error('Error saving VJ:', error);
+                alert('Error saving VJ. Please try again.');
+            }
+        }
+        
+        async function deleteVJ(id, name) {
+            if (!confirm(`Are you sure you want to delete ${name}?`)) return;
+            
+            const token = localStorage.getItem('token');
+            
+            try {
+                const response = await fetch(`${API_URL}/vjs/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success' || data.success) {
+                    alert('VJ deleted successfully!');
+                    loadVJs();
+                } else {
+                    alert(data.message || 'Error deleting VJ');
+                }
+            } catch (error) {
+                console.error('Error deleting VJ:', error);
+                alert('Error deleting VJ. Please try again.');
+            }
+        }
+        
+        // Close modal on outside click
+        document.getElementById('vjModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>

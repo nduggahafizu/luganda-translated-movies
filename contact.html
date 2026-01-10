@@ -502,30 +502,28 @@
             </div>
 
             <!-- Footer -->
-            <div class="app-footer">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="footer-text my-3">
-                            <a href="terms.html" style="margin: 0 10px;">Terms</a> |
-                            <a href="privacy.html" style="margin: 0 10px;">Privacy</a> |
-                            <a href="dmca.html" style="margin: 0 10px;">DMCA</a> |
-                            <a href="about.html" style="margin: 0 10px;">About</a> |
-                            <a href="contact.html" style="margin: 0 10px;">Contact</a>
-                            <br><br>
-                            &copy; 2025 <strong>Unruly Movies</strong>. Developed by <strong>Nduga Hafizu</strong>.<br>
-                            <small style="color: #666;">Legitimate Ugandan platform for Luganda VJ translations.</small>
-                        </div>
-                    </div>
+            <footer class="site-footer" style="margin-top: 40px;">
+                <div class="footer-bottom">
+                    <p>Copyright © unruly movies watch 2026</p>
                 </div>
-            </div>
+            </footer>
         </div>
     </div>
 
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/main.js"></script>
     <script>
+        const API_URL = API_CONFIG.BASE_URL + '/api';
+        
         // Contact Form Handler
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Sending...';
+            submitBtn.disabled = true;
             
             // Get form data
             const formData = {
@@ -535,18 +533,35 @@
                 message: document.getElementById('message').value
             };
             
-            // Show success message (in production, this would send to backend)
-            alert('Thank you for contacting us! We\'ll get back to you within 24 hours.');
-            
-            // Reset form
-            this.reset();
-            
-            // In production, you would send this to your backend:
-            // fetch('/api/contact', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify(formData)
-            // });
+            try {
+                // Build headers
+                const headers = { 'Content-Type': 'application/json' };
+                const token = localStorage.getItem('token');
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+                
+                const response = await fetch(`${API_URL}/requests`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ ' + data.message);
+                    this.reset();
+                } else {
+                    alert('❌ ' + (data.message || 'Failed to send message. Please try again.'));
+                }
+            } catch (error) {
+                console.error('Contact form error:', error);
+                alert('❌ Network error. Please check your connection and try again.');
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
         });
     </script>
 </body>

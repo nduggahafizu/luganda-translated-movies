@@ -15,8 +15,16 @@ Allow: /
 User-agent: DuckDuckBot
 Allow: /
 
+# Allow Google AdSense crawler
+User-agent: Mediapartners-Google
+Allow: /
+
+User-agent: AdsBot-Google
+Allow: /
+
 # Disallow admin and private areas
 Disallow: /admin.html
+Disallow: /admin-movies.html
 Disallow: /dashboard.html
 Disallow: /server/
 Disallow: /*.bat$

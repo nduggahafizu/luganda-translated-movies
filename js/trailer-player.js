@@ -229,11 +229,8 @@ class TrailerPlayer {
     }
 }
 
-// Initialize trailer player
-let trailerPlayer;
-document.addEventListener('DOMContentLoaded', () => {
-    trailerPlayer = new TrailerPlayer();
-});
+// Initialize trailer player immediately (scripts load after DOM)
+let trailerPlayer = new TrailerPlayer();
 
 /**
  * Helper function to add trailer button to movie cards
