@@ -251,8 +251,8 @@ class UnrulyNotifications {
         
         try {
             // Check for new movies - use Railway API
-            const API_BASE = window.API_BASE_URL || (window.API_CONFIG && window.API_CONFIG.BASE_URL) || 'https://luganda-translated-movies-production.up.railway.app/api';
-            const response = await fetch(`${API_BASE}/luganda-movies?limit=5&sort=-createdAt`);
+            const API_BASE = (window.API_CONFIG && window.API_CONFIG.BASE_URL) || 'https://luganda-translated-movies-production.up.railway.app';
+            const response = await fetch(`${API_BASE}/api/luganda-movies/latest?limit=5`);
             
             if (response.ok) {
                 const data = await response.json();
@@ -263,9 +263,10 @@ class UnrulyNotifications {
                     const movieTime = new Date(movie.createdAt).getTime();
                     if (movieTime > lastCheckTime) {
                         // New movie found!
+                        const movieTitle = movie.originalTitle || movie.title || 'New Movie';
                         this.showNotification({
                             title: '🎬 New Movie Added!',
-                            body: `${movie.title} is now available to watch`,
+                            body: `${movieTitle} is now available to watch`,
                             icon: movie.poster || '/assets/images/logo.png',
                             image: movie.poster,
                             url: `/player.html?id=${movie._id}`,

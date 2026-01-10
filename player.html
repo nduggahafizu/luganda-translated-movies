@@ -148,6 +148,123 @@
             padding-top: 60px;
         }
         
+        /* Pre-Roll Ad Overlay Styles */
+        .preroll-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.97);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .preroll-container {
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .preroll-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 0 10px;
+        }
+        
+        .ad-label {
+            background: #ff6b00;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .skip-timer {
+            color: #888;
+            font-size: 14px;
+        }
+        
+        .skip-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #7CFC00;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .skip-btn:hover {
+            background: #6be000;
+            transform: scale(1.05);
+        }
+        
+        .preroll-ad-content {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 30px;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .preroll-movie-info {
+            color: #888;
+            font-size: 14px;
+        }
+        
+        .preroll-movie-info span {
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .movie-preview {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #fff;
+            font-size: 16px;
+        }
+        
+        .movie-preview img {
+            width: 60px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        
+        @media (max-width: 768px) {
+            .preroll-container {
+                padding: 15px;
+            }
+            
+            .preroll-ad-content {
+                padding: 20px;
+                min-height: 250px;
+            }
+            
+            .preroll-header {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+        }
+        
         /* Plyr Customization */
         .plyr {
             --plyr-color-main: #7CFC00;
@@ -1456,6 +1573,37 @@
         </div>
     </header>
 
+    <!-- Pre-Roll Video Ad Overlay -->
+    <div id="prerollAdOverlay" class="preroll-overlay" style="display: none;">
+        <div class="preroll-container">
+            <div class="preroll-header">
+                <span class="ad-label">Advertisement</span>
+                <span class="skip-timer" id="skipTimer">Skip in 5s</span>
+                <button class="skip-btn" id="skipAdBtn" style="display: none;" onclick="skipPrerollAd()">
+                    Skip Ad
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="13 17 18 12 13 7"></polyline>
+                        <polyline points="6 17 11 12 6 7"></polyline>
+                    </svg>
+                </button>
+            </div>
+            <div class="preroll-ad-content">
+                <!-- Google AdSense In-Article/Video Ad -->
+                <ins class="adsbygoogle"
+                     style="display:block; text-align:center; min-height:250px;"
+                     data-ad-layout="in-article"
+                     data-ad-format="fluid"
+                     data-ad-client="ca-pub-1904736753681797"
+                     data-ad-slot="5239333828"></ins>
+                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+            </div>
+            <div class="preroll-movie-info">
+                <span>Your movie will start shortly...</span>
+                <div class="movie-preview" id="prerollMoviePreview"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Video Player -->
     <div class="player-wrapper" id="playerWrapper">
         <!-- Native Video Player (for direct video files) -->
@@ -2169,6 +2317,12 @@
             poster.src = movie.poster || 'assets/images/placeholder-poster.jpg';
             poster.alt = movie.originalTitle || movie.title;
             
+            // Show pre-roll ad before video starts
+            showPrerollAd(
+                movie.originalTitle || movie.title,
+                movie.poster || 'assets/images/placeholder-poster.jpg'
+            );
+            
             // Update meta tags for sharing
             document.querySelector('meta[property="og:title"]').content = movie.originalTitle || movie.title;
             document.querySelector('meta[property="og:description"]').content = movie.plot || movie.description || '';
@@ -2540,6 +2694,90 @@
                 likeBtn.style.transform = 'scale(1)';
             }, 150);
         });
+
+        // ===================================
+        // Pre-Roll Video Ad System
+        // ===================================
+        
+        let prerollShown = false;
+        let prerollSkipTimer = null;
+        let skipCountdown = 5;
+        
+        function showPrerollAd(movieTitle, posterUrl) {
+            // Don't show preroll if already shown this session
+            const lastPrerollTime = sessionStorage.getItem('lastPrerollTime');
+            const now = Date.now();
+            
+            // Show preroll once per 30 minutes per session
+            if (lastPrerollTime && (now - parseInt(lastPrerollTime)) < 1800000) {
+                console.log('⏭️ Skipping preroll - shown recently');
+                return false;
+            }
+            
+            const overlay = document.getElementById('prerollAdOverlay');
+            const skipTimer = document.getElementById('skipTimer');
+            const skipBtn = document.getElementById('skipAdBtn');
+            const moviePreview = document.getElementById('prerollMoviePreview');
+            
+            if (!overlay) return false;
+            
+            // Set movie preview
+            if (moviePreview) {
+                moviePreview.innerHTML = `
+                    ${posterUrl ? `<img src="${posterUrl}" alt="${movieTitle || 'Movie'}">` : ''}
+                    <span>${movieTitle || 'Your Movie'}</span>
+                `;
+            }
+            
+            // Show overlay
+            overlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            
+            // Reset countdown
+            skipCountdown = 5;
+            skipTimer.style.display = 'inline';
+            skipBtn.style.display = 'none';
+            skipTimer.textContent = `Skip in ${skipCountdown}s`;
+            
+            // Start countdown
+            prerollSkipTimer = setInterval(() => {
+                skipCountdown--;
+                if (skipCountdown > 0) {
+                    skipTimer.textContent = `Skip in ${skipCountdown}s`;
+                } else {
+                    clearInterval(prerollSkipTimer);
+                    skipTimer.style.display = 'none';
+                    skipBtn.style.display = 'flex';
+                }
+            }, 1000);
+            
+            prerollShown = true;
+            sessionStorage.setItem('lastPrerollTime', now.toString());
+            
+            return true;
+        }
+        
+        function skipPrerollAd() {
+            const overlay = document.getElementById('prerollAdOverlay');
+            
+            if (prerollSkipTimer) {
+                clearInterval(prerollSkipTimer);
+            }
+            
+            if (overlay) {
+                overlay.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+            
+            // Focus on player
+            const playerWrapper = document.getElementById('playerWrapper');
+            if (playerWrapper) {
+                playerWrapper.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        // Make skipPrerollAd available globally
+        window.skipPrerollAd = skipPrerollAd;
 
         // Wait for trailer player to be ready
         function waitForTrailerPlayer(callback, maxRetries = 10) {

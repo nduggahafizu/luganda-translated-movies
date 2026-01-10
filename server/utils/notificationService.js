@@ -11,11 +11,13 @@ const User = require('../models/User');
  */
 async function notifyNewMovie(movie) {
     try {
-        // Get all users who have notifications enabled (or all users if no preference exists)
+        // Get all users - send notifications to everyone by default
+        // Users can opt-out via preferences.notifications.newMovies = false
         const users = await User.find({
             $or: [
-                { 'preferences.notifications.newMovies': true },
-                { 'preferences.notifications': { $exists: false } }
+                { 'preferences.notifications.newMovies': { $ne: false } },
+                { 'preferences.notifications': { $exists: false } },
+                { 'preferences': { $exists: false } }
             ]
         }).select('_id');
 

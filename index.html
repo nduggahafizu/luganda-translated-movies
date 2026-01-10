@@ -118,6 +118,7 @@
     <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/card-grid.css">
     <link rel="stylesheet" href="css/trailer-player.css">
     <link rel="stylesheet" href="css/professional-enhancements.css">
     <link rel="stylesheet" href="css/adsense-styles.css">
@@ -684,10 +685,11 @@
                                         </svg>
                                     </a>
                                 </div>
-                                <div class="row row-cols-2 row-cols-md-5 list-scrollable" id="trendingMovies">
+                                <div class="card-grid" id="trendingMovies">
                                     <!-- Trending movies will be loaded here -->
-                                    <div class="col-12 text-center py-5">
-                                        <p style="color: #888;">Loading trending movies...</p>
+                                    <div class="loading-state">
+                                        <div class="loading-spinner"></div>
+                                        <p class="loading-text">Loading trending movies...</p>
                                     </div>
                                 </div>
                             </div>
@@ -724,10 +726,11 @@
                                         </svg>
                                     </a>
                                 </div>
-                                <div class="row row-cols-2 row-cols-md-5 list-scrollable" id="allMovies">
+                                <div class="card-grid" id="allMovies">
                                     <!-- Movies will be loaded here dynamically -->
-                                    <div class="col-12 text-center py-5">
-                                        <p style="color: #888;">Loading movies...</p>
+                                    <div class="loading-state">
+                                        <div class="loading-spinner"></div>
+                                        <p class="loading-text">Loading movies...</p>
                                     </div>
                                 </div>
                             </div>
@@ -748,10 +751,11 @@
                                         </svg>
                                     </a>
                                 </div>
-                                <div class="row row-cols-2 row-cols-md-5 list-scrollable" id="popularMovies">
+                                <div class="card-grid" id="popularMovies">
                                     <!-- Movies will be loaded dynamically -->
-                                    <div class="col-12 text-center py-5">
-                                        <p style="color: #888;">Loading popular movies...</p>
+                                    <div class="loading-state">
+                                        <div class="loading-spinner"></div>
+                                        <p class="loading-text">Loading popular movies...</p>
                                     </div>
                                 </div>
                             </div>
@@ -1197,9 +1201,14 @@
             try {
                 // Try to fetch from backend API first
                 try {
+                    console.log('🎬 Loading movies from API...');
+                    console.log('API Config:', API_CONFIG);
+                    
                     // Fetch ALL movies from backend (sorted by newest first - createdAt descending)
                     const allMoviesResponse = await LugandaMoviesAPI.getLatest(20);
+                    console.log('API Response:', allMoviesResponse);
                     const allMovies = allMoviesResponse.data || allMoviesResponse.movies || [];
+                    console.log('Movies loaded:', allMovies.length);
                     
                     // Render all movies (newest first from backend)
                     if (allMovies.length > 0) {
@@ -1227,10 +1236,12 @@
                     }
                     
                 } catch (apiError) {
-                    console.log('Backend API not available:', apiError.message);
+                    console.error('Backend API error:', apiError);
+                    console.log('API URL was:', API_CONFIG?.API_ENDPOINTS?.LUGANDA_MOVIES);
                     document.getElementById('allMovies').innerHTML = `
                         <div class="col-12 text-center py-5">
                             <p style="color: #888;">Unable to load movies. Please try again later.</p>
+                            <p style="color: #666; font-size: 12px;">Error: ${apiError.message}</p>
                         </div>
                     `;
                 }
@@ -1342,6 +1353,7 @@
             container.innerHTML = '';
             
             let cardsHTML = '';
+            const posterData = [];
             
             movies.forEach((movie, index) => {
                 const quality = movie.video?.quality || 'HD';
@@ -1349,45 +1361,60 @@
                 const fallbackPoster = getPlaceholderPoster(movie.originalTitle, movie.year);
                 const posterUrl = movie.poster || fallbackPoster;
                 const vjName = movie.vjName || 'Unknown';
-                const tmdbId = movie.tmdbId || movie.metaData?.tmdbId || movie.externalIds?.tmdbId || null;
+                const posterId = `${containerId}-poster-${index}`;
                 const movieTitle = movie.originalTitle || movie.lugandaTitle || 'Unknown Title';
+                const year = movie.year || '';
+                const genres = movie.genres || [];
                 const rank = index + 1;
                 
+                // Store poster data for later loading
+                if (movie.poster) {
+                    posterData.push({ posterId, posterUrl: movie.poster, fallbackPoster });
+                }
+                
                 const movieCard = `
-                    <div class="col">
-                        <div class="list-movie position-relative trending-item">
-                            <div class="trending-rank">${rank}</div>
-                            <a href="player.html?id=${movie._id}" class="list-media">
-                                <div class="list-media-attr">
-                                    <div class="quality">${quality.toUpperCase()}</div>
-                                    <div class="imdb">
-                                        <span>${rating.toFixed(1)}</span>
-                                        <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
-                                            <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" 
-                                                    stroke-dasharray="${rating * 20} 100" 
-                                                    stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
-                                        </svg>
-                                    </div>
-                                </div>
-                                <div class="play-btn">
-                                    <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                    </svg>
-                                </div>
-                                <div class="media media-cover" style="background-image: url('${posterUrl}');"></div>
-                            </a>
-                            <div class="list-caption">
-                                <a href="player.html?id=${movie._id}" class="list-title">${movieTitle}</a>
-                                <a href="#" class="list-category">VJ ${vjName}</a>
+                    <a href="player.html?id=${movie._id}" class="content-card">
+                        <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
+                            <span class="trending-rank">${rank}</span>
+                            <div class="card-badges">
+                                <span class="badge-quality">${quality.toUpperCase()}</span>
+                            </div>
+                            <div class="play-overlay">
+                                <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </div>
+                            <div class="card-rating">
+                                <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                </svg>
+                                <span>${rating.toFixed(1)}</span>
                             </div>
                         </div>
-                    </div>
-                `;
+                        <div class="card-info">
+                            <h3 class="card-title">${movieTitle}</h3>
+                            <div class="card-meta">
+                                ${year ? `<span>${year}</span>` : ''}
+                                ${genres.length > 0 ? `<span>${genres[0]}</span>` : ''}
+                                <span>VJ ${vjName}</span>
+                            </div>
+                        </div>
+                    </a>
                 `;
                 cardsHTML += movieCard;
             });
             
             container.innerHTML = cardsHTML;
+            
+            // Load posters with validation after DOM is updated
+            setTimeout(() => {
+                posterData.forEach(({ posterId, posterUrl, fallbackPoster }) => {
+                    const posterElement = document.getElementById(posterId);
+                    if (posterElement) {
+                        loadPosterImage(posterUrl, posterElement, fallbackPoster);
+                    }
+                });
+            }, 100);
         }
         
         // Check user login state and update UI
@@ -1660,6 +1687,8 @@
                 const posterId = `${containerId}-poster-${index}`;
                 const tmdbId = movie.tmdbId || movie.metaData?.tmdbId || movie.externalIds?.tmdbId || null;
                 const movieTitle = movie.originalTitle || movie.lugandaTitle || 'Unknown Title';
+                const year = movie.year || '';
+                const genres = movie.genres || [];
                 
                 // Store poster data for later loading
                 if (movie.poster) {
@@ -1667,33 +1696,32 @@
                 }
                 
                 const movieCard = `
-                    <div class="col">
-                        <div class="list-movie position-relative">
-                            <a href="player.html?id=${movie._id}" class="list-media">
-                                <div class="list-media-attr">
-                                    <div class="quality">${quality.toUpperCase()}</div>
-                                    <div class="imdb">
-                                        <span>${rating.toFixed(1)}</span>
-                                        <svg x="0px" y="0px" width="36px" height="36px" viewBox="0 0 36 36">
-                                            <circle fill="none" stroke-width="1" cx="18" cy="18" r="16" 
-                                                    stroke-dasharray="${rating * 20} 100" 
-                                                    stroke-dashoffset="0" transform="rotate(-90 18 18)"></circle>
-                                        </svg>
-                                    </div>
-                                </div>
-                                <div class="play-btn">
-                                    <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                    </svg>
-                                </div>
-                                <div class="media media-cover" id="${posterId}" style="background-image: url('${fallbackPoster}');"></div>
-                            </a>
-                            <div class="list-caption">
-                                <a href="player.html?id=${movie._id}" class="list-title">${movieTitle}</a>
-                                <a href="#" class="list-category">VJ ${vjName}</a>
+                    <a href="player.html?id=${movie._id}" class="content-card">
+                        <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
+                            <div class="card-badges">
+                                <span class="badge-quality">${quality.toUpperCase()}</span>
+                            </div>
+                            <div class="play-overlay">
+                                <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </div>
+                            <div class="card-rating">
+                                <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                </svg>
+                                <span>${rating.toFixed(1)}</span>
                             </div>
                         </div>
-                    </div>
+                        <div class="card-info">
+                            <h3 class="card-title">${movieTitle}</h3>
+                            <div class="card-meta">
+                                ${year ? `<span>${year}</span>` : ''}
+                                ${genres.length > 0 ? `<span>${genres[0]}</span>` : ''}
+                                <span>VJ ${vjName}</span>
+                            </div>
+                        </div>
+                    </a>
                 `;
                 cardsHTML += movieCard;
             });
