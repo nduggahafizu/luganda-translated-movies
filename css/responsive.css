@@ -337,7 +337,7 @@
     .row-cols-2 {
         display: grid !important;
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 12px !important;
+        gap: 10px !important;
     }
     
     .row-cols-2 > .col {
@@ -345,6 +345,15 @@
         max-width: 100% !important;
         flex: none !important;
         padding: 0 !important;
+    }
+    
+    /* Larger cards on mobile */
+    .list-movie {
+        min-height: auto;
+    }
+    
+    .list-media {
+        padding-bottom: 150%; /* 2:3 ratio */
     }
     
     /* Movie cards */
