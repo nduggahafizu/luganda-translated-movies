@@ -1,13 +1,14 @@
 
 /*
+  Cross-Origin-Opener-Policy: unsafe-none
+  Cross-Origin-Embedder-Policy: unsafe-none
   X-Frame-Options: SAMEORIGIN
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-  # CORS - restrict to main production domain; Netlify proxy will handle same-origin /api calls
-  Access-Control-Allow-Origin: https://watch.unrulymovies.com
+  # CORS - allow all origins for AdSense and Google Sign-In
+  Access-Control-Allow-Origin: *
   Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH, OPTIONS
   Access-Control-Allow-Headers: Content-Type, Authorization
-  Access-Control-Allow-Credentials: true
   Vary: Origin
 
 /assets/*

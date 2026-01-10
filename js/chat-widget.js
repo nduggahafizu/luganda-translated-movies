@@ -8,7 +8,7 @@
     
     // Configuration
     const CONFIG = {
-        whatsappNumber: '+256700000000', // Replace with your actual WhatsApp number
+        whatsappNumber: '+256743311809',
         supportEmail: 'nduggahafizu@gmail.com',
         position: 'bottom-right', // bottom-right, bottom-left
         greeting: 'Hi! How can we help you today?',
