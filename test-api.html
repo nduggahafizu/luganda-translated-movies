@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a2e; color: #fff; }
+        .success { color: #4caf50; }
+        .error { color: #f44336; }
+        pre { background: #16213e; padding: 15px; border-radius: 8px; overflow-x: auto; }
+        .info { background: #0f3460; padding: 15px; border-radius: 8px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🎬 Unruly Movies API Test</h1>
+    <div class="info">
+        <strong>Testing from:</strong> <span id="origin"></span><br>
+        <strong>API URL:</strong> <span id="apiUrl"></span>
+    </div>
+    <div id="result"></div>
+    
+    <script>
+        const API_URL = 'https://luganda-translated-movies-production.up.railway.app/api/movies/fetch?page=1&limit=5';
+        
+        document.getElementById('origin').textContent = window.location.origin;
+        document.getElementById('apiUrl').textContent = API_URL;
+        
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Testing API...</p>';
+            
+            try {
+                console.log('Origin:', window.location.origin);
+                console.log('Fetching from:', API_URL);
+                
+                const response = await fetch(API_URL, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+                
+                const data = await response.json();
+                console.log('Data:', data);
+                
+                if (data.success) {
+                    resultDiv.innerHTML = '<h2 class="success">✅ SUCCESS!</h2>' +
+                        '<p>Movies found: ' + data.movies.length + '</p>' +
+                        '<ul>' + data.movies.map(m => '<li>' + m.title + ' (' + m.year + ')</li>').join('') + '</ul>' +
+                        '<p class="success">CORS is working! Local testing is functional.</p>';
+                } else {
+                    resultDiv.innerHTML = '<h2 class="error">API returned error</h2><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                }
+            } catch (error) {
+                console.error('Full error:', error);
+                resultDiv.innerHTML = '<h2 class="error">❌ ERROR: ' + error.message + '</h2>' +
+                    '<div class="info">' +
+                    '<p><strong>This is likely a CORS issue.</strong></p>' +
+                    '<p>The API works fine but browsers block cross-origin requests from localhost.</p>' +
+                    '<p><strong>Solutions:</strong></p>' +
+                    '<ol>' +
+                    '<li>Test directly on production: <a href="https://watch.unrulymovies.com/movies.html" style="color:#64b5f6">watch.unrulymovies.com</a></li>' +
+                    '<li>Deploy changes to Netlify to test</li>' +
+                    '<li>Use browser extension to disable CORS for testing</li>' +
+                    '</ol>' +
+                    '</div>';
+            }
+        }
+        
+        testAPI();
+    </script>
+</body>
+</html>

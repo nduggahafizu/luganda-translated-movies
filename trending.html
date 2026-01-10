@@ -328,8 +328,15 @@
                         return;
                     }
                     
-                    // Sort by views (trending score)
-                    movies.sort((a, b) => (b.views || 0) - (a.views || 0));
+                    // Sort by: 1) trending flag, 2) views
+                    movies.sort((a, b) => {
+                        // Movies marked as trending come first
+                        const aTrending = a.trending === true ? 10000 : 0;
+                        const bTrending = b.trending === true ? 10000 : 0;
+                        const aScore = aTrending + (a.views || 0);
+                        const bScore = bTrending + (b.views || 0);
+                        return bScore - aScore;
+                    });
                     
                     grid.innerHTML = movies.map((movie, index) => {
                         const rank = index + 1;
