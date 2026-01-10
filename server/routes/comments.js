@@ -2,7 +2,45 @@ const express = require('express');
 const router = express.Router();
 const Comment = require('../models/Comment');
 const Notification = require('../models/Notification');
-const { protect, optionalAuth } = require('../middleware/auth');
+const { protect, optionalAuth, admin } = require('../middleware/auth');
+
+// GET all comments (admin only)
+router.get('/', protect, admin, async (req, res) => {
+    try {
+        const { page = 1, limit = 20, status = 'all' } = req.query;
+        
+        let query = { parentComment: null }; // Top-level comments only
+        if (status === 'hidden') {
+            query.isHidden = true;
+        } else if (status === 'visible') {
+            query.isHidden = false;
+        }
+        
+        const comments = await Comment.find(query)
+            .populate('user', 'fullName profileImage email')
+            .populate('movie', 'originalTitle poster')
+            .sort({ createdAt: -1 })
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .lean();
+        
+        const total = await Comment.countDocuments(query);
+        
+        res.json({
+            status: 'success',
+            data: comments,
+            pagination: {
+                page: parseInt(page),
+                limit: parseInt(limit),
+                total,
+                pages: Math.ceil(total / limit)
+            }
+        });
+    } catch (error) {
+        console.error('Get all comments error:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to fetch comments' });
+    }
+});
 
 // Get comments for a movie
 router.get('/movie/:movieId', optionalAuth, async (req, res) => {

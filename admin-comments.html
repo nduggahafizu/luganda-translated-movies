@@ -545,58 +545,6 @@
         let currentPage = 1;
         const perPage = 10;
         
-        // Sample comments for demo
-        const sampleComments = [
-            {
-                _id: '1',
-                user: { fullName: 'David Wasswa', email: 'david@email.com', profileImage: 'https://i.pravatar.cc/100?img=11' },
-                movie: { title: 'Avengers: Endgame', _id: '200' },
-                text: 'VJ Emmie always delivers! The emotional scenes were so well translated. Cried at the end 😢',
-                status: 'approved',
-                createdAt: new Date(Date.now() - 3600000)
-            },
-            {
-                _id: '2',
-                user: { fullName: 'Agnes Nakato', email: 'agnes@email.com', profileImage: 'https://i.pravatar.cc/100?img=12' },
-                movie: { title: 'John Wick 4', _id: '201' },
-                text: 'Best action movie ever! The fight choreography is insane. VJ did a great job keeping up with the action.',
-                status: 'approved',
-                createdAt: new Date(Date.now() - 7200000)
-            },
-            {
-                _id: '3',
-                user: { fullName: 'Moses Opio', email: 'moses@email.com', profileImage: 'https://i.pravatar.cc/100?img=13' },
-                movie: { title: 'The Marvels', _id: '202' },
-                text: 'Download link not working. Please fix!',
-                status: 'pending',
-                createdAt: new Date(Date.now() - 86400000)
-            },
-            {
-                _id: '4',
-                user: { fullName: 'spam_user_123', email: 'spam@spam.com', profileImage: '' },
-                movie: { title: 'Oppenheimer', _id: '203' },
-                text: 'Buy cheap watches at www.scamsite.com!!! Best deals!!!',
-                status: 'spam',
-                createdAt: new Date(Date.now() - 172800000)
-            },
-            {
-                _id: '5',
-                user: { fullName: 'Rebecca Namutebi', email: 'rebecca@email.com', profileImage: 'https://i.pravatar.cc/100?img=14' },
-                movie: { title: 'Barbie', _id: '204' },
-                text: 'My daughter loved this movie! Thank you for the Luganda version ❤️',
-                status: 'approved',
-                createdAt: new Date(Date.now() - 259200000)
-            },
-            {
-                _id: '6',
-                user: { fullName: 'Frank Ssempala', email: 'frank@email.com', profileImage: 'https://i.pravatar.cc/100?img=15' },
-                movie: { title: 'Mission Impossible 7', _id: '205' },
-                text: 'Tom Cruise never disappoints! And VJ Junior\'s commentary made it even better.',
-                status: 'pending',
-                createdAt: new Date(Date.now() - 345600000)
-            }
-        ];
-        
         // Check admin auth
         document.addEventListener('DOMContentLoaded', function() {
             const token = localStorage.getItem('token');
@@ -628,11 +576,11 @@
                 if (data.status === 'success' && data.data && data.data.length > 0) {
                     allComments = data.data;
                 } else {
-                    allComments = sampleComments;
+                    allComments = [];
                 }
             } catch (error) {
                 console.error('Error loading comments:', error);
-                allComments = sampleComments;
+                allComments = [];
             } finally {
                 loading.classList.remove('active');
                 filteredComments = [...allComments];

@@ -557,11 +557,9 @@
                                     }
                                 }
                             } catch (error) {
-                                console.log('Search error, filtering sample data:', error);
-                                const filtered = SAMPLE_SERIES.filter(s => 
-                                    s.title.toLowerCase().includes(query.toLowerCase())
-                                );
-                                renderSeries(filtered);
+                                console.log('Search error:', error);
+                                // Show empty state instead of sample data
+                                renderSeries([]);
                             }
                         } else if (query.length === 0) {
                             loadSeries(1);
