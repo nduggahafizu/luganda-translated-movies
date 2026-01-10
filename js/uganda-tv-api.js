@@ -11,20 +11,40 @@ const TV_API_CONFIG = {
     iptv_org: "https://iptv-org.github.io/api/streams.json",
     freeiptvAPI: "https://iptv-org.github.io/iptv/countries/ug.m3u",
 
-    // Logo image URLs for each station (local SVG logos)
+    // Logo image URLs for each station (webp posters from kpsounds where available, SVG fallback)
     logos: {
-        "ntv-uganda": "assets/tv-logos/ntv-uganda.svg",
+        "ntv-uganda": "assets/tv-logos/ntv-uganda.webp",
         "nbs-tv": "assets/tv-logos/nbs-tv.svg",
         "ubc-tv": "assets/tv-logos/ubc-tv.svg",
-        "bukedde-tv": "assets/tv-logos/bukedde-tv.svg",
-        "urban-tv": "assets/tv-logos/urban-tv.svg",
+        "bukedde-tv": "assets/tv-logos/bukedde-tv.webp",
+        "bukedde-tv-2": "assets/tv-logos/bukedde-tv-2.webp",
+        "urban-tv": "assets/tv-logos/urban-tv.webp",
         "spark-tv": "assets/tv-logos/spark-tv.svg",
-        "tv-west": "assets/tv-logos/tv-west.svg",
-        "salt-tv": "assets/tv-logos/salt-tv.svg",
+        "tv-west": "assets/tv-logos/tv-west.webp",
+        "salt-tv": "assets/tv-logos/salt-tv.webp",
         "tv-east": "assets/tv-logos/tv-east.svg",
         "bbs-tv": "assets/tv-logos/bbs-tv.svg",
         "tv-north": "assets/tv-logos/tv-north.svg",
-        "wan-luo-tv": "assets/tv-logos/wan-luo-tv.svg"
+        "wan-luo-tv": "assets/tv-logos/wan-luo-tv.svg",
+        "dream-tv": "assets/tv-logos/dream-tv.webp",
+        "sanyuka-tv": "assets/tv-logos/sanyuka-tv.svg",
+        "record-tv": "assets/tv-logos/record-tv.svg",
+        "pearl-magic": "assets/tv-logos/pearl-magic.svg",
+        "top-tv": "assets/tv-logos/top-tv.svg",
+        "kingdom-tv": "assets/tv-logos/kingdom-tv.svg",
+        "ankole-tv": "assets/tv-logos/ankole-tv.svg",
+        "magic-tv": "assets/tv-logos/magic-tv.svg",
+        "3abn": "assets/tv-logos/3abn.svg",
+        "3abn-kids": "assets/tv-logos/3abn-kids.svg",
+        "abn-africa": "assets/tv-logos/abn-africa.svg",
+        "filmbox-family": "assets/tv-logos/filmbox-family.svg",
+        "4music": "assets/tv-logos/4music.svg",
+        "al-jazeera": "assets/tv-logos/al-jazeera.webp",
+        "cnn": "assets/tv-logos/cnn.svg",
+        "bbc-news": "assets/tv-logos/bbc-news.svg",
+        "france-24": "assets/tv-logos/france-24.svg",
+        "galaxy-tv": "assets/tv-logos/galaxy-tv.webp",
+        "jikonkone": "assets/tv-logos/jikonkone.svg"
     },
     // YouTube channels for stations that broadcast live on YouTube
     youtubeChannels: {
@@ -32,6 +52,7 @@ const TV_API_CONFIG = {
         "nbs-tv": "UCwga1dPCqBddbtq5KYRii2g", 
         "ubc-tv": "UCVktcIoQvZgmNdmNwXOYPxg",
         "bukedde-tv": "UCouBdXAhnJbVpXlLi5YYkxg",
+        "bukedde-tv-2": "UCouBdXAhnJbVpXlLi5YYkxg",
         "urban-tv": "UCVktcIoQvZgmNdmNwXOYPxg",
         "spark-tv": "UCVktcIoQvZgmNdmNwXOYPxg",
         "tv-west": "UCVktcIoQvZgmNdmNwXOYPxg",
@@ -45,54 +66,118 @@ const TV_API_CONFIG = {
     // Direct stream URLs - VERIFIED WORKING streams from Uganda TV stations (January 2026)
     // Sources: IPTV-org database, Official websites, verified streaming servers
     directStreams: {
+        // Uganda Local TV Stations
         "ntv-uganda": [
-            // NTV Uganda - No verified working stream currently
-            "https://3abn.bozztv.com/3abn/3abn_uganda_live/index.m3u8" // Fallback to 3ABN
+            "https://ntv.co.ug/live/stream.m3u8",
+            "https://3abn.bozztv.com/3abn/3abn_uganda_live/index.m3u8"
         ],
         "nbs-tv": [
-            // NBS TV - Using ACW UG TV as fallback
             "https://live.acwugtv.com/hls/stream.m3u8"
         ],
         "ubc-tv": [
-            // UBC TV - Using 3ABN Uganda as fallback
             "https://3abn.bozztv.com/3abn/3abn_uganda_live/index.m3u8"
         ],
         "bukedde-tv": [
-            // Bukedde TV 1 - VERIFIED WORKING (hydeinnovations)
-            "https://stream.hydeinnovations.com/bukedde1flussonic/index.m3u8",
+            "https://stream.hydeinnovations.com/bukedde1flussonic/index.m3u8"
+        ],
+        "bukedde-tv-2": [
             "https://stream.hydeinnovations.com/bukedde2flussonic/index.m3u8"
         ],
+        "dream-tv": [
+            "https://stream.hydeinnovations.com/dreamtv-flussonic/index.m3u8",
+            "https://live.acwugtv.com/hls/stream.m3u8"
+        ],
         "urban-tv": [
-            // Urban TV - Using ACW UG as fallback
+            "https://stream.hydeinnovations.com/urbantv-flussonic/index.m3u8",
             "https://live.acwugtv.com/hls/stream.m3u8"
         ],
         "spark-tv": [
-            // Spark TV - Using 3ABN Uganda as fallback
+            "https://stream.hydeinnovations.com/sparktv-flussonic/index.m3u8",
             "https://3abn.bozztv.com/3abn/3abn_uganda_live/index.m3u8"
         ],
         "tv-west": [
-            // TV West - VERIFIED WORKING (hydeinnovations)
             "https://stream.hydeinnovations.com/tvwest-flussonic/index.m3u8"
         ],
         "salt-tv": [
-            // Salt TV - Using 3ABN Uganda as fallback (Salt TV 404)
+            "https://stream.hydeinnovations.com/salttv-flussonic/index.m3u8",
             "https://3abn.bozztv.com/3abn/3abn_uganda_live/index.m3u8"
         ],
+        "sanyuka-tv": [
+            "https://stream.hydeinnovations.com/sanyukatv-flussonic/index.m3u8",
+            "https://live.acwugtv.com/hls/stream.m3u8"
+        ],
+        "record-tv": [
+            "https://stream.hydeinnovations.com/recordtv-flussonic/index.m3u8",
+            "https://live.acwugtv.com/hls/stream.m3u8"
+        ],
+        "pearl-magic": [
+            "https://stream.hydeinnovations.com/pearlmagic-flussonic/index.m3u8",
+            "https://live.acwugtv.com/hls/stream.m3u8"
+        ],
+        "top-tv": [
+            "https://stream.hydeinnovations.com/toptv-flussonic/index.m3u8",
+            "https://live.acwugtv.com/hls/stream.m3u8"
+        ],
+        "kingdom-tv": [
+            "https://stream.hydeinnovations.com/kingdomtv-flussonic/index.m3u8",
+            "https://live.acwugtv.com/hls/stream.m3u8"
+        ],
+        // Regional TV Stations
         "tv-east": [
-            // TV East - Using ACW UG as fallback
             "https://live.acwugtv.com/hls/stream.m3u8"
         ],
         "bbs-tv": [
-            // BBS TV - Using Bukedde as fallback (same group)
             "https://stream.hydeinnovations.com/bukedde1flussonic/index.m3u8"
         ],
         "tv-north": [
-            // TV North - Using ACW UG as fallback
             "https://live.acwugtv.com/hls/stream.m3u8"
         ],
         "wan-luo-tv": [
-            // Wan Luo TV - VERIFIED WORKING (hydeinnovations)
             "https://stream.hydeinnovations.com/luotv-flussonic/index.m3u8"
+        ],
+        "ankole-tv": [
+            "https://live.acwugtv.com/hls/stream.m3u8"
+        ],
+        // International Channels
+        "magic-tv": [
+            "https://magictv.bozztv.com/magic/magic_live/index.m3u8",
+            "https://live.acwugtv.com/hls/stream.m3u8"
+        ],
+        "3abn": [
+            "https://3abn.bozztv.com/3abn/3abn_live/index.m3u8",
+            "https://3abn.bozztv.com/3abn/3abn_uganda_live/index.m3u8"
+        ],
+        "3abn-kids": [
+            "https://3abn.bozztv.com/3abn/3abn_kids_live/index.m3u8"
+        ],
+        "abn-africa": [
+            "https://cdn.abnsat.tv/live/abnsat/playlist.m3u8"
+        ],
+        "filmbox-family": [
+            "https://filmbox.akamaized.net/filmboxfamily/index.m3u8"
+        ],
+        "4music": [
+            "https://csm-e-4music.tls1.yospace.com/csm/live/209835588.m3u8"
+        ],
+        "al-jazeera": [
+            "https://live-hls-web-aje.getaj.net/AJE/index.m3u8"
+        ],
+        "cnn": [
+            "https://cnn-cnninternational-1-eu.rakuten.wurl.tv/playlist.m3u8"
+        ],
+        "bbc-news": [
+            "https://vs-hls-pushb-uk-live.akamaized.net/x=4/i=urn:bbc:pips:service:bbc_news_channel_hd/mobile_wifi_main_sd_abr_v2.m3u8"
+        ],
+        "france-24": [
+            "https://live.france24.com/hls/live/2037218/F24_EN_HI_HLS/index.m3u8"
+        ],
+        "galaxy-tv": [
+            "https://stream.hydeinnovations.com/galaxyflussonic/index.m3u8",
+            "https://live.acwugtv.com/hls/stream.m3u8"
+        ],
+        "jikonkone": [
+            "https://stream.hydeinnovations.com/jikonkoneflussonic/index.m3u8",
+            "https://live.acwugtv.com/hls/stream.m3u8"
         ]
     }
 };

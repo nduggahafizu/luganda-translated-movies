@@ -14,6 +14,7 @@
     <link rel="apple-touch-icon" href="/assets/images/logo.png">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/trailer-player.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     
     <style>
@@ -674,10 +675,20 @@
                 <!-- Pagination -->
                 <div class="pagination" id="pagination" style="display: none;"></div>
             </main>
+            
+            <!-- Footer -->
+            <footer class="site-footer" style="margin-top: 40px;">
+                <div class="footer-bottom">
+                    <p>Copyright © unruly movies watch 2026</p>
+                </div>
+            </footer>
         </div>
     </div>
 
     <script src="js/config.js"></script>
+    <script src="js/sanitize.js"></script>
+    <script src="js/tmdb-api.js"></script>
+    <script src="js/trailer-player.js"></script>
     <script>
         const API_URL = API_CONFIG.API_ENDPOINTS.LUGANDA_MOVIES;
         let currentPage = 1;
@@ -742,15 +753,23 @@
                 const movies = data.data || [];
                 
                 if (movies.length > 0) {
-                    suggestions.innerHTML = movies.map(movie => `
-                        <div class="suggestion-item" onclick="selectSuggestion('${movie._id}', '${(movie.originalTitle || movie.title || '').replace(/'/g, "\\'")}')">
-                            <img src="${movie.poster || 'https://placehold.co/50x75/1a1a2e/7CFC00?text=Movie'}" alt="${movie.originalTitle || movie.title}" class="suggestion-poster">
-                            <div class="suggestion-info">
-                                <div class="suggestion-title">${movie.originalTitle || movie.title}</div>
-                                <div class="suggestion-meta">${movie.year || ''} ${movie.vjName ? '• VJ ' + movie.vjName : ''}</div>
+                    suggestions.innerHTML = movies.map(movie => {
+                        const movieId = Sanitize.attr(movie._id);
+                        const movieTitle = Sanitize.text(movie.originalTitle || movie.title || 'Unknown');
+                        const moviePoster = Sanitize.url(movie.poster) || 'https://placehold.co/50x75/1a1a2e/7CFC00?text=Movie';
+                        const movieYear = Sanitize.text(movie.year || '');
+                        const movieVj = movie.vjName ? '• VJ ' + Sanitize.text(movie.vjName) : '';
+                        
+                        return `
+                            <div class="suggestion-item" onclick="selectSuggestion('${movieId}', '${movieTitle.replace(/'/g, "\\'")}')">
+                                <img src="${moviePoster}" alt="${movieTitle}" class="suggestion-poster" onerror="this.src='https://placehold.co/50x75/1a1a2e/7CFC00?text=Movie'">
+                                <div class="suggestion-info">
+                                    <div class="suggestion-title">${movieTitle}</div>
+                                    <div class="suggestion-meta">${movieYear} ${movieVj}</div>
+                                </div>
                             </div>
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
                     suggestions.classList.add('active');
                 } else {
                     hideSuggestions();
@@ -845,39 +864,54 @@
             resultsGrid.className = `results-grid ${currentView === 'list' ? 'list-view' : ''}`;
             
             resultsGrid.innerHTML = movies.map(movie => {
-                const title = movie.originalTitle || movie.title || 'Unknown Movie';
-                const posterUrl = movie.poster || `https://placehold.co/300x450/1a1a2e/7CFC00?text=${encodeURIComponent(title.substring(0,15))}`;
+                const title = Sanitize.text(movie.originalTitle || movie.title || 'Unknown Movie');
+                const movieId = Sanitize.attr(movie._id);
+                const posterUrl = Sanitize.url(movie.poster) || `https://placehold.co/300x450/1a1a2e/7CFC00?text=${encodeURIComponent(title.substring(0,15))}`;
                 const rating = movie.rating?.userRating || movie.rating?.imdb || null;
-                const vjName = movie.vjName || movie.vj || '';
-                const description = movie.overview || movie.description || '';
+                const vjName = Sanitize.text(movie.vjName || movie.vj || '');
+                const description = Sanitize.text(movie.overview || movie.description || '');
+                const quality = Sanitize.text(movie.video?.quality?.toUpperCase() || 'HD');
+                const year = Sanitize.text(movie.year || '');
+                const tmdbId = movie.tmdbId || movie.metaData?.tmdbId || movie.externalIds?.tmdbId || null;
                 
                 return `
                 <div class="movie-card">
                     <div class="movie-poster">
-                        <a href="player.html?id=${movie._id}">
+                        <a href="player.html?id=${movieId}">
                             <img src="${posterUrl}" alt="${title}" loading="lazy" onerror="this.src='https://placehold.co/300x450/1a1a2e/7CFC00?text=Movie'">
                         </a>
-                        <div class="movie-badge">${movie.video?.quality?.toUpperCase() || 'HD'}</div>
+                        <div class="movie-badge">${quality}</div>
                         ${rating ? `
                             <div class="movie-rating">
                                 <svg viewBox="0 0 24 24" fill="currentColor">
                                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                                 </svg>
-                                ${rating.toFixed(1)}
+                                ${parseFloat(rating).toFixed(1)}
                             </div>
                         ` : ''}
                         <div class="movie-overlay">
-                            <button class="play-btn" onclick="window.location.href='player.html?id=${movie._id}'">
+                            <button class="play-btn" onclick="window.location.href='player.html?id=${movieId}'">
                                 <svg viewBox="0 0 24 24" fill="currentColor">
                                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                 </svg>
                             </button>
+                            ${tmdbId ? `
+                            <button class="trailer-btn" onclick="event.preventDefault(); event.stopPropagation(); trailerPlayer.playTrailer(${tmdbId}, '${title.replace(/'/g, "\\'")}');" title="Watch Trailer">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                                    <line x1="7" y1="2" x2="7" y2="22"></line>
+                                    <line x1="17" y1="2" x2="17" y2="22"></line>
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                </svg>
+                                <span>Trailer</span>
+                            </button>
+                            ` : ''}
                         </div>
                     </div>
                     <div class="movie-info">
                         <div class="movie-title">${title}</div>
                         <div class="movie-meta">
-                            <span>${movie.year || ''}</span>
+                            <span>${year}</span>
                             ${vjName ? `<span class="movie-vj">VJ ${vjName}</span>` : ''}
                         </div>
                         ${currentView === 'list' && description ? `

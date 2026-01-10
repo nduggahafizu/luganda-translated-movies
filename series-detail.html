@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Series Details - Unruly Movies</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Watch TV series with Luganda VJ translation on Unruly Movies.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#7CFC00">
+    <meta name="google-adsense-account" content="ca-pub-1904736753681797">
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
+    <link rel="shortcut icon" type="image/png" href="/assets/images/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        .series-hero {
+            position: relative;
+            min-height: 500px;
+            display: flex;
+            align-items: flex-end;
+            padding: 40px;
+            margin: -20px -20px 30px -20px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        
+        .series-backdrop {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            z-index: 0;
+        }
+        
+        .series-backdrop::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, var(--background-dark) 0%, transparent 50%, var(--background-dark) 100%);
+        }
+        
+        .series-hero-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+        }
+        
+        .series-poster {
+            width: 250px;
+            height: 375px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        
+        .series-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .series-title {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--text-primary);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin: 0;
+        }
+        
+        .series-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            color: var(--text-muted);
+        }
+        
+        .series-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .series-rating {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+        
+        .series-status {
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        
+        .status-ongoing {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: #000;
+        }
+        
+        .status-completed {
+            background: linear-gradient(135deg, #00bcd4, #03a9f4);
+            color: #fff;
+        }
+        
+        .series-genres {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .genre-tag {
+            background-color: rgba(124, 252, 0, 0.1);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .series-description {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 15px;
+            max-width: 700px;
+        }
+        
+        .series-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .btn-play {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: #000;
+            padding: 15px 40px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .btn-play:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(124, 252, 0, 0.3);
+        }
+        
+        .btn-secondary {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: var(--primary-color);
+        }
+        
+        /* Seasons & Episodes */
+        .seasons-section {
+            margin-top: 40px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .season-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .season-tab {
+            padding: 10px 20px;
+            background-color: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .season-tab:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .season-tab.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: #000;
+            border-color: transparent;
+        }
+        
+        .episodes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .episode-card {
+            background-color: var(--background-light);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+        
+        .episode-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary-color);
+        }
+        
+        .episode-thumbnail {
+            position: relative;
+            height: 170px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .episode-thumbnail::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 50%);
+        }
+        
+        .episode-play {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(124, 252, 0, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .episode-card:hover .episode-play {
+            opacity: 1;
+        }
+        
+        .episode-number {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: var(--primary-color);
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 12px;
+            z-index: 2;
+        }
+        
+        .episode-duration {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: var(--text-primary);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 2;
+        }
+        
+        .episode-info {
+            padding: 15px;
+        }
+        
+        .episode-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .episode-desc {
+            color: var(--text-muted);
+            font-size: 13px;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        /* VJ Info */
+        .vj-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, rgba(124, 252, 0, 0.1), rgba(0, 255, 136, 0.1));
+            border: 1px solid var(--primary-color);
+            padding: 8px 15px;
+            border-radius: 25px;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .series-hero {
+                min-height: auto;
+                padding: 20px;
+            }
+            
+            .series-hero-content {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .series-poster {
+                width: 180px;
+                height: 270px;
+            }
+            
+            .series-title {
+                font-size: 28px;
+            }
+            
+            .series-meta {
+                justify-content: center;
+            }
+            
+            .series-genres {
+                justify-content: center;
+            }
+            
+            .series-actions {
+                flex-direction: column;
+            }
+            
+            .episodes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="app">
+            <!-- Header -->
+            <div class="app-header">
+                <div class="navbar navbar-expand-lg">
+                    <div class="menu" id="menuToggle" role="button" aria-label="Open navigation menu" tabindex="0">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </div>
+                    <div class="app-navbar">
+                        <a href="index.html" class="navbar-brand">
+                            <img src="assets/images/logo.png" alt="Unruly Movies" width="180" height="50">
+                        </a>
+                    </div>
+                    <ul class="navbar-nav navbar-user ml-auto align-items-center text-nowrap">
+                        <li class="nav-item">
+                            <a class="nav-link" href="series.html" aria-label="Back to Series">
+                                <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="15 18 9 12 15 6"></polyline>
+                                </svg>
+                                <span class="d-none d-lg-inline">Back to Series</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="app-wrapper">
+                <!-- Sidebar -->
+                <div class="app-aside nav-aside" id="aside">
+                    <button class="modal-close" data-dismiss="modal" aria-label="Close menu" title="Close menu">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    
+                    <ul class="nav">
+                        <li>
+                            <a href="index.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                </svg>
+                                Home
+                            </a>
+                        </li>
+                        <li>
+                            <a href="movies.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                                    <line x1="7" y1="2" x2="7" y2="22"></line>
+                                    <line x1="17" y1="2" x2="17" y2="22"></line>
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                </svg>
+                                Movies
+                            </a>
+                        </li>
+                        <li class="active">
+                            <a href="series.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                                    <polyline points="17 2 12 7 7 2"></polyline>
+                                </svg>
+                                TV Shows
+                            </a>
+                        </li>
+                        <li>
+                            <a href="uganda-tv.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                    <line x1="12" y1="7" x2="12" y2="22"></line>
+                                </svg>
+                                Uganda TV
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Main Content -->
+                <div class="app-container flex-fill">
+                    <div class="container">
+                        <div class="app-content pt-md-3" id="seriesContent">
+                            <!-- Loading State -->
+                            <div style="text-align: center; padding: 100px 20px;">
+                                <div class="spinner" style="width: 50px; height: 50px; border: 3px solid var(--border-color); border-top-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                                <p style="color: var(--text-muted);">Loading series details...</p>
+                            </div>
+                            <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="site-footer">
+                <div class="footer-bottom">
+                    <p>Copyright © unruly movies watch 2026</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/series-api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        let currentSeries = null;
+        let currentSeason = 1;
+
+        /**
+         * Render series details
+         */
+        function renderSeriesDetails(series) {
+            currentSeries = series;
+            const container = document.getElementById('seriesContent');
+            const seasonCount = series.seasons?.length || 0;
+            const rating = series.rating?.imdb || series.rating?.userRating || 0;
+            const poster = series.poster || series.thumbnail || 'assets/images/placeholder-movie.jpg';
+            const backdrop = series.backdrop || poster;
+            const genres = series.genres || ['Drama'];
+            const vjName = series.translator?.name || 'VJ';
+            
+            // Update page title
+            document.title = `${series.title} - Unruly Movies`;
+            
+            container.innerHTML = `
+                <!-- Hero Section -->
+                <div class="series-hero">
+                    <div class="series-backdrop" style="background-image: url('${backdrop}');"></div>
+                    <div class="series-hero-content">
+                        <img src="${poster}" alt="${series.title}" class="series-poster">
+                        <div class="series-info">
+                            <h1 class="series-title">${series.title}</h1>
+                            <div class="series-meta">
+                                <span class="series-rating">⭐ ${rating.toFixed(1)}</span>
+                                <span class="series-status ${series.status === 'ongoing' ? 'status-ongoing' : 'status-completed'}">${series.status}</span>
+                                <span>${series.startYear}${series.endYear ? ' - ' + series.endYear : ''}</span>
+                                <span>${seasonCount} Season${seasonCount !== 1 ? 's' : ''}</span>
+                            </div>
+                            <div class="series-genres">
+                                ${genres.map(g => `<span class="genre-tag">${g}</span>`).join('')}
+                            </div>
+                            <p class="series-description">${series.description || 'No description available.'}</p>
+                            <div class="vj-badge">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                                </svg>
+                                Translated by ${vjName}
+                            </div>
+                            <div class="series-actions">
+                                ${seasonCount > 0 && series.seasons[0].episodes?.length > 0 ? `
+                                <a href="player.html?series=${series._id}&season=1&episode=1" class="btn-play">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                    </svg>
+                                    Play S1 E1
+                                </a>
+                                ` : ''}
+                                <button class="btn-secondary" onclick="addToWatchlist()">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                    </svg>
+                                    Add to Watchlist
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Seasons & Episodes -->
+                ${seasonCount > 0 ? `
+                <div class="seasons-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Episodes</h2>
+                        <div class="season-tabs">
+                            ${series.seasons.map((s, i) => `
+                                <button class="season-tab ${i === 0 ? 'active' : ''}" onclick="showSeason(${s.seasonNumber || i + 1})">
+                                    Season ${s.seasonNumber || i + 1}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="episodes-grid" id="episodesGrid">
+                        ${renderEpisodes(series.seasons[0])}
+                    </div>
+                </div>
+                ` : `
+                <div style="text-align: center; padding: 60px 20px; background-color: var(--background-light); border-radius: 15px;">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" style="margin-bottom: 20px;">
+                        <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                        <polyline points="17 2 12 7 7 2"></polyline>
+                    </svg>
+                    <h3 style="color: var(--text-primary); margin-bottom: 10px;">No Episodes Available</h3>
+                    <p style="color: var(--text-muted);">Check back later for episodes.</p>
+                </div>
+                `}
+            `;
+        }
+
+        /**
+         * Render episodes for a season
+         */
+        function renderEpisodes(season) {
+            if (!season || !season.episodes || season.episodes.length === 0) {
+                return `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                        <p style="color: var(--text-muted);">No episodes available for this season.</p>
+                    </div>
+                `;
+            }
+            
+            return season.episodes.map((ep, i) => {
+                const thumbnail = ep.thumbnail || currentSeries.poster || 'assets/images/placeholder-movie.jpg';
+                const duration = ep.duration ? formatDuration(ep.duration) : '45 min';
+                
+                return `
+                    <a href="player.html?series=${currentSeries._id}&season=${season.seasonNumber || currentSeason}&episode=${ep.episodeNumber || i + 1}" class="episode-card">
+                        <div class="episode-thumbnail" style="background-image: url('${thumbnail}');">
+                            <span class="episode-number">E${ep.episodeNumber || i + 1}</span>
+                            <span class="episode-duration">${duration}</span>
+                            <div class="episode-play">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="#000">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="episode-info">
+                            <h3 class="episode-title">${ep.title || `Episode ${ep.episodeNumber || i + 1}`}</h3>
+                            <p class="episode-desc">${ep.description || 'No description available.'}</p>
+                        </div>
+                    </a>
+                `;
+            }).join('');
+        }
+
+        /**
+         * Show a specific season
+         */
+        function showSeason(seasonNumber) {
+            currentSeason = seasonNumber;
+            
+            // Update active tab
+            document.querySelectorAll('.season-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Find and render the season
+            const season = currentSeries.seasons.find(s => (s.seasonNumber || 1) === seasonNumber);
+            document.getElementById('episodesGrid').innerHTML = renderEpisodes(season);
+        }
+
+        /**
+         * Format duration
+         */
+        function formatDuration(minutes) {
+            if (minutes >= 60) {
+                const hours = Math.floor(minutes / 60);
+                const mins = minutes % 60;
+                return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+            }
+            return `${minutes} min`;
+        }
+
+        /**
+         * Add to watchlist
+         */
+        function addToWatchlist() {
+            // Check if user is logged in
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                alert('Please login to add to your watchlist');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // TODO: Implement watchlist API call
+            alert('Added to watchlist!');
+        }
+
+        /**
+         * Load series details
+         */
+        async function loadSeriesDetails() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const seriesId = urlParams.get('id');
+            
+            if (!seriesId) {
+                document.getElementById('seriesContent').innerHTML = `
+                    <div style="text-align: center; padding: 100px 20px;">
+                        <h2 style="color: var(--text-primary);">Series Not Found</h2>
+                        <p style="color: var(--text-muted);">Please select a series from the <a href="series.html" style="color: var(--primary-color);">series page</a>.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            try {
+                const response = await seriesAPI.getSeriesById(seriesId);
+                
+                if (response.success && response.data) {
+                    renderSeriesDetails(response.data);
+                } else {
+                    throw new Error('Series not found');
+                }
+            } catch (error) {
+                console.log('API error, checking sample data');
+                
+                // Try to find in sample data
+                const sampleSeries = SAMPLE_SERIES.find(s => s._id === seriesId || s.title.toLowerCase().replace(/\s+/g, '-') === seriesId);
+                
+                if (sampleSeries) {
+                    // Add some sample episodes
+                    sampleSeries.seasons = sampleSeries.seasons.map((s, i) => ({
+                        ...s,
+                        seasonNumber: i + 1,
+                        episodes: Array.from({ length: 8 }, (_, j) => ({
+                            episodeNumber: j + 1,
+                            title: `Episode ${j + 1}`,
+                            description: `${sampleSeries.title} Season ${i + 1} Episode ${j + 1}`,
+                            duration: 45,
+                            thumbnail: sampleSeries.poster
+                        }))
+                    }));
+                    renderSeriesDetails(sampleSeries);
+                } else {
+                    document.getElementById('seriesContent').innerHTML = `
+                        <div style="text-align: center; padding: 100px 20px;">
+                            <h2 style="color: var(--text-primary);">Series Not Found</h2>
+                            <p style="color: var(--text-muted);">The series you're looking for doesn't exist.</p>
+                            <a href="series.html" class="btn btn-glow" style="margin-top: 20px;">Browse Series</a>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadSeriesDetails);
+    </script>
+</body>
+</html>

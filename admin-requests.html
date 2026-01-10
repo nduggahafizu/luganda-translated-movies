@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Requests - Admin Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: var(--secondary-color);
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-header h2 {
+            color: var(--accent-color);
+            font-size: 1.5rem;
+        }
+        
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .nav-menu li {
+            margin-bottom: 5px;
+        }
+        
+        .nav-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            background: var(--accent-color);
+            color: var(--text-primary);
+        }
+        
+        .nav-menu i {
+            margin-right: 10px;
+            width: 20px;
+        }
+        
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 30px;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .page-header h1 {
+            color: var(--text-primary);
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: var(--secondary-color);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .stat-card .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+        
+        .stat-card .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .stat-card.pending .stat-icon { color: #f39c12; }
+        .stat-card.in-progress .stat-icon { color: #3498db; }
+        .stat-card.resolved .stat-icon { color: #27ae60; }
+        .stat-card.total .stat-icon { color: var(--accent-color); }
+        
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-bar select,
+        .filter-bar input {
+            padding: 10px 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            background: var(--secondary-color);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+        
+        .filter-bar input {
+            min-width: 250px;
+        }
+        
+        .filter-bar button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .btn-filter {
+            background: var(--accent-color);
+            color: var(--text-primary);
+        }
+        
+        .btn-clear {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+        }
+        
+        /* Requests Table */
+        .requests-table {
+            background: var(--secondary-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .requests-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .requests-table th,
+        .requests-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .requests-table th {
+            background: rgba(0,0,0,0.2);
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+        
+        .requests-table tr:hover {
+            background: rgba(255,255,255,0.02);
+        }
+        
+        .requests-table td {
+            color: var(--text-primary);
+        }
+        
+        .request-subject {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-pending { background: rgba(243,156,18,0.2); color: #f39c12; }
+        .status-in_progress { background: rgba(52,152,219,0.2); color: #3498db; }
+        .status-resolved { background: rgba(39,174,96,0.2); color: #27ae60; }
+        .status-closed { background: rgba(149,165,166,0.2); color: #95a5a6; }
+        .status-spam { background: rgba(231,76,60,0.2); color: #e74c3c; }
+        
+        .priority-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .priority-low { background: rgba(46,204,113,0.2); color: #2ecc71; }
+        .priority-normal { background: rgba(52,152,219,0.2); color: #3498db; }
+        .priority-high { background: rgba(230,126,34,0.2); color: #e67e22; }
+        .priority-urgent { background: rgba(231,76,60,0.2); color: #e74c3c; }
+        
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btns button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-view { background: var(--accent-color); color: white; }
+        .btn-delete { background: rgba(231,76,60,0.2); color: #e74c3c; }
+        .btn-view:hover { opacity: 0.8; }
+        .btn-delete:hover { background: #e74c3c; color: white; }
+        
+        /* Request Detail Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        
+        .modal-content {
+            background: var(--secondary-color);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 700px;
+            margin: 40px auto;
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            color: var(--text-primary);
+            font-size: 1.3rem;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .request-detail {
+            margin-bottom: 20px;
+        }
+        
+        .request-detail label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+        
+        .request-detail .value {
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+        
+        .request-message-box {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 8px;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .response-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .response-section h3 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            background: rgba(0,0,0,0.2);
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .modal-footer button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .btn-cancel {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+        }
+        
+        .btn-save {
+            background: var(--accent-color);
+            color: white;
+        }
+        
+        .btn-spam {
+            background: rgba(231,76,60,0.2);
+            color: #e74c3c;
+        }
+        
+        /* Notes Section */
+        .notes-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .notes-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        
+        .note-item {
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        
+        .note-item .note-meta {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        
+        .note-item .note-text {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+        
+        .add-note-form {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .add-note-form input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            background: rgba(0,0,0,0.2);
+            color: var(--text-primary);
+        }
+        
+        .add-note-form button {
+            padding: 10px 20px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .pagination button {
+            padding: 8px 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            background: var(--secondary-color);
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        
+        .pagination button.active,
+        .pagination button:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+        
+        .loading i {
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Bulk Actions */
+        .bulk-actions {
+            display: none;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(var(--accent-color-rgb), 0.1);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .bulk-actions.active {
+            display: flex;
+        }
+        
+        .bulk-actions span {
+            color: var(--text-primary);
+        }
+        
+        .bulk-actions select,
+        .bulk-actions button {
+            padding: 8px 15px;
+            border-radius: 6px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 70px;
+                padding: 10px;
+            }
+            
+            .sidebar-header h2,
+            .nav-menu span {
+                display: none;
+            }
+            
+            .nav-menu a {
+                justify-content: center;
+                padding: 15px;
+            }
+            
+            .nav-menu i {
+                margin: 0;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-bar input {
+                min-width: 100%;
+            }
+            
+            .requests-table {
+                overflow-x: auto;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-film"></i> VJ Admin</h2>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="admin.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li><a href="admin-movies.html"><i class="fas fa-film"></i> <span>Movies</span></a></li>
+                    <li><a href="admin-vjs.html"><i class="fas fa-microphone"></i> <span>VJs</span></a></li>
+                    <li><a href="admin-users.html"><i class="fas fa-users"></i> <span>Users</span></a></li>
+                    <li><a href="admin-subscriptions.html"><i class="fas fa-credit-card"></i> <span>Subscriptions</span></a></li>
+                    <li><a href="admin-requests.html" class="active"><i class="fas fa-envelope"></i> <span>Requests</span></a></li>
+                    <li><a href="admin-notifications.html"><i class="fas fa-bell"></i> <span>Notifications</span></a></li>
+                    <li><a href="admin-settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+                    <li><a href="index.html"><i class="fas fa-home"></i> <span>Back to Site</span></a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1><i class="fas fa-envelope"></i> User Requests</h1>
+                <button class="btn-filter" onclick="exportRequests()">
+                    <i class="fas fa-download"></i> Export
+                </button>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card pending">
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                    <div class="stat-value" id="pendingCount">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-card in-progress">
+                    <div class="stat-icon"><i class="fas fa-spinner"></i></div>
+                    <div class="stat-value" id="inProgressCount">0</div>
+                    <div class="stat-label">In Progress</div>
+                </div>
+                <div class="stat-card resolved">
+                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-value" id="resolvedCount">0</div>
+                    <div class="stat-label">Resolved</div>
+                </div>
+                <div class="stat-card total">
+                    <div class="stat-icon"><i class="fas fa-inbox"></i></div>
+                    <div class="stat-value" id="totalCount">0</div>
+                    <div class="stat-label">Total</div>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <select id="statusFilter">
+                    <option value="">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="resolved">Resolved</option>
+                    <option value="closed">Closed</option>
+                    <option value="spam">Spam</option>
+                </select>
+                <select id="subjectFilter">
+                    <option value="">All Subjects</option>
+                    <option value="general">General Support</option>
+                    <option value="billing">Billing Issue</option>
+                    <option value="content">Content Request</option>
+                    <option value="vj">VJ Application</option>
+                    <option value="business">Business Inquiry</option>
+                    <option value="feedback">Feedback</option>
+                    <option value="other">Other</option>
+                </select>
+                <select id="priorityFilter">
+                    <option value="">All Priorities</option>
+                    <option value="low">Low</option>
+                    <option value="normal">Normal</option>
+                    <option value="high">High</option>
+                    <option value="urgent">Urgent</option>
+                </select>
+                <input type="text" id="searchInput" placeholder="Search by name, email, or message...">
+                <button class="btn-filter" onclick="applyFilters()"><i class="fas fa-filter"></i> Filter</button>
+                <button class="btn-clear" onclick="clearFilters()"><i class="fas fa-times"></i> Clear</button>
+            </div>
+
+            <!-- Bulk Actions -->
+            <div class="bulk-actions" id="bulkActions">
+                <span><strong id="selectedCount">0</strong> selected</span>
+                <select id="bulkAction">
+                    <option value="">Select Action</option>
+                    <option value="mark_resolved">Mark Resolved</option>
+                    <option value="mark_spam">Mark as Spam</option>
+                    <option value="delete">Delete</option>
+                </select>
+                <button class="btn-filter" onclick="applyBulkAction()">Apply</button>
+                <button class="btn-clear" onclick="clearSelection()">Cancel</button>
+            </div>
+
+            <!-- Requests Table -->
+            <div class="requests-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                            <th>From</th>
+                            <th>Subject</th>
+                            <th>Message</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requestsTableBody">
+                        <tr>
+                            <td colspan="8" class="loading">
+                                <i class="fas fa-spinner"></i>
+                                <p>Loading requests...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination"></div>
+        </main>
+    </div>
+
+    <!-- Request Detail Modal -->
+    <div class="modal" id="requestModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Request Details</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="request-detail">
+                        <label>From</label>
+                        <div class="value" id="modalFrom"></div>
+                    </div>
+                    <div class="request-detail">
+                        <label>Email</label>
+                        <div class="value" id="modalEmail"></div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="request-detail">
+                        <label>Subject Type</label>
+                        <div class="value" id="modalSubjectType"></div>
+                    </div>
+                    <div class="request-detail">
+                        <label>Submitted</label>
+                        <div class="value" id="modalDate"></div>
+                    </div>
+                </div>
+                <div class="request-detail">
+                    <label>Message</label>
+                    <div class="request-message-box" id="modalMessage"></div>
+                </div>
+
+                <!-- Movie Details (if content request) -->
+                <div class="request-detail" id="movieDetailsSection" style="display: none;">
+                    <label>Movie Details</label>
+                    <div class="request-message-box" id="modalMovieDetails"></div>
+                </div>
+
+                <!-- Response Section -->
+                <div class="response-section">
+                    <h3>Admin Response</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="modalStatus">
+                                <option value="pending">Pending</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="resolved">Resolved</option>
+                                <option value="closed">Closed</option>
+                                <option value="spam">Spam</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Priority</label>
+                            <select id="modalPriority">
+                                <option value="low">Low</option>
+                                <option value="normal">Normal</option>
+                                <option value="high">High</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Admin Response (will be sent to user)</label>
+                        <textarea id="modalAdminResponse" placeholder="Type your response to the user..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Notes Section -->
+                <div class="notes-section">
+                    <h3>Internal Notes</h3>
+                    <div class="notes-list" id="notesList"></div>
+                    <div class="add-note-form">
+                        <input type="text" id="newNoteInput" placeholder="Add an internal note...">
+                        <button onclick="addNote()"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-spam" onclick="markAsSpam()"><i class="fas fa-ban"></i> Mark Spam</button>
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-save" onclick="saveRequest()"><i class="fas fa-save"></i> Save & Respond</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        const API_URL = API_CONFIG.BASE_URL + '/api';
+        let currentPage = 1;
+        let totalPages = 1;
+        let currentRequest = null;
+        let selectedRequests = [];
+
+        // Check admin auth
+        document.addEventListener('DOMContentLoaded', async function() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (!data.success || data.user.role !== 'admin') {
+                    alert('Access denied. Admin only.');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                // Load data
+                loadStats();
+                loadRequests();
+            } catch (error) {
+                console.error('Auth error:', error);
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Get auth headers
+        function getAuthHeaders() {
+            const token = localStorage.getItem('token');
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            };
+        }
+
+        // Load stats
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_URL}/requests/admin/stats`, {
+                    headers: getAuthHeaders()
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    const stats = data.stats;
+                    document.getElementById('pendingCount').textContent = stats.statusCounts.pending || 0;
+                    document.getElementById('inProgressCount').textContent = stats.statusCounts.in_progress || 0;
+                    document.getElementById('resolvedCount').textContent = stats.statusCounts.resolved || 0;
+                    document.getElementById('totalCount').textContent = stats.total || 0;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load requests
+        async function loadRequests(page = 1) {
+            const tableBody = document.getElementById('requestsTableBody');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Loading requests...</p>
+                    </td>
+                </tr>
+            `;
+
+            try {
+                const params = new URLSearchParams({
+                    page: page,
+                    limit: 20
+                });
+
+                const status = document.getElementById('statusFilter').value;
+                const subject = document.getElementById('subjectFilter').value;
+                const priority = document.getElementById('priorityFilter').value;
+                const search = document.getElementById('searchInput').value;
+
+                if (status) params.append('status', status);
+                if (subject) params.append('subject', subject);
+                if (priority) params.append('priority', priority);
+                if (search) params.append('search', search);
+
+                const response = await fetch(`${API_URL}/requests/admin?${params}`, {
+                    headers: getAuthHeaders()
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    renderRequests(data.requests);
+                    renderPagination(data.pagination);
+                    currentPage = page;
+                } else {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="8" class="empty-state">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <p>Error loading requests</p>
+                            </td>
+                        </tr>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading requests:', error);
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="empty-state">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <p>Error loading requests: ${error.message}</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Render requests table
+        function renderRequests(requests) {
+            const tableBody = document.getElementById('requestsTableBody');
+
+            if (!requests || requests.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>No requests found</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tableBody.innerHTML = requests.map(request => `
+                <tr data-id="${request._id}">
+                    <td><input type="checkbox" class="request-checkbox" value="${request._id}" onchange="updateSelection()"></td>
+                    <td>
+                        <strong>${escapeHtml(request.name)}</strong><br>
+                        <small style="color: var(--text-secondary)">${escapeHtml(request.email)}</small>
+                    </td>
+                    <td><span class="request-subject">${formatSubject(request.subject)}</span></td>
+                    <td class="request-subject">${escapeHtml(request.message.substring(0, 100))}${request.message.length > 100 ? '...' : ''}</td>
+                    <td><span class="status-badge status-${request.status}">${formatStatus(request.status)}</span></td>
+                    <td><span class="priority-badge priority-${request.priority}">${request.priority}</span></td>
+                    <td>${formatDate(request.createdAt)}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="btn-view" onclick="viewRequest('${request._id}')"><i class="fas fa-eye"></i></button>
+                            <button class="btn-delete" onclick="deleteRequest('${request._id}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Render pagination
+        function renderPagination(pagination) {
+            const paginationDiv = document.getElementById('pagination');
+            
+            if (!pagination || pagination.pages <= 1) {
+                paginationDiv.innerHTML = '';
+                return;
+            }
+
+            totalPages = pagination.pages;
+            let html = '';
+
+            html += `<button ${pagination.page === 1 ? 'disabled' : ''} onclick="loadRequests(${pagination.page - 1})">
+                <i class="fas fa-chevron-left"></i>
+            </button>`;
+
+            for (let i = 1; i <= pagination.pages; i++) {
+                if (i === 1 || i === pagination.pages || (i >= pagination.page - 2 && i <= pagination.page + 2)) {
+                    html += `<button class="${i === pagination.page ? 'active' : ''}" onclick="loadRequests(${i})">${i}</button>`;
+                } else if (i === pagination.page - 3 || i === pagination.page + 3) {
+                    html += `<button disabled>...</button>`;
+                }
+            }
+
+            html += `<button ${pagination.page === pagination.pages ? 'disabled' : ''} onclick="loadRequests(${pagination.page + 1})">
+                <i class="fas fa-chevron-right"></i>
+            </button>`;
+
+            paginationDiv.innerHTML = html;
+        }
+
+        // View request details
+        async function viewRequest(id) {
+            try {
+                const response = await fetch(`${API_URL}/requests/admin/${id}`, {
+                    headers: getAuthHeaders()
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    currentRequest = data.request;
+                    showRequestModal(data.request);
+                } else {
+                    alert('Error loading request details');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error loading request details');
+            }
+        }
+
+        // Show request modal
+        function showRequestModal(request) {
+            document.getElementById('modalFrom').textContent = request.name;
+            document.getElementById('modalEmail').innerHTML = `<a href="mailto:${request.email}" style="color: var(--accent-color)">${request.email}</a>`;
+            document.getElementById('modalSubjectType').textContent = formatSubject(request.subject);
+            document.getElementById('modalDate').textContent = new Date(request.createdAt).toLocaleString();
+            document.getElementById('modalMessage').textContent = request.message;
+            document.getElementById('modalStatus').value = request.status;
+            document.getElementById('modalPriority').value = request.priority;
+            document.getElementById('modalAdminResponse').value = request.adminResponse || '';
+
+            // Movie details
+            const movieSection = document.getElementById('movieDetailsSection');
+            if (request.movieDetails && Object.keys(request.movieDetails).length > 0) {
+                movieSection.style.display = 'block';
+                document.getElementById('modalMovieDetails').textContent = JSON.stringify(request.movieDetails, null, 2);
+            } else {
+                movieSection.style.display = 'none';
+            }
+
+            // Notes
+            renderNotes(request.notes || []);
+
+            document.getElementById('requestModal').classList.add('active');
+        }
+
+        // Render notes
+        function renderNotes(notes) {
+            const notesList = document.getElementById('notesList');
+            if (!notes || notes.length === 0) {
+                notesList.innerHTML = '<p style="color: var(--text-secondary); font-size: 0.9rem;">No internal notes yet</p>';
+                return;
+            }
+
+            notesList.innerHTML = notes.map(note => `
+                <div class="note-item">
+                    <div class="note-meta">
+                        ${note.addedBy?.name || 'Admin'} - ${new Date(note.createdAt).toLocaleString()}
+                    </div>
+                    <div class="note-text">${escapeHtml(note.note)}</div>
+                </div>
+            `).join('');
+        }
+
+        // Add note
+        async function addNote() {
+            const noteInput = document.getElementById('newNoteInput');
+            const note = noteInput.value.trim();
+
+            if (!note || !currentRequest) return;
+
+            try {
+                const response = await fetch(`${API_URL}/requests/admin/${currentRequest._id}/note`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({ note })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    currentRequest.notes = data.request.notes;
+                    renderNotes(data.request.notes);
+                    noteInput.value = '';
+                } else {
+                    alert('Error adding note');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error adding note');
+            }
+        }
+
+        // Save request
+        async function saveRequest() {
+            if (!currentRequest) return;
+
+            const updateData = {
+                status: document.getElementById('modalStatus').value,
+                priority: document.getElementById('modalPriority').value,
+                adminResponse: document.getElementById('modalAdminResponse').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/requests/admin/${currentRequest._id}`, {
+                    method: 'PUT',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(updateData)
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Request updated successfully!');
+                    closeModal();
+                    loadRequests(currentPage);
+                    loadStats();
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to update request'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error updating request');
+            }
+        }
+
+        // Mark as spam
+        async function markAsSpam() {
+            if (!currentRequest) return;
+            
+            if (!confirm('Mark this request as spam?')) return;
+
+            document.getElementById('modalStatus').value = 'spam';
+            await saveRequest();
+        }
+
+        // Delete request
+        async function deleteRequest(id) {
+            if (!confirm('Are you sure you want to delete this request?')) return;
+
+            try {
+                const response = await fetch(`${API_URL}/requests/admin/${id}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    loadRequests(currentPage);
+                    loadStats();
+                } else {
+                    alert('Error deleting request');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error deleting request');
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('requestModal').classList.remove('active');
+            currentRequest = null;
+        }
+
+        // Selection handling
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll').checked;
+            document.querySelectorAll('.request-checkbox').forEach(cb => {
+                cb.checked = selectAll;
+            });
+            updateSelection();
+        }
+
+        function updateSelection() {
+            selectedRequests = Array.from(document.querySelectorAll('.request-checkbox:checked')).map(cb => cb.value);
+            document.getElementById('selectedCount').textContent = selectedRequests.length;
+            
+            const bulkActions = document.getElementById('bulkActions');
+            if (selectedRequests.length > 0) {
+                bulkActions.classList.add('active');
+            } else {
+                bulkActions.classList.remove('active');
+            }
+        }
+
+        function clearSelection() {
+            document.getElementById('selectAll').checked = false;
+            document.querySelectorAll('.request-checkbox').forEach(cb => {
+                cb.checked = false;
+            });
+            selectedRequests = [];
+            document.getElementById('bulkActions').classList.remove('active');
+        }
+
+        // Bulk actions
+        async function applyBulkAction() {
+            const action = document.getElementById('bulkAction').value;
+            if (!action || selectedRequests.length === 0) {
+                alert('Please select requests and an action');
+                return;
+            }
+
+            if (!confirm(`Apply "${action.replace('_', ' ')}" to ${selectedRequests.length} requests?`)) return;
+
+            try {
+                const response = await fetch(`${API_URL}/requests/admin/bulk-action`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        action: action,
+                        requestIds: selectedRequests
+                    })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(`${data.modifiedCount || selectedRequests.length} requests updated`);
+                    clearSelection();
+                    loadRequests(currentPage);
+                    loadStats();
+                } else {
+                    alert('Error: ' + (data.message || 'Bulk action failed'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error performing bulk action');
+            }
+        }
+
+        // Filters
+        function applyFilters() {
+            loadRequests(1);
+        }
+
+        function clearFilters() {
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('subjectFilter').value = '';
+            document.getElementById('priorityFilter').value = '';
+            document.getElementById('searchInput').value = '';
+            loadRequests(1);
+        }
+
+        // Export
+        function exportRequests() {
+            alert('Export functionality coming soon!');
+        }
+
+        // Utility functions
+        function formatSubject(subject) {
+            const subjects = {
+                'general': 'General Support',
+                'billing': 'Billing Issue',
+                'content': 'Content Request',
+                'vj': 'VJ Application',
+                'business': 'Business Inquiry',
+                'feedback': 'Feedback',
+                'other': 'Other'
+            };
+            return subjects[subject] || subject;
+        }
+
+        function formatStatus(status) {
+            return status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 86400000) { // Less than 24 hours
+                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            } else if (diff < 604800000) { // Less than 7 days
+                return date.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+            }
+            return date.toLocaleDateString();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Close modal on outside click
+        document.getElementById('requestModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        // Search on enter
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') applyFilters();
+        });
+    </script>
+</body>
+</html>

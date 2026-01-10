@@ -89,7 +89,8 @@ exports.googleSignIn = async (req, res) => {
                     email: user.email,
                     profileImage: user.profileImage,
                     subscription: user.subscription,
-                    verified: user.verified
+                    verified: user.verified,
+                    role: user.role
                 }
             }
         });

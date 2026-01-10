@@ -73,6 +73,120 @@ class TMDBService {
     }
 
     /**
+     * Search TV series by title
+     */
+    async searchTVShows(query, page = 1, year = null) {
+        const params = {
+            query,
+            page,
+            include_adult: false
+        };
+        
+        if (year) {
+            params.first_air_date_year = year;
+        }
+        
+        return await this.makeRequest('/search/tv', params);
+    }
+
+    /**
+     * Search both movies and TV series (multi search)
+     */
+    async searchMulti(query, page = 1) {
+        const params = {
+            query,
+            page,
+            include_adult: false
+        };
+        
+        return await this.makeRequest('/search/multi', params);
+    }
+
+    /**
+     * Get TV show details by TMDB ID
+     */
+    async getTVShowDetails(tvId) {
+        return await this.makeRequest(`/tv/${tvId}`, {
+            append_to_response: 'credits,videos,images,keywords,similar,content_ratings'
+        });
+    }
+
+    /**
+     * Get TV show season details
+     */
+    async getTVSeasonDetails(tvId, seasonNumber) {
+        return await this.makeRequest(`/tv/${tvId}/season/${seasonNumber}`);
+    }
+
+    /**
+     * Get TV show episode details
+     */
+    async getTVEpisodeDetails(tvId, seasonNumber, episodeNumber) {
+        return await this.makeRequest(`/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}`);
+    }
+
+    /**
+     * Get popular TV shows
+     */
+    async getPopularTVShows(page = 1) {
+        return await this.makeRequest('/tv/popular', { page });
+    }
+
+    /**
+     * Get trending TV shows
+     */
+    async getTrendingTVShows(timeWindow = 'week', page = 1) {
+        return await this.makeRequest(`/trending/tv/${timeWindow}`, { page });
+    }
+
+    /**
+     * Get top rated TV shows
+     */
+    async getTopRatedTVShows(page = 1) {
+        return await this.makeRequest('/tv/top_rated', { page });
+    }
+
+    /**
+     * Get currently airing TV shows
+     */
+    async getOnTheAirTVShows(page = 1) {
+        return await this.makeRequest('/tv/on_the_air', { page });
+    }
+
+    /**
+     * Get TV shows airing today
+     */
+    async getAiringTodayTVShows(page = 1) {
+        return await this.makeRequest('/tv/airing_today', { page });
+    }
+
+    /**
+     * Discover TV shows with filters
+     */
+    async discoverTVShows(filters = {}) {
+        const params = {
+            page: filters.page || 1,
+            sort_by: filters.sortBy || 'popularity.desc',
+            include_adult: false
+        };
+
+        if (filters.year) params.first_air_date_year = filters.year;
+        if (filters.genreIds) params.with_genres = filters.genreIds.join(',');
+        if (filters.minRating) params['vote_average.gte'] = filters.minRating;
+        if (filters.minVotes) params['vote_count.gte'] = filters.minVotes;
+        if (filters.language) params.with_original_language = filters.language;
+
+        return await this.makeRequest('/discover/tv', params);
+    }
+
+    /**
+     * Get TV show genres list
+     */
+    async getTVGenres() {
+        return await this.makeRequest('/genre/tv/list');
+    }
+
+    /**
      * Get movie details by TMDB ID
      */
     async getMovieDetails(movieId) {

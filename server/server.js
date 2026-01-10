@@ -38,6 +38,10 @@ const statsRoutes = require('./routes/stats');
 const usersRoutes = require('./routes/users');
 const adminRoutes = require('./routes/admin');
 const tvRoutes = require('./routes/tv');
+const videoProxyRoutes = require('./routes/video-proxy');
+const r2UploadRoutes = require('./routes/r2-upload');
+const requestsRoutes = require('./routes/requests');
+const seriesRoutes = require('./routes/series');
 
 // Initialize Express app
 const app = express();
@@ -239,6 +243,10 @@ app.use('/api/stats', statsRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/tv', cache(600), tvRoutes); // TV stations with 10 min cache
+app.use('/api/video', videoProxyRoutes); // Video URL extraction proxy
+app.use('/api/r2', r2UploadRoutes); // Cloudflare R2 video uploads
+app.use('/api/requests', requestsRoutes); // User requests/contact form
+app.use('/api/series', cache(300), seriesRoutes); // TV Series with 5 min cache
 
 // Token refresh endpoint
 app.post('/api/auth/refresh', refreshTokenHandler);
@@ -430,13 +438,19 @@ app.listen(PORT, () => {
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
     console.error('Unhandled Rejection:', err);
-    process.exit(1);
+    // Don't exit in development - just log
+    if (process.env.NODE_ENV === 'production') {
+        process.exit(1);
+    }
 });
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
     console.error('Uncaught Exception:', err);
-    process.exit(1);
+    // Don't exit in development - just log
+    if (process.env.NODE_ENV === 'production') {
+        process.exit(1);
+    }
 });
 
 module.exports = app;

@@ -53,7 +53,7 @@ const FeaturedCarousel = {
                         </div>
                         <p class="carousel-description">${this.slides[0]?.description || ''}</p>
                         <div class="carousel-vj">
-                            <img src="${this.slides[0]?.vjAvatar || 'assets/images/default-avatar.png'}" alt="VJ" class="vj-avatar">
+                            <img src="${this.slides[0]?.vjAvatar || 'assets/images/default-avatar.svg'}" alt="VJ" class="vj-avatar">
                             <span>Translated by <strong>VJ ${this.slides[0]?.vjName || ''}</strong></span>
                         </div>
                         <div class="carousel-actions">
@@ -128,7 +128,7 @@ const FeaturedCarousel = {
             ${movie.rating || '8.5'}
         `;
         content.querySelector('.carousel-description').textContent = movie.description || '';
-        content.querySelector('.vj-avatar').src = movie.vjAvatar || 'assets/images/default-avatar.png';
+        content.querySelector('.vj-avatar').src = movie.vjAvatar || 'assets/images/default-avatar.svg';
         content.querySelector('.carousel-vj strong').textContent = `VJ ${movie.vjName || ''}`;
         content.querySelector('.btn-play').href = `player.html?id=${movie.id}`;
         content.querySelector('.btn-add-list').dataset.movieId = movie.id;
@@ -563,7 +563,7 @@ const FeaturedCarousel = {
                     poster: movie.poster,
                     backdrop: movie.backdrop || movie.poster,
                     vjName: movie.vjName,
-                    vjAvatar: movie.vjAvatar || 'assets/images/default-avatar.png'
+                    vjAvatar: movie.vjAvatar || 'assets/images/default-avatar.svg'
                 }));
 
                 this.init(containerId, movies);

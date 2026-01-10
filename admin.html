@@ -7,6 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
     
+    <!-- Google Analytics 4 (admin tracking) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMF82HVT9G"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-HMF82HVT9G');
+    </script>
+    
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
     <link rel="shortcut icon" type="image/png" href="/assets/images/favicon.png">
     <link rel="apple-touch-icon" href="/assets/images/logo.png">
@@ -610,6 +619,15 @@
                 <div class="nav-section-title">System</div>
                 <ul class="admin-nav">
                     <li>
+                        <a href="admin-requests.html">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                            User Requests
+                        </a>
+                    </li>
+                    <li>
                         <a href="admin-analytics.html">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <line x1="18" y1="20" x2="18" y2="10"></line>
@@ -820,34 +838,88 @@
 
     <script src="js/config.js"></script>
     <script>
-        const API_URL = API_CONFIG.API_URL;
+        const API_URL = API_CONFIG.BASE_URL + '/api';
 
         // Check admin authentication
         document.addEventListener('DOMContentLoaded', async () => {
+            console.log('=== ADMIN AUTH CHECK ===');
+            
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            console.log('Token exists:', !!token);
+            
             if (!token) {
+                console.log('No token, redirecting to login');
                 window.location.href = 'login.html?redirect=admin.html';
                 return;
             }
 
+            // First check cached user data
+            let userData = localStorage.getItem('user') || sessionStorage.getItem('user');
+            console.log('Cached user data:', userData);
+            
+            if (userData) {
+                try {
+                    const cachedUser = JSON.parse(userData);
+                    console.log('Parsed user role:', cachedUser.role);
+                    if (cachedUser.role === 'admin') {
+                        console.log('User is admin from cache, loading dashboard');
+                        loadDashboardData();
+                        return;
+                    }
+                } catch (e) {
+                    console.error('Error parsing cached user:', e);
+                }
+            }
+
+            // If no cached admin, ALWAYS verify with API to get fresh role
+            console.log('Verifying with API...');
             try {
                 const response = await fetch(`${API_URL}/auth/me`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
+                console.log('API response status:', response.status);
+                
                 if (!response.ok) throw new Error('Not authenticated');
                 
                 const data = await response.json();
+                console.log('API response data:', data);
                 
-                if (data.data.user.role !== 'admin') {
+                const user = data.data.user;
+                console.log('User from API:', user);
+                console.log('Role from API:', user.role);
+                
+                // Update cached user data with role from API
+                const updatedUser = {
+                    ...JSON.parse(userData || '{}'),
+                    ...user,
+                    role: user.role // Explicitly ensure role is saved
+                };
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+                sessionStorage.setItem('user', JSON.stringify(updatedUser));
+                console.log('Updated stored user with role:', updatedUser.role);
+                
+                if (user.role !== 'admin') {
+                    console.log('User is NOT admin, access denied');
                     alert('Access denied. Admin privileges required.');
                     window.location.href = 'index.html';
                     return;
                 }
                 
+                console.log('User IS admin, loading dashboard');
                 loadDashboardData();
             } catch (error) {
                 console.error('Auth error:', error);
+                // Check one more time if cached user is admin
+                if (userData) {
+                    try {
+                        const cachedUser = JSON.parse(userData);
+                        if (cachedUser.role === 'admin') {
+                            loadDashboardData();
+                            return;
+                        }
+                    } catch (e) {}
+                }
                 window.location.href = 'login.html?redirect=admin.html';
             }
         });
@@ -914,7 +986,7 @@
                 <tr>
                     <td>
                         <div class="movie-cell">
-                            <img src="${movie.poster || 'assets/images/placeholder.jpg'}" alt="${movie.title}" onerror="this.src='assets/images/placeholder.jpg'">
+                            <img src="${movie.poster || 'assets/images/placeholder.svg'}" alt="${movie.title}" onerror="this.src='assets/images/placeholder.svg'>">
                             <div class="movie-cell-info">
                                 <div class="movie-cell-title">${movie.title}</div>
                                 <div class="movie-cell-meta">${movie.year || 'N/A'}</div>
@@ -950,7 +1022,7 @@
             list.innerHTML = movies.map((item, index) => `
                 <div class="top-movie">
                     <div class="top-movie-rank">${index + 1}</div>
-                    <img src="${item.movie?.poster || 'assets/images/placeholder.jpg'}" alt="${item.movie?.title}" onerror="this.src='assets/images/placeholder.jpg'">
+                    <img src="${item.movie?.poster || 'assets/images/placeholder.svg'}" alt="${item.movie?.title}" onerror="this.src='assets/images/placeholder.svg'>">
                     <div class="top-movie-info">
                         <div class="top-movie-title">${item.movie?.title || 'Unknown'}</div>
                         <div class="top-movie-views">${formatNumber(item.totalViews)} views</div>

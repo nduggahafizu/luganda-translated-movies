@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Frequently Asked Questions - Unruly Movies</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Frequently asked questions about Unruly Movies - Luganda translated movies by licensed VJs in Uganda.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://watch.unrulymovies.com/faq.html">
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMF82HVT9G"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-HMF82HVT9G');
+    </script>
+    
+    <style>
+        .faq-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+        .faq-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .faq-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #7CFC00;
+        }
+        .faq-header p {
+            color: #aaa;
+            font-size: 1.1rem;
+        }
+        .faq-item {
+            background: #1a1a1a;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .faq-item:hover {
+            border-color: #7CFC00;
+        }
+        .faq-question {
+            padding: 20px 25px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        .faq-question h3 {
+            color: #fff;
+            font-size: 1.1rem;
+            margin: 0;
+            flex: 1;
+        }
+        .faq-icon {
+            width: 24px;
+            height: 24px;
+            color: #7CFC00;
+            transition: transform 0.3s;
+        }
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .faq-answer-content {
+            padding: 0 25px 20px 25px;
+            color: #aaa;
+            line-height: 1.7;
+        }
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+        }
+        .faq-category {
+            margin: 50px 0 25px;
+        }
+        .faq-category h2 {
+            color: #7CFC00;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+        .contact-cta {
+            background: linear-gradient(135deg, rgba(124, 252, 0, 0.1), rgba(124, 252, 0, 0.05));
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin-top: 60px;
+        }
+        .contact-cta h2 {
+            color: #fff;
+            margin-bottom: 15px;
+        }
+        .contact-cta p {
+            color: #aaa;
+            margin-bottom: 25px;
+        }
+        .contact-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #7CFC00;
+            color: #000;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .contact-btn:hover {
+            background: #9dff44;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-logo">
+                <a href="index.html">
+                    <img src="assets/images/logo.png" alt="Unruly Movies" height="30">
+                </a>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html">Home</a>
+                <a href="movies.html">Movies</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="faq-container">
+        <div class="faq-header">
+            <h1>❓ Frequently Asked Questions</h1>
+            <p>Find answers to common questions about Unruly Movies</p>
+        </div>
+
+        <!-- General Questions -->
+        <div class="faq-category">
+            <h2>General Questions</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>What is Unruly Movies?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        Unruly Movies is Uganda's premier platform for Luganda-translated movies featuring licensed Video Jockeys (VJs). We provide high-quality movie translations and commentary in Luganda, making international films accessible to Ugandan audiences.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>What is a VJ (Video Jockey)?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        A VJ (Video Jockey) is a licensed professional who provides Luganda translations and live commentary for movies. VJs are recognized cultural entertainers in Uganda and East Africa, adding local flavor and context to international films.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>Is Unruly Movies free?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        We offer both free and premium content. Basic access is free with ads. Premium subscriptions remove ads and provide access to exclusive content, early releases, and HD quality streaming.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content & VJs -->
+        <div class="faq-category">
+            <h2>Content & VJs</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>Which VJs are featured on Unruly Movies?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        We feature Uganda's top licensed VJs including VJ Junior, VJ Jingo, VJ Ice P (Omutaka Ice P), VJ Mark, KK the Best, and many more. Visit our <a href="vjs.html" style="color: #7CFC00;">VJ Translators page</a> to see all featured VJs.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>How often is new content added?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        We add new movies daily! Our VJs are constantly translating the latest and most popular films. Check back regularly or follow us on social media for updates on new releases.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>Can I request a specific movie or VJ?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        Yes! Use our <a href="contact.html" style="color: #7CFC00;">contact form</a> to request specific movies or VJ translations. While we can't guarantee all requests will be fulfilled, we review all suggestions and work with our VJs to add popular content.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technical -->
+        <div class="faq-category">
+            <h2>Technical Support</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>Why isn't a video playing?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        Try these solutions: 1) Refresh the page, 2) Clear your browser cache, 3) Try a different browser, 4) Check your internet connection, 5) Disable ad blockers temporarily. If issues persist, contact support.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>What internet speed do I need?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        We recommend at least 2 Mbps for SD quality and 5 Mbps for HD quality. Our player automatically adjusts quality based on your connection speed.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>Can I watch on mobile devices?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        Yes! Unruly Movies is fully responsive and works on all devices - smartphones, tablets, laptops, and desktops. Just visit our website from any browser.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accounts & Billing -->
+        <div class="faq-category">
+            <h2>Accounts & Billing</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>Do I need an account to watch?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        You can browse and watch some content without an account. However, creating a free account lets you save favorites, create watchlists, and access premium features.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>What payment methods do you accept?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        We accept Mobile Money (MTN, Airtel), credit/debit cards, and PayPal. All payments are processed securely through trusted payment partners.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>Can I cancel my subscription anytime?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        Yes! You can cancel your subscription at any time from your account settings. You'll continue to have access until the end of your billing period.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legal -->
+        <div class="faq-category">
+            <h2>Legal & Copyright</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>Is VJ translation legal?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        Yes! VJ translation is a recognized cultural practice in Uganda and East Africa. All our VJs are licensed professionals who operate within legal frameworks. We respect intellectual property rights and comply with copyright laws.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <h3>How do you handle copyright?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        We have a comprehensive <a href="dmca.html" style="color: #7CFC00;">DMCA policy</a> and respond promptly to valid takedown requests. We work only with licensed VJs who respect content creators' rights. If you're a copyright owner with concerns, please contact us.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact CTA -->
+        <div class="contact-cta">
+            <h2>Still Have Questions?</h2>
+            <p>Can't find the answer you're looking for? Our support team is here to help!</p>
+            <a href="contact.html" class="contact-btn">Contact Support</a>
+        </div>
+    </main>
+
+    <footer class="site-footer" style="margin-top: 60px;">
+        <div class="footer-bottom">
+            <p>Copyright © unruly movies watch 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        function toggleFAQ(element) {
+            const item = element.parentElement;
+            const allItems = document.querySelectorAll('.faq-item');
+            
+            // Close other items
+            allItems.forEach(i => {
+                if (i !== item) i.classList.remove('active');
+            });
+            
+            // Toggle current item
+            item.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

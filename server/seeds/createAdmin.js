@@ -29,7 +29,7 @@ async function createAdmin() {
         const adminUser = await User.create({
             fullName: 'Admin User',
             email: 'admin@unrulymovies.com',
-            password: 'Admin@123',
+            password: process.env.ADMIN_PASSWORD || 'ChangeMe@123!',
             role: 'admin',
             isActive: true,
             isEmailVerified: true,
@@ -43,8 +43,8 @@ async function createAdmin() {
         console.log('\n========================================');
         console.log('✅ Admin user created successfully!');
         console.log('========================================');
-        console.log(`   Email: admin@unrulymovies.com`);
-        console.log(`   Password: Admin@123`);
+        console.log(`   Email: nduggahafizu@gmail.com`);
+        console.log(`   Password: [Set via ADMIN_PASSWORD env var]`);
         console.log(`   Role: admin`);
         console.log('========================================\n');
         
@@ -54,7 +54,7 @@ async function createAdmin() {
             await User.create({
                 fullName: 'Test User',
                 email: 'test@unrulymovies.com',
-                password: 'Test@123',
+                password: process.env.TEST_USER_PASSWORD || 'TestUser@123!',
                 role: 'user',
                 isActive: true,
                 isEmailVerified: true,
@@ -65,7 +65,7 @@ async function createAdmin() {
             });
             console.log('✅ Test user also created:');
             console.log(`   Email: test@unrulymovies.com`);
-            console.log(`   Password: Test@123`);
+            console.log(`   Password: [Set via TEST_USER_PASSWORD env var]`);
             console.log(`   Role: user`);
             console.log('========================================\n');
         }
