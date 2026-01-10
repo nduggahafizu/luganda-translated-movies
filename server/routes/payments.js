@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const paymentController = require('../controllers/paymentController');
+const airtelMoneyController = require('../controllers/airtelMoneyController');
 const { protect } = require('../middleware/auth');
 const { validatePayment } = require('../middleware/validation');
 
@@ -13,6 +14,12 @@ router.post('/pesapal/ipn', paymentController.pesapalIPN);
 router.get('/history', protect, paymentController.getPaymentHistory);
 router.get('/:id', protect, paymentController.getPayment);
 
+// Airtel Money Uganda routes
+router.post('/airtel/initiate', protect, airtelMoneyController.initiateAirtelPayment);
+router.get('/airtel/status/:transactionId', protect, airtelMoneyController.checkAirtelPaymentStatus);
+router.post('/airtel/callback', airtelMoneyController.airtelCallback);
+router.get('/airtel/config', airtelMoneyController.getAirtelConfig);
+
 // Webhook routes (public)
 router.post('/stripe/webhook', express.raw({ type: 'application/json' }), paymentController.stripeWebhook);
 
@@ -24,6 +31,7 @@ router.get('/test/config', (req, res) => {
         config: {
             pesapalConfigured: !!(process.env.PESAPAL_CONSUMER_KEY && process.env.PESAPAL_CONSUMER_SECRET),
             stripeConfigured: !!process.env.STRIPE_SECRET_KEY,
+            airtelConfigured: !!(process.env.AIRTEL_CLIENT_ID && process.env.AIRTEL_CLIENT_SECRET),
             environment: process.env.PESAPAL_ENVIRONMENT || 'not set',
             ipnUrl: process.env.PESAPAL_IPN_URL || 'not set'
         }
