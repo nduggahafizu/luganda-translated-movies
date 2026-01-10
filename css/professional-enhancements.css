@@ -1,0 +1,431 @@
+/* ===================================
+   Professional Enhancements
+   Based on Netflix/KP Sounds Design
+   Load AFTER mobile-improvements.css
+   =================================== */
+
+/* Professional Section Headers - KP Sounds Style */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 24px 0;
+    padding: 0 0 16px 0;
+    border-bottom: 2px solid rgba(124, 252, 0, 0.2);
+}
+
+.section-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.section-header h2::before {
+    content: '';
+    width: 4px;
+    height: 28px;
+    background: linear-gradient(180deg, #7CFC00 0%, #00D9FF 100%);
+    border-radius: 2px;
+}
+
+.section-header .view-all {
+    color: #7CFC00;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: rgba(124, 252, 0, 0.05);
+    border: 1px solid rgba(124, 252, 0, 0.2);
+}
+
+.section-header .view-all:hover {
+    background: rgba(124, 252, 0, 0.15);
+    border-color: rgba(124, 252, 0, 0.4);
+    transform: translateX(4px);
+}
+
+.section-header .view-all svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s ease;
+}
+
+.section-header .view-all:hover svg {
+    transform: translateX(4px);
+}
+
+@media (max-width: 768px) {
+    .section-header h2 {
+        font-size: 20px;
+    }
+    
+    .section-header .view-all {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+}
+
+/* Professional Movie Card Info */
+.list-info {
+    padding: 16px !important;
+    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.7) 100%);
+}
+
+.list-info .media-title {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+    margin: 0 0 8px 0 !important;
+    line-height: 1.4 !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 42px;
+}
+
+@media (min-width: 768px) {
+    .list-info .media-title {
+        font-size: 16px !important;
+        min-height: 44px;
+    }
+}
+
+/* Meta Information */
+.meta-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 8px 0 0 0;
+}
+
+.meta-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.meta-badge.rating {
+    background: rgba(255, 215, 0, 0.2);
+    border-color: rgba(255, 215, 0, 0.3);
+    color: #FFD700;
+}
+
+.meta-badge.year {
+    background: rgba(124, 252, 0, 0.15);
+    border-color: rgba(124, 252, 0, 0.25);
+    color: #7CFC00;
+}
+
+.meta-badge.quality {
+    background: rgba(0, 217, 255, 0.2);
+    border-color: rgba(0, 217, 255, 0.3);
+    color: #00D9FF;
+}
+
+.meta-badge svg {
+    width: 12px;
+    height: 12px;
+}
+
+/* Professional Typography */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #ffffff;
+}
+
+/* Professional Spacing */
+.container {
+    margin-top: 30px !important;
+    margin-bottom: 30px !important;
+}
+
+@media (min-width: 768px) {
+    .container {
+        margin-top: 40px !important;
+        margin-bottom: 40px !important;
+    }
+}
+
+/* Movie Section Spacing */
+.movie-section {
+    margin-bottom: 60px !important;
+}
+
+@media (max-width: 768px) {
+    .movie-section {
+        margin-bottom: 40px !important;
+    }
+}
+
+/* Professional Loading State */
+.list-movie.loading .media-cover {
+    background: linear-gradient(
+        90deg,
+        #1a1a25 0%,
+        #252530 50%,
+        #1a1a25 100%
+    );
+    background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Professional VJ Badge */
+.vj-badge {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background: rgba(124, 252, 0, 0.95);
+    color: #000;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+@media (min-width: 768px) {
+    .vj-badge {
+        font-size: 11px;
+        padding: 5px 12px;
+    }
+}
+
+/* Professional Quality Badge */
+.quality-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: linear-gradient(135deg, #00D9FF 0%, #0099CC 100%);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0, 217, 255, 0.4);
+}
+
+/* Professional Genre Pills */
+.genre-pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin: 8px 0 0 0;
+}
+
+.genre-pill {
+    display: inline-block;
+    padding: 3px 10px;
+    background: rgba(124, 252, 0, 0.1);
+    border: 1px solid rgba(124, 252, 0, 0.25);
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #7CFC00;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Professional Play Button Overlay */
+.play-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    background: rgba(124, 252, 0, 0.95);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 15;
+    box-shadow: 0 4px 20px rgba(124, 252, 0, 0.5);
+}
+
+.list-movie:hover .play-overlay {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+.play-overlay svg {
+    width: 24px;
+    height: 24px;
+    fill: #000;
+    margin-left: 3px;
+}
+
+@media (max-width: 767px) {
+    .play-overlay {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .play-overlay svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* Professional Footer Enhancements */
+.footer {
+    margin-top: 80px !important;
+    padding-top: 60px !important;
+    border-top: 2px solid rgba(124, 252, 0, 0.15);
+}
+
+.footer-about {
+    background: linear-gradient(145deg, rgba(124, 252, 0, 0.05) 0%, rgba(0, 217, 255, 0.05) 100%);
+    border: 1px solid rgba(124, 252, 0, 0.2);
+    border-radius: 16px;
+    padding: 40px;
+    margin-bottom: 60px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 768px) {
+    .footer-about {
+        padding: 24px;
+        margin-bottom: 40px;
+    }
+}
+
+/* Professional Button Styles */
+.btn-primary-custom {
+    background: linear-gradient(135deg, #7CFC00 0%, #00D9FF 100%);
+    color: #000;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(124, 252, 0, 0.3);
+}
+
+.btn-primary-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(124, 252, 0, 0.5);
+    color: #000;
+}
+
+/* Professional Search Bar Enhancement */
+.header-search .form-control {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+    padding: 10px 16px 10px 40px !important;
+    border-radius: 12px !important;
+    font-size: 14px !important;
+    transition: all 0.3s ease !important;
+}
+
+.header-search .form-control:focus {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(124, 252, 0, 0.5) !important;
+    box-shadow: 0 0 0 3px rgba(124, 252, 0, 0.1) !important;
+}
+
+/* Professional Rating Display */
+.rating-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: rgba(255, 215, 0, 0.15);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #FFD700;
+}
+
+.rating-display svg {
+    width: 14px;
+    height: 14px;
+    fill: #FFD700;
+}
+
+/* Smooth Scroll */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Better Focus States */
+a:focus,
+button:focus,
+input:focus {
+    outline: 2px solid rgba(124, 252, 0, 0.5);
+    outline-offset: 2px;
+}
+
+/* Accessibility Improvements */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Professional Transitions */
+* {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Print Styles */
+@media print {
+    .navbar,
+    .footer,
+    .app-aside,
+    .chat-widget {
+        display: none !important;
+    }
+}
