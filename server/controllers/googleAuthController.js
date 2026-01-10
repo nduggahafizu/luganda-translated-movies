@@ -63,6 +63,8 @@ exports.googleSignIn = async (req, res) => {
                 user.verified = true;
             }
             
+            // Keep existing password if user has one (allows password login even after Google signup)
+            
             await user.save();
             console.log('Existing user updated:', user._id);
         }

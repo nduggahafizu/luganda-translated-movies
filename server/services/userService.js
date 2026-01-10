@@ -61,9 +61,12 @@ async function loginUser({ email, password }) {
     if (!user) {
         return { error: 'Invalid email or password' };
     }
-    if (user.provider === 'google' || user.googleId) {
-        return { error: 'This account uses Google Sign-In. Please use the Google button to login.' };
+    
+    // Check if Google user WITHOUT a password set
+    if ((user.provider === 'google' || user.googleId) && !user.password) {
+        return { error: 'This account uses Google Sign-In. Please use the Google button to login, or reset your password to enable email/password login.' };
     }
+    
     if (!user.isActive) {
         return { error: 'Your account has been deactivated. Please contact support.' };
     }
