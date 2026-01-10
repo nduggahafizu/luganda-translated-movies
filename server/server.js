@@ -64,7 +64,8 @@ app.use(helmet({
         preload: true
     },
     crossOriginEmbedderPolicy: false,
-    crossOriginResourcePolicy: { policy: "cross-origin" }
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginOpenerPolicy: false  // Disable COOP to allow Google OAuth popups
 }));
 
 // Enhanced CORS configuration
@@ -76,7 +77,8 @@ const corsOptions = {
             ? process.env.ALLOWED_ORIGINS.split(',')
             : [
                 'http://localhost:3000',
-                'http://localhost:5000'
+                'http://localhost:5000',
+                'http://localhost:8000'
               ];
 
         // Allow requests with no origin (mobile apps, Postman, etc.)
@@ -96,6 +98,14 @@ const corsOptions = {
         if (origin.includes('netlify.app') || origin.includes('up.railway.app') || process.env.NODE_ENV === 'development') {
             return callback(null, true);
         }
+
+        // Allow in development mode
+        if (process.env.NODE_ENV === 'development') {
+            return callback(null, true);
+        }
+
+        // Log blocked origins for debugging
+        logger.warn('CORS blocked origin:', origin);
 
         // Deny by default
         return callback(new Error('Not allowed by CORS'));
