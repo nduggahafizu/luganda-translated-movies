@@ -164,9 +164,10 @@ const createRateLimiter = (windowMinutes, maxRequests) => {
 };
 
 // Apply different rate limits to different routes
-const generalLimiter = createRateLimiter(15, 100); // 100 requests per 15 minutes
-const authLimiter = createRateLimiter(15, 50);     // 50 requests per 15 minutes for auth (increased for development)
-const apiLimiter = createRateLimiter(1, 30);       // 30 requests per minute for API
+// Increased limits for production use - a single page can make 10+ API calls
+const generalLimiter = createRateLimiter(1, 200);  // 200 requests per minute for general API
+const authLimiter = createRateLimiter(15, 100);    // 100 requests per 15 minutes for auth
+const apiLimiter = createRateLimiter(1, 300);      // 300 requests per minute for heavy API usage
 
 app.use('/api/auth', authLimiter);
 app.use('/api/', generalLimiter);
