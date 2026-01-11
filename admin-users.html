@@ -863,8 +863,8 @@
 
     <script src="js/config.js"></script>
     <script>
-        // Get API URL from config
-        const API_URL = window.APP_CONFIG?.API_URL || 'http://localhost:5000/api';
+        // Get API URL from config - use API_CONFIG from config.js
+        const API_URL = (typeof API_CONFIG !== 'undefined' ? API_CONFIG.BASE_URL : 'https://luganda-translated-movies-production.up.railway.app') + '/api';
         
         let currentPage = 1;
         let totalPages = 1;
