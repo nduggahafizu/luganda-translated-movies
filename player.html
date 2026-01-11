@@ -1819,17 +1819,70 @@
             return false;
         }
         
+        // Show video unavailable message
+        function showVideoUnavailable(movieTitle) {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.style.display = 'none';
+            
+            // Show message in player area
+            const playerContainer = document.querySelector('.player-container') || document.querySelector('.video-container');
+            if (playerContainer) {
+                playerContainer.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 300px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 12px; padding: 40px; text-align: center;">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="1.5" style="margin-bottom: 20px;">
+                            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                            <line x1="7" y1="2" x2="7" y2="22"></line>
+                            <line x1="17" y1="2" x2="17" y2="22"></line>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <line x1="2" y1="7" x2="22" y2="7"></line>
+                            <line x1="2" y1="17" x2="22" y2="17"></line>
+                        </svg>
+                        <h2 style="color: #fff; margin-bottom: 10px; font-size: 24px;">Video Unavailable</h2>
+                        <p style="color: #aaa; margin-bottom: 20px; max-width: 400px;">
+                            The video for "${movieTitle || 'this movie'}" is not available yet. 
+                            Our team is working on adding it. Please check back later!
+                        </p>
+                        <a href="movies.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: var(--primary-color, #7CFC00); color: #000; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            Browse Available Movies
+                        </a>
+                    </div>
+                `;
+            }
+        }
+        
         // Check if URL is an Archive.org embed/item URL
         function isArchiveOrgUrl(url) {
             if (!url) {
                 console.log('🔍 isArchiveOrgUrl: URL is empty/null');
                 return false;
             }
-            const isArchive = url.includes('archive.org/embed/') || 
-                   url.includes('archive.org/details/') ||
-                   (url.includes('archive.org/download/') && url.toLowerCase().endsWith('.mkv'));
-            console.log('🔍 isArchiveOrgUrl check:', url.substring(0, 50), '... =', isArchive);
+            // Clean up URL (remove spaces that might be added accidentally)
+            const cleanUrl = url.trim().replace(/\s+/g, '');
+            const isArchive = cleanUrl.includes('archive.org/embed/') || 
+                   cleanUrl.includes('archive.org/details/') ||
+                   (cleanUrl.includes('archive.org/download/') && cleanUrl.toLowerCase().endsWith('.mkv'));
+            console.log('🔍 isArchiveOrgUrl check:', cleanUrl.substring(0, 50), '... =', isArchive);
             return isArchive;
+        }
+        
+        // Check if URL is a valid video URL (not placeholder/pending)
+        function isValidVideoUrl(url) {
+            if (!url) return false;
+            const cleanUrl = url.trim().replace(/\s+/g, '');
+            // Check for invalid/placeholder URLs
+            if (cleanUrl === '' || 
+                cleanUrl === 'pending-upload' || 
+                cleanUrl === 'http://archive.org' ||
+                cleanUrl === 'https://archive.org' ||
+                cleanUrl.length < 20) {
+                console.log('⚠️ Invalid video URL detected:', url);
+                return false;
+            }
+            return true;
         }
         
         // Convert Archive.org URL to embed URL with minimal UI
@@ -1920,10 +1973,23 @@
                         updateMovieInfo(movie);
                         
                         // Get embed URL from either location
-                        const videoUrl = movie.embedUrl || movie.video?.embedUrl || movie.video?.url;
+                        let videoUrl = movie.embedUrl || movie.video?.embedUrl || movie.video?.url;
                         const streamtapeId = movie.video?.streamtapeId;
                         
+                        // Clean up URL if it exists
+                        if (videoUrl) {
+                            videoUrl = videoUrl.trim().replace(/\s+/g, '');
+                        }
+                        
                         console.log('🎬 Video URL:', videoUrl);
+                        
+                        // Check if video URL is valid
+                        if (!isValidVideoUrl(videoUrl) && !streamtapeId) {
+                            console.log('⚠️ No valid video URL available for this movie');
+                            showVideoUnavailable(movie.originalTitle);
+                            loadRelatedMovies(movie.genres?.[0] || 'action');
+                            return;
+                        }
                         
                         // Check if it's an Archive.org URL (use their embed player - works for MKV!)
                         if (videoUrl && isArchiveOrgUrl(videoUrl)) {
@@ -1963,19 +2029,12 @@
                     const trailerBtn = document.getElementById('trailerBtn');
                     if (trailerBtn) trailerBtn.style.display = 'none';
                 } else {
-                    // Demo video for testing
-                    loadVideoSource('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
-                    document.getElementById('movieTitle').textContent = 'Demo Video - Big Buck Bunny';
-                    document.getElementById('movieDescription').textContent = 'Big Buck Bunny is a short computer-animated comedy film featuring animals of the forest. This is a demo video to test the player functionality.';
-                    loadingOverlay.style.display = 'none';
+                    // No movie ID or stream URL - show unavailable message
+                    showVideoUnavailable('Unknown');
                 }
             } catch (error) {
                 console.error('❌ Error loading movie:', error);
-                document.getElementById('movieDescription').textContent = 'Error loading movie. Please check your connection and try again.';
-                loadingOverlay.style.display = 'none';
-                // Load demo video on error
-                loadVideoSource('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
-                document.getElementById('movieTitle').textContent = 'Demo Video';
+                showVideoUnavailable('this movie');
             }
         }
 
