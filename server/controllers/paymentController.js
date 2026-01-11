@@ -284,6 +284,8 @@ exports.initiatePesapalPayment = async (req, res) => {
                     }
                 );
                 ipnId = ipnListResponse.data?.[0]?.ipn_id;
+            }
+
             logger.info('IPN registered', { ipnId });
 
             // Submit order to PesaPal
