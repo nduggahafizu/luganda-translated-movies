@@ -1008,9 +1008,9 @@
         let allMovies = [];
         let currentTMDBData = null;
         
-        // Get auth token
+        // Get auth token (check both localStorage and sessionStorage)
         function getAuthHeaders() {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
             return {
                 'Content-Type': 'application/json',
                 'Authorization': token ? `Bearer ${token}` : ''
@@ -1019,8 +1019,8 @@
         
         // Check admin auth on load
         document.addEventListener('DOMContentLoaded', function() {
-            const token = localStorage.getItem('token');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
             
             if (!token || user.role !== 'admin') {
                 alert('Access denied. Admin only.');
@@ -1314,13 +1314,18 @@
                 
                 const data = await response.json();
                 
-                if (data.success) {
+                // Check for success - response.ok covers 200-299 status codes (including 201 Created)
+                if (response.ok && data.success) {
                     showToast('Movie added successfully!', 'success');
                     clearForm();
                     loadMovies();
                     showTab('list');
-                } else {
+                } else if (response.ok) {
+                    // Response OK but backend returned success: false
                     showToast(data.message || 'Failed to add movie', 'error');
+                } else {
+                    // HTTP error
+                    showToast(data.message || `Server error: ${response.status}`, 'error');
                 }
             } catch (error) {
                 console.error('Error adding movie:', error);

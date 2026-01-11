@@ -15,10 +15,70 @@ const API_CONFIG = (function() {
 
     // Backend URLs
     const PRODUCTION_API_URL = 'https://luganda-translated-movies-production.up.railway.app';
-    const DEVELOPMENT_API_URL = 'https://luganda-translated-movies-production.up.railway.app'; // Use production API for local testing
+    const DEVELOPMENT_API_URL = 'http://localhost:5000'; // Use local server for development
 
     // Select appropriate URL based on environment
-    const BASE_URL = PRODUCTION_API_URL; // Always use production API
+    const BASE_URL = isLocalhost ? DEVELOPMENT_API_URL : PRODUCTION_API_URL;
+
+    // Retry configuration
+    const RETRY_CONFIG = {
+        maxRetries: 3,
+        retryDelay: 1000, // 1 second
+        backoffMultiplier: 2
+    };
+
+    // Fetch with retry and timeout
+    async function fetchWithRetry(url, options = {}, retries = RETRY_CONFIG.maxRetries) {
+        const timeout = options.timeout || 15000; // 15 second default timeout
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
+        
+        try {
+            const response = await fetch(url, {
+                ...options,
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            
+            if (!response.ok && response.status >= 500 && retries > 0) {
+                // Server error - retry
+                const delay = RETRY_CONFIG.retryDelay * Math.pow(RETRY_CONFIG.backoffMultiplier, RETRY_CONFIG.maxRetries - retries);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                return fetchWithRetry(url, options, retries - 1);
+            }
+            
+            return response;
+        } catch (error) {
+            clearTimeout(timeoutId);
+            
+            if (error.name === 'AbortError') {
+                console.warn(`Request timeout: ${url}`);
+            }
+            
+            if (retries > 0) {
+                const delay = RETRY_CONFIG.retryDelay * Math.pow(RETRY_CONFIG.backoffMultiplier, RETRY_CONFIG.maxRetries - retries);
+                console.log(`Retrying in ${delay}ms... (${retries} retries left)`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                return fetchWithRetry(url, options, retries - 1);
+            }
+            
+            throw error;
+        }
+    }
+
+    // Pre-warm the backend on page load
+    function warmupBackend() {
+        fetch(`${BASE_URL}/api/health`, { 
+            method: 'GET',
+            cache: 'no-store'
+        }).catch(() => {});
+    }
+
+    // Warm up backend immediately
+    if (typeof window !== 'undefined') {
+        warmupBackend();
+    }
 
     return {
         // Base API URL
@@ -51,6 +111,12 @@ const API_CONFIG = (function() {
         getApiUrl: function(endpoint) {
             return `${BASE_URL}${endpoint}`;
         },
+
+        // Fetch with retry
+        fetch: fetchWithRetry,
+
+        // Warm up backend
+        warmup: warmupBackend,
 
         // Log configuration (only in development)
         logConfig: function() {

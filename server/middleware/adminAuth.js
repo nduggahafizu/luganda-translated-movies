@@ -1,6 +1,9 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
+// JWT Configuration with defaults (must match auth.js and authController)
+const JWT_SECRET = process.env.JWT_SECRET || 'unruly-movies-jwt-secret-key-2024';
+
 // Middleware to check if user is admin
 const adminOnly = async (req, res, next) => {
     try {
@@ -15,7 +18,7 @@ const adminOnly = async (req, res, next) => {
         }
 
         // Verify token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, JWT_SECRET);
         
         // Get user from database
         const user = await User.findById(decoded.userId || decoded.id).select('+role');
@@ -72,7 +75,7 @@ const optionalAuth = async (req, res, next) => {
             return next();
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, JWT_SECRET);
         const user = await User.findById(decoded.userId || decoded.id);
         
         req.user = user;
