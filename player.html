@@ -1504,9 +1504,6 @@
                 id="embedPlayer" 
                 src="" 
                 frameborder="0" 
-                allowfullscreen
-                webkitallowfullscreen="true"
-                mozallowfullscreen="true"
                 loading="eager"
                 allow="autoplay; fullscreen; encrypted-media; picture-in-picture; accelerometer; gyroscope"
                 style="width: 100%; height: 100%; border: none;">
@@ -2252,12 +2249,6 @@
             const poster = document.getElementById('moviePoster');
             poster.src = movie.poster || 'assets/images/placeholder-poster.jpg';
             poster.alt = movie.originalTitle || movie.title;
-            
-            // Show pre-roll ad before video starts
-            showPrerollAd(
-                movie.originalTitle || movie.title,
-                movie.poster || 'assets/images/placeholder-poster.jpg'
-            );
             
             // Update meta tags for sharing
             document.querySelector('meta[property="og:title"]').content = movie.originalTitle || movie.title;
