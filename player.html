@@ -11,6 +11,23 @@
     <meta name="robots" content="noindex">
     <meta name="google-adsense-account" content="ca-pub-1904736753681797">
     
+    <!-- DNS Prefetch and Preconnect for faster video loading -->
+    <link rel="dns-prefetch" href="//archive.org">
+    <link rel="dns-prefetch" href="//streamtape.com">
+    <link rel="dns-prefetch" href="//ia601502.us.archive.org">
+    <link rel="dns-prefetch" href="//ia902802.us.archive.org">
+    <link rel="preconnect" href="https://archive.org" crossorigin>
+    <link rel="preconnect" href="https://luganda-translated-movies-production.up.railway.app" crossorigin>
+    
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMF82HVT9G"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-HMF82HVT9G');
+    </script>
+    
     <!-- Open Graph / Social Share Meta -->
     <meta property="og:type" content="video.movie">
     <meta property="og:site_name" content="Unruly Movies">
@@ -30,6 +47,7 @@
     
     <!-- Main Styles -->
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/trailer-player.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     
     <!-- Google AdSense -->
@@ -138,6 +156,22 @@
             padding-top: 60px;
         }
         
+        @media (max-width: 768px) {
+            .preroll-container {
+                padding: 15px;
+            }
+            
+            .preroll-ad-content {
+                padding: 20px;
+                min-height: 250px;
+            }
+            
+            .preroll-header {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+        }
+        
         /* Plyr Customization */
         .plyr {
             --plyr-color-main: #7CFC00;
@@ -166,9 +200,119 @@
             border: none;
         }
         
+        /* Hide Archive.org branding, account links and share button in embed */
+        #embedContainer {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Full top overlay bar - completely covers Archive.org header */
+        .embed-top-cover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: #000;
+            z-index: 100;
+            pointer-events: auto; /* Block clicks on Archive.org buttons */
+        }
+        
+        /* Right side cover - hides share button and all right-side controls */
+        .embed-right-cover {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 80px;
+            background: #000;
+            z-index: 101;
+            pointer-events: auto;
+        }
+        
+        /* Left side cover - hides Archive.org logo/account link */
+        .embed-left-cover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 350px;
+            height: 70px;
+            background: #000;
+            z-index: 101;
+            pointer-events: auto;
+        }
+        
+        /* Custom branding bar for embed player */
+        .embed-brand-bar {
+            position: absolute;
+            top: 12px;
+            left: 15px;
+            z-index: 25;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 15px;
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 8px;
+            border: 1px solid var(--primary-color);
+            pointer-events: none;
+        }
+        
+        .embed-brand-bar img {
+            height: 24px;
+            width: auto;
+        }
+        
+        .embed-brand-bar span {
+            color: var(--primary-color);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        /* Gradient fade below the top cover for smooth transition */
+        .embed-top-cover::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(to bottom, #000 0%, transparent 100%);
+            pointer-events: none;
+        }
+        
         @media (max-width: 767px) {
             #embedContainer {
                 border-radius: 0;
+            }
+            
+            .embed-top-cover {
+                height: 60px;
+            }
+            
+            .embed-left-cover {
+                width: 200px;
+                height: 60px;
+            }
+            
+            .embed-right-cover {
+                width: 150px;
+                height: 65px;
+            }
+            
+            .embed-brand-bar {
+                top: 15px;
+                left: 10px;
+                padding: 5px 10px;
+            }
+            
+            .embed-brand-bar img {
+                height: 18px;
+            }
+            
+            .embed-brand-bar span {
+                font-size: 10px;
             }
         }
         
@@ -370,6 +514,111 @@
         .btn-secondary:hover {
             background: rgba(255,255,255,0.2);
             border-color: var(--primary-color);
+        }
+        
+        .btn-trailer {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            color: #fff;
+            font-weight: 700;
+            border: none;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .btn-trailer:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
+        }
+        
+        .btn-trailer:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Like button liked state */
+        #likeBtn.liked {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            color: #fff;
+            border-color: transparent;
+        }
+        
+        #likeBtn.liked svg {
+            fill: currentColor;
+        }
+        
+        #likeBtn {
+            transition: transform 0.15s ease, background 0.3s ease;
+        }
+        
+        /* Quality Selector Dropdown */
+        .quality-selector {
+            position: relative;
+        }
+        
+        .quality-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .quality-dropdown {
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--background-light);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 8px 0;
+            min-width: 180px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .quality-selector.open .quality-dropdown {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .quality-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .quality-option:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .quality-option.active {
+            background: rgba(124, 252, 0, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .quality-option.active::before {
+            content: '✓';
+            margin-right: 8px;
+            color: var(--primary-color);
+        }
+        
+        .quality-label {
+            font-size: 11px;
+            padding: 3px 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            color: var(--text-secondary);
+        }
+        
+        .quality-option.active .quality-label {
+            background: rgba(124, 252, 0, 0.2);
+            color: var(--primary-color);
         }
         
         .btn-icon {
@@ -586,6 +835,316 @@
         .movie-card-vj {
             font-size: 12px;
             color: var(--text-secondary);
+        }
+        
+        /* Comments Section */
+        .comments-section {
+            background: var(--background-light);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .comments-section .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+        
+        .comments-section .section-title {
+            display: flex;
+            align-items: center;
+        }
+        
+        .comment-count {
+            font-size: 14px;
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+        }
+        
+        /* Add Comment Form */
+        .add-comment-form {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .comment-user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        
+        .comment-user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .comment-input-wrapper {
+            flex: 1;
+        }
+        
+        .comment-input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 14px;
+            color: #fff;
+            resize: none;
+            min-height: 50px;
+            transition: all 0.3s ease;
+        }
+        
+        .comment-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: rgba(255,255,255,0.08);
+        }
+        
+        .comment-actions {
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .rating-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .star-rating-input {
+            display: flex;
+            flex-direction: row-reverse;
+            gap: 2px;
+        }
+        
+        .star-rating-input input {
+            display: none;
+        }
+        
+        .star-rating-input label {
+            cursor: pointer;
+            font-size: 22px;
+            color: #444;
+            transition: all 0.2s ease;
+        }
+        
+        .star-rating-input label:hover,
+        .star-rating-input label:hover ~ label,
+        .star-rating-input input:checked ~ label {
+            color: #FFD700;
+        }
+        
+        .comment-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-cancel {
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-cancel:hover {
+            border-color: rgba(255,255,255,0.4);
+            color: #fff;
+        }
+        
+        .btn-submit {
+            padding: 10px 20px;
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-submit:hover {
+            background: #5cb85c;
+            transform: translateY(-2px);
+        }
+        
+        /* Comments List */
+        .comments-list {
+            min-height: 100px;
+        }
+        
+        .comments-loading,
+        .no-comments {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+        
+        .no-comments svg {
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        .comment-item {
+            display: flex;
+            gap: 15px;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .comment-item:last-child {
+            border-bottom: none;
+        }
+        
+        .comment-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        
+        .comment-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .comment-content {
+            flex: 1;
+        }
+        
+        .comment-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .comment-author {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .admin-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+        }
+        
+        .admin-badge svg {
+            width: 12px;
+            height: 12px;
+        }
+        
+        .comment-rating {
+            display: flex;
+            gap: 2px;
+        }
+        
+        .comment-rating .star {
+            font-size: 12px;
+            color: #FFD700;
+        }
+        
+        .comment-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .comment-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 10px;
+        }
+        
+        .comment-actions-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .comment-action-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            padding: 5px 0;
+            transition: color 0.3s ease;
+        }
+        
+        .comment-action-btn:hover {
+            color: var(--primary-color);
+        }
+        
+        .comment-action-btn.liked {
+            color: #FF6B6B;
+        }
+        
+        .load-more-comments {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .load-more-comments:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
         }
         
         /* Footer */
@@ -891,113 +1450,6 @@
                 padding-right: max(15px, env(safe-area-inset-right));
             }
         }
-        
-        /* Pre-roll Ad Overlay Styles */
-        .preroll-ad-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .preroll-ad-overlay.hidden {
-            display: none;
-        }
-        
-        .ad-label {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: rgba(0,0,0,0.8);
-            color: #fff;
-            padding: 5px 12px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .ad-content {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .skip-ad-container {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1001;
-        }
-        
-        .skip-ad-btn {
-            background: rgba(0,0,0,0.9);
-            color: #fff;
-            border: 1px solid rgba(255,255,255,0.3);
-            padding: 12px 20px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-        }
-        
-        .skip-ad-btn:hover:not(:disabled) {
-            background: var(--primary-color);
-            color: #000;
-            border-color: var(--primary-color);
-        }
-        
-        .skip-ad-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        
-        .skip-countdown {
-            background: var(--primary-color);
-            color: #000;
-            padding: 2px 8px;
-            border-radius: 3px;
-            font-weight: 700;
-            min-width: 24px;
-            text-align: center;
-        }
-        
-        .ad-timer {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(0,0,0,0.8);
-            color: #fff;
-            padding: 8px 15px;
-            border-radius: 4px;
-            font-size: 13px;
-        }
-        
-        @media (max-width: 768px) {
-            .skip-ad-btn {
-                padding: 10px 16px;
-                font-size: 13px;
-            }
-            
-            .skip-ad-container {
-                bottom: 15px;
-                right: 15px;
-            }
-        }
     </style>
 </head>
 
@@ -1030,33 +1482,31 @@
 
     <!-- Video Player -->
     <div class="player-wrapper" id="playerWrapper">
-        <!-- Pre-roll Ad Overlay -->
-        <div class="preroll-ad-overlay" id="prerollAdOverlay">
-            <span class="ad-label">Advertisement</span>
-            <div class="ad-timer" id="adTimer">Ad ends in <span id="adCountdown">15</span>s</div>
-            <div class="ad-content" id="adContent">
-                <!-- Ad will be loaded here -->
-            </div>
-            <div class="skip-ad-container">
-                <button class="skip-ad-btn" id="skipAdBtn" disabled>
-                    Skip in <span class="skip-countdown" id="skipCountdown">10</span>
-                </button>
-            </div>
-        </div>
-        
         <!-- Native Video Player (for direct video files) -->
         <video id="player" playsinline controls crossorigin style="display: none;">
             <source src="" type="video/mp4">
         </video>
         
-        <!-- Embed Player Container (for Streamtape, etc.) -->
-        <div id="embedContainer" style="display: none; width: 100%; aspect-ratio: 16/9; background: #000;">
+        <!-- Embed Player Container (for Streamtape, Archive.org, etc.) -->
+        <div id="embedContainer" style="display: none; width: 100%; min-height: 400px; aspect-ratio: 16/9; background: #000; position: relative;">
+            <!-- Top cover bar - completely hides Archive.org header -->
+            <div class="embed-top-cover"></div>
+            <!-- Left cover - hides Archive.org logo and account link -->
+            <div class="embed-left-cover"></div>
+            <!-- Right cover - hides share button -->
+            <div class="embed-right-cover"></div>
+            <!-- Unruly Movies branding -->
+            <div class="embed-brand-bar">
+                <img src="assets/images/logo.png" alt="Unruly Movies">
+                <span>UNRULY MOVIES</span>
+            </div>
             <iframe 
                 id="embedPlayer" 
                 src="" 
                 frameborder="0" 
-                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-                style="width: 100%; height: 100%;">
+                loading="eager"
+                allow="autoplay; fullscreen; encrypted-media; picture-in-picture; accelerometer; gyroscope"
+                style="width: 100%; height: 100%; border: none;">
             </iframe>
         </div>
         
@@ -1112,7 +1562,7 @@
                     </div>
                     
                     <div class="vj-info" id="vjInfo">
-                        <img src="assets/images/default-avatar.png" alt="VJ" class="vj-avatar" id="vjAvatar">
+                        <img src="assets/images/default-avatar.svg" alt="VJ" class="vj-avatar" id="vjAvatar">
                         <div class="vj-details">
                             <div class="vj-label">Translated by</div>
                             <div class="vj-name" id="vjName">VJ Junior</div>
@@ -1127,6 +1577,46 @@
             <button class="show-more-btn" id="showMoreBtn">Show more</button>
             
             <div class="action-buttons">
+                <button class="action-btn btn-trailer" id="trailerBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    Watch Trailer
+                </button>
+                
+                <!-- Quality Selector -->
+                <div class="quality-selector" id="qualitySelector">
+                    <button class="action-btn btn-secondary quality-btn" id="qualityBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                        <span id="currentQuality">Auto</span>
+                    </button>
+                    <div class="quality-dropdown" id="qualityDropdown">
+                        <div class="quality-option" data-quality="auto">
+                            <span>Auto</span>
+                            <span class="quality-label">Recommended</span>
+                        </div>
+                        <div class="quality-option" data-quality="1080p">
+                            <span>1080p</span>
+                            <span class="quality-label">HD</span>
+                        </div>
+                        <div class="quality-option" data-quality="720p">
+                            <span>720p</span>
+                            <span class="quality-label">HD</span>
+                        </div>
+                        <div class="quality-option" data-quality="480p">
+                            <span>480p</span>
+                            <span class="quality-label">SD</span>
+                        </div>
+                        <div class="quality-option" data-quality="360p">
+                            <span>360p</span>
+                            <span class="quality-label">Low</span>
+                        </div>
+                    </div>
+                </div>
+                
                 <button class="action-btn btn-primary btn-full" id="watchlistBtn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
@@ -1172,6 +1662,68 @@
             </div>
         </div>
 
+        <!-- Comments & Reviews Section -->
+        <section class="comments-section" id="commentsSection">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px; vertical-align: middle;">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Comments & Reviews
+                </h2>
+                <div class="comment-count" id="commentCount">0 comments</div>
+            </div>
+            
+            <!-- Add Comment Form -->
+            <div class="add-comment-form" id="addCommentForm">
+                <div class="comment-user-avatar" id="commentUserAvatar">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </div>
+                <div class="comment-input-wrapper">
+                    <textarea class="comment-input" id="commentInput" placeholder="Write a comment..." rows="1"></textarea>
+                    <div class="comment-actions" id="commentActions" style="display: none;">
+                        <div class="rating-input">
+                            <span>Rate this movie:</span>
+                            <div class="star-rating-input" id="movieRatingInput">
+                                <input type="radio" name="rating" id="star5" value="5"><label for="star5">★</label>
+                                <input type="radio" name="rating" id="star4" value="4"><label for="star4">★</label>
+                                <input type="radio" name="rating" id="star3" value="3"><label for="star3">★</label>
+                                <input type="radio" name="rating" id="star2" value="2"><label for="star2">★</label>
+                                <input type="radio" name="rating" id="star1" value="1"><label for="star1">★</label>
+                            </div>
+                        </div>
+                        <div class="comment-buttons">
+                            <button class="btn-cancel" id="cancelComment">Cancel</button>
+                            <button class="btn-submit" id="submitComment">Post Comment</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Comments List -->
+            <div class="comments-list" id="commentsList">
+                <div class="comments-loading" id="commentsLoading">
+                    <div class="spinner"></div>
+                    <p>Loading comments...</p>
+                </div>
+                <div class="no-comments" id="noComments" style="display: none;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <p>No comments yet. Be the first to share your thoughts!</p>
+                </div>
+                <!-- Comments will be loaded here -->
+            </div>
+            
+            <!-- Load More Comments -->
+            <button class="load-more-comments" id="loadMoreComments" style="display: none;">
+                Load More Comments
+            </button>
+        </section>
+
         <!-- Related Content -->
         <section class="related-section">
             <h2 class="section-title">You May Also Like</h2>
@@ -1195,16 +1747,19 @@
 
     <!-- Footer -->
     <footer class="player-footer">
-        <p>&copy; 2025 <strong>Unruly Movies</strong>. Developed by <strong>Nduga Hafizu</strong>.</p>
-        <p style="font-size: 12px; margin-top: 5px; opacity: 0.7;">Legitimate Ugandan platform for Luganda VJ translations</p>
+        <p>Copyright © unruly movies watch 2026</p>
     </footer>
 
     <!-- Scripts -->
     <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/tmdb-api.js"></script>
+    <script src="js/trailer-player.js"></script>
     <script src="js/social-share.js"></script>
     <script src="js/watchlist-manager.js"></script>
+    <script src="js/notifications.js"></script>
     
     <script>
         // Initialize Plyr
@@ -1222,6 +1777,140 @@
         const embedUrl = urlParams.get('embed');
         const isSeries = urlParams.has('series');
         const isStation = urlParams.has('station');
+
+        // Comments system variables (declared early to avoid temporal dead zone)
+        let commentsPage = 1;
+        const commentsPerPage = 10;
+        let allComments = [];
+
+        // Check if URL is a direct video file (can be played natively)
+        function isDirectVideoUrl(url) {
+            if (!url) return false;
+            
+            // Archive.org EMBED URLs should use iframe (better compatibility)
+            if (url.includes('archive.org/embed/')) return false;
+            
+            // Archive.org direct downloads (only MP4/WebM for native playback)
+            if (url.includes('archive.org/download/')) {
+                const urlLower = url.toLowerCase();
+                // Only treat MP4 and WebM as direct (they work in all browsers)
+                if (urlLower.endsWith('.mp4') || urlLower.endsWith('.webm')) return true;
+                // MKV should use embed player for better compatibility
+                if (urlLower.endsWith('.mkv')) return false;
+            }
+            
+            // Direct video file extensions (browser-compatible only)
+            const videoExtensions = ['.mp4', '.webm', '.m4v', '.m3u8'];
+            const urlLower = url.toLowerCase();
+            if (videoExtensions.some(ext => urlLower.includes(ext))) return true;
+            
+            // Google Drive direct links
+            if (url.includes('drive.google.com') && url.includes('export=download')) return true;
+            
+            // Cloudflare R2 public URLs
+            if (url.includes('.r2.dev/')) return true;
+            
+            // Backblaze B2 URLs
+            if (url.includes('backblazeb2.com')) return true;
+            
+            return false;
+        }
+        
+        // Show video unavailable message
+        function showVideoUnavailable(movieTitle) {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.style.display = 'none';
+            
+            // Show message in player area
+            const playerContainer = document.querySelector('.player-container') || document.querySelector('.video-container');
+            if (playerContainer) {
+                playerContainer.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 300px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 12px; padding: 40px; text-align: center;">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="1.5" style="margin-bottom: 20px;">
+                            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                            <line x1="7" y1="2" x2="7" y2="22"></line>
+                            <line x1="17" y1="2" x2="17" y2="22"></line>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <line x1="2" y1="7" x2="22" y2="7"></line>
+                            <line x1="2" y1="17" x2="22" y2="17"></line>
+                        </svg>
+                        <h2 style="color: #fff; margin-bottom: 10px; font-size: 24px;">Video Unavailable</h2>
+                        <p style="color: #aaa; margin-bottom: 20px; max-width: 400px;">
+                            The video for "${movieTitle || 'this movie'}" is not available yet. 
+                            Our team is working on adding it. Please check back later!
+                        </p>
+                        <a href="movies.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: var(--primary-color, #7CFC00); color: #000; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            Browse Available Movies
+                        </a>
+                    </div>
+                `;
+            }
+        }
+        
+        // Check if URL is an Archive.org embed/item URL
+        function isArchiveOrgUrl(url) {
+            if (!url) {
+                console.log('🔍 isArchiveOrgUrl: URL is empty/null');
+                return false;
+            }
+            // Clean up URL (remove spaces that might be added accidentally)
+            const cleanUrl = url.trim().replace(/\s+/g, '');
+            const isArchive = cleanUrl.includes('archive.org/embed/') || 
+                   cleanUrl.includes('archive.org/details/') ||
+                   (cleanUrl.includes('archive.org/download/') && cleanUrl.toLowerCase().endsWith('.mkv'));
+            console.log('🔍 isArchiveOrgUrl check:', cleanUrl.substring(0, 50), '... =', isArchive);
+            return isArchive;
+        }
+        
+        // Check if URL is a valid video URL (not placeholder/pending)
+        function isValidVideoUrl(url) {
+            if (!url) return false;
+            const cleanUrl = url.trim().replace(/\s+/g, '');
+            // Check for invalid/placeholder URLs
+            if (cleanUrl === '' || 
+                cleanUrl === 'pending-upload' || 
+                cleanUrl === 'http://archive.org' ||
+                cleanUrl === 'https://archive.org' ||
+                cleanUrl.length < 20) {
+                console.log('⚠️ Invalid video URL detected:', url);
+                return false;
+            }
+            return true;
+        }
+        
+        // Convert Archive.org URL to embed URL with minimal UI
+        function getArchiveOrgEmbedUrl(url) {
+            if (!url) return null;
+            
+            let embedUrl = url;
+            
+            // Already an embed URL
+            if (url.includes('archive.org/embed/')) {
+                embedUrl = url;
+            }
+            // Convert details URL to embed
+            else if (url.includes('archive.org/details/')) {
+                embedUrl = url.replace('/details/', '/embed/');
+            }
+            // Convert download URL to embed (extract item ID)
+            else if (url.includes('archive.org/download/')) {
+                const match = url.match(/archive\.org\/download\/([^\/]+)/);
+                if (match) {
+                    embedUrl = `https://archive.org/embed/${match[1]}`;
+                }
+            }
+            
+            // Add parameters to hide Archive.org branding and account links
+            // ui=min - minimal UI, playlist=0 - no playlist, autoplay=1
+            const separator = embedUrl.includes('?') ? '&' : '?';
+            embedUrl += `${separator}ui=min&playlist=0&autoplay=1&output=embed`;
+            
+            return embedUrl;
+        }
 
         // Initialize Plyr only for native video
         function initPlyr() {
@@ -1262,28 +1951,68 @@
         async function loadMovieData() {
             try {
                 if (movieId) {
+                    console.log('🎬 Loading movie data for ID:', movieId);
+                    
                     const apiUrl = typeof API_CONFIG !== 'undefined' 
                         ? API_CONFIG.BASE_URL 
                         : 'https://luganda-translated-movies-production.up.railway.app';
                     
+                    console.log('📡 API URL:', `${apiUrl}/api/luganda-movies/${movieId}`);
+                    
                     const response = await fetch(`${apiUrl}/api/luganda-movies/${movieId}`);
                     const data = await response.json();
                     
-                    if (data.status === 'success' && data.data) {
+                    console.log('📦 API Response:', data);
+                    
+                    if ((data.status === 'success' || data.success === true) && data.data) {
                         const movie = data.data;
+                        console.log('🎥 Movie data:', movie);
                         updateMovieInfo(movie);
                         
-                        // Check for embed URL first (Streamtape, etc.)
-                        if (movie.video?.embedUrl || movie.video?.streamtapeId) {
-                            const embedSrc = movie.video.embedUrl || 
-                                `https://streamtape.com/e/${movie.video.streamtapeId}`;
+                        // Get embed URL from either location
+                        let videoUrl = movie.embedUrl || movie.video?.embedUrl || movie.video?.url;
+                        const streamtapeId = movie.video?.streamtapeId;
+                        
+                        // Clean up URL if it exists
+                        if (videoUrl) {
+                            videoUrl = videoUrl.trim().replace(/\s+/g, '');
+                        }
+                        
+                        console.log('🎬 Video URL:', videoUrl);
+                        
+                        // Check if video URL is valid
+                        if (!isValidVideoUrl(videoUrl) && !streamtapeId) {
+                            console.log('⚠️ No valid video URL available for this movie');
+                            showVideoUnavailable(movie.originalTitle);
+                            loadRelatedMovies(movie.genres?.[0] || 'action');
+                            return;
+                        }
+                        
+                        // Check if it's an Archive.org URL (use their embed player - works for MKV!)
+                        if (videoUrl && isArchiveOrgUrl(videoUrl)) {
+                            console.log('📦 Archive.org URL detected, using embed player');
+                            const archiveEmbedUrl = getArchiveOrgEmbedUrl(videoUrl);
+                            loadArchiveOrgEmbed(archiveEmbedUrl);
+                        }
+                        // Check if it's a direct playable URL (MP4, WebM only)
+                        else if (videoUrl && isDirectVideoUrl(videoUrl)) {
+                            console.log('✅ Direct video URL detected, playing directly');
+                            loadVideoSource(videoUrl);
+                        }
+                        // Check for embed URL (Streamtape, etc.)
+                        else if (videoUrl || streamtapeId) {
+                            const embedSrc = videoUrl || 
+                                `https://streamtape.com/e/${streamtapeId}`;
                             loadEmbedVideo(embedSrc);
                         } else {
                             // Fall back to direct video URL
-                            loadVideoSource(movie.video?.url || movie.video?.originalVideoPath || movie.streamUrl);
+                            loadVideoSource(movie.video?.originalVideoPath || movie.streamUrl);
                         }
                         
                         loadRelatedMovies(movie.genres?.[0] || 'action');
+                    } else {
+                        console.error('❌ API returned error or no data:', data);
+                        document.getElementById('movieDescription').textContent = 'Unable to load movie description. Please try refreshing the page.';
                     }
                 } else if (embedUrl) {
                     // Direct embed URL from query param
@@ -1293,24 +2022,60 @@
                     loadVideoSource(streamUrl);
                     document.getElementById('movieTitle').textContent = urlParams.get('movie') || urlParams.get('station') || 'Now Playing';
                     loadingOverlay.style.display = 'none';
+                    // Hide trailer button for direct streams/TV
+                    const trailerBtn = document.getElementById('trailerBtn');
+                    if (trailerBtn) trailerBtn.style.display = 'none';
                 } else {
-                    // Demo video for testing
-                    loadVideoSource('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
-                    document.getElementById('movieTitle').textContent = 'Demo Video - Big Buck Bunny';
-                    document.getElementById('movieDescription').textContent = 'Big Buck Bunny is a short computer-animated comedy film featuring animals of the forest. This is a demo video to test the player functionality.';
-                    loadingOverlay.style.display = 'none';
+                    // No movie ID or stream URL - show unavailable message
+                    showVideoUnavailable('Unknown');
                 }
             } catch (error) {
-                console.error('Error loading movie:', error);
-                loadingOverlay.style.display = 'none';
-                // Load demo video on error
-                loadVideoSource('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
-                document.getElementById('movieTitle').textContent = 'Demo Video';
+                console.error('❌ Error loading movie:', error);
+                showVideoUnavailable('this movie');
             }
         }
 
-        // Load embed video (Streamtape, etc.)
-        function loadEmbedVideo(url) {
+        // Load embed video (Streamtape, etc.) - Try ad-free extraction first
+        async function loadEmbedVideo(url) {
+            console.log('🎬 Loading video from:', url);
+            
+            // First, try to extract direct video URL (ad-free)
+            try {
+                const extractResponse = await fetch(`${API_BASE}/video/extract`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url })
+                });
+                
+                const extractData = await extractResponse.json();
+                console.log('📦 Extraction result:', extractData);
+                
+                if (extractData.success && extractData.directUrl) {
+                    console.log('✅ Direct URL extracted! Playing ad-free.');
+                    
+                    // Use our own player with the direct URL
+                    isEmbedMode = false;
+                    embedContainer.style.display = 'none';
+                    video.style.display = 'block';
+                    
+                    // Check if it's HLS or direct MP4
+                    if (extractData.type === 'hls' || extractData.directUrl.includes('.m3u8')) {
+                        loadHLSSource(extractData.directUrl);
+                    } else {
+                        // For direct URLs that might have CORS issues, use proxy
+                        const proxyUrl = `${API_BASE}/video/proxy?url=${encodeURIComponent(extractData.directUrl)}`;
+                        loadVideoSource(proxyUrl);
+                    }
+                    
+                    loadingOverlay.style.display = 'none';
+                    return;
+                }
+            } catch (error) {
+                console.warn('⚠️ Direct extraction failed, falling back to iframe:', error.message);
+            }
+            
+            // Fallback: Use iframe embed (has ads)
+            console.log('📺 Using iframe embed (fallback)');
             isEmbedMode = true;
             
             // Hide native player, show embed container
@@ -1333,8 +2098,129 @@
             setTimeout(() => {
                 loadingOverlay.style.display = 'none';
             }, 3000);
+        }
+
+        // Load Archive.org embed (works for MKV and all formats, NO ADS!)
+        function loadArchiveOrgEmbed(url) {
+            console.log('📦 Loading Archive.org embed:', url);
+            isEmbedMode = true;
             
-            console.log('📺 Playing embed video:', url);
+            // Extract the original Archive.org URL for fallback
+            let originalArchiveUrl = url;
+            if (url.includes('/embed/')) {
+                originalArchiveUrl = url.replace('/embed/', '/details/').split('?')[0];
+            }
+            
+            // Hide native player, show embed container
+            video.style.display = 'none';
+            if (player) {
+                player.destroy();
+                player = null;
+            }
+            embedContainer.style.display = 'block';
+            
+            // Set the Archive.org embed URL
+            embedPlayer.src = url;
+            
+            // Listen for iframe load
+            embedPlayer.onload = () => {
+                console.log('✅ Archive.org iframe loaded');
+                loadingOverlay.style.display = 'none';
+                
+                // Check for embedding error after a short delay
+                setTimeout(() => {
+                    checkForEmbedError(originalArchiveUrl);
+                }, 1500);
+            };
+            
+            // Also check for error on iframe error event
+            embedPlayer.onerror = () => {
+                console.log('❌ Archive.org embed failed');
+                showEmbedErrorFallback(originalArchiveUrl);
+            };
+            
+            // Fallback hide loading after timeout
+            setTimeout(() => {
+                loadingOverlay.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Check if embed shows error (embedding disabled)
+        function checkForEmbedError(originalUrl) {
+            // We can't access iframe content due to cross-origin, so provide a manual option
+            // Add a "Not working?" button below the player
+            addEmbedFallbackButton(originalUrl);
+        }
+        
+        // Add fallback button for embed issues - DISABLED
+        function addEmbedFallbackButton(originalUrl) {
+            // Button removed - users will use direct video player
+            console.log('Embed fallback button disabled');
+        }
+        
+        // Show embed error fallback UI
+        function showEmbedErrorFallback(originalUrl) {
+            loadingOverlay.style.display = 'none';
+            embedContainer.innerHTML = `
+                <div style="
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100%;
+                    min-height: 300px;
+                    background: #0a0a0a;
+                    padding: 40px 20px;
+                    text-align: center;
+                ">
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="1.5" style="margin-bottom: 20px;">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/>
+                        <line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>
+                    <h3 style="color: #fff; font-size: 18px; margin-bottom: 10px;">Video Unavailable</h3>
+                    <p style="color: #888; font-size: 14px; margin-bottom: 25px; max-width: 400px;">
+                        This video is temporarily unavailable. Please try another movie or check back later.
+                    </p>
+                </div>
+            `;
+        }
+
+        // Load HLS source
+        function loadHLSSource(url) {
+            if (Hls.isSupported()) {
+                const hls = new Hls({
+                    maxBufferLength: 30,
+                    maxMaxBufferLength: 60
+                });
+                hls.loadSource(url);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    initPlayer();
+                    loadingOverlay.style.display = 'none';
+                });
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    console.error('HLS error:', data);
+                    if (data.fatal) {
+                        // Fallback to iframe on HLS error
+                        loadEmbedFallback(url);
+                    }
+                });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url;
+                initPlayer();
+                loadingOverlay.style.display = 'none';
+            }
+        }
+
+        // Fallback to iframe embed
+        function loadEmbedFallback(originalUrl) {
+            console.log('📺 Falling back to iframe embed');
+            isEmbedMode = true;
+            video.style.display = 'none';
+            embedContainer.style.display = 'block';
+            embedPlayer.src = originalUrl;
+            loadingOverlay.style.display = 'none';
         }
 
         // Convert Streamtape URL to embed URL
@@ -1391,6 +2277,59 @@
             }
             if (movie.vjAvatar) {
                 document.getElementById('vjAvatar').src = movie.vjAvatar;
+            }
+            
+            // Setup trailer button if movie has TMDB ID (hide for TV stations)
+            const trailerBtn = document.getElementById('trailerBtn');
+            
+            // Hide trailer button for TV stations
+            if (isStation || isSeries) {
+                if (trailerBtn) {
+                    trailerBtn.style.display = 'none';
+                }
+            } else {
+                // For movies, setup trailer functionality
+                const tmdbId = movie.tmdbId || movie.metaData?.tmdbId || movie.externalIds?.tmdbId || movie.tmdb_id;
+                console.log('🎬 Trailer setup - TMDB ID:', tmdbId, 'Movie data:', movie);
+                
+                if (trailerBtn) {
+                    if (tmdbId) {
+                        trailerBtn.style.display = 'flex';
+                        trailerBtn.disabled = false;
+                        trailerBtn.classList.remove('disabled');
+                        trailerBtn.onclick = async () => {
+                            console.log('🎬 Trailer button clicked, TMDB ID:', tmdbId);
+                            trailerBtn.disabled = true;
+                            trailerBtn.innerHTML = `
+                                <svg class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;">
+                                    <circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="12"></circle>
+                                </svg>
+                                Loading...
+                            `;
+                            
+                            try {
+                                if (typeof trailerPlayer !== 'undefined' && trailerPlayer) {
+                                    await trailerPlayer.playTrailer(tmdbId, movie.originalTitle || movie.title);
+                                } else {
+                                    throw new Error('TrailerPlayer not initialized');
+                                }
+                            } catch (error) {
+                                console.error('Error playing trailer:', error);
+                                showNotification('Trailer not available for this movie', 'error');
+                            } finally {
+                                trailerBtn.disabled = false;
+                                trailerBtn.innerHTML = `
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                    </svg>
+                                    Watch Trailer
+                                `;
+                            }
+                        };
+                    } else {
+                        trailerBtn.style.display = 'none';
+                    }
+                }
             }
             
             // Show episodes section for series
@@ -1453,16 +2392,67 @@
                     });
                 }
             } else {
-                // Regular video file
+                // Regular video file (MP4, MKV, WebM, etc.)
+                console.log('🎬 Loading video file:', url);
+                
                 video.src = url;
                 video.addEventListener('loadedmetadata', () => {
+                    console.log('✅ Video loaded successfully');
                     loadingOverlay.style.display = 'none';
                 });
-                video.addEventListener('error', () => {
+                video.addEventListener('canplay', () => {
+                    console.log('✅ Video can play');
                     loadingOverlay.style.display = 'none';
-                    console.error('Video load error');
+                });
+                video.addEventListener('error', (e) => {
+                    loadingOverlay.style.display = 'none';
+                    console.error('❌ Video load error:', e);
+                    
+                    // Check if it's a format issue (MKV not supported in some browsers)
+                    const urlLower = url.toLowerCase();
+                    if (urlLower.includes('.mkv')) {
+                        // Show helpful message for MKV files
+                        showVideoError('MKV format may not be supported in this browser. Try using Chrome/Edge, or download the video to watch locally.', url);
+                    } else {
+                        showVideoError('Error loading video. The file may be unavailable or your browser may not support this format.', url);
+                    }
                 });
             }
+        }
+        
+        // Show video error with download option
+        function showVideoError(message, downloadUrl) {
+            const videoContainer = document.querySelector('.video-wrapper');
+            if (!videoContainer) return;
+            
+            // Create error overlay
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'video-error-overlay';
+            errorDiv.innerHTML = `
+                <div style="text-align: center; padding: 40px; background: rgba(0,0,0,0.9); border-radius: 10px; max-width: 500px;">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="2" style="margin-bottom: 20px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <h3 style="color: #fff; margin-bottom: 15px;">Video Playback Issue</h3>
+                    <p style="color: #ccc; margin-bottom: 20px; line-height: 1.6;">${message}</p>
+                    ${downloadUrl ? `
+                        <a href="${downloadUrl}" download class="btn-admin" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Download Video
+                        </a>
+                    ` : ''}
+                </div>
+            `;
+            errorDiv.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; z-index: 100;';
+            
+            videoContainer.style.position = 'relative';
+            videoContainer.appendChild(errorDiv);
         }
 
         // Load episodes for series
@@ -1514,10 +2504,10 @@
             
             try {
                 const apiUrl = typeof API_CONFIG !== 'undefined' 
-                    ? API_CONFIG.API_URL 
+                    ? API_CONFIG.BASE_URL 
                     : 'https://luganda-translated-movies-production.up.railway.app';
                 
-                const response = await fetch(`${apiUrl}/api/luganda-movies?limit=8`);
+                const response = await fetch(`${apiUrl}/api/luganda-movies/latest?limit=8`);
                 const data = await response.json();
                 
                 if (data.status === 'success' && data.data) {
@@ -1598,96 +2588,565 @@
             }
         });
 
-        // Initialize
-        loadMovieData();
+        // Like button functionality
+        const likeBtn = document.getElementById('likeBtn');
+        let isLiked = localStorage.getItem(`liked_${movieId}`) === 'true';
+        
+        // Update like button initial state
+        function updateLikeButton() {
+            likeBtn.innerHTML = isLiked ? `
+                <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                Liked
+            ` : `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                Like
+            `;
+            likeBtn.classList.toggle('liked', isLiked);
+        }
+        
+        updateLikeButton();
+        
+        likeBtn.addEventListener('click', () => {
+            isLiked = !isLiked;
+            localStorage.setItem(`liked_${movieId}`, isLiked);
+            updateLikeButton();
+            
+            // Visual feedback
+            likeBtn.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                likeBtn.style.transform = 'scale(1)';
+            }, 150);
+        });
 
-        // ============================================
-        // PRE-ROLL AD SYSTEM
-        // ============================================
-        const prerollAdOverlay = document.getElementById('prerollAdOverlay');
-        const skipAdBtn = document.getElementById('skipAdBtn');
-        const skipCountdown = document.getElementById('skipCountdown');
-        const adCountdown = document.getElementById('adCountdown');
-        const adContent = document.getElementById('adContent');
+        // Wait for trailer player to be ready
+        function waitForTrailerPlayer(callback, maxRetries = 10) {
+            if (typeof trailerPlayer !== 'undefined' && trailerPlayer) {
+                callback();
+            } else if (maxRetries > 0) {
+                setTimeout(() => waitForTrailerPlayer(callback, maxRetries - 1), 100);
+            } else {
+                console.warn('TrailerPlayer not available after retries');
+                callback(); // Continue anyway
+            }
+        }
+
+        // Initialize
+        waitForTrailerPlayer(() => {
+            console.log('✅ TrailerPlayer ready, loading movie data...');
+            loadMovieData();
+        });
         
-        let adSkipTime = 10; // Seconds before skip is available
-        let adTotalTime = 15; // Total ad duration (user can skip after 10s or wait 15s)
-        let adTimer = null;
-        let skipTimer = null;
-        let adShown = false;
+        // Load comments when movie is loaded
+        if (movieId) {
+            loadComments(movieId);
+            setupCommentForm();
+        }
+
+        // ===================================
+        // Quality Selector
+        // ===================================
         
-        // Initialize pre-roll ad
-        function initPrerollAd() {
-            // Check if ad was already shown this session for this movie
-            const adShownKey = `ad_shown_${movieId}`;
-            if (sessionStorage.getItem(adShownKey)) {
-                hidePrerollAd();
+        let currentQuality = localStorage.getItem('preferredQuality') || 'auto';
+        
+        // Setup quality selector (must be after currentQuality declaration)
+        setupQualitySelector();
+        
+        function setupQualitySelector() {
+            const qualityBtn = document.getElementById('qualityBtn');
+            const qualityDropdown = document.getElementById('qualityDropdown');
+            const qualitySelector = document.getElementById('qualitySelector');
+            const currentQualityEl = document.getElementById('currentQuality');
+            
+            if (!qualityBtn || !qualityDropdown) return;
+            
+            // Set initial quality display
+            if (currentQualityEl) {
+                currentQualityEl.textContent = currentQuality === 'auto' ? 'Auto' : currentQuality;
+            }
+            
+            // Mark current quality as active
+            const options = qualityDropdown.querySelectorAll('.quality-option');
+            options.forEach(opt => {
+                if (opt.dataset.quality === currentQuality) {
+                    opt.classList.add('active');
+                }
+            });
+            
+            // Toggle dropdown
+            qualityBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                qualitySelector.classList.toggle('open');
+            });
+            
+            // Quality option click
+            options.forEach(option => {
+                option.addEventListener('click', () => {
+                    const quality = option.dataset.quality;
+                    
+                    // Update UI
+                    options.forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                    
+                    if (currentQualityEl) {
+                        currentQualityEl.textContent = quality === 'auto' ? 'Auto' : quality;
+                    }
+                    
+                    // Save preference
+                    currentQuality = quality;
+                    localStorage.setItem('preferredQuality', quality);
+                    
+                    // Apply quality change
+                    applyQuality(quality);
+                    
+                    // Close dropdown
+                    qualitySelector.classList.remove('open');
+                    
+                    showNotification(`Quality set to ${quality === 'auto' ? 'Auto' : quality}`, 'success');
+                });
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!qualitySelector.contains(e.target)) {
+                    qualitySelector.classList.remove('open');
+                }
+            });
+        }
+        
+        function applyQuality(quality) {
+            // Apply quality to HLS player if available
+            if (typeof Hls !== 'undefined' && window.hlsInstance) {
+                const hls = window.hlsInstance;
+                
+                if (quality === 'auto') {
+                    hls.currentLevel = -1; // Auto
+                } else {
+                    // Find matching level
+                    const targetHeight = parseInt(quality);
+                    const levels = hls.levels || [];
+                    
+                    for (let i = 0; i < levels.length; i++) {
+                        if (levels[i].height === targetHeight || levels[i].height <= targetHeight) {
+                            hls.currentLevel = i;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // For Plyr player
+            if (player && player.quality !== undefined) {
+                if (quality !== 'auto') {
+                    const qualityValue = parseInt(quality);
+                    player.quality = qualityValue;
+                }
+            }
+            
+            console.log(`📺 Quality set to: ${quality}`);
+        }
+
+        // ===================================
+        // Comments System
+        // ===================================
+        
+        // Load comments from localStorage (or API when available)
+        async function loadComments(movieId) {
+            const loadingEl = document.getElementById('commentsLoading');
+            const noCommentsEl = document.getElementById('noComments');
+            const commentsListEl = document.getElementById('commentsList');
+            const loadMoreBtn = document.getElementById('loadMoreComments');
+            const commentCountEl = document.getElementById('commentCount');
+            
+            try {
+                // Try to load from API first
+                const apiUrl = typeof API_CONFIG !== 'undefined' 
+                    ? API_CONFIG.BASE_URL 
+                    : 'https://luganda-translated-movies-production.up.railway.app';
+                
+                try {
+                    const response = await fetch(`${apiUrl}/api/comments/movie/${movieId}?page=${commentsPage}&limit=${commentsPerPage}`);
+                    const data = await response.json();
+                    
+                    if (data.status === 'success' && data.data?.comments) {
+                        allComments = data.data.comments;
+                        commentCountEl.textContent = `${data.data.pagination?.total || allComments.length} comments`;
+                    }
+                } catch (apiError) {
+                    console.log('Comments API not available, using localStorage');
+                    // Load from localStorage as fallback
+                    const localComments = JSON.parse(localStorage.getItem(`comments_${movieId}`) || '[]');
+                    allComments = localComments;
+                    commentCountEl.textContent = `${allComments.length} comments`;
+                }
+                
+                if (loadingEl) loadingEl.style.display = 'none';
+                
+                if (allComments.length === 0) {
+                    if (noCommentsEl) noCommentsEl.style.display = 'flex';
+                    return;
+                }
+                
+                if (noCommentsEl) noCommentsEl.style.display = 'none';
+                renderComments(allComments);
+                
+            } catch (error) {
+                console.error('Error loading comments:', error);
+                if (loadingEl) loadingEl.style.display = 'none';
+                if (noCommentsEl) noCommentsEl.style.display = 'flex';
+            }
+        }
+        
+        // Render comments to the page
+        function renderComments(comments) {
+            const listEl = document.getElementById('commentsList');
+            if (!listEl) return;
+            
+            // Clear loading and no comments elements
+            const loadingEl = listEl.querySelector('.comments-loading');
+            const noCommentsEl = listEl.querySelector('.no-comments');
+            if (loadingEl) loadingEl.style.display = 'none';
+            if (noCommentsEl) noCommentsEl.style.display = 'none';
+            
+            // Remove existing comments
+            listEl.querySelectorAll('.comment-item').forEach(el => el.remove());
+            
+            comments.forEach(comment => {
+                const commentEl = createCommentElement(comment);
+                listEl.appendChild(commentEl);
+            });
+        }
+        
+        // Create a comment element
+        function createCommentElement(comment) {
+            const div = document.createElement('div');
+            div.className = 'comment-item';
+            div.dataset.id = comment.id || comment._id;
+            
+            const avatar = comment.user?.avatar || comment.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.user?.name || comment.author || 'user'}`;
+            const author = comment.user?.fullName || comment.user?.name || comment.author || 'Anonymous';
+            const date = comment.createdAt ? formatTimeAgo(new Date(comment.createdAt)) : 'Just now';
+            const rating = comment.rating || 0;
+            const likes = comment.likeCount || comment.likes?.length || 0;
+            const isLiked = comment.userLiked || localStorage.getItem(`comment_liked_${comment.id || comment._id}`) === 'true';
+            const isAdmin = comment.user?.role === 'admin';
+            
+            // Admin badge HTML with crown icon
+            const adminBadgeHtml = isAdmin ? `
+                <span class="admin-badge">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/>
+                    </svg>
+                    Admin
+                </span>
+            ` : '';
+            
+            div.innerHTML = `
+                <div class="comment-avatar">
+                    <img src="${avatar}" alt="${author}">
+                </div>
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <span class="comment-author">${author}</span>
+                        ${adminBadgeHtml}
+                        ${rating > 0 ? `
+                        <div class="comment-rating">
+                            ${Array(5).fill(0).map((_, i) => `<span class="star">${i < rating ? '★' : '☆'}</span>`).join('')}
+                        </div>
+                        ` : ''}
+                        <span class="comment-date">${date}</span>
+                    </div>
+                    <p class="comment-text">${escapeHtml(comment.content || comment.text)}</p>
+                    <div class="comment-actions-row">
+                        <button class="comment-action-btn ${isLiked ? 'liked' : ''}" onclick="toggleCommentLike('${comment.id || comment._id}')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                            </svg>
+                            <span>${likes}</span>
+                        </button>
+                        <button class="comment-action-btn" onclick="replyToComment('${comment.id || comment._id}', '${author}')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            Reply
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return div;
+        }
+        
+        // Setup comment form interactions
+        function setupCommentForm() {
+            const input = document.getElementById('commentInput');
+            const actions = document.getElementById('commentActions');
+            const cancelBtn = document.getElementById('cancelComment');
+            const submitBtn = document.getElementById('submitComment');
+            const avatarEl = document.getElementById('commentUserAvatar');
+            
+            console.log('📝 Setting up comment form:', { input, actions, cancelBtn, submitBtn });
+            
+            // Show actions when input is focused
+            if (input) {
+                input.addEventListener('focus', () => {
+                    if (actions) actions.style.display = 'flex';
+                    input.rows = 3;
+                });
+                
+                // Auto-resize textarea
+                input.addEventListener('input', () => {
+                    input.style.height = 'auto';
+                    input.style.height = Math.min(input.scrollHeight, 150) + 'px';
+                });
+                
+                // Submit on Ctrl+Enter
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                        e.preventDefault();
+                        submitComment();
+                    }
+                });
+            }
+            
+            // Cancel button
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    if (input) {
+                        input.value = '';
+                        input.rows = 1;
+                        input.style.height = 'auto';
+                    }
+                    if (actions) actions.style.display = 'none';
+                    // Clear rating
+                    document.querySelectorAll('.star-rating-input input').forEach(r => r.checked = false);
+                });
+            }
+            
+            // Submit button
+            if (submitBtn) {
+                submitBtn.addEventListener('click', () => submitComment());
+            }
+            
+            // Update avatar if user is logged in
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (user.picture && avatarEl) {
+                avatarEl.innerHTML = `<img src="${user.picture}" alt="${user.name || 'User'}">`;
+            }
+        }
+        
+        // Submit a new comment
+        async function submitComment() {
+            console.log('📝 submitComment called');
+            const input = document.getElementById('commentInput');
+            const content = input?.value.trim();
+            
+            console.log('📝 Comment content:', content);
+            
+            if (!content) {
+                showNotification('Please write a comment', 'error');
                 return;
             }
             
-            // Show the ad overlay
-            prerollAdOverlay.classList.remove('hidden');
+            // Get selected rating
+            const ratingInput = document.querySelector('.star-rating-input input:checked');
+            const rating = ratingInput ? parseInt(ratingInput.value) : 0;
+            console.log('📝 Rating:', rating);
             
-            // Start the skip countdown
-            let skipTimeLeft = adSkipTime;
-            let totalTimeLeft = adTotalTime;
+            // Get user info
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const token = localStorage.getItem('token');
             
-            skipTimer = setInterval(() => {
-                skipTimeLeft--;
-                skipCountdown.textContent = skipTimeLeft;
-                
-                if (skipTimeLeft <= 0) {
-                    clearInterval(skipTimer);
-                    skipAdBtn.disabled = false;
-                    skipAdBtn.innerHTML = `
-                        Skip Ad
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="5 4 15 12 5 20 5 4"></polygon>
-                            <line x1="19" y1="5" x2="19" y2="19"></line>
-                        </svg>
-                    `;
+            const newComment = {
+                id: 'comment_' + Date.now(),
+                movieId: movieId,
+                author: user.name || 'Guest User',
+                avatar: user.picture || null,
+                content: content,
+                rating: rating,
+                createdAt: new Date().toISOString(),
+                likes: [],
+                likeCount: 0
+            };
+            
+            try {
+                // Try to save to API first
+                if (token) {
+                    const apiUrl = typeof API_CONFIG !== 'undefined' 
+                        ? API_CONFIG.BASE_URL 
+                        : 'https://luganda-translated-movies-production.up.railway.app';
+                    
+                    const response = await fetch(`${apiUrl}/api/comments`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            movieId: movieId,
+                            content: content,
+                            rating: rating
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        newComment.id = data.data?.comment?._id || newComment.id;
+                    }
                 }
-            }, 1000);
+            } catch (error) {
+                console.log('API not available, saving locally');
+            }
             
-            // Ad total duration countdown
-            adTimer = setInterval(() => {
-                totalTimeLeft--;
-                adCountdown.textContent = totalTimeLeft;
-                
-                if (totalTimeLeft <= 0) {
-                    clearInterval(adTimer);
-                    hidePrerollAd();
-                }
-            }, 1000);
+            // Save to localStorage as backup
+            const localComments = JSON.parse(localStorage.getItem(`comments_${movieId}`) || '[]');
+            localComments.unshift(newComment);
+            localStorage.setItem(`comments_${movieId}`, JSON.stringify(localComments));
             
-            // Mark ad as shown for this movie
-            sessionStorage.setItem(adShownKey, 'true');
+            // Add to display
+            allComments.unshift(newComment);
+            
+            // Hide no comments message
+            const noCommentsEl = document.getElementById('noComments');
+            if (noCommentsEl) noCommentsEl.style.display = 'none';
+            
+            // Render the new comment
+            const listEl = document.getElementById('commentsList');
+            const commentEl = createCommentElement(newComment);
+            const firstComment = listEl.querySelector('.comment-item');
+            if (firstComment) {
+                listEl.insertBefore(commentEl, firstComment);
+            } else {
+                listEl.appendChild(commentEl);
+            }
+            
+            // Update count
+            const countEl = document.getElementById('commentCount');
+            if (countEl) {
+                countEl.textContent = `${allComments.length} comments`;
+            }
+            
+            // Clear form
+            input.value = '';
+            input.rows = 1;
+            input.style.height = 'auto';
+            document.getElementById('commentActions').style.display = 'none';
+            document.querySelectorAll('.star-rating-input input').forEach(r => r.checked = false);
+            
+            // Show success feedback
+            showNotification('Comment posted successfully!', 'success');
         }
         
-        // Hide pre-roll ad and start video
-        function hidePrerollAd() {
-            clearInterval(skipTimer);
-            clearInterval(adTimer);
-            prerollAdOverlay.classList.add('hidden');
-            adShown = true;
+        // Toggle comment like
+        function toggleCommentLike(commentId) {
+            const isLiked = localStorage.getItem(`comment_liked_${commentId}`) === 'true';
+            localStorage.setItem(`comment_liked_${commentId}`, !isLiked);
             
-            // Auto-play video after ad (if not embed mode)
-            if (!isEmbedMode && video && video.src) {
-                video.play().catch(e => console.log('Autoplay prevented'));
+            // Update UI
+            const btn = document.querySelector(`.comment-item[data-id="${commentId}"] .comment-action-btn`);
+            if (btn) {
+                btn.classList.toggle('liked');
+                const countSpan = btn.querySelector('span');
+                if (countSpan) {
+                    const currentCount = parseInt(countSpan.textContent) || 0;
+                    countSpan.textContent = isLiked ? Math.max(0, currentCount - 1) : currentCount + 1;
+                }
             }
         }
         
-        // Skip button click
-        skipAdBtn.addEventListener('click', () => {
-            if (!skipAdBtn.disabled) {
-                hidePrerollAd();
+        // Reply to comment
+        function replyToComment(commentId, author) {
+            const input = document.getElementById('commentInput');
+            if (input) {
+                input.value = `@${author} `;
+                input.focus();
+                document.getElementById('commentActions').style.display = 'flex';
             }
-        });
+        }
         
-        // Initialize ad when page loads (after slight delay)
-        setTimeout(() => {
-            initPrerollAd();
-        }, 500);
+        // Helper: Format time ago
+        function formatTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            const intervals = {
+                year: 31536000,
+                month: 2592000,
+                week: 604800,
+                day: 86400,
+                hour: 3600,
+                minute: 60
+            };
+            
+            for (const [unit, secondsInUnit] of Object.entries(intervals)) {
+                const interval = Math.floor(seconds / secondsInUnit);
+                if (interval >= 1) {
+                    return `${interval} ${unit}${interval > 1 ? 's' : ''} ago`;
+                }
+            }
+            return 'Just now';
+        }
+        
+        // Helper: Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Helper: Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? 'var(--primary-color)' : type === 'error' ? '#FF6B6B' : 'var(--background-light)'};
+                color: ${type === 'success' ? '#000' : '#fff'};
+                padding: 15px 20px;
+                border-radius: 10px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                max-width: 300px;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Save watch progress to localStorage for Continue Watching feature
+        function saveWatchProgress(currentTime, duration) {
+            if (!movieId || !duration) return;
+            
+            const percentage = (currentTime / duration) * 100;
+            const watchProgress = JSON.parse(localStorage.getItem('watchProgress') || '{}');
+            
+            watchProgress[movieId] = {
+                currentTime: currentTime,
+                duration: duration,
+                percentage: percentage,
+                lastWatched: new Date().toISOString(),
+                title: document.getElementById('movieTitle')?.textContent || 'Unknown',
+                poster: document.getElementById('moviePoster')?.src || ''
+            };
+            
+            localStorage.setItem('watchProgress', JSON.stringify(watchProgress));
+        }
+        
+        // Track video progress for Continue Watching
+        if (video) {
+            video.addEventListener('timeupdate', () => {
+                if (video.duration && video.currentTime) {
+                    saveWatchProgress(video.currentTime, video.duration);
+                }
+            });
+        }
 
         // Service Worker Registration
         if ('serviceWorker' in navigator) {
@@ -1696,5 +3155,8 @@
             });
         }
     </script>
+    
+    <!-- System Notification -->
+    <script src="js/system-notification.js"></script>
 </body>
 </html>

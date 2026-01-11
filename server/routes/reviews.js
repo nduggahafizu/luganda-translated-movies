@@ -2,7 +2,43 @@ const express = require('express');
 const router = express.Router();
 const Review = require('../models/Review');
 const LugandaMovie = require('../models/LugandaMovie');
-const { protect, optionalAuth } = require('../middleware/auth');
+const { protect, optionalAuth, admin } = require('../middleware/auth');
+
+// GET all reviews (admin only)
+router.get('/', protect, admin, async (req, res) => {
+    try {
+        const { page = 1, limit = 20, status = 'all' } = req.query;
+        
+        let query = {};
+        if (status !== 'all') {
+            query.status = status;
+        }
+        
+        const reviews = await Review.find(query)
+            .populate('user', 'fullName profileImage email')
+            .populate('movie', 'originalTitle poster')
+            .sort({ createdAt: -1 })
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .lean();
+        
+        const total = await Review.countDocuments(query);
+        
+        res.json({
+            status: 'success',
+            data: reviews,
+            pagination: {
+                page: parseInt(page),
+                limit: parseInt(limit),
+                total,
+                pages: Math.ceil(total / limit)
+            }
+        });
+    } catch (error) {
+        console.error('Get all reviews error:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to fetch reviews' });
+    }
+});
 
 // Get reviews for a movie
 router.get('/movie/:movieId', optionalAuth, async (req, res) => {

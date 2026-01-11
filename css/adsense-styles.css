@@ -1,0 +1,154 @@
+/* ===================================
+   Professional AdSense Styling
+   Ensures ads blend seamlessly with design
+   =================================== */
+
+/* Ad Container Styling */
+.ad-container {
+    margin: 40px 0;
+    padding: 20px;
+    background: linear-gradient(145deg, rgba(124, 252, 0, 0.02) 0%, rgba(0, 217, 255, 0.02) 100%);
+    border: 1px solid rgba(124, 252, 0, 0.1);
+    border-radius: 16px;
+    text-align: center;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .ad-container {
+        margin: 30px 0;
+        padding: 15px;
+    }
+}
+
+/* Ad Label (optional - remove if not allowed by AdSense) */
+.ad-label {
+    display: block;
+    font-size: 10px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    opacity: 0.6;
+}
+
+/* Responsive Ad Sizing */
+.adsbygoogle {
+    display: block;
+    min-width: 100%;
+    max-width: 100%;
+}
+
+/* In-Article Ads (between sections) */
+.ad-in-article {
+    margin: 50px auto;
+    max-width: 728px;
+}
+
+@media (max-width: 768px) {
+    .ad-in-article {
+        margin: 30px auto;
+    }
+}
+
+/* Sidebar Ads (if you add sidebar later) */
+.ad-sidebar {
+    position: sticky;
+    top: 80px;
+    margin-bottom: 30px;
+}
+
+/* Footer Ads */
+.ad-footer {
+    margin: 40px 0 0 0;
+    padding-top: 40px;
+    border-top: 1px solid rgba(124, 252, 0, 0.1);
+}
+
+/* Hero Ad (before content) */
+.ad-hero {
+    margin: 20px 0 40px 0;
+}
+
+@media (max-width: 768px) {
+    .ad-hero {
+        margin: 15px 0 30px 0;
+    }
+}
+
+/* Prevent layout shift while ads load */
+.ad-container ins.adsbygoogle {
+    min-height: 90px;
+    background: transparent;
+}
+
+@media (min-width: 768px) {
+    .ad-container ins.adsbygoogle {
+        min-height: 250px;
+    }
+}
+
+/* Mobile-specific ad styling */
+@media (max-width: 480px) {
+    .ad-container {
+        padding: 10px;
+        border-radius: 12px;
+    }
+    
+    .ad-container ins.adsbygoogle {
+        min-height: 50px;
+    }
+}
+
+/* Prevent ads from breaking layout */
+.ad-container ins.adsbygoogle[data-ad-status="filled"] {
+    display: block !important;
+}
+
+/* Loading state for ads */
+.ad-container:empty::before {
+    content: 'Loading advertisement...';
+    color: var(--text-secondary);
+    font-size: 12px;
+    opacity: 0.5;
+}
+
+/* Professional spacing between content and ads */
+.movie-section + .ad-container {
+    margin-top: 60px;
+}
+
+.ad-container + .movie-section {
+    margin-top: 60px;
+}
+
+@media (max-width: 768px) {
+    .movie-section + .ad-container {
+        margin-top: 40px;
+    }
+    
+    .ad-container + .movie-section {
+        margin-top: 40px;
+    }
+}
+
+/* Ensure ads don't overflow on small screens */
+.ad-container {
+    overflow: hidden;
+}
+
+.ad-container ins {
+    overflow: hidden;
+}
+
+/* AdSense responsive sizing */
+@media (min-width: 1400px) {
+    .ad-container {
+        max-width: 970px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}

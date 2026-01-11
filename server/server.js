@@ -1,15 +1,20 @@
  const express = require('express');
 const mongoose = require('mongoose');
+const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const cors = require('cors');
 const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const responseTime = require('response-time');
 const swaggerUi = require('swagger-ui-express');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 // Import middleware
 const { logger, requestLogger } = require('./middleware/logger');
+const requestIdMiddleware = require('./middleware/requestId');
 const { cache, clearCache, getCacheStats } = require('./middleware/cache');
 const { metricsMiddleware, getHealthCheck, getApiMetrics } = require('./utils/monitoring');
 const { refreshTokenHandler } = require('./middleware/jwtAuth');
@@ -33,6 +38,10 @@ const statsRoutes = require('./routes/stats');
 const usersRoutes = require('./routes/users');
 const adminRoutes = require('./routes/admin');
 const tvRoutes = require('./routes/tv');
+const videoProxyRoutes = require('./routes/video-proxy');
+const r2UploadRoutes = require('./routes/r2-upload');
+const requestsRoutes = require('./routes/requests');
+const seriesRoutes = require('./routes/series');
 
 // Initialize Express app
 const app = express();
@@ -55,7 +64,8 @@ app.use(helmet({
         preload: true
     },
     crossOriginEmbedderPolicy: false,
-    crossOriginResourcePolicy: { policy: "cross-origin" }
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginOpenerPolicy: false  // Disable COOP to allow Google OAuth popups
 }));
 
 // Enhanced CORS configuration
@@ -67,7 +77,8 @@ const corsOptions = {
             ? process.env.ALLOWED_ORIGINS.split(',')
             : [
                 'http://localhost:3000',
-                'http://localhost:5000'
+                'http://localhost:5000',
+                'http://localhost:8000'
               ];
 
         // Allow requests with no origin (mobile apps, Postman, etc.)
@@ -88,12 +99,20 @@ const corsOptions = {
             return callback(null, true);
         }
 
+        // Allow in development mode
+        if (process.env.NODE_ENV === 'development') {
+            return callback(null, true);
+        }
+
+        // Log blocked origins for debugging
+        logger.warn('CORS blocked origin:', origin);
+
         // Deny by default
         return callback(new Error('Not allowed by CORS'));
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control'],
     exposedHeaders: ['X-Response-Time'],
     maxAge: 86400, // 24 hours
     preflightContinue: false,
@@ -106,13 +125,17 @@ app.use(cors(corsOptions));
 // Explicit OPTIONS handler for preflight requests
 app.options('*', cors(corsOptions));
 
-// Body parser middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+// Body parser middleware with stricter limits
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+// Sanitize data against NoSQL injection
+app.use(mongoSanitize());
 
 // Compression middleware
 app.use(compression());
 
+// Attach requestId to every request
+app.use(requestIdMiddleware);
 // Request logging with Winston
 app.use(requestLogger);
 
@@ -141,9 +164,10 @@ const createRateLimiter = (windowMinutes, maxRequests) => {
 };
 
 // Apply different rate limits to different routes
-const generalLimiter = createRateLimiter(15, 100); // 100 requests per 15 minutes
-const authLimiter = createRateLimiter(15, 50);     // 50 requests per 15 minutes for auth (increased for development)
-const apiLimiter = createRateLimiter(1, 30);       // 30 requests per minute for API
+// Increased limits for production use - a single page can make 10+ API calls
+const generalLimiter = createRateLimiter(1, 200);  // 200 requests per minute for general API
+const authLimiter = createRateLimiter(15, 100);    // 100 requests per 15 minutes for auth
+const apiLimiter = createRateLimiter(1, 300);      // 300 requests per minute for heavy API usage
 
 app.use('/api/auth', authLimiter);
 app.use('/api/', generalLimiter);
@@ -230,6 +254,10 @@ app.use('/api/stats', statsRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/tv', cache(600), tvRoutes); // TV stations with 10 min cache
+app.use('/api/video', videoProxyRoutes); // Video URL extraction proxy
+app.use('/api/r2', r2UploadRoutes); // Cloudflare R2 video uploads
+app.use('/api/requests', requestsRoutes); // User requests/contact form
+app.use('/api/series', cache(300), seriesRoutes); // TV Series with 5 min cache
 
 // Token refresh endpoint
 app.post('/api/auth/refresh', refreshTokenHandler);
@@ -249,10 +277,10 @@ app.get('/api/health', async (req, res) => {
         const health = await getHealthCheck();
         res.json(health);
     } catch (error) {
+        logger.error('Health check error', { error, requestId: req.requestId });
         res.status(500).json({
             status: 'error',
-            message: 'Health check failed',
-            error: error.message
+            message: 'Something went wrong'
         });
     }
 });
@@ -293,10 +321,10 @@ app.get('/api/cache/stats', async (req, res) => {
             cache: stats
         });
     } catch (error) {
+        logger.error('Cache stats error', { error, requestId: req.requestId });
         res.status(500).json({
             status: 'error',
-            message: 'Failed to get cache stats',
-            error: error.message
+            message: 'Something went wrong'
         });
     }
 });
@@ -330,10 +358,10 @@ app.post('/api/cache/clear', async (req, res) => {
             result
         });
     } catch (error) {
+        logger.error('Clear cache error', { error, requestId: req.requestId });
         res.status(500).json({
             status: 'error',
-            message: 'Failed to clear cache',
-            error: error.message
+            message: 'Something went wrong'
         });
     }
 });
@@ -365,6 +393,33 @@ app.get('/', (req, res) => {
     });
 });
 
+// S3 pre-signed video URL endpoint
+app.get('/api/video-url', async (req, res) => {
+    const { key } = req.query;
+    if (!key) return res.status(400).json({ error: 'Missing video key' });
+
+    // Configure AWS SDK v3 S3 Client
+    const s3Client = new S3Client({
+        region: process.env.AWS_REGION,
+        credentials: {
+            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+        }
+    });
+
+    const command = new GetObjectCommand({
+        Bucket: process.env.AWS_S3_BUCKET,
+        Key: key
+    });
+
+    try {
+        const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 }); // 1 hour
+        res.json({ url });
+    } catch (err) {
+        res.status(500).json({ error: 'Could not generate URL', details: err.message });
+    }
+});
+
 // 404 handler
 app.use((req, res) => {
     res.status(404).json({
@@ -375,12 +430,11 @@ app.use((req, res) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
-    console.error('Error:', err);
-    
+    logger.error('Unhandled error', { error: err, requestId: req.requestId });
     res.status(err.statusCode || 500).json({
         status: 'error',
-        message: err.message || 'Internal server error',
-        ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+        message: 'Something went wrong',
+        requestId: req.requestId
     });
 });
 
@@ -390,18 +444,40 @@ app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📍 Environment: ${process.env.NODE_ENV}`);
     console.log(`🌐 API URL: http://localhost:${PORT}`);
+    
+    // Keep-alive ping to prevent cold starts (every 5 minutes)
+    if (process.env.NODE_ENV === 'production' && process.env.KEEP_ALIVE_URL) {
+        const https = require('https');
+        const keepAliveUrl = process.env.KEEP_ALIVE_URL;
+        
+        setInterval(() => {
+            https.get(keepAliveUrl, (res) => {
+                console.log(`🏓 Keep-alive ping: ${res.statusCode}`);
+            }).on('error', (err) => {
+                console.error('Keep-alive error:', err.message);
+            });
+        }, 5 * 60 * 1000); // Every 5 minutes
+        
+        console.log('🔄 Keep-alive enabled');
+    }
 });
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
     console.error('Unhandled Rejection:', err);
-    process.exit(1);
+    // Don't exit in development - just log
+    if (process.env.NODE_ENV === 'production') {
+        process.exit(1);
+    }
 });
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
     console.error('Uncaught Exception:', err);
-    process.exit(1);
+    // Don't exit in development - just log
+    if (process.env.NODE_ENV === 'production') {
+        process.exit(1);
+    }
 });
 
 module.exports = app;

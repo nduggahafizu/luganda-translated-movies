@@ -1,0 +1,70 @@
+================================================================
+YOUR CORRECTED MONGODB CONNECTION STRING FOR RAILWAY
+================================================================
+
+ORIGINAL (HAD ERRORS):
+mongodb+srv://nduggahafizu67:<nduggahaf67> @hafithu67.nyi9cp3.mongodb.net/?appName=hafithu67
+
+CORRECTED (READY TO USE):
+mongodb+srv://nduggahafizu67:nduggahaf67@hafithu67.nyi9cp3.mongodb.net/luganda-movies?retryWrites=true&w=majority&appName=hafithu67
+
+================================================================
+WHAT WAS FIXED:
+================================================================
+✅ Removed space before @
+✅ Removed < > brackets around password
+✅ Added database name: luganda-movies
+✅ Added required parameters: retryWrites=true&w=majority
+
+================================================================
+ADD TO RAILWAY:
+================================================================
+
+1. Go to: https://railway.app
+2. Click your project → Your service
+3. Click "Variables" tab
+4. Click "New Variable"
+5. Variable name: MONGODB_URI
+6. Value: (paste the corrected string above)
+7. Click "Add"
+
+OR use Raw Editor:
+
+MONGODB_URI=mongodb+srv://nduggahafizu67:nduggahaf67@hafithu67.nyi9cp3.mongodb.net/luganda-movies?retryWrites=true&w=majority&appName=hafithu67
+
+================================================================
+IF YOUR PASSWORD IS DIFFERENT:
+================================================================
+
+Replace "nduggahaf67" with your actual password:
+
+mongodb+srv://nduggahafizu67:YOUR_ACTUAL_PASSWORD@hafithu67.nyi9cp3.mongodb.net/luganda-movies?retryWrites=true&w=majority&appName=hafithu67
+
+To find/reset your password:
+1. Go to: https://cloud.mongodb.com
+2. Database Access → Find user "nduggahafizu67"
+3. Click "Edit" → "Edit Password"
+4. Autogenerate or enter new password
+5. Click "Update User"
+
+================================================================
+VERIFY MONGODB ATLAS SETTINGS:
+================================================================
+
+✅ Network Access → IP Whitelist → 0.0.0.0/0 (Allow all)
+✅ Database Access → User: nduggahafizu67 → Read/Write privileges
+✅ Cluster is running (green status)
+
+================================================================
+TEST AFTER ADDING TO RAILWAY:
+================================================================
+
+Railway will redeploy automatically (2-3 minutes)
+
+Test with:
+curl https://your-railway-url.up.railway.app/api/health
+
+Expected:
+{"status":"healthy","services":{"database":{"status":"healthy"}}}
+
+================================================================

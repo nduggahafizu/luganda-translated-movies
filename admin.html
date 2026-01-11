@@ -7,6 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
     
+    <!-- Google Analytics 4 (admin tracking) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMF82HVT9G"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-HMF82HVT9G');
+    </script>
+    
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
     <link rel="shortcut icon" type="image/png" href="/assets/images/favicon.png">
     <link rel="apple-touch-icon" href="/assets/images/logo.png">
@@ -555,6 +564,24 @@
                         </a>
                     </li>
                     <li>
+                        <a href="#" onclick="openSeriesModal(); return false;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                                <polyline points="17 2 12 7 7 2"></polyline>
+                            </svg>
+                            Import TV Series
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-series.html">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                                <polyline points="17 2 12 7 7 2"></polyline>
+                            </svg>
+                            All TV Series
+                        </a>
+                    </li>
+                    <li>
                         <a href="admin-vjs.html">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -609,6 +636,24 @@
                 
                 <div class="nav-section-title">System</div>
                 <ul class="admin-nav">
+                    <li>
+                        <a href="#" onclick="openNotificationModal(); return false;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                            Send Notification
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-requests.html">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                            User Requests
+                        </a>
+                    </li>
                     <li>
                         <a href="admin-analytics.html">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -820,34 +865,88 @@
 
     <script src="js/config.js"></script>
     <script>
-        const API_URL = API_CONFIG.API_URL;
+        const API_URL = API_CONFIG.BASE_URL + '/api';
 
         // Check admin authentication
         document.addEventListener('DOMContentLoaded', async () => {
+            console.log('=== ADMIN AUTH CHECK ===');
+            
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            console.log('Token exists:', !!token);
+            
             if (!token) {
+                console.log('No token, redirecting to login');
                 window.location.href = 'login.html?redirect=admin.html';
                 return;
             }
 
+            // First check cached user data
+            let userData = localStorage.getItem('user') || sessionStorage.getItem('user');
+            console.log('Cached user data:', userData);
+            
+            if (userData) {
+                try {
+                    const cachedUser = JSON.parse(userData);
+                    console.log('Parsed user role:', cachedUser.role);
+                    if (cachedUser.role === 'admin') {
+                        console.log('User is admin from cache, loading dashboard');
+                        loadDashboardData();
+                        return;
+                    }
+                } catch (e) {
+                    console.error('Error parsing cached user:', e);
+                }
+            }
+
+            // If no cached admin, ALWAYS verify with API to get fresh role
+            console.log('Verifying with API...');
             try {
                 const response = await fetch(`${API_URL}/auth/me`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
+                console.log('API response status:', response.status);
+                
                 if (!response.ok) throw new Error('Not authenticated');
                 
                 const data = await response.json();
+                console.log('API response data:', data);
                 
-                if (data.data.user.role !== 'admin') {
+                const user = data.data.user;
+                console.log('User from API:', user);
+                console.log('Role from API:', user.role);
+                
+                // Update cached user data with role from API
+                const updatedUser = {
+                    ...JSON.parse(userData || '{}'),
+                    ...user,
+                    role: user.role // Explicitly ensure role is saved
+                };
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+                sessionStorage.setItem('user', JSON.stringify(updatedUser));
+                console.log('Updated stored user with role:', updatedUser.role);
+                
+                if (user.role !== 'admin') {
+                    console.log('User is NOT admin, access denied');
                     alert('Access denied. Admin privileges required.');
                     window.location.href = 'index.html';
                     return;
                 }
                 
+                console.log('User IS admin, loading dashboard');
                 loadDashboardData();
             } catch (error) {
                 console.error('Auth error:', error);
+                // Check one more time if cached user is admin
+                if (userData) {
+                    try {
+                        const cachedUser = JSON.parse(userData);
+                        if (cachedUser.role === 'admin') {
+                            loadDashboardData();
+                            return;
+                        }
+                    } catch (e) {}
+                }
                 window.location.href = 'login.html?redirect=admin.html';
             }
         });
@@ -914,7 +1013,7 @@
                 <tr>
                     <td>
                         <div class="movie-cell">
-                            <img src="${movie.poster || 'assets/images/placeholder.jpg'}" alt="${movie.title}" onerror="this.src='assets/images/placeholder.jpg'">
+                            <img src="${movie.poster || 'assets/images/placeholder.svg'}" alt="${movie.title}" onerror="this.src='assets/images/placeholder.svg'>">
                             <div class="movie-cell-info">
                                 <div class="movie-cell-title">${movie.title}</div>
                                 <div class="movie-cell-meta">${movie.year || 'N/A'}</div>
@@ -950,7 +1049,7 @@
             list.innerHTML = movies.map((item, index) => `
                 <div class="top-movie">
                     <div class="top-movie-rank">${index + 1}</div>
-                    <img src="${item.movie?.poster || 'assets/images/placeholder.jpg'}" alt="${item.movie?.title}" onerror="this.src='assets/images/placeholder.jpg'">
+                    <img src="${item.movie?.poster || 'assets/images/placeholder.svg'}" alt="${item.movie?.title}" onerror="this.src='assets/images/placeholder.svg'>">
                     <div class="top-movie-info">
                         <div class="top-movie-title">${item.movie?.title || 'Unknown'}</div>
                         <div class="top-movie-views">${formatNumber(item.totalViews)} views</div>
@@ -1045,6 +1144,497 @@
             // Reload data with new timeframe
             loadDashboardData();
         }
+
+        // ========== SEND NOTIFICATION FEATURE ==========
+        function openNotificationModal() {
+            document.getElementById('notificationModal').classList.add('active');
+        }
+
+        function closeNotificationModal() {
+            document.getElementById('notificationModal').classList.remove('active');
+        }
+
+        async function sendNotification() {
+            const type = document.getElementById('notifType').value;
+            const title = document.getElementById('notifTitle').value.trim();
+            const message = document.getElementById('notifMessage').value.trim();
+            
+            if (!title || !message) {
+                alert('Please fill in both title and message');
+                return;
+            }
+            
+            // Generate unique notification ID
+            const notifId = 'admin-' + Date.now();
+            
+            // Save notification config to localStorage (for frontend display)
+            const notifConfig = {
+                id: notifId,
+                type: type,
+                title: title,
+                message: message,
+                createdAt: new Date().toISOString(),
+                enabled: true
+            };
+            
+            localStorage.setItem('admin_notification', JSON.stringify(notifConfig));
+            
+            // Also save to server if we have an endpoint
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            try {
+                await fetch(`${API_URL}/admin/broadcast-notification`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(notifConfig)
+                });
+            } catch (err) {
+                console.log('Server notification save not available, using localStorage only');
+            }
+            
+            alert('✅ Notification sent! All users will see this notification on their next visit.');
+            closeNotificationModal();
+            
+            // Clear form
+            document.getElementById('notifTitle').value = '';
+            document.getElementById('notifMessage').value = '';
+        }
+
+        function clearNotification() {
+            if (confirm('This will remove the notification for all users. Continue?')) {
+                localStorage.removeItem('admin_notification');
+                
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                fetch(`${API_URL}/admin/broadcast-notification`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }).catch(() => {});
+                
+                alert('Notification cleared!');
+                closeNotificationModal();
+            }
+        }
+
+        // Close modal on outside click
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('notificationModal');
+            if (e.target === modal) {
+                closeNotificationModal();
+            }
+            const seriesModal = document.getElementById('seriesModal');
+            if (e.target === seriesModal) {
+                closeSeriesModal();
+            }
+        });
+
+        // ============================================================
+        // TV SERIES IMPORT FUNCTIONALITY
+        // ============================================================
+        
+        // Use the API_URL from config
+        const API_BASE_URL = API_CONFIG.BASE_URL;
+        
+        function openSeriesModal() {
+            document.getElementById('seriesModal').classList.add('active');
+            document.getElementById('seriesSearchQuery').value = '';
+            document.getElementById('seriesSearchResults').innerHTML = '';
+            document.getElementById('seriesImportSection').style.display = 'none';
+        }
+        
+        function closeSeriesModal() {
+            document.getElementById('seriesModal').classList.remove('active');
+        }
+        
+        async function searchSeries() {
+            const query = document.getElementById('seriesSearchQuery').value.trim();
+            const year = document.getElementById('seriesSearchYear').value.trim();
+            
+            if (!query) {
+                alert('Please enter a series name to search');
+                return;
+            }
+            
+            const searchBtn = document.querySelector('#seriesModal .btn-search');
+            const originalText = searchBtn.innerHTML;
+            searchBtn.innerHTML = '🔍 Searching...';
+            searchBtn.disabled = true;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/luganda-movies/search-series`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ query, year: year || null })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.data.length > 0) {
+                    displaySeriesResults(data.data);
+                } else {
+                    document.getElementById('seriesSearchResults').innerHTML = `
+                        <div class="no-results">
+                            <p>No TV series found for "${query}"</p>
+                            <p style="font-size: 12px; color: #666;">Try a different search term</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Series search error:', error);
+                document.getElementById('seriesSearchResults').innerHTML = `
+                    <div class="no-results error">
+                        <p>❌ Search failed</p>
+                        <p style="font-size: 12px;">${error.message}</p>
+                    </div>
+                `;
+            } finally {
+                searchBtn.innerHTML = originalText;
+                searchBtn.disabled = false;
+            }
+        }
+        
+        function displaySeriesResults(results) {
+            const container = document.getElementById('seriesSearchResults');
+            container.innerHTML = results.map(series => `
+                <div class="series-result-card" onclick="selectSeries(${series.tmdbId}, '${escapeHtml(series.title)}', '${series.poster || ''}')">
+                    <img src="${series.poster || '/assets/images/placeholder.svg'}" alt="${series.title}" onerror="this.src='/assets/images/placeholder.svg'">
+                    <div class="series-info">
+                        <h4>${series.title}</h4>
+                        <p class="series-year">${series.year || 'Unknown Year'}</p>
+                        <p class="series-rating">⭐ ${(series.rating || 0).toFixed(1)}</p>
+                        <p class="series-overview">${(series.overview || 'No description available').substring(0, 100)}...</p>
+                    </div>
+                    <div class="select-indicator">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML.replace(/'/g, "\\'");
+        }
+        
+        let selectedSeriesId = null;
+        
+        function selectSeries(tmdbId, title, poster) {
+            selectedSeriesId = tmdbId;
+            document.getElementById('seriesSearchResults').innerHTML = `
+                <div class="selected-series">
+                    <img src="${poster || '/assets/images/placeholder.svg'}" alt="${title}">
+                    <div class="series-info">
+                        <h4>✅ Selected: ${title}</h4>
+                        <p>TMDB ID: ${tmdbId}</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('seriesImportSection').style.display = 'block';
+            document.getElementById('seriesVjName').value = '';
+            document.getElementById('seriesLugandaTitle').value = title;
+        }
+        
+        async function importSeries() {
+            if (!selectedSeriesId) {
+                alert('Please select a TV series first');
+                return;
+            }
+            
+            const vjName = document.getElementById('seriesVjName').value.trim();
+            const lugandaTitle = document.getElementById('seriesLugandaTitle').value.trim();
+            
+            const importBtn = document.getElementById('importSeriesBtn');
+            const originalText = importBtn.innerHTML;
+            importBtn.innerHTML = '⏳ Importing... (this may take a moment)';
+            importBtn.disabled = true;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/luganda-movies/import-series`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        tmdbId: selectedSeriesId,
+                        vjName: vjName || '',
+                        lugandaTitle: lugandaTitle || ''
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`✅ Success!\n\n${data.message}\n\nThe series is saved as draft. Go to "All TV Series" to publish it and add episode video URLs.`);
+                    closeSeriesModal();
+                    // Refresh dashboard stats
+                    if (typeof loadMovies === 'function') loadMovies();
+                } else {
+                    alert(`❌ Import failed: ${data.message}`);
+                }
+            } catch (error) {
+                console.error('Series import error:', error);
+                alert(`❌ Import failed: ${error.message}`);
+            } finally {
+                importBtn.innerHTML = originalText;
+                importBtn.disabled = false;
+            }
+        }
     </script>
+
+    <!-- TV Series Import Modal -->
+    <div id="seriesModal" class="notification-modal-overlay">
+        <div class="notification-modal" style="max-width: 700px;">
+            <div class="notification-modal-header">
+                <h2>📺 Import TV Series from TMDB</h2>
+                <button onclick="closeSeriesModal()" class="modal-close-btn">&times;</button>
+            </div>
+            <div class="notification-modal-body">
+                <p style="margin-bottom: 20px; color: var(--text-secondary); font-size: 14px;">
+                    Search for a TV series on TMDB. All seasons and episodes will be automatically imported!
+                </p>
+                
+                <div class="form-group">
+                    <label>Search TV Series</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="seriesSearchQuery" class="form-input" placeholder="e.g. Breaking Bad, Game of Thrones" style="flex: 1;" onkeypress="if(event.key === 'Enter') searchSeries()">
+                        <input type="text" id="seriesSearchYear" class="form-input" placeholder="Year (optional)" style="width: 120px;">
+                        <button onclick="searchSeries()" class="btn-admin btn-search">🔍 Search</button>
+                    </div>
+                </div>
+                
+                <div id="seriesSearchResults" class="series-search-results">
+                    <!-- Results will appear here -->
+                </div>
+                
+                <div id="seriesImportSection" style="display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                    <h4 style="margin-bottom: 15px;">📝 Import Options</h4>
+                    <div class="form-group">
+                        <label>Luganda Title (optional)</label>
+                        <input type="text" id="seriesLugandaTitle" class="form-input" placeholder="Custom Luganda title">
+                    </div>
+                    <div class="form-group">
+                        <label>VJ Name (optional)</label>
+                        <input type="text" id="seriesVjName" class="form-input" placeholder="e.g. VJ Junior, VJ Emmy">
+                    </div>
+                </div>
+            </div>
+            <div class="notification-modal-footer">
+                <button onclick="closeSeriesModal()" class="btn-admin secondary">Cancel</button>
+                <button id="importSeriesBtn" onclick="importSeries()" class="btn-admin">📥 Import Series</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .series-search-results {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        .series-result-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            background: var(--background-dark);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+        .series-result-card:hover {
+            border-color: var(--primary-color);
+            transform: translateX(5px);
+        }
+        .series-result-card img {
+            width: 60px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .series-result-card .series-info {
+            flex: 1;
+        }
+        .series-result-card h4 {
+            margin: 0 0 5px 0;
+            font-size: 14px;
+        }
+        .series-result-card .series-year {
+            font-size: 12px;
+            color: var(--primary-color);
+            margin: 0;
+        }
+        .series-result-card .series-rating {
+            font-size: 12px;
+            color: #ffd700;
+            margin: 3px 0;
+        }
+        .series-result-card .series-overview {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin: 5px 0 0 0;
+            line-height: 1.4;
+        }
+        .series-result-card .select-indicator {
+            color: var(--primary-color);
+        }
+        .selected-series {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(124, 252, 0, 0.1);
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+        }
+        .selected-series img {
+            width: 80px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .selected-series h4 {
+            margin: 0 0 5px 0;
+            color: var(--primary-color);
+        }
+        .no-results {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-secondary);
+        }
+        .no-results.error {
+            color: #ef4444;
+        }
+    </style>
+
+    <!-- Notification Modal -->
+    <div id="notificationModal" class="notification-modal-overlay">
+        <div class="notification-modal">
+            <div class="notification-modal-header">
+                <h2>📢 Send Notification to All Users</h2>
+                <button onclick="closeNotificationModal()" class="modal-close-btn">&times;</button>
+            </div>
+            <div class="notification-modal-body">
+                <div class="form-group">
+                    <label>Notification Type</label>
+                    <select id="notifType" class="form-input">
+                        <option value="warning">⚠️ Warning (Red)</option>
+                        <option value="info">ℹ️ Info (Blue)</option>
+                        <option value="success">✅ Success (Green)</option>
+                        <option value="error">❌ Error (Dark Red)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="notifTitle" class="form-input" placeholder="e.g. Important Notice">
+                </div>
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea id="notifMessage" class="form-input" rows="5" placeholder="Enter your message here..."></textarea>
+                </div>
+            </div>
+            <div class="notification-modal-footer">
+                <button onclick="clearNotification()" class="btn-admin secondary">Clear Current</button>
+                <button onclick="sendNotification()" class="btn-admin">Send Notification</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .notification-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+        .notification-modal-overlay.active {
+            display: flex;
+        }
+        .notification-modal {
+            background: var(--background-light);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            overflow: hidden;
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .notification-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .notification-modal-header h2 {
+            font-size: 18px;
+            margin: 0;
+        }
+        .modal-close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            line-height: 1;
+        }
+        .modal-close-btn:hover {
+            color: #fff;
+        }
+        .notification-modal-body {
+            padding: 25px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--background-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        textarea.form-input {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .notification-modal-footer {
+            display: flex;
+            gap: 15px;
+            padding: 20px 25px;
+            border-top: 1px solid var(--border-color);
+            justify-content: flex-end;
+        }
+    </style>
 </body>
 </html>

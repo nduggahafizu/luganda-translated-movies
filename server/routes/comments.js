@@ -2,7 +2,45 @@ const express = require('express');
 const router = express.Router();
 const Comment = require('../models/Comment');
 const Notification = require('../models/Notification');
-const { protect, optionalAuth } = require('../middleware/auth');
+const { protect, optionalAuth, admin } = require('../middleware/auth');
+
+// GET all comments (admin only)
+router.get('/', protect, admin, async (req, res) => {
+    try {
+        const { page = 1, limit = 20, status = 'all' } = req.query;
+        
+        let query = { parentComment: null }; // Top-level comments only
+        if (status === 'hidden') {
+            query.isHidden = true;
+        } else if (status === 'visible') {
+            query.isHidden = false;
+        }
+        
+        const comments = await Comment.find(query)
+            .populate('user', 'fullName profileImage email')
+            .populate('movie', 'originalTitle poster')
+            .sort({ createdAt: -1 })
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .lean();
+        
+        const total = await Comment.countDocuments(query);
+        
+        res.json({
+            status: 'success',
+            data: comments,
+            pagination: {
+                page: parseInt(page),
+                limit: parseInt(limit),
+                total,
+                pages: Math.ceil(total / limit)
+            }
+        });
+    } catch (error) {
+        console.error('Get all comments error:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to fetch comments' });
+    }
+});
 
 // Get comments for a movie
 router.get('/movie/:movieId', optionalAuth, async (req, res) => {
@@ -20,11 +58,11 @@ router.get('/movie/:movieId', optionalAuth, async (req, res) => {
             parentComment: null,
             isHidden: false
         })
-            .populate('user', 'fullName avatar')
+            .populate('user', 'fullName avatar role')
             .populate({
                 path: 'replies',
                 match: { isHidden: false },
-                populate: { path: 'user', select: 'fullName avatar' },
+                populate: { path: 'user', select: 'fullName avatar role' },
                 options: { limit: 3, sort: { createdAt: 1 } }
             })
             .sort(sortQuery)
@@ -77,7 +115,7 @@ router.get('/:commentId/replies', optionalAuth, async (req, res) => {
             parentComment: commentId,
             isHidden: false
         })
-            .populate('user', 'fullName avatar')
+            .populate('user', 'fullName avatar role')
             .sort({ createdAt: 1 })
             .limit(limit * 1)
             .skip((page - 1) * limit)
@@ -139,7 +177,7 @@ router.post('/', protect, async (req, res) => {
         }
 
         const comment = await Comment.create(commentData);
-        await comment.populate('user', 'fullName avatar');
+        await comment.populate('user', 'fullName avatar role');
 
         res.status(201).json({
             status: 'success',
@@ -171,7 +209,7 @@ router.put('/:commentId', protect, async (req, res) => {
         comment.isEdited = true;
 
         await comment.save();
-        await comment.populate('user', 'fullName avatar');
+        await comment.populate('user', 'fullName avatar role');
 
         res.json({
             status: 'success',

@@ -16,7 +16,7 @@ const STATIC_ASSETS = [
     '/js/main.js',
     '/js/auth.js',
     '/assets/images/logo.png',
-    '/assets/images/placeholder.jpg',
+    '/assets/images/placeholder.svg',
     '/manifest.json',
     '/offline.html'
 ];
@@ -110,7 +110,7 @@ async function cacheFirst(request) {
     } catch (error) {
         // Return placeholder for images
         if (request.destination === 'image') {
-            return caches.match('/assets/images/placeholder.jpg');
+            return caches.match('/assets/images/placeholder.svg');
         }
         
         throw error;

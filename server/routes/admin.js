@@ -9,6 +9,8 @@ const Review = require('../models/Review');
 const Comment = require('../models/Comment');
 const ViewStats = require('../models/ViewStats');
 const Notification = require('../models/Notification');
+const Settings = require('../models/Settings');
+const { validateMovie, validateAdminUserUpdate, validateNotificationBroadcast } = require('../middleware/validation');
 
 // @route   GET /api/admin/dashboard
 // @desc    Get admin dashboard stats
@@ -179,7 +181,7 @@ router.get('/users', [auth, adminOnly], async (req, res) => {
 // @route   PUT /api/admin/users/:id
 // @desc    Update user
 // @access  Admin only
-router.put('/users/:id', [auth, adminOnly], async (req, res) => {
+router.put('/users/:id', [auth, adminOnly, validateAdminUserUpdate], async (req, res) => {
     try {
         const { role, isActive, subscription } = req.body;
         
@@ -311,7 +313,7 @@ router.get('/movies', [auth, adminOnly], async (req, res) => {
 // @route   POST /api/admin/movies
 // @desc    Add new movie
 // @access  Admin only
-router.post('/movies', [auth, adminOnly], async (req, res) => {
+router.post('/movies', [auth, adminOnly, validateMovie], async (req, res) => {
     try {
         const movie = new LugandaMovie(req.body);
         await movie.save();
@@ -342,7 +344,7 @@ router.post('/movies', [auth, adminOnly], async (req, res) => {
 // @route   PUT /api/admin/movies/:id
 // @desc    Update movie
 // @access  Admin only
-router.put('/movies/:id', [auth, adminOnly], async (req, res) => {
+router.put('/movies/:id', [auth, adminOnly, validateMovie], async (req, res) => {
     try {
         const movie = await LugandaMovie.findByIdAndUpdate(
             req.params.id,
@@ -513,7 +515,7 @@ router.get('/analytics', [auth, adminOnly], async (req, res) => {
 // @route   POST /api/admin/notifications/broadcast
 // @desc    Send notification to all users
 // @access  Admin only
-router.post('/notifications/broadcast', [auth, adminOnly], async (req, res) => {
+router.post('/notifications/broadcast', [auth, adminOnly, validateNotificationBroadcast], async (req, res) => {
     try {
         const { title, message, link, image, userFilter } = req.body;
         
@@ -675,6 +677,392 @@ router.delete('/comments/:id', [auth, adminOnly], async (req, res) => {
             status: 'error',
             message: 'Server error'
         });
+    }
+});
+
+// ============ VJ MANAGEMENT ============
+
+// @route   GET /api/admin/vjs
+// @desc    Get all VJs for admin
+// @access  Admin only
+router.get('/vjs', [auth, adminOnly], async (req, res) => {
+    try {
+        const vjs = await VJ.find().sort({ createdAt: -1 });
+        res.json({
+            status: 'success',
+            data: vjs
+        });
+    } catch (error) {
+        console.error('Error fetching VJs:', error);
+        res.status(500).json({ status: 'error', message: 'Server error' });
+    }
+});
+
+// @route   POST /api/admin/vjs
+// @desc    Add new VJ
+// @access  Admin only
+router.post('/vjs', [auth, adminOnly], async (req, res) => {
+    try {
+        const { name, slug, description, avatar, specialties, youtubeChannel, status } = req.body;
+        
+        // Check if VJ with same slug exists
+        const existingVJ = await VJ.findOne({ slug });
+        if (existingVJ) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'A VJ with this slug already exists'
+            });
+        }
+        
+        const vj = new VJ({
+            name,
+            slug,
+            description,
+            avatar,
+            specialties: specialties || [],
+            youtubeChannel,
+            status: status || 'active'
+        });
+        
+        await vj.save();
+        
+        res.status(201).json({
+            status: 'success',
+            message: 'VJ added successfully',
+            data: vj
+        });
+    } catch (error) {
+        console.error('Error adding VJ:', error);
+        res.status(500).json({ status: 'error', message: error.message || 'Server error' });
+    }
+});
+
+// @route   PUT /api/admin/vjs/:id
+// @desc    Update VJ
+// @access  Admin only
+router.put('/vjs/:id', [auth, adminOnly], async (req, res) => {
+    try {
+        const vj = await VJ.findByIdAndUpdate(
+            req.params.id,
+            { $set: req.body },
+            { new: true }
+        );
+        
+        if (!vj) {
+            return res.status(404).json({ status: 'error', message: 'VJ not found' });
+        }
+        
+        res.json({
+            status: 'success',
+            message: 'VJ updated successfully',
+            data: vj
+        });
+    } catch (error) {
+        console.error('Error updating VJ:', error);
+        res.status(500).json({ status: 'error', message: 'Server error' });
+    }
+});
+
+// @route   DELETE /api/admin/vjs/:id
+// @desc    Delete VJ
+// @access  Admin only
+router.delete('/vjs/:id', [auth, adminOnly], async (req, res) => {
+    try {
+        const vj = await VJ.findByIdAndDelete(req.params.id);
+        
+        if (!vj) {
+            return res.status(404).json({ status: 'error', message: 'VJ not found' });
+        }
+        
+        res.json({
+            status: 'success',
+            message: 'VJ deleted successfully'
+        });
+    } catch (error) {
+        console.error('Error deleting VJ:', error);
+        res.status(500).json({ status: 'error', message: 'Server error' });
+    }
+});
+
+// ============ GENRE MANAGEMENT ============
+
+// @route   GET /api/admin/genres
+// @desc    Get all genres (aggregated from movies)
+// @access  Admin only
+router.get('/genres', [auth, adminOnly], async (req, res) => {
+    try {
+        const genres = await LugandaMovie.aggregate([
+            { $unwind: '$genres' },
+            { $group: { 
+                _id: '$genres', 
+                movieCount: { $sum: 1 } 
+            }},
+            { $sort: { movieCount: -1 } }
+        ]);
+        
+        res.json({
+            status: 'success',
+            data: genres.map(g => ({
+                name: g._id,
+                slug: g._id.toLowerCase().replace(/\s+/g, '-'),
+                movieCount: g.movieCount
+            }))
+        });
+    } catch (error) {
+        console.error('Error fetching genres:', error);
+        res.status(500).json({ status: 'error', message: 'Server error' });
+    }
+});
+
+// ============ SEND NOTIFICATIONS ============
+
+// @route   POST /api/admin/notifications/send
+// @desc    Send notification to specific users or all users
+// @access  Admin only
+router.post('/notifications/send', [auth, adminOnly], async (req, res) => {
+    try {
+        const { title, message, type, link, linkText, image, targetUsers, targetAll, recipients } = req.body;
+        
+        if (!title || !message) {
+            return res.status(400).json({
+                success: false,
+                message: 'Title and message are required'
+            });
+        }
+        
+        let userIds = [];
+        let recipientDescription = 'all users';
+        
+        // Handle different recipient options
+        if (targetAll || recipients === 'all') {
+            const users = await User.find({ isActive: { $ne: false } }).select('_id');
+            userIds = users.map(u => u._id);
+            recipientDescription = 'all users';
+        } else if (recipients === 'subscribers') {
+            const users = await User.find({ 
+                isActive: { $ne: false },
+                'subscription.plan': { $in: ['basic', 'premium', 'vip'] }
+            }).select('_id');
+            userIds = users.map(u => u._id);
+            recipientDescription = 'subscribers';
+        } else if (recipients === 'free') {
+            const users = await User.find({ 
+                isActive: { $ne: false },
+                $or: [
+                    { 'subscription.plan': 'free' },
+                    { 'subscription.plan': { $exists: false } }
+                ]
+            }).select('_id');
+            userIds = users.map(u => u._id);
+            recipientDescription = 'free users';
+        } else if (targetUsers && targetUsers.length > 0) {
+            userIds = targetUsers;
+            recipientDescription = `${targetUsers.length} specific users`;
+        } else {
+            // Default to all users if no recipient specified
+            const users = await User.find({ isActive: { $ne: false } }).select('_id');
+            userIds = users.map(u => u._id);
+            recipientDescription = 'all users';
+        }
+        
+        if (userIds.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'No users found matching the criteria'
+            });
+        }
+        
+        const notifications = userIds.map(userId => ({
+            user: userId,
+            type: type || 'system_announcement',
+            title,
+            message,
+            link: link || null,
+            image: image || null,
+            metadata: {
+                linkText: linkText || null,
+                sentBy: req.user._id,
+                recipients: recipientDescription
+            }
+        }));
+        
+        await Notification.insertMany(notifications);
+        
+        res.json({
+            success: true,
+            message: `Notification sent to ${userIds.length} ${recipientDescription}`,
+            recipientCount: userIds.length,
+            data: { notifiedCount: userIds.length }
+        });
+    } catch (error) {
+        console.error('Send notification error:', error);
+        res.status(500).json({ success: false, message: 'Server error: ' + error.message });
+    }
+});
+
+// @route   GET /api/admin/notifications/history
+// @desc    Get notification history (sent notifications)
+// @access  Admin only
+router.get('/notifications/history', [auth, adminOnly], async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
+        
+        // Get unique notification titles/messages (as broadcasts)
+        const notifications = await Notification.aggregate([
+            { $sort: { createdAt: -1 } },
+            { $group: {
+                _id: { title: '$title', message: '$message', createdAt: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } } },
+                count: { $sum: 1 },
+                type: { $first: '$type' },
+                createdAt: { $first: '$createdAt' },
+                readCount: { $sum: { $cond: ['$isRead', 1, 0] } },
+                recipients: { $first: '$metadata.recipients' }
+            }},
+            { $sort: { createdAt: -1 } },
+            { $skip: (page - 1) * limit },
+            { $limit: limit }
+        ]);
+        
+        res.json({
+            success: true,
+            data: notifications.map(n => ({
+                title: n._id.title,
+                message: n._id.message,
+                type: n.type,
+                recipientCount: n.count,
+                readCount: n.readCount,
+                recipients: n.recipients || 'all users',
+                createdAt: n.createdAt
+            }))
+        });
+    } catch (error) {
+        console.error('Notification history error:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+// ============== SETTINGS ROUTES ==============
+
+// @route   GET /api/admin/settings
+// @desc    Get site settings
+// @access  Admin only
+router.get('/settings', [auth, adminOnly], async (req, res) => {
+    try {
+        const settings = await Settings.getSettings();
+        res.json({
+            success: true,
+            data: settings
+        });
+    } catch (error) {
+        console.error('Get settings error:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+// @route   PUT /api/admin/settings
+// @desc    Update site settings
+// @access  Admin only
+router.put('/settings', [auth, adminOnly], async (req, res) => {
+    try {
+        const updates = req.body;
+        const settings = await Settings.updateSettings(updates, req.user._id);
+        res.json({
+            success: true,
+            message: 'Settings updated successfully',
+            data: settings
+        });
+    } catch (error) {
+        console.error('Update settings error:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+// @route   PUT /api/admin/settings/general
+// @desc    Update general settings
+// @access  Admin only
+router.put('/settings/general', [auth, adminOnly], async (req, res) => {
+    try {
+        const { siteName, siteTagline, siteDescription, contactEmail, supportPhone } = req.body;
+        const settings = await Settings.updateSettings({
+            siteName,
+            siteTagline,
+            siteDescription,
+            contactEmail,
+            supportPhone
+        }, req.user._id);
+        
+        res.json({
+            success: true,
+            message: 'General settings updated',
+            data: settings
+        });
+    } catch (error) {
+        console.error('Update general settings error:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+// @route   PUT /api/admin/settings/social
+// @desc    Update social media settings
+// @access  Admin only
+router.put('/settings/social', [auth, adminOnly], async (req, res) => {
+    try {
+        const { youtube, twitter, facebook, instagram, tiktok } = req.body;
+        const settings = await Settings.updateSettings({
+            socialMedia: { youtube, twitter, facebook, instagram, tiktok }
+        }, req.user._id);
+        
+        res.json({
+            success: true,
+            message: 'Social media settings updated',
+            data: settings
+        });
+    } catch (error) {
+        console.error('Update social settings error:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+// @route   PUT /api/admin/settings/features
+// @desc    Update feature settings
+// @access  Admin only
+router.put('/settings/features', [auth, adminOnly], async (req, res) => {
+    try {
+        const features = req.body;
+        const settings = await Settings.updateSettings({
+            features
+        }, req.user._id);
+        
+        res.json({
+            success: true,
+            message: 'Feature settings updated',
+            data: settings
+        });
+    } catch (error) {
+        console.error('Update feature settings error:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+// @route   PUT /api/admin/settings/pricing
+// @desc    Update pricing settings
+// @access  Admin only
+router.put('/settings/pricing', [auth, adminOnly], async (req, res) => {
+    try {
+        const { basicPrice, premiumPrice, vipPrice, currency, trialDays } = req.body;
+        const settings = await Settings.updateSettings({
+            pricing: { basicPrice, premiumPrice, vipPrice, currency, trialDays }
+        }, req.user._id);
+        
+        res.json({
+            success: true,
+            message: 'Pricing settings updated',
+            data: settings
+        });
+    } catch (error) {
+        console.error('Update pricing settings error:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 });
 

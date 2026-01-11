@@ -51,50 +51,114 @@
     // DOM Elements
     const body = document.body;
     const menuBtn = document.getElementById('menuToggle') || document.querySelector('.menu');
+    const navbarNav = document.querySelector('.navbar-nav');
     const sidebar = document.getElementById('aside') || document.querySelector('.app-aside');
     const searchBtn = document.querySelector('.search-btn');
     const headerSearch = document.querySelector('.header-search');
     const scrollUpBtn = document.querySelector('.scroll-up');
 
+    // Create sidebar backdrop if it doesn't exist
+    let sidebarBackdrop = document.querySelector('.sidebar-backdrop');
+    if (!sidebarBackdrop && sidebar) {
+        sidebarBackdrop = document.createElement('div');
+        sidebarBackdrop.className = 'sidebar-backdrop';
+        document.body.appendChild(sidebarBackdrop);
+    }
+
     // ===================================
-    // Mobile Menu Toggle
+    // Sidebar Toggle (works on all screen sizes)
     // ===================================
-    if (menuBtn && sidebar) {
+    function openSidebar() {
+        if (sidebar) {
+            sidebar.classList.add('show');
+            if (sidebarBackdrop) sidebarBackdrop.classList.add('show');
+            body.style.overflow = 'hidden';
+        }
+    }
+
+    function closeSidebar() {
+        if (sidebar) {
+            sidebar.classList.remove('show');
+            if (sidebarBackdrop) sidebarBackdrop.classList.remove('show');
+            body.style.overflow = '';
+        }
+    }
+
+    if (menuBtn) {
         menuBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            sidebar.classList.toggle('show');
-            body.style.overflow = sidebar.classList.contains('show') ? 'hidden' : '';
-            console.log('Menu clicked, sidebar show:', sidebar.classList.contains('show'));
+            if (sidebar && sidebar.classList.contains('show')) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
         });
-        
-        // Also handle keyboard accessibility
+
+        // Keyboard accessibility
         menuBtn.addEventListener('keypress', function(e) {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                sidebar.classList.toggle('show');
-                body.style.overflow = sidebar.classList.contains('show') ? 'hidden' : '';
+                if (sidebar && sidebar.classList.contains('show')) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
             }
         });
+    }
 
-        // Close sidebar when clicking outside
-        document.addEventListener('click', function(e) {
-            if (sidebar.classList.contains('show') &&
-                !sidebar.contains(e.target) &&
-                !menuBtn.contains(e.target)) {
-                sidebar.classList.remove('show');
-                body.style.overflow = '';
-            }
-        });
+    // Close sidebar when clicking backdrop
+    if (sidebarBackdrop) {
+        sidebarBackdrop.addEventListener('click', closeSidebar);
+    }
 
-        // Close button in sidebar
-        const modalClose = sidebar.querySelector('.modal-close');
-        if (modalClose) {
-            modalClose.addEventListener('click', function() {
-                sidebar.classList.remove('show');
-                body.style.overflow = '';
+    // Close sidebar on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && sidebar && sidebar.classList.contains('show')) {
+            closeSidebar();
+        }
+    });
+
+    // Handle sidebar close button
+    if (sidebar) {
+        const closeBtn = sidebar.querySelector('.modal-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                closeSidebar();
             });
         }
+    }
+
+    // ===================================
+    // Mobile Menu Toggle (for .navbar-nav) - Keep for backward compatibility
+    // ===================================
+    if (menuBtn && navbarNav && !sidebar) {
+        menuBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            navbarNav.classList.toggle('open');
+            body.style.overflow = navbarNav.classList.contains('open') ? 'hidden' : '';
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (navbarNav.classList.contains('open') &&
+                !navbarNav.contains(e.target) &&
+                !menuBtn.contains(e.target)) {
+                navbarNav.classList.remove('open');
+                body.style.overflow = '';
+            }
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && navbarNav.classList.contains('open')) {
+                navbarNav.classList.remove('open');
+                body.style.overflow = '';
+            }
+        });
     }
 
     // ===================================

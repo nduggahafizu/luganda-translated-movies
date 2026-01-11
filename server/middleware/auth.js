@@ -102,6 +102,18 @@ exports.checkSubscription = (requiredPlan) => {
     };
 };
 
+// Admin only middleware
+exports.admin = (req, res, next) => {
+    if (req.user && req.user.role === 'admin') {
+        next();
+    } else {
+        return res.status(403).json({
+            status: 'error',
+            message: 'Admin access required'
+        });
+    }
+};
+
 // Optional authentication - doesn't fail if no token
 exports.optionalAuth = async (req, res, next) => {
     try {

@@ -1,6 +1,45 @@
 const mongoose = require('mongoose');
 
+// Episode Schema (for TV Series)
+const episodeSchema = new mongoose.Schema({
+    episodeNumber: { type: Number, required: true },
+    name: { type: String, default: '' },
+    overview: { type: String, default: '' },
+    airDate: { type: String, default: '' },
+    stillPath: { type: String, default: '' },
+    runtime: { type: Number, default: 0 },
+    voteAverage: { type: Number, default: 0 },
+    // Video sources for this episode
+    video: {
+        embedUrl: { type: String, default: null },
+        streamtapeId: { type: String, default: null },
+        archiveUrl: { type: String, default: null },
+        provider: { type: String, enum: ['local', 'streamtape', 'archive', 'doodstream', 'filemoon', 'other'], default: 'archive' }
+    },
+    // Luganda translation info
+    vjName: { type: String, default: '' },
+    isTranslated: { type: Boolean, default: false }
+});
+
+// Season Schema (for TV Series)
+const seasonSchema = new mongoose.Schema({
+    seasonNumber: { type: Number, required: true },
+    name: { type: String, default: '' },
+    overview: { type: String, default: '' },
+    airDate: { type: String, default: '' },
+    posterPath: { type: String, default: '' },
+    episodeCount: { type: Number, default: 0 },
+    episodes: [episodeSchema]
+});
+
 const lugandaMovieSchema = new mongoose.Schema({
+    // Content Type - Movie or TV Series
+    contentType: {
+        type: String,
+        enum: ['movie', 'series'],
+        default: 'movie'
+    },
+    
     // Original Movie Information
     originalTitle: {
         type: String,
@@ -97,7 +136,7 @@ const lugandaMovieSchema = new mongoose.Schema({
     // Categories
     genres: [{
         type: String,
-        enum: ['action', 'comedy', 'drama', 'horror', 'sci-fi', 'romance', 'thriller', 'animation', 'fantasy', 'documentary', 'crime', 'mystery', 'adventure', 'family']
+        enum: ['action', 'comedy', 'drama', 'horror', 'sci-fi', 'romance', 'thriller', 'animation', 'fantasy', 'documentary', 'crime', 'mystery', 'adventure', 'family', 'war', 'history', 'western', 'music', 'tv movie', 'science fiction', 'other']
     }],
     
     // Cast and Crew
@@ -282,6 +321,42 @@ const lugandaMovieSchema = new mongoose.Schema({
         },
         url: String,
         streamUrl: String
+    },
+    
+    // TV Series specific fields
+    seasons: [seasonSchema],
+    
+    totalSeasons: {
+        type: Number,
+        default: 0
+    },
+    
+    totalEpisodes: {
+        type: Number,
+        default: 0
+    },
+    
+    seriesStatus: {
+        type: String,
+        enum: ['returning', 'ended', 'canceled', 'in_production', 'planned'],
+        default: 'ended'
+    },
+    
+    networks: [{
+        name: String,
+        logo: String
+    }],
+    
+    lastAirDate: {
+        type: String,
+        default: null
+    },
+    
+    nextEpisodeToAir: {
+        episodeNumber: Number,
+        seasonNumber: Number,
+        name: String,
+        airDate: String
     }
 }, {
     timestamps: true

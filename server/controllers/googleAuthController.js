@@ -1,4 +1,5 @@
 const { OAuth2Client } = require('google-auth-library');
+const { logger } = require('../middleware/logger');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
@@ -62,6 +63,8 @@ exports.googleSignIn = async (req, res) => {
                 user.verified = true;
             }
             
+            // Keep existing password if user has one (allows password login even after Google signup)
+            
             await user.save();
             console.log('Existing user updated:', user._id);
         }
@@ -74,7 +77,7 @@ exports.googleSignIn = async (req, res) => {
                 subscription: user.subscription.plan
             },
             process.env.JWT_SECRET || 'your-secret-key-change-this-in-production',
-            { expiresIn: '7d' }
+            { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
         );
         
         res.status(200).json({
@@ -88,26 +91,18 @@ exports.googleSignIn = async (req, res) => {
                     email: user.email,
                     profileImage: user.profileImage,
                     subscription: user.subscription,
-                    verified: user.verified
+                    verified: user.verified,
+                    role: user.role
                 }
             }
         });
         
     } catch (error) {
-        console.error('Google sign-in error:', error);
-        
-        // Handle specific errors
-        if (error.message && error.message.includes('Token used too late')) {
-            return res.status(401).json({
-                status: 'error',
-                message: 'Google token expired. Please try again.'
-            });
-        }
-        
+        logger.error('GoogleSignIn error', { error, requestId: req.requestId });
         res.status(401).json({
             status: 'error',
-            message: 'Invalid Google token. Please try again.',
-            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };
@@ -160,7 +155,7 @@ exports.login = async (req, res) => {
                 subscription: user.subscription.plan
             },
             process.env.JWT_SECRET || 'your-secret-key-change-this-in-production',
-            { expiresIn: '7d' }
+            { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
         );
         
         res.status(200).json({
@@ -180,11 +175,11 @@ exports.login = async (req, res) => {
         });
         
     } catch (error) {
-        console.error('Login error:', error);
+        logger.error('GoogleLogin error', { error, requestId: req.requestId });
         res.status(500).json({
             status: 'error',
-            message: 'Error logging in',
-            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };
@@ -236,7 +231,7 @@ exports.register = async (req, res) => {
                 subscription: user.subscription.plan
             },
             process.env.JWT_SECRET || 'your-secret-key-change-this-in-production',
-            { expiresIn: '7d' }
+            { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
         );
         
         res.status(201).json({
@@ -256,11 +251,11 @@ exports.register = async (req, res) => {
         });
         
     } catch (error) {
-        console.error('Registration error:', error);
+        logger.error('GoogleRegister error', { error, requestId: req.requestId });
         res.status(500).json({
             status: 'error',
-            message: 'Error registering user',
-            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };

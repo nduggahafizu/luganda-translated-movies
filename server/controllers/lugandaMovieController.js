@@ -1,4 +1,5 @@
 const LugandaMovie = require('../models/LugandaMovie');
+const { logger } = require('../middleware/logger');
 
 // @desc    Get all Luganda movies
 // @route   GET /api/luganda-movies
@@ -57,10 +58,11 @@ exports.getAllMovies = async (req, res) => {
             data: movies
         });
     } catch (error) {
+        logger.error('GetAllMovies error', { error, requestId: req.requestId });
         res.status(500).json({
             success: false,
-            message: 'Error fetching movies',
-            error: error.message
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };
@@ -94,10 +96,11 @@ exports.getMovie = async (req, res) => {
             data: movie
         });
     } catch (error) {
+        logger.error('GetMovie error', { error, requestId: req.requestId });
         res.status(500).json({
             success: false,
-            message: 'Error fetching movie',
-            error: error.message
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };
@@ -144,10 +147,11 @@ exports.searchMovies = async (req, res) => {
             data: movies
         });
     } catch (error) {
+        logger.error('SearchMovies error', { error, requestId: req.requestId });
         res.status(500).json({
             success: false,
-            message: 'Error searching movies',
-            error: error.message
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };
@@ -166,10 +170,11 @@ exports.getTrending = async (req, res) => {
             data: movies
         });
     } catch (error) {
+        logger.error('GetTrending error', { error, requestId: req.requestId });
         res.status(500).json({
             success: false,
-            message: 'Error fetching trending movies',
-            error: error.message
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };
@@ -188,10 +193,11 @@ exports.getFeatured = async (req, res) => {
             data: movies
         });
     } catch (error) {
+        logger.error('GetFeatured error', { error, requestId: req.requestId });
         res.status(500).json({
             success: false,
-            message: 'Error fetching featured movies',
-            error: error.message
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };
@@ -210,10 +216,11 @@ exports.getLatest = async (req, res) => {
             data: movies
         });
     } catch (error) {
+        logger.error('GetLatest error', { error, requestId: req.requestId });
         res.status(500).json({
             success: false,
-            message: 'Error fetching latest movies',
-            error: error.message
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };
@@ -234,10 +241,11 @@ exports.getByVJ = async (req, res) => {
             data: movies
         });
     } catch (error) {
+        logger.error('GetByVJ error', { error, requestId: req.requestId });
         res.status(500).json({
             success: false,
-            message: 'Error fetching VJ movies',
-            error: error.message
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };
@@ -266,10 +274,11 @@ exports.getAllVJs = async (req, res) => {
             data: vjs
         });
     } catch (error) {
+        logger.error('GetAllVJs error', { error, requestId: req.requestId });
         res.status(500).json({
             success: false,
-            message: 'Error fetching VJs',
-            error: error.message
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };
@@ -305,10 +314,11 @@ exports.rateMovie = async (req, res) => {
             data: movie
         });
     } catch (error) {
+        logger.error('RateMovie error', { error, requestId: req.requestId });
         res.status(500).json({
             success: false,
-            message: 'Error adding rating',
-            error: error.message
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };
@@ -344,10 +354,11 @@ exports.rateTranslation = async (req, res) => {
             data: movie
         });
     } catch (error) {
+        logger.error('RateTranslation error', { error, requestId: req.requestId });
         res.status(500).json({
             success: false,
-            message: 'Error adding translation rating',
-            error: error.message
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };
@@ -365,10 +376,11 @@ exports.createMovie = async (req, res) => {
             data: movie
         });
     } catch (error) {
+        logger.error('CreateMovie error', { error, requestId: req.requestId });
         res.status(400).json({
             success: false,
-            message: 'Error creating movie',
-            error: error.message
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };
@@ -400,10 +412,11 @@ exports.updateMovie = async (req, res) => {
             data: movie
         });
     } catch (error) {
+        logger.error('UpdateMovie error', { error, requestId: req.requestId });
         res.status(400).json({
             success: false,
-            message: 'Error updating movie',
-            error: error.message
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };
@@ -427,10 +440,11 @@ exports.deleteMovie = async (req, res) => {
             message: 'Movie deleted successfully'
         });
     } catch (error) {
+        logger.error('DeleteMovie error', { error, requestId: req.requestId });
         res.status(500).json({
             success: false,
-            message: 'Error deleting movie',
-            error: error.message
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };
@@ -464,10 +478,11 @@ exports.getStreamUrl = async (req, res) => {
             }
         });
     } catch (error) {
+        logger.error('GetStreamUrl error', { error, requestId: req.requestId });
         res.status(500).json({
             success: false,
-            message: 'Error fetching stream URL',
-            error: error.message
+            message: 'Something went wrong',
+            requestId: req.requestId
         });
     }
 };

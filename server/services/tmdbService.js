@@ -73,6 +73,120 @@ class TMDBService {
     }
 
     /**
+     * Search TV series by title
+     */
+    async searchTVShows(query, page = 1, year = null) {
+        const params = {
+            query,
+            page,
+            include_adult: false
+        };
+        
+        if (year) {
+            params.first_air_date_year = year;
+        }
+        
+        return await this.makeRequest('/search/tv', params);
+    }
+
+    /**
+     * Search both movies and TV series (multi search)
+     */
+    async searchMulti(query, page = 1) {
+        const params = {
+            query,
+            page,
+            include_adult: false
+        };
+        
+        return await this.makeRequest('/search/multi', params);
+    }
+
+    /**
+     * Get TV show details by TMDB ID
+     */
+    async getTVShowDetails(tvId) {
+        return await this.makeRequest(`/tv/${tvId}`, {
+            append_to_response: 'credits,videos,images,keywords,similar,content_ratings'
+        });
+    }
+
+    /**
+     * Get TV show season details
+     */
+    async getTVSeasonDetails(tvId, seasonNumber) {
+        return await this.makeRequest(`/tv/${tvId}/season/${seasonNumber}`);
+    }
+
+    /**
+     * Get TV show episode details
+     */
+    async getTVEpisodeDetails(tvId, seasonNumber, episodeNumber) {
+        return await this.makeRequest(`/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}`);
+    }
+
+    /**
+     * Get popular TV shows
+     */
+    async getPopularTVShows(page = 1) {
+        return await this.makeRequest('/tv/popular', { page });
+    }
+
+    /**
+     * Get trending TV shows
+     */
+    async getTrendingTVShows(timeWindow = 'week', page = 1) {
+        return await this.makeRequest(`/trending/tv/${timeWindow}`, { page });
+    }
+
+    /**
+     * Get top rated TV shows
+     */
+    async getTopRatedTVShows(page = 1) {
+        return await this.makeRequest('/tv/top_rated', { page });
+    }
+
+    /**
+     * Get currently airing TV shows
+     */
+    async getOnTheAirTVShows(page = 1) {
+        return await this.makeRequest('/tv/on_the_air', { page });
+    }
+
+    /**
+     * Get TV shows airing today
+     */
+    async getAiringTodayTVShows(page = 1) {
+        return await this.makeRequest('/tv/airing_today', { page });
+    }
+
+    /**
+     * Discover TV shows with filters
+     */
+    async discoverTVShows(filters = {}) {
+        const params = {
+            page: filters.page || 1,
+            sort_by: filters.sortBy || 'popularity.desc',
+            include_adult: false
+        };
+
+        if (filters.year) params.first_air_date_year = filters.year;
+        if (filters.genreIds) params.with_genres = filters.genreIds.join(',');
+        if (filters.minRating) params['vote_average.gte'] = filters.minRating;
+        if (filters.minVotes) params['vote_count.gte'] = filters.minVotes;
+        if (filters.language) params.with_original_language = filters.language;
+
+        return await this.makeRequest('/discover/tv', params);
+    }
+
+    /**
+     * Get TV show genres list
+     */
+    async getTVGenres() {
+        return await this.makeRequest('/genre/tv/list');
+    }
+
+    /**
      * Get movie details by TMDB ID
      */
     async getMovieDetails(movieId) {
@@ -237,6 +351,147 @@ class TMDBService {
      */
     getProfileUrl(path, size = 'w185') {
         return this.getImageUrl(path, size);
+    }
+
+    /**
+     * Get complete TV series with ALL seasons and episodes
+     * This is the main function for importing a series with all data
+     */
+    async getTVSeriesComplete(tmdbId) {
+        try {
+            // Step 1: Get main series info
+            const seriesInfo = await this.getTVShowDetails(tmdbId);
+            
+            if (!seriesInfo) {
+                throw new Error('TV series not found');
+            }
+
+            // Step 2: Fetch ALL seasons with episodes
+            const seasons = [];
+            const numberOfSeasons = seriesInfo.number_of_seasons || 0;
+
+            for (let seasonNum = 1; seasonNum <= numberOfSeasons; seasonNum++) {
+                try {
+                    const seasonData = await this.getTVSeasonDetails(tmdbId, seasonNum);
+                    
+                    if (seasonData) {
+                        // Format episodes for this season
+                        const episodes = (seasonData.episodes || []).map(ep => ({
+                            episodeNumber: ep.episode_number,
+                            name: ep.name || `Episode ${ep.episode_number}`,
+                            overview: ep.overview || '',
+                            airDate: ep.air_date || null,
+                            stillPath: ep.still_path ? this.getImageUrl(ep.still_path, 'w500') : null,
+                            runtime: ep.runtime || 0,
+                            voteAverage: ep.vote_average || 0,
+                            // Video URLs will be added manually by admin
+                            video: {
+                                embedUrl: '',
+                                streamtapeId: '',
+                                archiveUrl: '',
+                                provider: ''
+                            },
+                            vjName: '',
+                            isTranslated: false
+                        }));
+
+                        seasons.push({
+                            seasonNumber: seasonNum,
+                            name: seasonData.name || `Season ${seasonNum}`,
+                            overview: seasonData.overview || '',
+                            airDate: seasonData.air_date || null,
+                            posterPath: seasonData.poster_path ? this.getImageUrl(seasonData.poster_path, 'w500') : null,
+                            episodeCount: episodes.length,
+                            episodes: episodes
+                        });
+                    }
+                } catch (seasonError) {
+                    console.error(`Error fetching season ${seasonNum}:`, seasonError.message);
+                    // Continue with other seasons even if one fails
+                }
+            }
+
+            // Step 3: Calculate totals
+            const totalEpisodes = seasons.reduce((sum, s) => sum + s.episodes.length, 0);
+
+            // Step 4: Format complete series data for database
+            return {
+                contentType: 'series',
+                tmdbId: seriesInfo.id,
+                originalTitle: seriesInfo.name || seriesInfo.original_name,
+                lugandaTitle: seriesInfo.name || seriesInfo.original_name, // Admin can change
+                description: seriesInfo.overview || '',
+                year: seriesInfo.first_air_date ? new Date(seriesInfo.first_air_date).getFullYear() : null,
+                rating: {
+                    imdb: seriesInfo.vote_average || 0,
+                    userRating: 0,
+                    totalRatings: seriesInfo.vote_count || 0
+                },
+                genres: seriesInfo.genres ? seriesInfo.genres.map(g => g.name.toLowerCase()) : [],
+                poster: this.getPosterUrl(seriesInfo.poster_path),
+                backdrop: this.getBackdropUrl(seriesInfo.backdrop_path),
+                country: seriesInfo.origin_country && seriesInfo.origin_country[0] 
+                    ? seriesInfo.origin_country[0] 
+                    : 'USA',
+                originalLanguage: seriesInfo.original_language || 'en',
+                metaData: {
+                    tmdbId: seriesInfo.id.toString()
+                },
+                cast: seriesInfo.credits && seriesInfo.credits.cast 
+                    ? seriesInfo.credits.cast.slice(0, 10).map(actor => ({
+                        name: actor.name,
+                        character: actor.character,
+                        image: this.getProfileUrl(actor.profile_path)
+                    }))
+                    : [],
+                director: seriesInfo.created_by && seriesInfo.created_by.length > 0
+                    ? seriesInfo.created_by.map(c => c.name).join(', ')
+                    : 'Unknown',
+                // TV Series specific fields
+                seasons: seasons,
+                totalSeasons: numberOfSeasons,
+                totalEpisodes: totalEpisodes,
+                seriesStatus: seriesInfo.status || 'Unknown',
+                networks: seriesInfo.networks ? seriesInfo.networks.map(n => n.name) : [],
+                lastAirDate: seriesInfo.last_air_date || null,
+                nextEpisodeToAir: seriesInfo.next_episode_to_air ? {
+                    airDate: seriesInfo.next_episode_to_air.air_date,
+                    episodeNumber: seriesInfo.next_episode_to_air.episode_number,
+                    seasonNumber: seriesInfo.next_episode_to_air.season_number,
+                    name: seriesInfo.next_episode_to_air.name
+                } : null,
+                // Default values
+                vjName: '',
+                status: 'draft',
+                isFeatured: false,
+                views: 0,
+                translationDate: new Date()
+            };
+        } catch (error) {
+            console.error('Error fetching complete TV series:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Search and get complete series data (convenience method)
+     */
+    async searchAndImportSeries(query, year = null) {
+        try {
+            // Search for the series
+            const searchResults = await this.searchTVShows(query, 1, year);
+            
+            if (!searchResults.results || searchResults.results.length === 0) {
+                throw new Error('No TV series found');
+            }
+
+            // Get the first result's complete data
+            const firstResult = searchResults.results[0];
+            return await this.getTVSeriesComplete(firstResult.id);
+        } catch (error) {
+            console.error('Error searching and importing series:', error);
+            throw error;
+        }
     }
 
     /**

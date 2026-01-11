@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="css/responsive.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     
+    <!-- API Config -->
+    <script src="js/config.js"></script>
+    
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
     
@@ -346,8 +349,7 @@
 
     <script>
         // Configuration
-        // Use centralized API config (defined in js/config.js) so production/dev URLs stay in sync
-        const API_URL = API_CONFIG.BASE_URL + '/api';
+        const API_URL = (typeof API_CONFIG !== 'undefined' ? API_CONFIG.BASE_URL : 'https://luganda-translated-movies-production.up.railway.app') + '/api';
         const STRIPE_PUBLIC_KEY = 'pk_test_your_key'; // Add your Stripe public key
         
         // Get plan details from URL
@@ -502,7 +504,7 @@
             setLoading(false);
         });
         
-        // Mobile money payment
+        // Mobile money payment via PesaPal
         document.getElementById('payment-form-mobile').addEventListener('submit', async (e) => {
             e.preventDefault();
             setLoading(true);
@@ -518,6 +520,18 @@
             const network = document.getElementById('network').value;
             const phone = document.getElementById('phone').value;
             
+            if (!network) {
+                showError('Please select a network');
+                setLoading(false);
+                return;
+            }
+            
+            if (!phone || phone.length < 10) {
+                showError('Please enter a valid phone number');
+                setLoading(false);
+                return;
+            }
+            
             try {
                 const response = await fetch(`${API_URL}/payments/pesapal/initiate`, {
                     method: 'POST',
@@ -529,29 +543,52 @@
                         subscriptionPlan: plan,
                         subscriptionDuration: duration,
                         amount: pricing[plan][duration].ugx,
-                        paymentMethod: network === 'MTN' ? 'mtn_mobile_money' : 'airtel_money',
+                        currency: 'UGX',
                         phoneNumber: phone,
-                        network: network
+                        paymentMethod: network.toLowerCase() + '_money',
+                        description: `Unruly Movies ${plan} subscription (${duration})`
                     })
                 });
                 
                 const data = await response.json();
+                console.log('PesaPal response:', data);
                 
-                if (data.status === 'success') {
-                    showSuccess('Payment initiated! Please complete on your phone.');
-                    // Redirect to Pesapal if needed
-                    if (data.data.redirectUrl) {
-                        setTimeout(() => window.location.href = data.data.redirectUrl, 2000);
+                if (data.status === 'success' || response.ok) {
+                    // PesaPal returns a redirect URL for the user to complete payment
+                    if (data.data && data.data.redirectUrl) {
+                        showSuccess('Redirecting to PesaPal to complete payment...');
+                        setTimeout(() => {
+                            window.location.href = data.data.redirectUrl;
+                        }, 1500);
+                    } else if (data.data && data.data.iframe_url) {
+                        showSuccess('Redirecting to payment page...');
+                        setTimeout(() => {
+                            window.location.href = data.data.iframe_url;
+                        }, 1500);
+                    } else {
+                        showSuccess('Payment request sent! Check your phone and enter your PIN.');
+                        // Poll for status or show instructions
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.html?payment=pending';
+                        }, 3000);
                     }
                 } else {
-                    showError(data.message || 'Payment failed');
+                    showError(data.message || 'Payment initiation failed. Please try again.');
                 }
             } catch (error) {
-                showError('Payment error: ' + error.message);
+                console.error('Payment error:', error);
+                showError('Payment error: ' + (error.message || 'Network error. Please try again.'));
             }
             
             setLoading(false);
         });
     </script>
+    
+    <!-- Footer -->
+    <footer class="site-footer" style="margin-top: 40px;">
+        <div class="footer-bottom">
+            <p>Copyright © unruly movies watch 2026</p>
+        </div>
+    </footer>
 </body>
 </html>

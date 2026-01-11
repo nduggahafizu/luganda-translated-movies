@@ -143,4 +143,72 @@ router.delete('/', protect, async (req, res) => {
     }
 });
 
+// Admin: Send system announcement to all users
+router.post('/announce', protect, async (req, res) => {
+    try {
+        // Check if user is admin (add proper admin check based on your auth system)
+        if (!req.user.role || req.user.role !== 'admin') {
+            return res.status(403).json({ status: 'error', message: 'Admin access required' });
+        }
+
+        const { title, message, link } = req.body;
+
+        if (!title || !message) {
+            return res.status(400).json({ status: 'error', message: 'Title and message are required' });
+        }
+
+        const { sendSystemAnnouncement } = require('../utils/notificationService');
+        const result = await sendSystemAnnouncement(title, message, link);
+
+        if (result.success) {
+            res.json({
+                status: 'success',
+                message: `Announcement sent to ${result.notified} users`
+            });
+        } else {
+            res.status(500).json({ status: 'error', message: result.error });
+        }
+    } catch (error) {
+        console.error('Send announcement error:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to send announcement' });
+    }
+});
+
+// Admin: Manually trigger new movie notification
+router.post('/notify-movie/:movieId', protect, async (req, res) => {
+    try {
+        // Check if user is admin
+        if (!req.user.role || req.user.role !== 'admin') {
+            return res.status(403).json({ status: 'error', message: 'Admin access required' });
+        }
+
+        const { movieId } = req.params;
+        const LugandaMovie = require('../models/LugandaMovie');
+        const movie = await LugandaMovie.findById(movieId);
+
+        if (!movie) {
+            return res.status(404).json({ status: 'error', message: 'Movie not found' });
+        }
+
+        const { notifyNewMovie, notifyVjFollowers } = require('../utils/notificationService');
+        
+        const [newMovieResult, vjResult] = await Promise.all([
+            notifyNewMovie(movie),
+            notifyVjFollowers(movie, movie.vjName)
+        ]);
+
+        res.json({
+            status: 'success',
+            message: 'Notifications sent',
+            data: {
+                newMovieNotifications: newMovieResult.notified || 0,
+                vjFollowerNotifications: vjResult.notified || 0
+            }
+        });
+    } catch (error) {
+        console.error('Manual movie notification error:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to send notifications' });
+    }
+});
+
 module.exports = router;

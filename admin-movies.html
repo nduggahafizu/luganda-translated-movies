@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Manage Movies - Admin | Unruly Movies</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { box-sizing: border-box; }
+        
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .admin-sidebar {
+            width: 260px;
+            background: var(--background-light);
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .admin-logo img { height: 35px; }
+        .admin-logo span {
+            font-size: 12px;
+            background: var(--primary-color);
+            color: #000;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .admin-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .admin-nav li { margin-bottom: 5px; }
+        
+        .admin-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .admin-nav a:hover, .admin-nav a.active {
+            background: rgba(124, 252, 0, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .admin-nav svg { width: 20px; height: 20px; }
+        
+        .nav-section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin: 25px 0 10px;
+            padding-left: 15px;
+            letter-spacing: 1px;
+        }
+        
+        .admin-main {
+            flex: 1;
+            margin-left: 260px;
+            padding: 30px;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .admin-title { font-size: 28px; font-weight: 700; }
+        
+        .admin-actions { display: flex; gap: 15px; align-items: center; }
+        
+        .btn-admin {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: var(--primary-color);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-admin:hover {
+            background: #9dff44;
+            transform: translateY(-2px);
+        }
+        
+        .btn-admin.secondary {
+            background: var(--background-light);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .panel {
+            background: var(--background-light);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .panel-title { font-size: 18px; font-weight: 600; }
+        
+        /* Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--background-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(124, 252, 0, 0.1);
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .input-with-button {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .input-with-button input { flex: 1; }
+        
+        .btn-search {
+            padding: 12px 20px;
+            background: #00d9ff;
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .btn-search:hover {
+            background: #00c4e6;
+        }
+        
+        .btn-search:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            padding: 10px 18px;
+            background: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(124, 252, 0, 0.1);
+        }
+        
+        /* TMDB Preview */
+        .tmdb-preview {
+            display: none;
+            background: var(--background-dark);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .tmdb-preview.show { display: block; }
+        
+        .tmdb-preview-content {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .tmdb-poster {
+            width: 150px;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+        
+        .tmdb-info { flex: 1; }
+        .tmdb-info h3 { margin-bottom: 10px; color: var(--primary-color); }
+        .tmdb-info p { color: var(--text-secondary); margin-bottom: 10px; font-size: 14px; }
+        .tmdb-info .genres { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+        .tmdb-info .genres span {
+            background: rgba(124, 252, 0, 0.1);
+            color: var(--primary-color);
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        
+        /* Movie List */
+        .movies-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .movies-table th,
+        .movies-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .movies-table th {
+            background: var(--background-dark);
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .movies-table tr:hover td {
+            background: rgba(124, 252, 0, 0.02);
+        }
+        
+        .movie-row-poster {
+            width: 50px;
+            height: 70px;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+        
+        .movie-row-title {
+            font-weight: 500;
+        }
+        
+        .movie-row-vj {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            background: rgba(124, 252, 0, 0.1);
+            border-radius: 15px;
+            font-size: 12px;
+            color: var(--primary-color);
+        }
+        
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-badge.published { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+        .status-badge.draft { background: rgba(255, 159, 67, 0.1); color: #ff9f43; }
+        
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 8px;
+            background: var(--background-dark);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            background: var(--primary-color);
+            color: #000;
+        }
+        
+        .action-btn.delete:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+        
+        .action-btn svg { width: 16px; height: 16px; }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .tab-btn {
+            padding: 10px 20px;
+            background: var(--background-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn.active {
+            background: var(--primary-color);
+            color: #000;
+            border-color: var(--primary-color);
+        }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* Search & Filter */
+        .search-filter {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            background: var(--background-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 500;
+            z-index: 10000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast.success { background: #22c55e; }
+        .toast.error { background: #ef4444; }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--background-light);
+            border-radius: 15px;
+            padding: 30px;
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .modal-header h2 {
+            font-size: 22px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+        
+        .modal-close:hover {
+            color: #ef4444;
+        }
+        
+        /* Checkbox */
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .checkbox-label input { width: 18px; height: 18px; accent-color: var(--primary-color); }
+        
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+        
+        .loading.show { display: block; }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        @media (max-width: 1200px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full-width { grid-column: span 1; }
+        }
+        
+        @media (max-width: 768px) {
+            .admin-sidebar { display: none; }
+            .admin-main { margin-left: 0; }
+            .tmdb-preview-content { flex-direction: column; }
+            .movies-table { font-size: 12px; }
+            .tabs { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <img src="assets/images/logo.png" alt="Unruly Movies">
+                <span>Admin</span>
+            </div>
+            
+            <nav>
+                <ul class="admin-nav">
+                    <li>
+                        <a href="admin.html">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="9"></rect>
+                                <rect x="14" y="3" width="7" height="5"></rect>
+                                <rect x="14" y="12" width="7" height="9"></rect>
+                                <rect x="3" y="16" width="7" height="5"></rect>
+                            </svg>
+                            Dashboard
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="nav-section-title">Content</div>
+                <ul class="admin-nav">
+                    <li>
+                        <a href="admin-movies.html" class="active">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                                <line x1="7" y1="2" x2="7" y2="22"></line>
+                                <line x1="17" y1="2" x2="17" y2="22"></line>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                            </svg>
+                            Movies
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-vjs.html">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            VJ Translators
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="nav-section-title">Settings</div>
+                <ul class="admin-nav">
+                    <li>
+                        <a href="admin-requests.html">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                            User Requests
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin-settings.html">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
+                            Settings
+                        </a>
+                    </li>
+                    <li>
+                        <a href="index.html">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            </svg>
+                            View Site
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="admin-main">
+            <div class="admin-header">
+                <h1 class="admin-title">Manage Movies</h1>
+                <div class="admin-actions">
+                    <button class="btn-admin" onclick="showTab('add')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add New Movie
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('list')">All Movies</button>
+                <button class="tab-btn" onclick="showTab('add')">Add Movie</button>
+                <button class="tab-btn" onclick="showTab('bulk')">Bulk Upload</button>
+            </div>
+            
+            <!-- Movies List Tab -->
+            <div id="list-tab" class="tab-content active">
+                <div class="panel">
+                    <div class="search-filter">
+                        <input type="text" class="search-input" placeholder="Search movies..." id="search-movies" oninput="filterMovies()">
+                        <select class="search-input" style="width: 200px;" id="filter-vj" onchange="filterMovies()">
+                            <option value="">All VJs</option>
+                            <option value="VJ Junior">VJ Junior</option>
+                            <option value="VJ Ice P">VJ Ice P</option>
+                            <option value="VJ Emmy">VJ Emmy</option>
+                            <option value="VJ Jingo">VJ Jingo</option>
+                            <option value="VJ Mark">VJ Mark</option>
+                        </select>
+                    </div>
+                    
+                    <div class="loading" id="movies-loading">
+                        <div class="spinner"></div>
+                        <p>Loading movies...</p>
+                    </div>
+                    
+                    <div class="empty-state" id="no-movies" style="display: none;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                            <line x1="7" y1="2" x2="7" y2="22"></line>
+                            <line x1="17" y1="2" x2="17" y2="22"></line>
+                        </svg>
+                        <h3>No movies found</h3>
+                        <p>Add your first movie to get started</p>
+                    </div>
+                    
+                    <table class="movies-table" id="movies-table" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th>Poster</th>
+                                <th>Title</th>
+                                <th>VJ</th>
+                                <th>Year</th>
+                                <th>Status</th>
+                                <th>Views</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="movies-tbody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Add Movie Tab -->
+            <div id="add-tab" class="tab-content">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Add New Movie</h2>
+                    </div>
+                    
+                    <form id="add-movie-form">
+                        <!-- TMDB Search -->
+                        <div class="form-group">
+                            <label>🔍 Search TMDB for Movie/Series Details (Auto-fill)</label>
+                            <div class="input-with-button" style="display: flex; gap: 10px;">
+                                <input type="text" id="tmdb-search" placeholder="Enter title to search TMDB..." style="flex: 1;">
+                                <select id="tmdb-type" style="width: 120px; padding: 10px; border-radius: 8px; background: var(--background-light); border: 1px solid var(--border-color); color: var(--text-primary);">
+                                    <option value="multi">Both</option>
+                                    <option value="movie">Movie</option>
+                                    <option value="tv">TV Series</option>
+                                </select>
+                                <button type="button" class="btn-search" onclick="searchTMDB()">Search</button>
+                            </div>
+                        </div>
+                        
+                        <!-- TMDB Preview -->
+                        <div class="tmdb-preview" id="tmdb-preview">
+                            <div class="tmdb-preview-content">
+                                <img src="" alt="Movie Poster" class="tmdb-poster" id="preview-poster">
+                                <div class="tmdb-info">
+                                    <h3 id="preview-title">Movie Title</h3>
+                                    <p><strong>Year:</strong> <span id="preview-year"></span> | <strong>Runtime:</strong> <span id="preview-runtime"></span> min</p>
+                                    <div class="genres" id="preview-genres"></div>
+                                    <p id="preview-overview"></p>
+                                    <button type="button" class="btn-admin" onclick="useTMDBData()">✓ Use This Movie</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr style="border-color: var(--border-color); margin: 25px 0;">
+                        
+                        <div class="form-grid">
+                            <!-- Basic Info -->
+                            <div class="form-group">
+                                <label>Original Title *</label>
+                                <input type="text" id="movie-title" required placeholder="e.g., John Wick">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Luganda Title</label>
+                                <input type="text" id="movie-luganda-title" placeholder="e.g., John Wick (Oluganda)">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>VJ Translator *</label>
+                                <select id="movie-vj" required>
+                                    <option value="">Select VJ</option>
+                                    <option value="VJ Junior">VJ Junior</option>
+                                    <option value="VJ Ice P">VJ Ice P</option>
+                                    <option value="VJ Emmy">VJ Emmy</option>
+                                    <option value="VJ Jingo">VJ Jingo</option>
+                                    <option value="VJ Mark">VJ Mark</option>
+                                    <option value="VJ Fredy">VJ Fredy</option>
+                                    <option value="VJ Soul">VJ Soul</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Year</label>
+                                <input type="number" id="movie-year" placeholder="2024" min="1900" max="2030">
+                            </div>
+                            
+                            <!-- Video Source -->
+                            <div class="form-group full-width">
+                                <label>📺 Video URL *</label>
+                                <input type="url" id="movie-embed-url" required placeholder="https://archive.org/embed/your-item-id">
+                                <small style="color: var(--text-secondary);">
+                                    Paste the embed URL from Archive.org (recommended), Streamtape, or other hosts.
+                                </small>
+                            </div>
+                            
+                            <!-- Archive.org Helper -->
+                            <div class="form-group full-width" style="background: rgba(124, 252, 0, 0.05); padding: 15px; border-radius: 10px; border: 1px dashed var(--primary-color);">
+                                <label style="color: var(--primary-color);">🎬 Archive.org Embed Helper (FREE, No Ads, Works for MKV!)</label>
+                                <div style="margin-top: 10px;">
+                                    <input type="text" id="archive-item-id" placeholder="Item ID from URL (e.g., sisu.-road.to.-revenge.-a.-k.-a.-sisu.-2.2025.1080p.-ice.part-01)" style="width: 100%;">
+                                </div>
+                                <div style="margin-top: 10px; display: flex; gap: 10px;">
+                                    <button type="button" class="btn-secondary" onclick="generateArchiveUrl()" style="flex: 1;">
+                                        Generate Embed URL
+                                    </button>
+                                    <a href="https://archive.org/upload" target="_blank" class="btn-secondary" style="text-align: center; text-decoration: none;">
+                                        Upload to Archive.org →
+                                    </a>
+                                </div>
+                                <small style="color: var(--text-secondary); margin-top: 8px; display: block;">
+                                    <strong>How to use:</strong> Upload video to archive.org → Copy Item ID from URL → Click Generate<br>
+                                    <strong>Example:</strong> From <code>archive.org/details/<b>my-movie-2024</b></code> → Item ID is <b>my-movie-2024</b>
+                                </small>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label>Description</label>
+                                <textarea id="movie-description" placeholder="Movie plot summary..."></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Poster URL</label>
+                                <input type="url" id="movie-poster" placeholder="https://image.tmdb.org/t/p/w500/...">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Backdrop URL</label>
+                                <input type="url" id="movie-backdrop" placeholder="https://image.tmdb.org/t/p/original/...">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Runtime (minutes)</label>
+                                <input type="number" id="movie-runtime" placeholder="120">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Genres (comma separated)</label>
+                                <input type="text" id="movie-genres" placeholder="Action, Thriller, Drama">
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label>Options</label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="movie-featured">
+                                        Featured on Homepage
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="movie-trending">
+                                        Mark as Trending
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <input type="hidden" id="movie-tmdb-id">
+                        
+                        <div style="display: flex; gap: 15px; margin-top: 20px;">
+                            <button type="submit" class="btn-admin">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                    <polyline points="7 3 7 8 15 8"></polyline>
+                                </svg>
+                                Save Movie
+                            </button>
+                            <button type="button" class="btn-admin secondary" onclick="clearForm()">Clear Form</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Bulk Upload Tab -->
+            <div id="bulk-tab" class="tab-content">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Bulk Upload Movies</h2>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Paste Movie Data (JSON format)</label>
+                        <textarea id="bulk-data" style="min-height: 300px; font-family: monospace;" placeholder='[
+  {
+    "title": "John Wick",
+    "vjName": "VJ Ice P",
+    "embedUrl": "https://streamtape.com/e/xxx",
+    "year": 2014,
+    "genres": ["Action", "Thriller"]
+  },
+  {
+    "title": "The Matrix",
+    "vjName": "VJ Emmy",
+    "embedUrl": "https://streamtape.com/e/yyy"
+  }
+]'></textarea>
+                    </div>
+                    
+                    <button type="button" class="btn-admin" onclick="bulkUpload()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        Upload All Movies
+                    </button>
+                    
+                    <div style="margin-top: 20px; padding: 20px; background: var(--background-dark); border-radius: 10px;">
+                        <h4 style="color: var(--primary-color); margin-bottom: 10px;">📋 JSON Format Guide</h4>
+                        <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.8;">
+                            Required fields: <code>title</code>, <code>vjName</code>, <code>embedUrl</code><br>
+                            Optional fields: <code>year</code>, <code>genres</code>, <code>description</code>, <code>poster</code>, <code>backdrop</code>, <code>featured</code>, <code>trending</code>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Edit Movie Modal -->
+    <div class="modal-overlay" id="edit-modal" onclick="closeEditModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2>✏️ Edit Movie</h2>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="edit-movie-form" onsubmit="saveMovieChanges(event)">
+                <input type="hidden" id="edit-movie-id">
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Original Title *</label>
+                        <input type="text" id="edit-title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Luganda Title</label>
+                        <input type="text" id="edit-luganda-title">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>VJ Translator *</label>
+                        <select id="edit-vj" required>
+                            <option value="">Select VJ</option>
+                            <option value="VJ Junior">VJ Junior</option>
+                            <option value="VJ Ice P">VJ Ice P</option>
+                            <option value="VJ Emmy">VJ Emmy</option>
+                            <option value="VJ Jingo">VJ Jingo</option>
+                            <option value="VJ Mark">VJ Mark</option>
+                            <option value="VJ Fredy">VJ Fredy</option>
+                            <option value="VJ Soul">VJ Soul</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Year</label>
+                        <input type="number" id="edit-year" min="1900" max="2030">
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label>📺 Video URL *</label>
+                        <input type="url" id="edit-embed-url" required placeholder="https://archive.org/download/...">
+                        <small style="color: var(--text-secondary);">
+                            Archive.org, Streamtape, or other video URL
+                        </small>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label>Description</label>
+                        <textarea id="edit-description" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Poster URL</label>
+                        <input type="url" id="edit-poster">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Backdrop URL</label>
+                        <input type="url" id="edit-backdrop">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Runtime (minutes)</label>
+                        <input type="number" id="edit-runtime">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Genres (comma separated)</label>
+                        <input type="text" id="edit-genres" placeholder="Action, Thriller">
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label>Options</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="edit-featured">
+                                Featured on Homepage
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="edit-trending">
+                                Mark as Trending
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 15px; margin-top: 20px;">
+                    <button type="submit" class="btn-admin" style="flex: 1;">
+                        💾 Save Changes
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="closeEditModal()" style="flex: 1;">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+    
+    <script src="js/config.js"></script>
+    <script>
+        // Configuration
+        const API_BASE = API_CONFIG.BASE_URL + '/api';
+        let allMovies = [];
+        let currentTMDBData = null;
+        
+        // Get auth token (check both localStorage and sessionStorage)
+        function getAuthHeaders() {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': token ? `Bearer ${token}` : ''
+            };
+        }
+        
+        // Check admin auth on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
+            
+            if (!token || user.role !== 'admin') {
+                alert('Access denied. Admin only.');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            loadMovies();
+        });
+        
+        // Show tab
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        
+        // Generate Archive.org URL (use embed URL for best compatibility)
+        function generateArchiveUrl() {
+            const itemId = document.getElementById('archive-item-id').value.trim();
+            
+            if (!itemId) {
+                showToast('Please enter the Archive.org Item ID', 'error');
+                return;
+            }
+            
+            // Generate the EMBED URL (works for all formats including MKV!)
+            const archiveUrl = `https://archive.org/embed/${itemId}`;
+            
+            // Set the embed URL field
+            document.getElementById('movie-embed-url').value = archiveUrl;
+            
+            showToast('Archive.org embed URL generated! ✓', 'success');
+        }
+        
+        // Load movies from API
+        async function loadMovies() {
+            const loading = document.getElementById('movies-loading');
+            const table = document.getElementById('movies-table');
+            const noMovies = document.getElementById('no-movies');
+            
+            loading.classList.add('show');
+            table.style.display = 'none';
+            noMovies.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_BASE}/luganda-movies?limit=100`, {
+                    headers: getAuthHeaders()
+                });
+                const data = await response.json();
+                
+                loading.classList.remove('show');
+                
+                if (data.success && data.data && data.data.length > 0) {
+                    allMovies = data.data;
+                    renderMovies(allMovies);
+                    table.style.display = 'table';
+                } else {
+                    noMovies.style.display = 'block';
+                }
+            } catch (error) {
+                loading.classList.remove('show');
+                console.error('Error loading movies:', error);
+                showToast('Failed to load movies', 'error');
+            }
+        }
+        
+        // Render movies table
+        function renderMovies(movies) {
+            const tbody = document.getElementById('movies-tbody');
+            tbody.innerHTML = movies.map(movie => `
+                <tr>
+                    <td>
+                        <img src="${movie.poster || '/assets/images/placeholder.svg'}" 
+                             alt="${movie.originalTitle}" class="movie-row-poster"
+                             onerror="this.src='/assets/images/placeholder.svg'">
+                    </td>
+                    <td>
+                        <div class="movie-row-title">${movie.originalTitle || movie.title}</div>
+                        ${movie.lugandaTitle ? `<small style="color: var(--text-secondary)">${movie.lugandaTitle}</small>` : ''}
+                    </td>
+                    <td><span class="movie-row-vj">${movie.vjName || 'Unknown'}</span></td>
+                    <td>${movie.year || '-'}</td>
+                    <td><span class="status-badge ${movie.status || 'published'}">${movie.status || 'Published'}</span></td>
+                    <td>${(movie.views || 0).toLocaleString()}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn" onclick="editMovie('${movie._id}')" title="Edit">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </button>
+                            <button class="action-btn delete" onclick="deleteMovie('${movie._id}')" title="Delete">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </button>
+                            <a href="player.html?id=${movie._id}" class="action-btn" title="Watch" target="_blank">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Filter movies
+        function filterMovies() {
+            const search = document.getElementById('search-movies').value.toLowerCase();
+            const vjFilter = document.getElementById('filter-vj').value;
+            
+            const filtered = allMovies.filter(movie => {
+                const matchesSearch = (movie.originalTitle || movie.title || '').toLowerCase().includes(search);
+                const matchesVJ = !vjFilter || movie.vjName === vjFilter;
+                return matchesSearch && matchesVJ;
+            });
+            
+            renderMovies(filtered);
+        }
+        
+        // Search TMDB
+        async function searchTMDB() {
+            const query = document.getElementById('tmdb-search').value.trim();
+            const searchType = document.getElementById('tmdb-type').value;
+            
+            if (!query) {
+                showToast('Please enter a title to search', 'error');
+                return;
+            }
+            
+            try {
+                // Choose endpoint based on search type
+                let endpoint;
+                if (searchType === 'movie') {
+                    endpoint = `/tmdb/search/movies`;
+                } else if (searchType === 'tv') {
+                    endpoint = `/tmdb/search/tv`;
+                } else {
+                    endpoint = `/tmdb/search/multi`;
+                }
+                
+                const response = await fetch(`${API_BASE}${endpoint}?query=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                
+                if (data.success && data.data.results && data.data.results.length > 0) {
+                    // Get first result (prioritize TV if searching both)
+                    let item = data.data.results[0];
+                    
+                    // If multi-search, prefer TV series for "Ever Night" type queries
+                    if (searchType === 'multi' && data.data.results.length > 1) {
+                        const tvResult = data.data.results.find(r => r.media_type === 'tv');
+                        if (tvResult) item = tvResult;
+                    }
+                    
+                    const isTV = item.media_type === 'tv' || searchType === 'tv' || item.name;
+                    currentTMDBData = item;
+                    currentTMDBData.isTV = isTV;
+                    
+                    // Show preview
+                    document.getElementById('preview-poster').src = item.poster_path 
+                        ? `https://image.tmdb.org/t/p/w300${item.poster_path}` 
+                        : '/assets/images/placeholder.svg';
+                    
+                    const title = isTV ? (item.name || item.original_name) : (item.title || item.original_title);
+                    const year = isTV ? item.first_air_date : item.release_date;
+                    
+                    document.getElementById('preview-title').textContent = title;
+                    document.getElementById('preview-year').textContent = year ? year.substring(0, 4) : 'N/A';
+                    document.getElementById('preview-overview').textContent = item.overview || 'No description available.';
+                    
+                    // Fetch full details for runtime and genres
+                    const detailEndpoint = isTV ? `/tmdb/tv/${item.id}` : `/tmdb/movie/${item.id}`;
+                    const detailsResponse = await fetch(`${API_BASE}${detailEndpoint}`);
+                    const detailsData = await detailsResponse.json();
+                    
+                    if (detailsData.success) {
+                        currentTMDBData = { ...item, ...detailsData.data, isTV };
+                        
+                        if (isTV) {
+                            document.getElementById('preview-runtime').textContent = detailsData.data.number_of_seasons 
+                                ? `${detailsData.data.number_of_seasons} Seasons` 
+                                : 'N/A';
+                        } else {
+                            document.getElementById('preview-runtime').textContent = detailsData.data.runtime || 'N/A';
+                        }
+                        
+                        const genres = detailsData.data.genres || [];
+                        document.getElementById('preview-genres').innerHTML = genres.map(g => `<span>${g.name}</span>`).join('');
+                    }
+                    
+                    document.getElementById('tmdb-preview').classList.add('show');
+                    showToast(`Found ${isTV ? 'TV series' : 'movie'}: ${title}`, 'success');
+                } else {
+                    showToast('No results found. Try a different search or type.', 'error');
+                }
+            } catch (error) {
+                console.error('TMDB search error:', error);
+                showToast('Failed to search TMDB. Check your connection.', 'error');
+            }
+        }
+        
+        // Use TMDB data to fill form
+        function useTMDBData() {
+            if (!currentTMDBData) return;
+            
+            const item = currentTMDBData;
+            const isTV = item.isTV;
+            
+            // Use correct field names based on type
+            const title = isTV ? (item.name || item.original_name) : (item.title || item.original_title);
+            const releaseDate = isTV ? item.first_air_date : item.release_date;
+            const runtime = isTV ? (item.number_of_seasons ? `${item.number_of_seasons} Seasons` : '') : item.runtime;
+            
+            document.getElementById('movie-title').value = title || '';
+            document.getElementById('movie-year').value = releaseDate ? releaseDate.substring(0, 4) : '';
+            document.getElementById('movie-description').value = item.overview || '';
+            document.getElementById('movie-runtime').value = runtime || '';
+            document.getElementById('movie-tmdb-id').value = item.id || '';
+            
+            if (item.poster_path) {
+                document.getElementById('movie-poster').value = `https://image.tmdb.org/t/p/w500${item.poster_path}`;
+            }
+            
+            if (item.backdrop_path) {
+                document.getElementById('movie-backdrop').value = `https://image.tmdb.org/t/p/original${item.backdrop_path}`;
+            }
+            
+            if (item.genres) {
+                document.getElementById('movie-genres').value = item.genres.map(g => g.name).join(', ');
+            }
+            
+            document.getElementById('tmdb-preview').classList.remove('show');
+            showToast(`${isTV ? 'Series' : 'Movie'} details loaded! Now add VJ and embed URL.`, 'success');
+        }
+        
+        // Clear form
+        function clearForm() {
+            document.getElementById('add-movie-form').reset();
+            document.getElementById('tmdb-preview').classList.remove('show');
+            currentTMDBData = null;
+        }
+        
+        // Submit new movie
+        document.getElementById('add-movie-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const movieData = {
+                originalTitle: document.getElementById('movie-title').value,
+                lugandaTitle: document.getElementById('movie-luganda-title').value || undefined,
+                vjName: document.getElementById('movie-vj').value,
+                year: parseInt(document.getElementById('movie-year').value) || undefined,
+                duration: parseInt(document.getElementById('movie-runtime').value) || undefined,
+                description: document.getElementById('movie-description').value || undefined,
+                overview: document.getElementById('movie-description').value || undefined,
+                poster: document.getElementById('movie-poster').value || undefined,
+                backdrop: document.getElementById('movie-backdrop').value || undefined,
+                genres: document.getElementById('movie-genres').value 
+                    ? document.getElementById('movie-genres').value.split(',').map(g => g.trim().toLowerCase())
+                    : undefined,
+                featured: document.getElementById('movie-featured').checked,
+                trending: document.getElementById('movie-trending').checked,
+                embedUrl: document.getElementById('movie-embed-url').value,
+                tmdbId: document.getElementById('movie-tmdb-id').value || undefined
+            };
+            
+            // Clean undefined fields
+            Object.keys(movieData).forEach(key => {
+                if (movieData[key] === undefined) delete movieData[key];
+            });
+            
+            try {
+                const response = await fetch(`${API_BASE}/luganda-movies/simple-add`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(movieData)
+                });
+                
+                const data = await response.json();
+                
+                // Check for success - response.ok covers 200-299 status codes (including 201 Created)
+                if (response.ok && data.success) {
+                    showToast('Movie added successfully!', 'success');
+                    clearForm();
+                    loadMovies();
+                    showTab('list');
+                } else if (response.ok) {
+                    // Response OK but backend returned success: false
+                    showToast(data.message || 'Failed to add movie', 'error');
+                } else {
+                    // HTTP error
+                    showToast(data.message || `Server error: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error adding movie:', error);
+                showToast('Failed to add movie. Check your connection.', 'error');
+            }
+        });
+        
+        // Delete movie
+        async function deleteMovie(id) {
+            if (!confirm('Are you sure you want to delete this movie?')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/luganda-movies/${id}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('Movie deleted successfully!', 'success');
+                    loadMovies();
+                } else {
+                    showToast(data.message || 'Failed to delete movie', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting movie:', error);
+                showToast('Failed to delete movie', 'error');
+            }
+        }
+        
+        // Edit movie - open modal with movie data
+        async function editMovie(id) {
+            const movie = allMovies.find(m => m._id === id);
+            if (!movie) {
+                showToast('Movie not found', 'error');
+                return;
+            }
+            
+            // Fill the edit form with movie data
+            document.getElementById('edit-movie-id').value = movie._id;
+            document.getElementById('edit-title').value = movie.originalTitle || movie.title || '';
+            document.getElementById('edit-luganda-title').value = movie.lugandaTitle || '';
+            document.getElementById('edit-vj').value = movie.vjName || '';
+            document.getElementById('edit-year').value = movie.year || '';
+            document.getElementById('edit-embed-url').value = movie.embedUrl || '';
+            document.getElementById('edit-description').value = movie.description || movie.overview || '';
+            document.getElementById('edit-poster').value = movie.poster || '';
+            document.getElementById('edit-backdrop').value = movie.backdrop || '';
+            document.getElementById('edit-runtime').value = movie.duration || movie.runtime || '';
+            document.getElementById('edit-genres').value = (movie.genres || []).join(', ');
+            document.getElementById('edit-featured').checked = movie.featured || false;
+            document.getElementById('edit-trending').checked = movie.trending || false;
+            
+            // Show the modal
+            document.getElementById('edit-modal').classList.add('show');
+        }
+        
+        // Close edit modal
+        function closeEditModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('edit-modal').classList.remove('show');
+        }
+        
+        // Save movie changes
+        async function saveMovieChanges(event) {
+            event.preventDefault();
+            
+            const id = document.getElementById('edit-movie-id').value;
+            
+            const movieData = {
+                originalTitle: document.getElementById('edit-title').value,
+                lugandaTitle: document.getElementById('edit-luganda-title').value || undefined,
+                vjName: document.getElementById('edit-vj').value,
+                year: document.getElementById('edit-year').value ? parseInt(document.getElementById('edit-year').value) : undefined,
+                embedUrl: document.getElementById('edit-embed-url').value,
+                description: document.getElementById('edit-description').value || undefined,
+                overview: document.getElementById('edit-description').value || undefined,
+                poster: document.getElementById('edit-poster').value || undefined,
+                backdrop: document.getElementById('edit-backdrop').value || undefined,
+                duration: document.getElementById('edit-runtime').value ? parseInt(document.getElementById('edit-runtime').value) : undefined,
+                genres: document.getElementById('edit-genres').value 
+                    ? document.getElementById('edit-genres').value.split(',').map(g => g.trim().toLowerCase())
+                    : undefined,
+                featured: document.getElementById('edit-featured').checked,
+                trending: document.getElementById('edit-trending').checked
+            };
+            
+            // Clean undefined fields
+            Object.keys(movieData).forEach(key => {
+                if (movieData[key] === undefined) delete movieData[key];
+            });
+            
+            try {
+                const response = await fetch(`${API_BASE}/luganda-movies/${id}`, {
+                    method: 'PUT',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(movieData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('Movie updated successfully!', 'success');
+                    closeEditModal();
+                    loadMovies();
+                } else {
+                    showToast(data.message || 'Failed to update movie', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating movie:', error);
+                showToast('Failed to update movie. Check your connection.', 'error');
+            }
+        }
+        
+        // Bulk upload
+        async function bulkUpload() {
+            const bulkData = document.getElementById('bulk-data').value.trim();
+            
+            if (!bulkData) {
+                showToast('Please enter movie data', 'error');
+                return;
+            }
+            
+            let movies;
+            try {
+                movies = JSON.parse(bulkData);
+                if (!Array.isArray(movies)) {
+                    movies = [movies];
+                }
+            } catch (e) {
+                showToast('Invalid JSON format. Check your data.', 'error');
+                return;
+            }
+            
+            let successCount = 0;
+            let errorCount = 0;
+            
+            for (const movie of movies) {
+                try {
+                    const movieData = {
+                        originalTitle: movie.title,
+                        lugandaTitle: movie.lugandaTitle,
+                        vjName: movie.vjName,
+                        year: movie.year,
+                        duration: movie.duration,
+                        description: movie.description,
+                        overview: movie.description,
+                        poster: movie.poster,
+                        backdrop: movie.backdrop,
+                        genres: movie.genres,
+                        featured: movie.featured || false,
+                        trending: movie.trending || false,
+                        embedUrl: movie.embedUrl
+                    };
+                    
+                    const response = await fetch(`${API_BASE}/luganda-movies/simple-add`, {
+                        method: 'POST',
+                        headers: getAuthHeaders(),
+                        body: JSON.stringify(movieData)
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        successCount++;
+                    } else {
+                        errorCount++;
+                    }
+                } catch (e) {
+                    errorCount++;
+                }
+            }
+            
+            showToast(`Uploaded: ${successCount} success, ${errorCount} failed`, successCount > 0 ? 'success' : 'error');
+            
+            if (successCount > 0) {
+                document.getElementById('bulk-data').value = '';
+                loadMovies();
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMovies();
+        });
+    </script>
+</body>
+</html>

@@ -160,4 +160,127 @@ router.get('/search/:query', async (req, res) => {
     }
 });
 
+// ============== ADMIN CRUD ROUTES ==============
+
+// Create a new VJ
+router.post('/', async (req, res) => {
+    try {
+        const { name, slug, description, image, specialties, youtube, status } = req.body;
+
+        if (!name) {
+            return res.status(400).json({
+                success: false,
+                message: 'VJ name is required'
+            });
+        }
+
+        // Generate slug if not provided
+        const vjSlug = slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+        // Check if VJ already exists
+        const existingVJ = await VJ.findOne({ $or: [{ name }, { slug: vjSlug }] });
+        if (existingVJ) {
+            return res.status(400).json({
+                success: false,
+                message: 'VJ with this name or slug already exists'
+            });
+        }
+
+        const newVJ = await VJ.create({
+            name,
+            slug: vjSlug,
+            description: description || '',
+            profileImage: image || '',
+            image: image || '',
+            specialties: specialties || [],
+            youtube: youtube || '',
+            status: status || 'active',
+            movieCount: 0,
+            rating: { overall: 4.5, count: 0 }
+        });
+
+        res.status(201).json({
+            success: true,
+            message: 'VJ created successfully',
+            data: newVJ
+        });
+    } catch (error) {
+        console.error('Error creating VJ:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error creating VJ',
+            error: error.message
+        });
+    }
+});
+
+// Update VJ by ID
+router.put('/:id', async (req, res) => {
+    try {
+        const { name, slug, description, image, specialties, youtube, status } = req.body;
+
+        const vj = await VJ.findById(req.params.id);
+        if (!vj) {
+            return res.status(404).json({
+                success: false,
+                message: 'VJ not found'
+            });
+        }
+
+        // Update fields
+        if (name) vj.name = name;
+        if (slug) vj.slug = slug;
+        if (description !== undefined) vj.description = description;
+        if (image !== undefined) {
+            vj.image = image;
+            vj.profileImage = image;
+        }
+        if (specialties) vj.specialties = specialties;
+        if (youtube !== undefined) vj.youtube = youtube;
+        if (status) vj.status = status;
+
+        await vj.save();
+
+        res.json({
+            success: true,
+            message: 'VJ updated successfully',
+            data: vj
+        });
+    } catch (error) {
+        console.error('Error updating VJ:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error updating VJ',
+            error: error.message
+        });
+    }
+});
+
+// Delete VJ by ID
+router.delete('/:id', async (req, res) => {
+    try {
+        const vj = await VJ.findByIdAndDelete(req.params.id);
+
+        if (!vj) {
+            return res.status(404).json({
+                success: false,
+                message: 'VJ not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'VJ deleted successfully',
+            data: vj
+        });
+    } catch (error) {
+        console.error('Error deleting VJ:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error deleting VJ',
+            error: error.message
+        });
+    }
+});
+
 module.exports = router;
