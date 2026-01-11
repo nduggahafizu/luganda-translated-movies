@@ -198,7 +198,24 @@ async function getPesapalToken() {
 // @access  Private
 exports.initiatePesapalPayment = async (req, res) => {
     try {
+        // Check if user is authenticated
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'User not authenticated'
+            });
+        }
+
         const { subscriptionPlan, subscriptionDuration = 'monthly', phoneNumber, amount, currency = 'UGX', description } = req.body;
+
+        logger.info('PesaPal initiate request', { 
+            userId: req.user.id,
+            email: req.user.email,
+            subscriptionPlan,
+            subscriptionDuration,
+            amount,
+            phoneNumber: phoneNumber ? '***' + phoneNumber.slice(-4) : 'none'
+        });
 
         // Get price in UGX
         const paymentAmount = amount || SUBSCRIPTION_PRICES[subscriptionPlan]?.[`ugx_${subscriptionDuration}`] || SUBSCRIPTION_PRICES[subscriptionPlan]?.ugx_monthly;
@@ -206,7 +223,7 @@ exports.initiatePesapalPayment = async (req, res) => {
         if (!paymentAmount) {
             return res.status(400).json({
                 status: 'error',
-                message: 'Invalid subscription plan'
+                message: 'Invalid subscription plan or amount'
             });
         }
 
@@ -222,19 +239,21 @@ exports.initiatePesapalPayment = async (req, res) => {
             paymentMethod: 'mobile_money',
             paymentProvider: 'pesapal',
             status: 'pending',
-            subscriptionPlan,
-            subscriptionDuration,
+            subscriptionPlan: subscriptionPlan || 'basic',
+            subscriptionDuration: subscriptionDuration || 'monthly',
             paymentDetails: {
                 pesapalMerchantReference: merchantReference,
                 phoneNumber: phoneNumber || '',
-                payerEmail: req.user.email,
-                payerName: req.user.fullName
+                payerEmail: req.user.email || '',
+                payerName: req.user.fullName || req.user.name || 'Customer'
             }
         });
 
         try {
             // Get OAuth token
             const token = await getPesapalToken();
+            
+            logger.info('PesaPal token obtained', { tokenLength: token?.length });
             
             // Register IPN URL first (required by PesaPal 3.0)
             const ipnUrl = process.env.PESAPAL_IPN_URL || `https://luganda-translated-movies-production.up.railway.app/api/payments/pesapal/ipn`;
@@ -265,23 +284,28 @@ exports.initiatePesapalPayment = async (req, res) => {
                     }
                 );
                 ipnId = ipnListResponse.data?.[0]?.ipn_id;
-            }
+            logger.info('IPN registered', { ipnId });
 
             // Submit order to PesaPal
+            const userEmail = req.user.email || '';
+            const userName = req.user.fullName || req.user.name || 'Customer';
+            
             const orderData = {
                 id: merchantReference,
                 currency: 'UGX',
                 amount: paymentAmount,
-                description: description || `Unruly Movies ${subscriptionPlan} subscription (${subscriptionDuration})`,
+                description: description || `Unruly Movies ${subscriptionPlan || 'basic'} subscription (${subscriptionDuration || 'monthly'})`,
                 callback_url: `https://watch.unrulymovies.com/payment-success.html?ref=${merchantReference}`,
                 notification_id: ipnId,
                 billing_address: {
-                    email_address: req.user.email,
+                    email_address: userEmail,
                     phone_number: phoneNumber || '',
-                    first_name: req.user.fullName?.split(' ')[0] || 'Customer',
-                    last_name: req.user.fullName?.split(' ').slice(1).join(' ') || ''
+                    first_name: userName.split(' ')[0] || 'Customer',
+                    last_name: userName.split(' ').slice(1).join(' ') || ''
                 }
             };
+
+            logger.info('Submitting order to PesaPal', { merchantReference, amount: paymentAmount });
 
             const orderResponse = await axios.post(
                 `${PESAPAL_CONFIG.baseUrl}/api/Transactions/SubmitOrderRequest`,
@@ -293,6 +317,12 @@ exports.initiatePesapalPayment = async (req, res) => {
                     }
                 }
             );
+
+            logger.info('PesaPal order response', { 
+                status: orderResponse.status,
+                hasRedirectUrl: !!orderResponse.data?.redirect_url,
+                trackingId: orderResponse.data?.order_tracking_id
+            });
 
             if (orderResponse.data && orderResponse.data.redirect_url) {
                 // Update payment with tracking ID
