@@ -63,7 +63,8 @@ router.get('/test/pesapal-token', async (req, res) => {
             tokenReceived: !!response.data?.token,
             tokenLength: response.data?.token?.length || 0,
             expiryDate: response.data?.expiryDate,
-            baseUrl: baseUrl
+            baseUrl: baseUrl,
+            fullResponse: response.data
         });
     } catch (error) {
         res.status(500).json({
