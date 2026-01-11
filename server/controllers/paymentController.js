@@ -236,7 +236,7 @@ exports.initiatePesapalPayment = async (req, res) => {
             transactionId: merchantReference,
             amount: paymentAmount,
             currency: 'UGX',
-            paymentMethod: 'mobile_money',
+            paymentMethod: 'pesapal',
             paymentProvider: 'pesapal',
             status: 'pending',
             subscriptionPlan: subscriptionPlan || 'basic',
