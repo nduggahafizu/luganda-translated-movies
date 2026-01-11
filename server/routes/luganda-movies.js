@@ -142,6 +142,246 @@ router.post('/simple-add', async (req, res) => {
     }
 });
 
+// ============================================================
+// TV SERIES IMPORT ROUTES
+// ============================================================
+
+// Import TMDB service for TV series
+const tmdbService = require('../services/tmdbService');
+
+// POST /api/luganda-movies/import-series - Import complete TV series from TMDB
+router.post('/import-series', async (req, res) => {
+    setCorsHeaders(req, res);
+    try {
+        const { tmdbId, vjName, lugandaTitle } = req.body;
+
+        if (!tmdbId) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'TMDB ID is required' 
+            });
+        }
+
+        // Fetch complete series data from TMDB
+        const seriesData = await tmdbService.getTVSeriesComplete(tmdbId);
+
+        if (!seriesData) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'TV series not found on TMDB' 
+            });
+        }
+
+        // Customize data if provided
+        if (vjName) {
+            seriesData.vjName = vjName;
+        }
+        if (lugandaTitle) {
+            seriesData.lugandaTitle = lugandaTitle;
+        }
+
+        // Generate slug
+        seriesData.slug = generateSlug(seriesData.originalTitle) + '-series-' + Date.now();
+
+        // Save to database
+        const newSeries = await LugandaMovie.create(seriesData);
+
+        res.status(201).json({ 
+            success: true, 
+            message: `TV series "${newSeries.originalTitle}" imported with ${newSeries.totalSeasons} seasons and ${newSeries.totalEpisodes} episodes!`,
+            data: newSeries 
+        });
+    } catch (error) {
+        console.error('Error importing TV series:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Failed to import TV series', 
+            details: error.message 
+        });
+    }
+});
+
+// POST /api/luganda-movies/search-series - Search for TV series on TMDB
+router.post('/search-series', async (req, res) => {
+    setCorsHeaders(req, res);
+    try {
+        const { query, year } = req.body;
+
+        if (!query) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Search query is required' 
+            });
+        }
+
+        const results = await tmdbService.searchTVShows(query, 1, year);
+
+        // Format results for frontend
+        const formattedResults = (results.results || []).slice(0, 10).map(show => ({
+            tmdbId: show.id,
+            title: show.name || show.original_name,
+            year: show.first_air_date ? new Date(show.first_air_date).getFullYear() : null,
+            poster: show.poster_path ? `https://image.tmdb.org/t/p/w500${show.poster_path}` : null,
+            overview: show.overview,
+            rating: show.vote_average
+        }));
+
+        res.json({ 
+            success: true, 
+            count: formattedResults.length,
+            data: formattedResults 
+        });
+    } catch (error) {
+        console.error('Error searching TV series:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Failed to search TV series', 
+            details: error.message 
+        });
+    }
+});
+
+// GET /api/luganda-movies/series/:id - Get a series with all seasons/episodes
+router.get('/series/:id', async (req, res) => {
+    setCorsHeaders(req, res);
+    try {
+        let series;
+        
+        // Check if it's a MongoDB ID or slug
+        if (req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+            series = await LugandaMovie.findOne({ _id: req.params.id, contentType: 'series' });
+        } else {
+            series = await LugandaMovie.findOne({ slug: req.params.id, contentType: 'series' });
+        }
+
+        if (!series) {
+            return res.status(404).json({
+                success: false,
+                message: 'TV series not found'
+            });
+        }
+
+        // Increment views
+        series.views = (series.views || 0) + 1;
+        await series.save();
+
+        res.json({
+            success: true,
+            data: series
+        });
+    } catch (error) {
+        console.error('Error fetching series:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch series',
+            details: error.message
+        });
+    }
+});
+
+// PUT /api/luganda-movies/series/:id/episode - Update a specific episode video URL
+router.put('/series/:id/episode', async (req, res) => {
+    setCorsHeaders(req, res);
+    try {
+        const { seasonNumber, episodeNumber, embedUrl, vjName, isTranslated } = req.body;
+
+        if (!seasonNumber || !episodeNumber) {
+            return res.status(400).json({
+                success: false,
+                message: 'Season number and episode number are required'
+            });
+        }
+
+        const series = await LugandaMovie.findById(req.params.id);
+
+        if (!series || series.contentType !== 'series') {
+            return res.status(404).json({
+                success: false,
+                message: 'TV series not found'
+            });
+        }
+
+        // Find the season
+        const season = series.seasons.find(s => s.seasonNumber === parseInt(seasonNumber));
+        if (!season) {
+            return res.status(404).json({
+                success: false,
+                message: `Season ${seasonNumber} not found`
+            });
+        }
+
+        // Find the episode
+        const episode = season.episodes.find(e => e.episodeNumber === parseInt(episodeNumber));
+        if (!episode) {
+            return res.status(404).json({
+                success: false,
+                message: `Episode ${episodeNumber} not found in Season ${seasonNumber}`
+            });
+        }
+
+        // Update episode data
+        if (embedUrl) {
+            episode.video = {
+                embedUrl: embedUrl,
+                streamtapeId: '',
+                archiveUrl: '',
+                provider: 'streamtape'
+            };
+        }
+        if (vjName !== undefined) episode.vjName = vjName;
+        if (isTranslated !== undefined) episode.isTranslated = isTranslated;
+
+        await series.save();
+
+        res.json({
+            success: true,
+            message: `Episode S${seasonNumber}E${episodeNumber} updated successfully`,
+            data: series
+        });
+    } catch (error) {
+        console.error('Error updating episode:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update episode',
+            details: error.message
+        });
+    }
+});
+
+// GET /api/luganda-movies/all-series - Get all TV series
+router.get('/all-series', async (req, res) => {
+    setCorsHeaders(req, res);
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
+        const skip = (page - 1) * limit;
+
+        const series = await LugandaMovie.find({ contentType: 'series', status: 'published' })
+            .sort('-createdAt')
+            .skip(skip)
+            .limit(limit)
+            .select('originalTitle lugandaTitle poster totalSeasons totalEpisodes rating genres year slug');
+
+        const total = await LugandaMovie.countDocuments({ contentType: 'series', status: 'published' });
+
+        res.json({
+            success: true,
+            count: series.length,
+            total,
+            page,
+            pages: Math.ceil(total / limit),
+            data: series
+        });
+    } catch (error) {
+        console.error('Error fetching series:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch series',
+            details: error.message
+        });
+    }
+});
+
 // POST /api/luganda-movies/auto-add - Auto-add a movie using TMDB and S3
 router.post('/auto-add', async (req, res) => {
     setCorsHeaders(req, res);

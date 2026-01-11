@@ -17,6 +17,13 @@
     <meta name="google-site-verification" content="ZETgIS2RUYfcmNN7z0_OCZ7CjNP4LbfPI-F1MD7uiyY">
     <meta name="google-site-verification" content="LhqhmhY1yPoQxVg8znDH4aKifHlXtc8S8m-UMHtBrXY">
     
+    <!-- DNS Prefetch and Preconnect for faster loading -->
+    <link rel="preconnect" href="https://luganda-translated-movies-production.up.railway.app" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="//image.tmdb.org">
+    <link rel="dns-prefetch" href="//archive.org">
+    
     <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMF82HVT9G"></script>
     <script>
@@ -111,10 +118,6 @@
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797"
-            crossorigin="anonymous"></script>
-    
     <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/responsive.css">
@@ -130,6 +133,15 @@
     
     <!-- Video.js for enhanced video playback -->
     <link href="https://vjs.zencdn.net/8.16.1/video-js.css" rel="stylesheet">
+
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-1904736753681797",
+            enable_page_level_ads: true
+        });
+    </script>
 
     <!-- Global JS Vars -->
     <script type="text/javascript">
@@ -154,9 +166,6 @@
             return window.i18n[msgid] || msgid;
         };
     </script>
-    
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -627,49 +636,8 @@
                                 </div>
                             </div>
 
-                            <!-- Ad Banner - Below Hero -->
-                            <div class="ad-container" style="margin: 20px 0; text-align: center;">
-                                <ins class="adsbygoogle"
-                                     style="display:block"
-                                     data-ad-client="ca-pub-1904736753681797"
-                                     data-ad-slot="auto"
-                                     data-ad-format="horizontal"
-                                     data-full-width-responsive="true"></ins>
-                                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-                            </div>
-
-                            <!-- Continue Watching Section (Only shows if user has watch history) -->
-                            <div class="app-section" id="continueWatchingSection" style="display: none;">
-                                <div class="app-heading">
-                                    <div class="text">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px; vertical-align: middle;">
-                                            <circle cx="12" cy="12" r="10"></circle>
-                                            <polyline points="12 6 12 12 16 14"></polyline>
-                                        </svg>
-                                        Continue Watching
-                                    </div>
-                                    <a href="dashboard.html#history" class="all">View History</a>
-                                </div>
-                                <div class="row row-cols-2 row-cols-md-5 list-scrollable" id="continueWatchingGrid">
-                                    <!-- Continue watching items will be loaded here -->
-                                </div>
-                            </div>
-
-                            <!-- AdSense Display Ad -->
-                            <div class="ad-container" style="margin: 40px 0; text-align: center;">
-                                <ins class="adsbygoogle"
-                                     style="display:block"
-                                     data-ad-client="ca-pub-1904736753681797"
-                                     data-ad-slot="auto"
-                                     data-ad-format="auto"
-                                     data-full-width-responsive="true"></ins>
-                                <script>
-                                     (adsbygoogle = window.adsbygoogle || []).push({});
-                                </script>
-                            </div>
-
-                            <!-- Trending Now Section -->
-                            <div class="app-section movie-section">
+                            <!-- Trending Now Section - Immediately after slider -->
+                            <div class="app-section movie-section" style="margin-top: 25px;">
                                 <div class="section-header">
                                     <h2>
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" stroke-width="2">
@@ -694,17 +662,37 @@
                                 </div>
                             </div>
 
-                            <!-- AdSense Display Ad -->
-                            <div class="ad-container" style="margin: 40px 0; text-align: center;">
+                            <!-- Continue Watching Section (Only shows if user has watch history) -->
+                            <div class="app-section" id="continueWatchingSection" style="display: none;">
+                                <div class="app-heading">
+                                    <div class="text">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px; vertical-align: middle;">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <polyline points="12 6 12 12 16 14"></polyline>
+                                        </svg>
+                                        Continue Watching
+                                    </div>
+                                    <a href="dashboard.html#history" class="all">View History</a>
+                                </div>
+                                <div class="row row-cols-2 row-cols-md-5 list-scrollable" id="continueWatchingGrid">
+                                    <!-- Continue watching items will be loaded here -->
+                                </div>
+                            </div>
+
+                            <!-- Ad Container - Between Sections -->
+                            <div class="ad-container" style="margin: 30px auto; max-width: 728px; text-align: center;">
                                 <ins class="adsbygoogle"
                                      style="display:block"
                                      data-ad-client="ca-pub-1904736753681797"
                                      data-ad-slot="auto"
-                                     data-ad-format="auto"
+                                     data-ad-format="horizontal"
                                      data-full-width-responsive="true"></ins>
-                                <script>
-                                     (adsbygoogle = window.adsbygoogle || []).push({});
-                                </script>
+                                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+                            </div>
+
+                            <!-- Latest Movies Section -->
+                            <div class="app-section movie-section">
+                                </div>
                             </div>
 
                             <!-- All Movies Section (Newest First) -->
@@ -733,6 +721,17 @@
                                         <p class="loading-text">Loading movies...</p>
                                     </div>
                                 </div>
+                            </div>
+
+                            <!-- Ad Container - Mid Page -->
+                            <div class="ad-container" style="margin: 30px auto; max-width: 728px; text-align: center;">
+                                <ins class="adsbygoogle"
+                                     style="display:block"
+                                     data-ad-client="ca-pub-1904736753681797"
+                                     data-ad-slot="auto"
+                                     data-ad-format="rectangle"
+                                     data-full-width-responsive="true"></ins>
+                                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
                             </div>
 
                             <!-- Popular VJ Movies -->
@@ -1766,5 +1765,8 @@
     
     <!-- Live Chat Widget -->
     <script src="js/chat-widget.js"></script>
+    
+    <!-- System Notification (centralized config in js/system-notification.js) -->
+    <script src="js/system-notification.js"></script>
 </body>
 </html>

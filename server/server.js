@@ -443,6 +443,22 @@ app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📍 Environment: ${process.env.NODE_ENV}`);
     console.log(`🌐 API URL: http://localhost:${PORT}`);
+    
+    // Keep-alive ping to prevent cold starts (every 5 minutes)
+    if (process.env.NODE_ENV === 'production' && process.env.KEEP_ALIVE_URL) {
+        const https = require('https');
+        const keepAliveUrl = process.env.KEEP_ALIVE_URL;
+        
+        setInterval(() => {
+            https.get(keepAliveUrl, (res) => {
+                console.log(`🏓 Keep-alive ping: ${res.statusCode}`);
+            }).on('error', (err) => {
+                console.error('Keep-alive error:', err.message);
+            });
+        }, 5 * 60 * 1000); // Every 5 minutes
+        
+        console.log('🔄 Keep-alive enabled');
+    }
 });
 
 // Handle unhandled promise rejections
