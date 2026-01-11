@@ -49,19 +49,18 @@ const getDatabaseHealth = async () => {
         const health = {
             status: state === 1 ? 'healthy' : 'unhealthy',
             state: states[state],
-            name: mongoose.connection.name,
-            host: mongoose.connection.host,
-            port: mongoose.connection.port
+            name: mongoose.connection.name || 'luganda-movies',
+            host: mongoose.connection.host || 'mongodb-atlas'
         };
 
         if (state === 1) {
-            // Get database stats
-            const admin = mongoose.connection.db.admin();
-            const serverStatus = await admin.serverStatus();
-            
-            health.version = serverStatus.version;
-            health.connections = serverStatus.connections;
-            health.uptime = serverStatus.uptime;
+            // Simple ping to verify connection works (doesn't require admin)
+            try {
+                await mongoose.connection.db.command({ ping: 1 });
+                health.ping = 'ok';
+            } catch (pingError) {
+                health.ping = 'failed';
+            }
         }
 
         return health;
