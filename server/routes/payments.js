@@ -45,15 +45,20 @@ router.get('/test/pesapal-token', async (req, res) => {
         ? 'https://pay.pesapal.com/v3'
         : 'https://cybqa.pesapal.com/pesapalv3';
     
+    const requestData = {
+        consumer_key: process.env.PESAPAL_CONSUMER_KEY,
+        consumer_secret: process.env.PESAPAL_CONSUMER_SECRET
+    };
+    
     try {
         const response = await axios.post(
             `${baseUrl}/api/Auth/RequestToken`,
+            requestData,
             {
-                consumer_key: process.env.PESAPAL_CONSUMER_KEY,
-                consumer_secret: process.env.PESAPAL_CONSUMER_SECRET
-            },
-            {
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
             }
         );
         
@@ -62,8 +67,9 @@ router.get('/test/pesapal-token', async (req, res) => {
             message: 'PesaPal token retrieved',
             tokenReceived: !!response.data?.token,
             tokenLength: response.data?.token?.length || 0,
-            expiryDate: response.data?.expiryDate,
+            status: response.status,
             baseUrl: baseUrl,
+            keyUsed: requestData.consumer_key ? requestData.consumer_key.substring(0, 8) + '...' : 'none',
             fullResponse: response.data
         });
     } catch (error) {
@@ -71,8 +77,10 @@ router.get('/test/pesapal-token', async (req, res) => {
             success: false,
             message: 'PesaPal token error',
             error: error.message,
-            response: error.response?.data,
-            baseUrl: baseUrl
+            status: error.response?.status,
+            responseData: error.response?.data,
+            baseUrl: baseUrl,
+            keyUsed: requestData.consumer_key ? requestData.consumer_key.substring(0, 8) + '...' : 'none'
         });
     }
 });
