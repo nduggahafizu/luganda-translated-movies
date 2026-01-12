@@ -449,7 +449,7 @@
             .dashboard-tabs {
                 flex-wrap: nowrap;
                 overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
+                overflow-y: hidden;
                 scrollbar-width: none;
                 -ms-overflow-style: none;
                 padding-bottom: 10px;
@@ -677,10 +677,10 @@
                         </div>
                         <div class="setting-item">
                             <div>
-                                <div class="setting-label">Video Quality</div>
+                                <div class="setting-label" id="qualityLabel">Video Quality</div>
                                 <div class="setting-description">Choose your preferred streaming quality</div>
                             </div>
-                            <select class="select-setting" id="qualitySelect" onchange="updateSetting('quality', this.value)">
+                            <select class="select-setting" id="qualitySelect" onchange="updateSetting('quality', this.value)" aria-labelledby="qualityLabel" title="Video quality">
                                 <option value="auto">Auto</option>
                                 <option value="sd">SD (480p)</option>
                                 <option value="hd">HD (720p)</option>
@@ -711,10 +711,10 @@
                         <h3 class="settings-title">Account</h3>
                         <div class="setting-item">
                             <div>
-                                <div class="setting-label">Language</div>
+                                <div class="setting-label" id="languageLabel">Language</div>
                                 <div class="setting-description">Choose your preferred language</div>
                             </div>
-                            <select class="select-setting" id="languageSelect" onchange="updateSetting('language', this.value)">
+                            <select class="select-setting" id="languageSelect" onchange="updateSetting('language', this.value)" aria-labelledby="languageLabel" title="Language">
                                 <option value="en">English</option>
                                 <option value="lg">Luganda</option>
                             </select>

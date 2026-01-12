@@ -769,12 +769,12 @@
                     </svg>
                     <input type="text" id="searchInput" placeholder="Search by name or email...">
                 </div>
-                <select class="filter-select" id="roleFilter">
+                <select class="filter-select" id="roleFilter" title="Filter by role" aria-label="Filter by user role">
                     <option value="">All Roles</option>
                     <option value="admin">Admin</option>
                     <option value="user">User</option>
                 </select>
-                <select class="filter-select" id="planFilter">
+                <select class="filter-select" id="planFilter" title="Filter by plan" aria-label="Filter by subscription plan">
                     <option value="">All Plans</option>
                     <option value="premium">Premium</option>
                     <option value="free">Free</option>
@@ -840,14 +840,14 @@
                     <input type="email" id="editUserEmail" readonly style="opacity: 0.7;">
                 </div>
                 <div class="form-group">
-                    <label>Role</label>
+                    <label for="editUserRole">Role</label>
                     <select id="editUserRole">
                         <option value="user">User</option>
                         <option value="admin">Admin</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Subscription Plan</label>
+                    <label for="editUserPlan">Subscription Plan</label>
                     <select id="editUserPlan">
                         <option value="free">Free</option>
                         <option value="premium">Premium</option>

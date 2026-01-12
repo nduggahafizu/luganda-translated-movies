@@ -408,8 +408,8 @@
                     <form id="notificationForm" onsubmit="sendNotification(event)">
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Notification Type</label>
-                                <select id="notificationType" required>
+                                <label for="notificationType">Notification Type</label>
+                                <select id="notificationType" required title="Select notification type" aria-label="Notification type">
                                     <option value="system_announcement">📢 System Announcement</option>
                                     <option value="new_movie">🎬 New Movie Alert</option>
                                     <option value="promotion">🎁 Promotion / Offer</option>
@@ -419,8 +419,8 @@
                             </div>
                             
                             <div class="form-group">
-                                <label>Recipients</label>
-                                <select id="recipients" required>
+                                <label for="recipients">Recipients</label>
+                                <select id="recipients" required title="Select recipients" aria-label="Recipients">
                                     <option value="all">All Users</option>
                                     <option value="subscribers">Subscribers Only</option>
                                     <option value="free">Free Users Only</option>

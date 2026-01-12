@@ -415,20 +415,26 @@ class TMDBService {
             const totalEpisodes = seasons.reduce((sum, s) => sum + s.episodes.length, 0);
 
             // Step 4: Format complete series data for database
+            // Calculate average episode runtime for duration field
+            const avgEpisodeRuntime = seasons.length > 0 
+                ? Math.round(seasons.flatMap(s => s.episodes).reduce((sum, ep) => sum + (ep.runtime || 45), 0) / totalEpisodes) || 45
+                : 45;
+            
             return {
                 contentType: 'series',
                 tmdbId: seriesInfo.id,
                 originalTitle: seriesInfo.name || seriesInfo.original_name,
                 lugandaTitle: seriesInfo.name || seriesInfo.original_name, // Admin can change
-                description: seriesInfo.overview || '',
-                year: seriesInfo.first_air_date ? new Date(seriesInfo.first_air_date).getFullYear() : null,
+                description: seriesInfo.overview || 'No description available',
+                year: seriesInfo.first_air_date ? new Date(seriesInfo.first_air_date).getFullYear() : new Date().getFullYear(),
+                duration: avgEpisodeRuntime, // Average episode runtime
                 rating: {
                     imdb: seriesInfo.vote_average || 0,
                     userRating: 0,
                     totalRatings: seriesInfo.vote_count || 0
                 },
                 genres: seriesInfo.genres ? seriesInfo.genres.map(g => g.name.toLowerCase()) : [],
-                poster: this.getPosterUrl(seriesInfo.poster_path),
+                poster: this.getPosterUrl(seriesInfo.poster_path) || '/assets/images/no-poster.png',
                 backdrop: this.getBackdropUrl(seriesInfo.backdrop_path),
                 country: seriesInfo.origin_country && seriesInfo.origin_country[0] 
                     ? seriesInfo.origin_country[0] 
@@ -447,6 +453,12 @@ class TMDBService {
                 director: seriesInfo.created_by && seriesInfo.created_by.length > 0
                     ? seriesInfo.created_by.map(c => c.name).join(', ')
                     : 'Unknown',
+                // Video placeholder for series
+                video: {
+                    originalVideoPath: '',
+                    embedUrl: '',
+                    provider: 'archive'
+                },
                 // TV Series specific fields
                 seasons: seasons,
                 totalSeasons: numberOfSeasons,
@@ -461,7 +473,7 @@ class TMDBService {
                     name: seriesInfo.next_episode_to_air.name
                 } : null,
                 // Default values
-                vjName: '',
+                vjName: 'Unknown VJ',
                 status: 'draft',
                 isFeatured: false,
                 views: 0,

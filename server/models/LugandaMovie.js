@@ -65,7 +65,7 @@ const lugandaMovieSchema = new mongoose.Schema({
     // VJ Translator Information
     vjName: {
         type: String,
-        required: [true, 'Please provide VJ translator name'],
+        default: 'Unknown VJ',
         trim: true
     },
     
@@ -100,7 +100,7 @@ const lugandaMovieSchema = new mongoose.Schema({
     
     duration: {
         type: Number,
-        required: [true, 'Please provide duration in minutes']
+        default: 0  // 0 for series (uses episode runtime instead)
     },
     
     // Ratings
@@ -148,7 +148,7 @@ const lugandaMovieSchema = new mongoose.Schema({
     
     director: {
         type: String,
-        required: [true, 'Please provide director name']
+        default: 'Unknown'
     },
     
     writers: [String],
@@ -189,7 +189,7 @@ const lugandaMovieSchema = new mongoose.Schema({
     video: {
         originalVideoPath: {
             type: String,
-            required: [true, 'Please provide original video path']
+            default: ''  // Empty for series (uses episode videos instead)
         },
         lugandaVideoPath: {
             type: String,

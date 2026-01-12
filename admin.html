@@ -761,7 +761,7 @@
                     <div class="panel" style="margin-bottom: 25px;">
                         <div class="panel-header">
                             <h2 class="panel-title">Views Overview</h2>
-                            <select class="filter-select" style="width: auto; background: var(--background-dark);" onchange="updateChart(this.value)">
+                            <select class="filter-select" style="width: auto; background: var(--background-dark);" onchange="updateChart(this.value)" title="Select time period" aria-label="Select time period for chart">
                                 <option value="7">Last 7 days</option>
                                 <option value="30" selected>Last 30 days</option>
                                 <option value="90">Last 90 days</option>
@@ -1525,7 +1525,7 @@
             </div>
             <div class="notification-modal-body">
                 <div class="form-group">
-                    <label>Notification Type</label>
+                    <label for="notifType">Notification Type</label>
                     <select id="notifType" class="form-input">
                         <option value="warning">⚠️ Warning (Red)</option>
                         <option value="info">ℹ️ Info (Blue)</option>

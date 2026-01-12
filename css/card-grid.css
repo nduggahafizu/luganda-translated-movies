@@ -222,12 +222,14 @@
 .badge-vj {
     background: rgba(0, 0, 0, 0.85);
     color: #7CFC00;
+    -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
 }
 
 .badge-year {
     background: rgba(0, 0, 0, 0.85);
     color: #fff;
+    -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
 }
 
@@ -262,6 +264,7 @@
     left: 10px;
     background: rgba(0, 0, 0, 0.85);
     color: #7CFC00;
+    -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
 }
 
@@ -271,6 +274,7 @@
     top: auto;
     background: rgba(0, 0, 0, 0.85);
     color: #fff;
+    -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
 }
 

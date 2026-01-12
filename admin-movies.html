@@ -654,7 +654,7 @@
                 <div class="panel">
                     <div class="search-filter">
                         <input type="text" class="search-input" placeholder="Search movies..." id="search-movies" oninput="filterMovies()">
-                        <select class="search-input" style="width: 200px;" id="filter-vj" onchange="filterMovies()">
+                        <select class="search-input" style="width: 200px;" id="filter-vj" onchange="filterMovies()" title="Filter by VJ" aria-label="Filter movies by VJ translator">
                             <option value="">All VJs</option>
                             <option value="VJ Junior">VJ Junior</option>
                             <option value="VJ Ice P">VJ Ice P</option>
@@ -710,7 +710,7 @@
                             <label>🔍 Search TMDB for Movie/Series Details (Auto-fill)</label>
                             <div class="input-with-button" style="display: flex; gap: 10px;">
                                 <input type="text" id="tmdb-search" placeholder="Enter title to search TMDB..." style="flex: 1;">
-                                <select id="tmdb-type" style="width: 120px; padding: 10px; border-radius: 8px; background: var(--background-light); border: 1px solid var(--border-color); color: var(--text-primary);">
+                                <select id="tmdb-type" title="Content type" aria-label="Select content type" style="width: 120px; padding: 10px; border-radius: 8px; background: var(--background-light); border: 1px solid var(--border-color); color: var(--text-primary);">
                                     <option value="multi">Both</option>
                                     <option value="movie">Movie</option>
                                     <option value="tv">TV Series</option>
@@ -748,7 +748,7 @@
                             </div>
                             
                             <div class="form-group">
-                                <label>VJ Translator *</label>
+                                <label for="movie-vj">VJ Translator *</label>
                                 <select id="movie-vj" required>
                                     <option value="">Select VJ</option>
                                     <option value="VJ Junior">VJ Junior</option>
@@ -785,7 +785,7 @@
                                     <button type="button" class="btn-secondary" onclick="generateArchiveUrl()" style="flex: 1;">
                                         Generate Embed URL
                                     </button>
-                                    <a href="https://archive.org/upload" target="_blank" class="btn-secondary" style="text-align: center; text-decoration: none;">
+                                    <a href="https://archive.org/upload" target="_blank" rel="noopener" class="btn-secondary" style="text-align: center; text-decoration: none;">
                                         Upload to Archive.org →
                                     </a>
                                 </div>
@@ -920,7 +920,7 @@
                     </div>
                     
                     <div class="form-group">
-                        <label>VJ Translator *</label>
+                        <label for="edit-vj">VJ Translator *</label>
                         <select id="edit-vj" required>
                             <option value="">Select VJ</option>
                             <option value="VJ Junior">VJ Junior</option>

@@ -452,7 +452,7 @@
                         </svg>
                         <input type="text" placeholder="Search comments..." id="searchInput" onkeyup="searchComments()">
                     </div>
-                    <select class="filter-select" id="statusFilter" onchange="filterByStatus()">
+                    <select class="filter-select" id="statusFilter" onchange="filterByStatus()" title="Filter by status" aria-label="Filter comments by status">
                         <option value="all">All Status</option>
                         <option value="approved">Approved</option>
                         <option value="pending">Pending</option>

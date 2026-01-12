@@ -640,7 +640,7 @@
 
             <!-- Filter Bar -->
             <div class="filter-bar">
-                <select id="statusFilter">
+                <select id="statusFilter" title="Filter by status" aria-label="Filter by status">
                     <option value="">All Statuses</option>
                     <option value="pending">Pending</option>
                     <option value="in_progress">In Progress</option>
@@ -648,7 +648,7 @@
                     <option value="closed">Closed</option>
                     <option value="spam">Spam</option>
                 </select>
-                <select id="subjectFilter">
+                <select id="subjectFilter" title="Filter by subject" aria-label="Filter by subject">
                     <option value="">All Subjects</option>
                     <option value="general">General Support</option>
                     <option value="billing">Billing Issue</option>
@@ -658,7 +658,7 @@
                     <option value="feedback">Feedback</option>
                     <option value="other">Other</option>
                 </select>
-                <select id="priorityFilter">
+                <select id="priorityFilter" title="Filter by priority" aria-label="Filter by priority">
                     <option value="">All Priorities</option>
                     <option value="low">Low</option>
                     <option value="normal">Normal</option>
@@ -673,7 +673,7 @@
             <!-- Bulk Actions -->
             <div class="bulk-actions" id="bulkActions">
                 <span><strong id="selectedCount">0</strong> selected</span>
-                <select id="bulkAction">
+                <select id="bulkAction" title="Bulk action" aria-label="Select bulk action">
                     <option value="">Select Action</option>
                     <option value="mark_resolved">Mark Resolved</option>
                     <option value="mark_spam">Mark as Spam</option>
@@ -688,7 +688,7 @@
                 <table>
                     <thead>
                         <tr>
-                            <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                            <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()" title="Select all requests" aria-label="Select all requests"></th>
                             <th>From</th>
                             <th>Subject</th>
                             <th>Message</th>
@@ -758,7 +758,7 @@
                     <h3>Admin Response</h3>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Status</label>
+                            <label for="modalStatus">Status</label>
                             <select id="modalStatus">
                                 <option value="pending">Pending</option>
                                 <option value="in_progress">In Progress</option>
@@ -768,7 +768,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Priority</label>
+                            <label for="modalPriority">Priority</label>
                             <select id="modalPriority">
                                 <option value="low">Low</option>
                                 <option value="normal">Normal</option>
@@ -902,7 +902,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    renderRequests(data.requests);
+                    renderRequests(data.data);
                     renderPagination(data.pagination);
                     currentPage = page;
                 } else {

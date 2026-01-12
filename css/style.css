@@ -488,6 +488,7 @@ img {
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.7);
+    -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
     z-index: 1999;
     opacity: 0;
@@ -799,6 +800,7 @@ img {
     padding: 6px 14px;
     border-radius: 8px;
     font-size: 12px;
+    -webkit-backdrop-filter: blur(5px);
     backdrop-filter: blur(5px);
 }
 
@@ -1020,6 +1022,7 @@ img {
     justify-content: center;
     background: rgba(0, 0, 0, 0.7);
     border-radius: 8px;
+    -webkit-backdrop-filter: blur(5px);
     backdrop-filter: blur(5px);
 }
 
@@ -2737,6 +2740,7 @@ a:focus-visible {
     line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -2979,6 +2983,7 @@ a:focus-visible {
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.85);
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     display: flex;
     align-items: center;
@@ -3223,6 +3228,7 @@ a:focus-visible {
     .slide-desc {
         font-size: 13px;
         -webkit-line-clamp: 2;
+        line-clamp: 2;
     }
     
     .carousel {
@@ -3244,4 +3250,140 @@ a:focus-visible {
     .col {
         padding: 0 5px;
     }
+}
+
+/* Utility classes to replace inline styles */
+.hidden {
+    display: none;
+}
+
+.mt-25 {
+    margin-top: 25px;
+}
+
+.mt-40 {
+    margin-top: 40px;
+}
+
+.icon-inline {
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.notification-badge-hidden {
+    display: none;
+}
+
+.btn-admin {
+    display: none;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    text-decoration: none;
+    text-align: center;
+}
+
+.btn-secondary-style {
+    background: var(--background-light);
+    color: var(--text-primary);
+}
+
+.btn-danger {
+    background: #ff4444;
+    color: #fff;
+}
+
+.btn-link-style {
+    text-decoration: none;
+}
+
+.sidebar-actions {
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Ad container styles */
+.ad-container {
+    margin: 30px auto;
+    max-width: 728px;
+    text-align: center;
+}
+
+.ad-container-search {
+    margin: 20px auto;
+    max-width: 728px;
+    text-align: center;
+}
+
+/* Data transparency section styles */
+.data-transparency-section {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    padding: 60px 20px;
+    margin: 0 0 40px 0;
+    border-radius: 12px;
+}
+
+.data-transparency-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.data-transparency-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.data-transparency-title {
+    color: #7CFC00;
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.data-transparency-subtitle {
+    color: #aaa;
+    font-size: 1.1rem;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.data-transparency-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.data-card {
+    background: rgba(124, 252, 0, 0.05);
+    border: 1px solid rgba(124, 252, 0, 0.2);
+    border-radius: 12px;
+    padding: 25px;
+}
+
+.data-card-icon {
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.data-card-title {
+    color: #fff;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.data-card-text {
+    color: #aaa;
+    font-size: 0.95rem;
+    line-height: 1.7;
+}
+
+.data-card-list {
+    color: #aaa;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    margin: 10px 0 0 20px;
+}
+
+.text-highlight {
+    color: #7CFC00;
 }
