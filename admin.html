@@ -891,6 +891,12 @@
                     if (cachedUser.role === 'admin') {
                         console.log('User is admin from cache, loading dashboard');
                         loadDashboardData();
+                        
+                        // Check for action parameter
+                        const urlParams = new URLSearchParams(window.location.search);
+                        if (urlParams.get('action') === 'import-series') {
+                            setTimeout(() => openSeriesModal(), 500);
+                        }
                         return;
                     }
                 } catch (e) {
@@ -935,6 +941,12 @@
                 
                 console.log('User IS admin, loading dashboard');
                 loadDashboardData();
+                
+                // Check for action parameter
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('action') === 'import-series') {
+                    setTimeout(() => openSeriesModal(), 500);
+                }
             } catch (error) {
                 console.error('Auth error:', error);
                 // Check one more time if cached user is admin

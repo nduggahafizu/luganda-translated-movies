@@ -162,6 +162,16 @@ router.post('/import-series', async (req, res) => {
             });
         }
 
+        // Check if TMDB API key is configured
+        if (!process.env.TMDB_API_KEY) {
+            return res.status(500).json({ 
+                success: false, 
+                message: 'TMDB API key not configured. Please add TMDB_API_KEY to environment variables.' 
+            });
+        }
+
+        console.log('Importing series with TMDB ID:', tmdbId);
+
         // Fetch complete series data from TMDB
         const seriesData = await tmdbService.getTVSeriesComplete(tmdbId);
 
@@ -171,6 +181,8 @@ router.post('/import-series', async (req, res) => {
                 message: 'TV series not found on TMDB' 
             });
         }
+
+        console.log('Series data fetched:', seriesData.originalTitle);
 
         // Customize data if provided
         if (vjName) {
@@ -185,6 +197,7 @@ router.post('/import-series', async (req, res) => {
 
         // Save to database
         const newSeries = await LugandaMovie.create(seriesData);
+        console.log('Series saved to database:', newSeries._id);
 
         res.status(201).json({ 
             success: true, 
@@ -214,6 +227,15 @@ router.post('/search-series', async (req, res) => {
             });
         }
 
+        // Check if TMDB API key is configured
+        if (!process.env.TMDB_API_KEY) {
+            return res.status(500).json({ 
+                success: false, 
+                message: 'TMDB API key not configured. Please add TMDB_API_KEY to environment variables.' 
+            });
+        }
+
+        console.log('Searching TMDB for:', query, year);
         const results = await tmdbService.searchTVShows(query, 1, year);
 
         // Format results for frontend
@@ -226,6 +248,7 @@ router.post('/search-series', async (req, res) => {
             rating: show.vote_average
         }));
 
+        console.log('Found', formattedResults.length, 'series results');
         res.json({ 
             success: true, 
             count: formattedResults.length,
@@ -514,6 +537,11 @@ router.get('/', async (req, res) => {
         const skip = (page - 1) * limit;
         
         const query = { status: 'published' };
+        
+        // Filter by contentType if provided (movie or series)
+        if (req.query.contentType) {
+            query.contentType = req.query.contentType;
+        }
         
         const [movies, total] = await Promise.all([
             LugandaMovie.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),

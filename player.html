@@ -54,6 +54,152 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
     
     <style>
+        /* ========== PRE-ROLL VIDEO AD STYLES ========== */
+        .preroll-ad-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .preroll-ad-container.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .preroll-ad-video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+        
+        .preroll-ad-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            pointer-events: none;
+        }
+        
+        .preroll-ad-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            pointer-events: auto;
+        }
+        
+        .preroll-ad-label {
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 12px;
+            background: rgba(255,193,7,0.9);
+            color: #000;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .preroll-skip-btn {
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            border: 2px solid #fff;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            pointer-events: auto;
+        }
+        
+        .preroll-skip-btn:hover:not(:disabled) {
+            background: var(--primary-color);
+            color: #000;
+            border-color: var(--primary-color);
+        }
+        
+        .preroll-skip-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .preroll-ad-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px 20px;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: auto;
+        }
+        
+        .preroll-ad-info {
+            color: #fff;
+            font-size: 13px;
+        }
+        
+        .preroll-ad-info a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .preroll-progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: var(--primary-color);
+            transition: width 0.1s linear;
+        }
+        
+        /* Display ad fallback in pre-roll */
+        .preroll-display-ad {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 40px;
+        }
+        
+        .preroll-display-ad .ad-content {
+            max-width: 728px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .preroll-display-ad .ad-message {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .preroll-countdown {
+            color: #fff;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        
+        /* ========== END PRE-ROLL STYLES ========== */
+        
         /* Player Page Responsive Styles */
         :root {
             --player-radius: 12px;
@@ -1482,6 +1628,43 @@
 
     <!-- Video Player -->
     <div class="player-wrapper" id="playerWrapper">
+        <!-- PRE-ROLL VIDEO AD CONTAINER -->
+        <div class="preroll-ad-container" id="prerollAdContainer">
+            <!-- Video Ad Player -->
+            <video class="preroll-ad-video" id="prerollAdVideo" playsinline muted>
+                <source src="" type="video/mp4">
+            </video>
+            
+            <!-- Display Ad Fallback (if no video ad available) -->
+            <div class="preroll-display-ad" id="prerollDisplayAd" style="display: none;">
+                <div class="ad-content">
+                    <div class="ad-message">Advertisement</div>
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-1904736753681797"
+                         data-ad-slot="auto"
+                         data-ad-format="rectangle"></ins>
+                    <div class="preroll-countdown" id="displayAdCountdown">Video starts in 5 seconds...</div>
+                </div>
+            </div>
+            
+            <!-- Ad Overlay -->
+            <div class="preroll-ad-overlay" id="prerollAdOverlay">
+                <div class="preroll-ad-header">
+                    <span class="preroll-ad-label">⚡ AD</span>
+                    <button class="preroll-skip-btn" id="prerollSkipBtn" disabled>
+                        Skip in <span id="skipCountdown">5</span>s
+                    </button>
+                </div>
+                <div class="preroll-ad-footer">
+                    <span class="preroll-ad-info">
+                        Support Unruly Movies • <a href="#" onclick="return false;">Learn more</a>
+                    </span>
+                </div>
+                <div class="preroll-progress-bar" id="prerollProgress"></div>
+            </div>
+        </div>
+        
         <!-- Native Video Player (for direct video files) -->
         <video id="player" playsinline controls crossorigin style="display: none;">
             <source src="" type="video/mp4">
@@ -1783,6 +1966,233 @@
         const commentsPerPage = 10;
         let allComments = [];
 
+        // ========== PRE-ROLL AD SYSTEM ==========
+        const prerollAdConfig = {
+            enabled: false,                   // DISABLED - Enable when Monetag verifies your site
+            skipAfterSeconds: 5,              // Allow skip after X seconds
+            maxAdDuration: 30,                // Maximum ad duration in seconds
+            fallbackToDisplay: false,         // DISABLED - No display ad fallback
+            displayAdDuration: 5,             // Display ad duration in seconds
+            // Video ads - Add your Monetag/PropellerAds URLs here after verification
+            videoAdSources: [
+                // ADD YOUR MONETAG VIDEO AD URLs HERE AFTER VERIFICATION:
+                // 'https://your-monetag-vast-tag.com/ad.xml',
+            ]
+        };
+
+        let prerollAdPlayed = false;          // Track if ad was already played this session
+        let pendingVideoUrl = null;           // Store the movie URL to play after ad
+        let pendingVideoType = null;          // 'direct', 'embed', or 'archive'
+
+        // Pre-roll Ad Elements
+        const prerollContainer = document.getElementById('prerollAdContainer');
+        const prerollVideo = document.getElementById('prerollAdVideo');
+        const prerollDisplayAd = document.getElementById('prerollDisplayAd');
+        const prerollOverlay = document.getElementById('prerollAdOverlay');
+        const prerollSkipBtn = document.getElementById('prerollSkipBtn');
+        const skipCountdown = document.getElementById('skipCountdown');
+        const prerollProgress = document.getElementById('prerollProgress');
+        const displayAdCountdown = document.getElementById('displayAdCountdown');
+
+        // Initialize Pre-roll Ad System
+        function initPrerollAd(movieUrl, videoType) {
+            if (!prerollAdConfig.enabled || prerollAdPlayed) {
+                // Skip ad and play video directly
+                playMainVideo(movieUrl, videoType);
+                return;
+            }
+
+            // Store pending video info
+            pendingVideoUrl = movieUrl;
+            pendingVideoType = videoType;
+
+            // Check if we have video ads
+            if (prerollAdConfig.videoAdSources.length > 0) {
+                playVideoAd();
+            } else if (prerollAdConfig.fallbackToDisplay) {
+                showDisplayAd();
+            } else {
+                // No ads configured, play video directly
+                playMainVideo(movieUrl, videoType);
+            }
+        }
+
+        // Play Video Ad
+        function playVideoAd() {
+            const randomAd = prerollAdConfig.videoAdSources[
+                Math.floor(Math.random() * prerollAdConfig.videoAdSources.length)
+            ];
+
+            prerollContainer.classList.add('active');
+            prerollVideo.style.display = 'block';
+            prerollDisplayAd.style.display = 'none';
+            prerollOverlay.style.display = 'flex';
+
+            prerollVideo.src = randomAd;
+            prerollVideo.load();
+            
+            // Try to play with sound first, fall back to muted
+            prerollVideo.muted = false;
+            prerollVideo.play().catch(() => {
+                prerollVideo.muted = true;
+                prerollVideo.play();
+            });
+
+            let skipTimer = prerollAdConfig.skipAfterSeconds;
+            
+            // Update skip countdown
+            const skipInterval = setInterval(() => {
+                skipTimer--;
+                skipCountdown.textContent = skipTimer;
+                
+                if (skipTimer <= 0) {
+                    clearInterval(skipInterval);
+                    prerollSkipBtn.disabled = false;
+                    prerollSkipBtn.innerHTML = 'Skip Ad →';
+                }
+            }, 1000);
+
+            // Update progress bar
+            prerollVideo.addEventListener('timeupdate', () => {
+                const progress = (prerollVideo.currentTime / prerollVideo.duration) * 100;
+                prerollProgress.style.width = progress + '%';
+            });
+
+            // Ad ended naturally
+            prerollVideo.addEventListener('ended', () => {
+                clearInterval(skipInterval);
+                closePrerollAd();
+            });
+
+            // Handle ad errors - fallback to display ad
+            prerollVideo.addEventListener('error', () => {
+                clearInterval(skipInterval);
+                if (prerollAdConfig.fallbackToDisplay) {
+                    showDisplayAd();
+                } else {
+                    closePrerollAd();
+                }
+            });
+
+            // Skip button click
+            prerollSkipBtn.onclick = () => {
+                clearInterval(skipInterval);
+                closePrerollAd();
+            };
+        }
+
+        // Show Display Ad (fallback)
+        function showDisplayAd() {
+            prerollContainer.classList.add('active');
+            prerollVideo.style.display = 'none';
+            prerollDisplayAd.style.display = 'flex';
+            prerollOverlay.style.display = 'none';
+
+            // Try to push AdSense ad
+            try {
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            } catch (e) {
+                console.log('AdSense not available');
+            }
+
+            let countdown = prerollAdConfig.displayAdDuration;
+            displayAdCountdown.textContent = `Video starts in ${countdown} seconds...`;
+
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                displayAdCountdown.textContent = `Video starts in ${countdown} seconds...`;
+                
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    closePrerollAd();
+                }
+            }, 1000);
+        }
+
+        // Close Pre-roll Ad and Play Main Video
+        function closePrerollAd() {
+            prerollAdPlayed = true;
+            prerollContainer.classList.remove('active');
+            
+            // Stop ad video
+            prerollVideo.pause();
+            prerollVideo.src = '';
+
+            // Play the main video
+            if (pendingVideoUrl && pendingVideoType) {
+                playMainVideo(pendingVideoUrl, pendingVideoType);
+            }
+        }
+
+        // Play Main Video (after ad or directly)
+        function playMainVideo(url, type) {
+            console.log('🎬 Playing main video:', type, url);
+            
+            switch(type) {
+                case 'direct':
+                    loadVideoSource(url);
+                    break;
+                case 'embed':
+                    loadEmbedVideo(url);
+                    break;
+                case 'archive':
+                    loadArchiveOrgEmbed(url);
+                    break;
+                default:
+                    loadVideoSource(url);
+            }
+        }
+
+        // Convert Archive.org URL to direct MP4 (for native player with ad support)
+        function getArchiveOrgDirectUrl(url) {
+            // If it's already a direct download URL with .mp4 or .ia.mp4
+            if (url.includes('archive.org/download/') && 
+                (url.endsWith('.mp4') || url.endsWith('.ia.mp4'))) {
+                return url;
+            }
+            
+            // Convert embed URL to potential direct URL
+            // archive.org/embed/item-id → archive.org/download/item-id/item-id.ia.mp4
+            const embedMatch = url.match(/archive\.org\/embed\/([^\/\?]+)/);
+            if (embedMatch) {
+                const itemId = embedMatch[1];
+                // Archive.org creates .ia.mp4 versions that are browser-compatible
+                return `https://archive.org/download/${itemId}/${itemId}.ia.mp4`;
+            }
+            
+            // Convert details URL
+            const detailsMatch = url.match(/archive\.org\/details\/([^\/\?]+)/);
+            if (detailsMatch) {
+                const itemId = detailsMatch[1];
+                return `https://archive.org/download/${itemId}/${itemId}.ia.mp4`;
+            }
+            
+            return url;
+        }
+
+        // Try direct MP4 URL first, fall back to embed if it fails
+        async function tryDirectMp4WithFallback(directMp4Url, originalEmbedUrl) {
+            console.log('🔍 Checking if direct MP4 exists:', directMp4Url);
+            
+            try {
+                // Quick HEAD request to check if MP4 exists
+                const response = await fetch(directMp4Url, { 
+                    method: 'HEAD',
+                    mode: 'no-cors' // Archive.org may block CORS on HEAD
+                });
+                
+                // If no error, try to use direct MP4
+                console.log('✅ Direct MP4 URL accessible, using native player with pre-roll');
+                initPrerollAd(directMp4Url, 'direct');
+                
+            } catch (error) {
+                console.log('⚠️ Direct MP4 not available, falling back to embed:', error.message);
+                const archiveEmbedUrl = getArchiveOrgEmbedUrl(originalEmbedUrl);
+                initPrerollAd(archiveEmbedUrl, 'archive');
+            }
+        }
+        // ========== END PRE-ROLL AD SYSTEM ==========
+
         // Check if URL is a direct video file (can be played natively)
         function isDirectVideoUrl(url) {
             if (!url) return false;
@@ -1988,25 +2398,31 @@
                             return;
                         }
                         
-                        // Check if it's an Archive.org URL (use their embed player - works for MKV!)
+                        // Check if it's an Archive.org URL - ALWAYS use direct MP4
                         if (videoUrl && isArchiveOrgUrl(videoUrl)) {
-                            console.log('📦 Archive.org URL detected, using embed player');
-                            const archiveEmbedUrl = getArchiveOrgEmbedUrl(videoUrl);
-                            loadArchiveOrgEmbed(archiveEmbedUrl);
+                            console.log('📦 Archive.org URL detected');
+                            
+                            // Get direct MP4 URL for native player
+                            const directMp4Url = getArchiveOrgDirectUrl(videoUrl);
+                            console.log('🎬 Using direct MP4 URL:', directMp4Url);
+                            
+                            // Always use native player with direct MP4
+                            initPrerollAd(directMp4Url, 'direct');
                         }
                         // Check if it's a direct playable URL (MP4, WebM only)
                         else if (videoUrl && isDirectVideoUrl(videoUrl)) {
-                            console.log('✅ Direct video URL detected, playing directly');
-                            loadVideoSource(videoUrl);
+                            console.log('✅ Direct video URL detected');
+                            initPrerollAd(videoUrl, 'direct');
                         }
                         // Check for embed URL (Streamtape, etc.)
                         else if (videoUrl || streamtapeId) {
                             const embedSrc = videoUrl || 
                                 `https://streamtape.com/e/${streamtapeId}`;
-                            loadEmbedVideo(embedSrc);
+                            // For embed players, show display ad first
+                            initPrerollAd(embedSrc, 'embed');
                         } else {
                             // Fall back to direct video URL
-                            loadVideoSource(movie.video?.originalVideoPath || movie.streamUrl);
+                            initPrerollAd(movie.video?.originalVideoPath || movie.streamUrl, 'direct');
                         }
                         
                         loadRelatedMovies(movie.genres?.[0] || 'action');
@@ -2015,10 +2431,11 @@
                         document.getElementById('movieDescription').textContent = 'Unable to load movie description. Please try refreshing the page.';
                     }
                 } else if (embedUrl) {
-                    // Direct embed URL from query param
-                    loadEmbedVideo(embedUrl);
+                    // Direct embed URL from query param - use pre-roll
+                    initPrerollAd(embedUrl, 'embed');
                     document.getElementById('movieTitle').textContent = urlParams.get('title') || 'Now Playing';
                 } else if (streamUrl) {
+                    // For live TV/streams, skip pre-roll ad
                     loadVideoSource(streamUrl);
                     document.getElementById('movieTitle').textContent = urlParams.get('movie') || urlParams.get('station') || 'Now Playing';
                     loadingOverlay.style.display = 'none';

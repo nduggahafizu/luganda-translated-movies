@@ -435,7 +435,8 @@
         async function loadSeries() {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
             try {
-                const response = await fetch(`${API_BASE_URL}/api/luganda-movies?contentType=series&limit=100`, {
+                // Use status=all to get both published and draft series
+                const response = await fetch(`${API_BASE_URL}/api/luganda-movies?contentType=series&status=all&limit=100`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
