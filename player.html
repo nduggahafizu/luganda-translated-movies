@@ -1666,7 +1666,7 @@
         </div>
         
         <!-- Native Video Player (for direct video files) -->
-        <video id="player" playsinline controls crossorigin style="display: none;">
+        <video id="player" playsinline controls style="display: none;">
             <source src="" type="video/mp4">
         </video>
         
@@ -2145,6 +2145,14 @@
 
         // Convert Archive.org URL to direct MP4 (for native player with ad support)
         function getArchiveOrgDirectUrl(url) {
+            // If it's already a CDN direct URL (ia800101.us.archive.org/...)
+            // These are already direct playable URLs
+            if (url.match(/ia\d+\.us\.archive\.org/) && 
+                (url.endsWith('.mp4') || url.endsWith('.ia.mp4'))) {
+                console.log('✅ Already a direct CDN URL:', url.substring(0, 60));
+                return url;
+            }
+            
             // If it's already a direct download URL with .mp4 or .ia.mp4
             if (url.includes('archive.org/download/') && 
                 (url.endsWith('.mp4') || url.endsWith('.ia.mp4'))) {
@@ -2201,7 +2209,8 @@
             if (url.includes('archive.org/embed/')) return false;
             
             // Archive.org direct downloads (only MP4/WebM for native playback)
-            if (url.includes('archive.org/download/')) {
+            // Also check for CDN subdomain URLs (ia800101.us.archive.org, etc.)
+            if (url.includes('archive.org/download/') || url.match(/ia\d+\.us\.archive\.org/)) {
                 const urlLower = url.toLowerCase();
                 // Only treat MP4 and WebM as direct (they work in all browsers)
                 if (urlLower.endsWith('.mp4') || urlLower.endsWith('.webm')) return true;
@@ -2261,7 +2270,7 @@
             }
         }
         
-        // Check if URL is an Archive.org embed/item URL
+        // Check if URL is an Archive.org URL (any format)
         function isArchiveOrgUrl(url) {
             if (!url) {
                 console.log('🔍 isArchiveOrgUrl: URL is empty/null');
@@ -2269,10 +2278,12 @@
             }
             // Clean up URL (remove spaces that might be added accidentally)
             const cleanUrl = url.trim().replace(/\s+/g, '');
+            // Check for all Archive.org URL formats including CDN subdomains (ia800101.us.archive.org, etc.)
             const isArchive = cleanUrl.includes('archive.org/embed/') || 
                    cleanUrl.includes('archive.org/details/') ||
-                   (cleanUrl.includes('archive.org/download/') && cleanUrl.toLowerCase().endsWith('.mkv'));
-            console.log('🔍 isArchiveOrgUrl check:', cleanUrl.substring(0, 50), '... =', isArchive);
+                   cleanUrl.includes('archive.org/download/') ||
+                   cleanUrl.match(/ia\d+\.us\.archive\.org/) !== null; // CDN URLs like ia800101.us.archive.org
+            console.log('🔍 isArchiveOrgUrl check:', cleanUrl.substring(0, 60), '... =', isArchive);
             return isArchive;
         }
         
@@ -2313,6 +2324,13 @@
                     embedUrl = `https://archive.org/embed/${match[1]}`;
                 }
             }
+            // Handle CDN URLs like ia800101.us.archive.org/14/items/item-id/file.mp4
+            else if (url.match(/ia\d+\.us\.archive\.org/)) {
+                const match = url.match(/items\/([^\/]+)/);
+                if (match) {
+                    embedUrl = `https://archive.org/embed/${match[1]}`;
+                }
+            }
             
             // Add parameters to hide Archive.org branding and account links
             // ui=min - minimal UI, playlist=0 - no playlist, autoplay=1
@@ -2325,6 +2343,9 @@
         // Initialize Plyr only for native video
         function initPlyr() {
             if (player) return player;
+            
+            // Remove crossorigin to avoid CORS issues with Archive.org
+            video.removeAttribute('crossorigin');
             
             player = new Plyr(video, {
                 controls: [
@@ -2382,6 +2403,8 @@
                         // Get embed URL from either location
                         let videoUrl = movie.embedUrl || movie.video?.embedUrl || movie.video?.url;
                         const streamtapeId = movie.video?.streamtapeId;
+                        // Get direct CDN URL if available (works without CORS issues)
+                        const directCdnUrl = movie.video?.originalVideoPath;
                         
                         // Clean up URL if it exists
                         if (videoUrl) {
@@ -2389,25 +2412,37 @@
                         }
                         
                         console.log('🎬 Video URL:', videoUrl);
+                        console.log('🎬 Direct CDN URL:', directCdnUrl);
                         
                         // Check if video URL is valid
-                        if (!isValidVideoUrl(videoUrl) && !streamtapeId) {
+                        if (!isValidVideoUrl(videoUrl) && !streamtapeId && !directCdnUrl) {
                             console.log('⚠️ No valid video URL available for this movie');
                             showVideoUnavailable(movie.originalTitle);
                             loadRelatedMovies(movie.genres?.[0] || 'action');
                             return;
                         }
                         
-                        // Check if it's an Archive.org URL - ALWAYS use direct MP4
-                        if (videoUrl && isArchiveOrgUrl(videoUrl)) {
-                            console.log('📦 Archive.org URL detected');
+                        // PRIORITY 1: Use direct CDN URL if available (ia800101.us.archive.org/...)
+                        // These work without CORS issues because there's no redirect
+                        if (directCdnUrl && directCdnUrl.match(/ia\d+\.us\.archive\.org/)) {
+                            console.log('✅ Direct Archive.org CDN URL found - using native player');
+                            initPrerollAd(directCdnUrl, 'direct');
+                        }
+                        // PRIORITY 2: Check if videoUrl/embedUrl is already a direct CDN URL
+                        else if (videoUrl && videoUrl.match(/ia\d+\.us\.archive\.org/) && videoUrl.endsWith('.mp4')) {
+                            console.log('✅ Video URL is direct CDN URL - using native player');
+                            initPrerollAd(videoUrl, 'direct');
+                        }
+                        // PRIORITY 3: Check if it's an Archive.org URL (embed/details/download) - Use EMBED
+                        else if (videoUrl && isArchiveOrgUrl(videoUrl)) {
+                            console.log('📦 Archive.org URL detected - using embed (CORS workaround)');
                             
-                            // Get direct MP4 URL for native player
-                            const directMp4Url = getArchiveOrgDirectUrl(videoUrl);
-                            console.log('🎬 Using direct MP4 URL:', directMp4Url);
+                            // Get embed URL for iframe player (bypasses CORS)
+                            const archiveEmbedUrl = getArchiveOrgEmbedUrl(videoUrl);
+                            console.log('🎬 Using Archive.org embed URL:', archiveEmbedUrl);
                             
-                            // Always use native player with direct MP4
-                            initPrerollAd(directMp4Url, 'direct');
+                            // Load directly into iframe (skip pre-roll for now with embed)
+                            loadArchiveOrgEmbed(archiveEmbedUrl);
                         }
                         // Check if it's a direct playable URL (MP4, WebM only)
                         else if (videoUrl && isDirectVideoUrl(videoUrl)) {
@@ -2776,7 +2811,10 @@
             video.style.display = 'block';
             embedContainer.style.display = 'none';
             
-            // Initialize Plyr
+            // IMPORTANT: Remove crossorigin attribute to avoid CORS issues with Archive.org
+            video.removeAttribute('crossorigin');
+            
+            // Initialize Plyr (without crossorigin)
             initPlyr();
             
             // Check if HLS stream
