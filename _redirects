@@ -11,5 +11,9 @@ http://watch.unrulymovies.com/* https://translatedmovies.netlify.app/:splat 301!
 # API proxy
 /api/* https://luganda-translated-movies-production.up.railway.app/:splat 200
 
+# Serve static files (don't redirect these to index.html)
+/.well-known/*  /.well-known/:splat  200
+
 # Redirect all requests to index.html for client-side routing
 /*    /index.html   200
+
