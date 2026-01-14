@@ -777,21 +777,26 @@
                             
                             <!-- Archive.org Helper -->
                             <div class="form-group full-width" style="background: rgba(124, 252, 0, 0.05); padding: 15px; border-radius: 10px; border: 1px dashed var(--primary-color);">
-                                <label style="color: var(--primary-color);">🎬 Archive.org Embed Helper (FREE, No Ads, Works for MKV!)</label>
+                                <label style="color: var(--primary-color);">🎬 Archive.org Direct Link Generator (FAST, No CORS!)</label>
                                 <div style="margin-top: 10px;">
-                                    <input type="text" id="archive-item-id" placeholder="Item ID from URL (e.g., sisu.-road.to.-revenge.-a.-k.-a.-sisu.-2.2025.1080p.-ice.part-01)" style="width: 100%;">
+                                    <input type="text" id="archive-item-id" placeholder="Item ID or full URL (e.g., my-movie-2024 or https://archive.org/details/my-movie-2024)" style="width: 100%;">
                                 </div>
-                                <div style="margin-top: 10px; display: flex; gap: 10px;">
-                                    <button type="button" class="btn-secondary" onclick="generateArchiveUrl()" style="flex: 1;">
-                                        Generate Embed URL
+                                <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
+                                    <button type="button" class="btn-secondary" onclick="getDirectMP4Link()" style="flex: 2; background: var(--primary-color); color: #000;">
+                                        ⚡ Get Direct MP4 Link (Recommended)
                                     </button>
-                                    <a href="https://archive.org/upload" target="_blank" rel="noopener" class="btn-secondary" style="text-align: center; text-decoration: none;">
-                                        Upload to Archive.org →
+                                    <button type="button" class="btn-secondary" onclick="generateArchiveUrl()" style="flex: 1;">
+                                        Embed URL
+                                    </button>
+                                    <a href="https://archive.org/upload" target="_blank" rel="noopener" class="btn-secondary" style="text-align: center; text-decoration: none; flex: 1;">
+                                        Upload →
                                     </a>
                                 </div>
+                                <div id="archive-status" style="margin-top: 10px; padding: 10px; border-radius: 8px; display: none;"></div>
                                 <small style="color: var(--text-secondary); margin-top: 8px; display: block;">
-                                    <strong>How to use:</strong> Upload video to archive.org → Copy Item ID from URL → Click Generate<br>
-                                    <strong>Example:</strong> From <code>archive.org/details/<b>my-movie-2024</b></code> → Item ID is <b>my-movie-2024</b>
+                                    <strong>⚡ Direct MP4:</strong> Fastest loading, no buffering, works on all devices<br>
+                                    <strong>How to use:</strong> Paste Archive.org URL or Item ID → Click "Get Direct MP4 Link"<br>
+                                    <strong>Example:</strong> <code>archive.org/details/<b>my-movie-2024</b></code> or just <b>my-movie-2024</b>
                                 </small>
                             </div>
                             
@@ -1048,12 +1053,134 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
         
-        // Generate Archive.org URL (use embed URL for best compatibility)
-        function generateArchiveUrl() {
-            const itemId = document.getElementById('archive-item-id').value.trim();
+        // Extract item ID from input (supports full URL or just ID)
+        function extractArchiveItemId(input) {
+            if (!input) return null;
+            input = input.trim();
             
+            // If it's a URL, extract the item ID
+            const urlPatterns = [
+                /archive\.org\/details\/([^\/\?]+)/,
+                /archive\.org\/download\/([^\/\?]+)/,
+                /archive\.org\/embed\/([^\/\?]+)/,
+                /ia\d+\.us\.archive\.org\/\d+\/items\/([^\/]+)/
+            ];
+            
+            for (const pattern of urlPatterns) {
+                const match = input.match(pattern);
+                if (match) return match[1];
+            }
+            
+            // Otherwise assume it's just the item ID
+            return input;
+        }
+        
+        // Get direct MP4 link from Archive.org (fast CDN URL)
+        async function getDirectMP4Link() {
+            const input = document.getElementById('archive-item-id').value.trim();
+            const statusDiv = document.getElementById('archive-status');
+            
+            if (!input) {
+                showToast('Please enter an Archive.org Item ID or URL', 'error');
+                return;
+            }
+            
+            const itemId = extractArchiveItemId(input);
             if (!itemId) {
-                showToast('Please enter the Archive.org Item ID', 'error');
+                showToast('Could not extract Item ID from input', 'error');
+                return;
+            }
+            
+            // Show loading status
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = 'rgba(124, 252, 0, 0.1)';
+            statusDiv.innerHTML = '<span style="color: var(--primary-color);">⏳ Fetching direct link from Archive.org...</span>';
+            
+            try {
+                // Fetch metadata from Archive.org
+                const response = await fetch(`https://archive.org/metadata/${itemId}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Item not found (${response.status})`);
+                }
+                
+                const metadata = await response.json();
+                
+                if (!metadata.server || !metadata.dir) {
+                    throw new Error('Invalid metadata response');
+                }
+                
+                // Find MP4 files (prefer highest quality)
+                const mp4Files = (metadata.files || [])
+                    .filter(f => f.name && f.name.toLowerCase().endsWith('.mp4'))
+                    .sort((a, b) => (parseInt(b.size) || 0) - (parseInt(a.size) || 0));
+                
+                if (mp4Files.length === 0) {
+                    // Check for other video formats
+                    const videoFiles = (metadata.files || [])
+                        .filter(f => f.name && /\.(mkv|avi|webm|mov)$/i.test(f.name));
+                    
+                    if (videoFiles.length > 0) {
+                        statusDiv.style.background = 'rgba(255, 165, 0, 0.1)';
+                        statusDiv.innerHTML = `
+                            <span style="color: orange;">⚠️ No MP4 found, but found: ${videoFiles.map(f => f.name).join(', ')}</span><br>
+                            <small>Archive.org will auto-convert. Using embed URL instead.</small>
+                        `;
+                        // Fall back to embed URL
+                        document.getElementById('movie-embed-url').value = `https://archive.org/embed/${itemId}`;
+                        showToast('Using embed URL (no MP4 available)', 'warning');
+                        return;
+                    }
+                    
+                    throw new Error('No video files found in this item');
+                }
+                
+                // Build direct CDN URL
+                const mp4File = mp4Files[0];
+                const directUrl = `https://${metadata.server}${metadata.dir}/${encodeURIComponent(mp4File.name)}`;
+                
+                // Calculate file size
+                const fileSizeMB = mp4File.size ? (parseInt(mp4File.size) / (1024 * 1024)).toFixed(1) : 'Unknown';
+                
+                // Set the URL in the form
+                document.getElementById('movie-embed-url').value = directUrl;
+                
+                // Show success with details
+                statusDiv.style.background = 'rgba(124, 252, 0, 0.15)';
+                statusDiv.innerHTML = `
+                    <span style="color: var(--primary-color);">✅ Direct MP4 Link Ready!</span><br>
+                    <small style="color: var(--text-secondary);">
+                        <strong>File:</strong> ${mp4File.name}<br>
+                        <strong>Size:</strong> ${fileSizeMB} MB<br>
+                        <strong>Server:</strong> ${metadata.server}
+                    </small>
+                `;
+                
+                showToast('Direct MP4 link generated! Fast loading enabled ⚡', 'success');
+                
+            } catch (error) {
+                console.error('Archive.org fetch error:', error);
+                statusDiv.style.background = 'rgba(255, 0, 0, 0.1)';
+                statusDiv.innerHTML = `
+                    <span style="color: #ff6b6b;">❌ ${error.message}</span><br>
+                    <small>Try the embed URL instead, or check if the item exists on Archive.org</small>
+                `;
+                showToast(error.message, 'error');
+            }
+        }
+        
+        // Generate Archive.org embed URL (fallback for non-MP4 formats)
+        function generateArchiveUrl() {
+            const input = document.getElementById('archive-item-id').value.trim();
+            
+            if (!input) {
+                showToast('Please enter the Archive.org Item ID or URL', 'error');
+                return;
+            }
+            
+            const itemId = extractArchiveItemId(input);
+            if (!itemId) {
+                showToast('Could not extract Item ID from input', 'error');
                 return;
             }
             
