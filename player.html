@@ -2340,6 +2340,107 @@
             return embedUrl;
         }
 
+        // Auto-rotate to landscape on fullscreen (like YouTube)
+        function setupAutoRotate(playerInstance) {
+            // Check if Screen Orientation API is supported
+            const screenOrientation = screen.orientation || screen.mozOrientation || screen.msOrientation;
+            
+            // Detect if on mobile device
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (!isMobile) {
+                console.log('📱 Auto-rotate: Desktop detected, skipping');
+                return;
+            }
+            
+            console.log('📱 Auto-rotate: Mobile detected, setting up rotation');
+            
+            // Listen for Plyr fullscreen events
+            if (playerInstance && playerInstance.on) {
+                playerInstance.on('enterfullscreen', async () => {
+                    console.log('🔄 Entering fullscreen - rotating to landscape');
+                    try {
+                        if (screenOrientation && screenOrientation.lock) {
+                            await screenOrientation.lock('landscape');
+                        } else if (screen.lockOrientation) {
+                            screen.lockOrientation('landscape');
+                        } else if (screen.mozLockOrientation) {
+                            screen.mozLockOrientation('landscape');
+                        } else if (screen.msLockOrientation) {
+                            screen.msLockOrientation('landscape');
+                        }
+                    } catch (e) {
+                        console.log('⚠️ Could not lock orientation:', e.message);
+                    }
+                });
+                
+                playerInstance.on('exitfullscreen', async () => {
+                    console.log('🔄 Exiting fullscreen - unlocking orientation');
+                    try {
+                        if (screenOrientation && screenOrientation.unlock) {
+                            screenOrientation.unlock();
+                        } else if (screen.unlockOrientation) {
+                            screen.unlockOrientation();
+                        } else if (screen.mozUnlockOrientation) {
+                            screen.mozUnlockOrientation();
+                        } else if (screen.msUnlockOrientation) {
+                            screen.msUnlockOrientation();
+                        }
+                    } catch (e) {
+                        console.log('⚠️ Could not unlock orientation:', e.message);
+                    }
+                });
+            }
+            
+            // Also listen for native fullscreen API (for iframe embeds)
+            document.addEventListener('fullscreenchange', async () => {
+                const isFullscreen = !!document.fullscreenElement;
+                
+                if (isFullscreen) {
+                    console.log('🔄 Fullscreen detected - rotating to landscape');
+                    try {
+                        if (screenOrientation && screenOrientation.lock) {
+                            await screenOrientation.lock('landscape');
+                        }
+                    } catch (e) {
+                        console.log('⚠️ Could not lock orientation:', e.message);
+                    }
+                } else {
+                    console.log('🔄 Exited fullscreen - unlocking orientation');
+                    try {
+                        if (screenOrientation && screenOrientation.unlock) {
+                            screenOrientation.unlock();
+                        }
+                    } catch (e) {
+                        console.log('⚠️ Could not unlock orientation:', e.message);
+                    }
+                }
+            });
+            
+            // Webkit fullscreen (Safari/iOS)
+            document.addEventListener('webkitfullscreenchange', async () => {
+                const isFullscreen = !!document.webkitFullscreenElement;
+                
+                if (isFullscreen) {
+                    try {
+                        if (screenOrientation && screenOrientation.lock) {
+                            await screenOrientation.lock('landscape');
+                        }
+                    } catch (e) {
+                        console.log('⚠️ Could not lock orientation:', e.message);
+                    }
+                } else {
+                    try {
+                        if (screenOrientation && screenOrientation.unlock) {
+                            screenOrientation.unlock();
+                        }
+                    } catch (e) {
+                        console.log('⚠️ Could not unlock orientation:', e.message);
+                    }
+                }
+            });
+        }
+
         // Initialize Plyr only for native video
         function initPlyr() {
             if (player) return player;
@@ -2372,11 +2473,16 @@
                 invertTime: false,
                 toggleInvert: true,
                 displayDuration: true,
-                ratio: '16:9'
+                ratio: '16:9',
+                fullscreen: { enabled: true, fallback: true, iosNative: true }
             });
+            
+            // Setup auto-rotate for mobile
+            setupAutoRotate(player);
             
             return player;
         }
+
 
         // Load movie data
         async function loadMovieData() {
@@ -2574,6 +2680,9 @@
             // Set the Archive.org embed URL
             embedPlayer.src = url;
             
+            // Setup auto-rotate for iframe embeds
+            setupIframeFullscreenRotate(embedPlayer);
+            
             // Listen for iframe load
             embedPlayer.onload = () => {
                 console.log('✅ Archive.org iframe loaded');
@@ -2595,6 +2704,63 @@
             setTimeout(() => {
                 loadingOverlay.style.display = 'none';
             }, 5000);
+        }
+        
+        // Setup auto-rotate for iframe embeds (Archive.org, Streamtape, etc)
+        function setupIframeFullscreenRotate(iframe) {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (!isMobile) return;
+            
+            // Add fullscreen button for iframe
+            const embedContainer = document.getElementById('embed-container');
+            if (!embedContainer) return;
+            
+            // Create fullscreen button if not exists
+            let fsButton = document.getElementById('iframe-fullscreen-btn');
+            if (!fsButton) {
+                fsButton = document.createElement('button');
+                fsButton.id = 'iframe-fullscreen-btn';
+                fsButton.innerHTML = '⛶';
+                fsButton.title = 'Fullscreen';
+                fsButton.style.cssText = `
+                    position: absolute;
+                    bottom: 60px;
+                    right: 15px;
+                    z-index: 100;
+                    background: rgba(0,0,0,0.7);
+                    color: white;
+                    border: none;
+                    padding: 10px 15px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-size: 20px;
+                `;
+                embedContainer.style.position = 'relative';
+                embedContainer.appendChild(fsButton);
+                
+                fsButton.addEventListener('click', async () => {
+                    try {
+                        // Request fullscreen on the container (includes iframe)
+                        if (embedContainer.requestFullscreen) {
+                            await embedContainer.requestFullscreen();
+                        } else if (embedContainer.webkitRequestFullscreen) {
+                            await embedContainer.webkitRequestFullscreen();
+                        } else if (embedContainer.mozRequestFullScreen) {
+                            await embedContainer.mozRequestFullScreen();
+                        } else if (embedContainer.msRequestFullscreen) {
+                            await embedContainer.msRequestFullscreen();
+                        }
+                        
+                        // Rotate to landscape
+                        const screenOrientation = screen.orientation;
+                        if (screenOrientation && screenOrientation.lock) {
+                            await screenOrientation.lock('landscape');
+                        }
+                    } catch (e) {
+                        console.log('⚠️ Fullscreen/rotation error:', e.message);
+                    }
+                });
+            }
         }
         
         // Check if embed shows error (embedding disabled)

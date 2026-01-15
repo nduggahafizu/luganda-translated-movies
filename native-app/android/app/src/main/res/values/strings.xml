@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Unruly Movies</string>
+    <string name="title_activity_main">Unruly Movies</string>
+    <string name="package_name">com.unrulymovies.app</string>
+    <string name="custom_url_scheme">com.unrulymovies.app</string>
+</resources>
