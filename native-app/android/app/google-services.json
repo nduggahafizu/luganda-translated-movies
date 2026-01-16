@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "353353696580",
+    "project_id": "mdm-agent-390eb",
+    "storage_bucket": "mdm-agent-390eb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:353353696580:android:d3cfbeb5cb31539b97c311",
+        "android_client_info": {
+          "package_name": "com.example.mdmagent"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5fgK3UyS9RH9iV4FhAFPuQMHLe7G5CoE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:353353696580:android:e3958b9b3aee34f697c311",
+        "android_client_info": {
+          "package_name": "com.unrulymovies.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5fgK3UyS9RH9iV4FhAFPuQMHLe7G5CoE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

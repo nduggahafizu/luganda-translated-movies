@@ -3,6 +3,21 @@
  * Automatically detects environment and uses appropriate backend URL
  */
 
+// Disable console.log in production to hide API URLs
+(function() {
+    const hostname = window.location.hostname;
+    const isProd = hostname.includes('netlify.app') || 
+                   hostname === 'unrulymovies.com' || 
+                   hostname === 'watch.unrulymovies.com';
+    if (isProd) {
+        const noop = function() {};
+        window.console.log = noop;
+        window.console.debug = noop;
+        window.console.info = noop;
+        // Keep console.warn and console.error for real issues
+    }
+})();
+
 const API_CONFIG = (function() {
     'use strict';
 
