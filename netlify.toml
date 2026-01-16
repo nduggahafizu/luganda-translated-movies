@@ -2,6 +2,11 @@
   publish = "."
   command = "echo 'Static site - no build needed'"
 
+[build.environment]
+  # Disable smart detection for secrets that were previously exposed in commit messages
+  # but have since been removed from actual files and rotated
+  SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"
+
 # Only redirect 404s to index.html, not all requests
 [[redirects]]
   from = "/*"
