@@ -109,7 +109,14 @@ async function handleGoogleSignIn(response) {
             
             showNotification('Login successful! Redirecting...', 'success');
             setTimeout(() => {
-                window.location.href = 'index.html';
+                // Check if there's a redirect URL saved (from login gate)
+                const redirectUrl = localStorage.getItem('redirectAfterLogin');
+                if (redirectUrl) {
+                    localStorage.removeItem('redirectAfterLogin');
+                    window.location.href = redirectUrl;
+                } else {
+                    window.location.href = 'index.html';
+                }
             }, 1000);
         } else {
             showNotification(data.message || 'Google sign-in failed', 'error');
@@ -223,7 +230,14 @@ async function loginWithEmail(email, password, rememberMe) {
             
             showNotification('Login successful! Redirecting...', 'success');
             setTimeout(() => {
-                window.location.href = 'index.html';
+                // Check if there's a redirect URL saved (from login gate)
+                const redirectUrl = localStorage.getItem('redirectAfterLogin');
+                if (redirectUrl) {
+                    localStorage.removeItem('redirectAfterLogin');
+                    window.location.href = redirectUrl;
+                } else {
+                    window.location.href = 'index.html';
+                }
             }, 1000);
         } else {
             showNotification(data.message || 'Login failed', 'error');
@@ -257,7 +271,14 @@ async function registerWithEmail(fullName, email, password) {
             
             showNotification('Registration successful! Redirecting...', 'success');
             setTimeout(() => {
-                window.location.href = 'index.html';
+                // Check if there's a redirect URL saved (from login gate)
+                const redirectUrl = localStorage.getItem('redirectAfterLogin');
+                if (redirectUrl) {
+                    localStorage.removeItem('redirectAfterLogin');
+                    window.location.href = redirectUrl;
+                } else {
+                    window.location.href = 'index.html';
+                }
             }, 1000);
         } else {
             showNotification(data.message || 'Registration failed', 'error');

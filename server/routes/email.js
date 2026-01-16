@@ -263,7 +263,8 @@ router.post('/notify/new-movie', protect, admin, async (req, res) => {
             });
         }
         
-        const siteUrl = process.env.SITE_URL || 'https://unrulymovies.com';
+        const siteUrl = process.env.SITE_URL || 'https://watch.unrulymovies.com';
+        const apiUrl = process.env.API_URL || 'https://luganda-translated-movies-production.up.railway.app';
         const transporter = createTransporter();
         
         let sent = 0;
@@ -280,7 +281,7 @@ router.post('/notify/new-movie', protect, admin, async (req, res) => {
                         moviePoster,
                         movieDescription,
                         movieUrl: `${siteUrl}/player.html?id=${movieId}`,
-                        unsubscribeUrl: `${siteUrl}/api/email/unsubscribe/${subscriber.unsubscribeToken}`
+                        unsubscribeUrl: `${apiUrl}/api/email/unsubscribe/${subscriber.unsubscribeToken}`
                     })
                 });
                 
@@ -331,7 +332,8 @@ router.post('/notify/weekly-digest', protect, admin, async (req, res) => {
             });
         }
         
-        const siteUrl = process.env.SITE_URL || 'https://unrulymovies.com';
+        const siteUrl = process.env.SITE_URL || 'https://watch.unrulymovies.com';
+        const apiUrl = process.env.API_URL || 'https://luganda-translated-movies-production.up.railway.app';
         const transporter = createTransporter();
         
         let sent = 0;
@@ -345,7 +347,7 @@ router.post('/notify/weekly-digest', protect, admin, async (req, res) => {
                     html: generateWeeklyDigestEmail({
                         movies,
                         siteUrl,
-                        unsubscribeUrl: `${siteUrl}/api/email/unsubscribe/${subscriber.unsubscribeToken}`
+                        unsubscribeUrl: `${apiUrl}/api/email/unsubscribe/${subscriber.unsubscribeToken}`
                     })
                 });
                 
@@ -407,7 +409,8 @@ router.get('/stats', protect, admin, async (req, res) => {
 
 // Helper: Send verification email
 async function sendVerificationEmail(subscription) {
-    const siteUrl = process.env.SITE_URL || 'https://unrulymovies.com';
+    const siteUrl = process.env.SITE_URL || 'https://watch.unrulymovies.com';
+    const apiUrl = process.env.API_URL || 'https://luganda-translated-movies-production.up.railway.app';
     const transporter = createTransporter();
     
     await transporter.sendMail({
@@ -429,7 +432,7 @@ async function sendVerificationEmail(subscription) {
                     <div style="background: #1a1a2e; border-radius: 16px; padding: 30px; text-align: center;">
                         <h2 style="color: #fff; margin-bottom: 15px;">Verify Your Email</h2>
                         <p style="color: #aaa; margin-bottom: 30px;">Click the button below to confirm your subscription and start receiving updates about new Luganda-translated movies.</p>
-                        <a href="${siteUrl}/api/email/verify/${subscription.verificationToken}" style="display: inline-block; padding: 14px 30px; background: linear-gradient(135deg, #66BB6A, #4CAF50); color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold;">Verify Email</a>
+                        <a href="${apiUrl}/api/email/verify/${subscription.verificationToken}" style="display: inline-block; padding: 14px 30px; background: linear-gradient(135deg, #66BB6A, #4CAF50); color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold;">Verify Email</a>
                         <p style="color: #666; font-size: 12px; margin-top: 30px;">If you didn't sign up for this, just ignore this email.</p>
                     </div>
                 </div>

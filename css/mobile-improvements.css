@@ -518,11 +518,44 @@
     }
     
     .container {
-        padding: 0 12px;
+        padding: 0 8px;
+        max-width: 100%;
     }
     
     .app-section {
         margin-bottom: 24px;
+        padding: 0 !important;
+    }
+    
+    .app-container {
+        padding: 0 !important;
+    }
+    
+    /* Full-width card grid on mobile */
+    .card-grid {
+        gap: 8px !important;
+        margin: 0 !important;
+        padding: 0 8px !important;
+    }
+    
+    .row-cols-2,
+    .row-cols-md-5 {
+        gap: 8px !important;
+        padding: 0 8px !important;
+    }
+    
+    .movie-section {
+        padding: 0 !important;
+    }
+    
+    .section-header {
+        padding: 0 8px 12px 8px !important;
+        margin: 0 !important;
+    }
+    
+    .app-heading {
+        padding: 0 8px 12px 8px !important;
+        margin-bottom: 12px !important;
     }
     
     .list-caption {

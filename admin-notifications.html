@@ -863,23 +863,25 @@
                 const select = document.getElementById('movieSelect');
                 const weeklyList = document.getElementById('weeklyMoviesList');
                 
-                if (data.data && data.data.movies) {
-                    const movies = data.data.movies;
-                    
+                // API returns data as array directly, not data.movies
+                const movies = data.data || [];
+                
+                if (movies.length > 0) {
                     // Populate dropdown
                     select.innerHTML = '<option value="">-- Select a movie --</option>';
                     movies.forEach(movie => {
-                        select.innerHTML += `<option value="${movie._id}" data-title="${movie.title}" data-poster="${movie.poster || ''}" data-desc="${movie.overview || ''}">${movie.title}</option>`;
+                        const title = movie.lugandaTitle || movie.originalTitle || movie.title;
+                        select.innerHTML += `<option value="${movie._id}" data-title="${title}" data-poster="${movie.poster || ''}" data-desc="${movie.description || ''}">${title}</option>`;
                     });
                     
                     // Show last 5 movies for weekly digest
                     const recentMovies = movies.slice(0, 5);
                     weeklyList.innerHTML = recentMovies.map(m => `
                         <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: var(--background-dark); border-radius: 8px; margin-bottom: 10px;">
-                            <img src="${m.poster || 'assets/images/placeholder.png'}" alt="${m.title}" style="width: 50px; height: 75px; object-fit: cover; border-radius: 6px;">
+                            <img src="${m.poster || 'assets/images/placeholder.png'}" alt="${m.lugandaTitle || m.originalTitle}" style="width: 50px; height: 75px; object-fit: cover; border-radius: 6px;">
                             <div>
-                                <strong style="color: #fff;">${m.title}</strong>
-                                <br><small style="color: var(--text-secondary);">${m.vj || 'VJ Unknown'}</small>
+                                <strong style="color: #fff;">${m.lugandaTitle || m.originalTitle}</strong>
+                                <br><small style="color: var(--text-secondary);">${m.vjName || 'VJ Unknown'}</small>
                             </div>
                         </div>
                     `).join('');
@@ -887,12 +889,15 @@
                     // Store for digest
                     window.recentMoviesForDigest = recentMovies.map(m => ({
                         id: m._id,
-                        title: m.title,
+                        title: m.lugandaTitle || m.originalTitle,
                         poster: m.poster || ''
                     }));
+                } else {
+                    weeklyList.innerHTML = '<p style="color: var(--text-secondary);">No movies found</p>';
                 }
             } catch (error) {
                 console.error('Error loading movies:', error);
+                document.getElementById('weeklyMoviesList').innerHTML = '<p style="color: #ff6b6b;">Failed to load movies</p>';
             }
         }
         

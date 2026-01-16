@@ -83,7 +83,7 @@ emailSubscriptionSchema.pre('save', function(next) {
 emailSubscriptionSchema.statics.getActiveSubscribers = function(preference = 'newMovies') {
     const query = { isActive: true, verified: true };
     query[`preferences.${preference}`] = true;
-    return this.find(query).select('email preferences favoriteGenres');
+    return this.find(query).select('email preferences favoriteGenres unsubscribeToken');
 };
 
 module.exports = mongoose.model('EmailSubscription', emailSubscriptionSchema);

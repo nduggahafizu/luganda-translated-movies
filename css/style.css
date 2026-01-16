@@ -3189,7 +3189,7 @@ a:focus-visible {
    =================================== */
 @media (max-width: 576px) {
     .container {
-        padding: 0 10px;
+        padding: 0 8px;
         width: 100%;
         max-width: 100%;
     }
@@ -3200,7 +3200,7 @@ a:focus-visible {
     }
     
     .app-container {
-        padding: 0 5px;
+        padding: 0;
     }
     
     .app-content {
@@ -3209,6 +3209,28 @@ a:focus-visible {
     
     .app-section {
         margin-bottom: 25px;
+        padding: 0 8px;
+    }
+    
+    /* Movie Grid Full Width Fix */
+    .row {
+        margin: 0 -4px;
+        width: calc(100% + 8px);
+    }
+    
+    .col, [class*="col-"] {
+        padding: 0 4px;
+    }
+    
+    .list-scrollable {
+        padding: 0 8px;
+        margin: 0 -8px;
+        width: calc(100% + 16px);
+    }
+    
+    .list-scrollable > .col {
+        width: 46%;
+        min-width: 150px;
     }
     
     .slide {

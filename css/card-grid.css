@@ -599,7 +599,19 @@
 @media (max-width: 480px) {
     .card-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .movie-section {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    .section-header {
+        padding: 0 8px;
+        margin-bottom: 12px;
     }
     
     .card-title {
@@ -609,4 +621,10 @@
     .card-meta {
         font-size: 9px;
     }
-}
+    
+    .content-card {
+        border-radius: 10px;
+    }
+    
+    .card-info {
+        padding: 8px;
