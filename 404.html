@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found - Unruly Movies</title>
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 600px;
+        }
+        .error-code {
+            font-size: 8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #66BB6A, #4CAF50);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(102, 187, 106, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .error-title {
+            font-size: 1.8rem;
+            margin: 1rem 0;
+            color: #fff;
+        }
+        .error-message {
+            color: #adb5bd;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        .movie-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #66BB6A, #4CAF50);
+            color: #fff;
+            border: none;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 187, 106, 0.4);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: #66BB6A;
+            border: 2px solid #66BB6A;
+        }
+        .btn-secondary:hover {
+            background: rgba(102, 187, 106, 0.1);
+            transform: translateY(-3px);
+        }
+        .search-box {
+            margin: 2rem 0;
+            display: flex;
+            gap: 0.5rem;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .search-box input {
+            flex: 1;
+            padding: 0.8rem 1.2rem;
+            border: 2px solid rgba(102, 187, 106, 0.3);
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .search-box input:focus {
+            border-color: #66BB6A;
+        }
+        .search-box input::placeholder {
+            color: #6c757d;
+        }
+        .search-box button {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, #66BB6A, #4CAF50);
+            border: none;
+            border-radius: 50px;
+            color: #fff;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .search-box button:hover {
+            transform: scale(1.05);
+        }
+        .suggestions {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            text-align: left;
+        }
+        .suggestions h3 {
+            color: #66BB6A;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+        .suggestions ul {
+            list-style: none;
+        }
+        .suggestions li {
+            padding: 0.5rem 0;
+        }
+        .suggestions a {
+            color: #adb5bd;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .suggestions a:hover {
+            color: #66BB6A;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="movie-icon">🎬</div>
+        <div class="error-code">404</div>
+        <h1 class="error-title">Oops! Page Not Found</h1>
+        <p class="error-message">
+            The page you're looking for seems to have wandered off like a lost movie scene. 
+            Let's help you find your way back to the action!
+        </p>
+        
+        <form class="search-box" action="/search.html" method="GET">
+            <input type="text" name="q" placeholder="Search for movies...">
+            <button type="submit">🔍</button>
+        </form>
+        
+        <div class="buttons">
+            <a href="/" class="btn btn-primary">
+                🏠 Go Home
+            </a>
+            <a href="/movies.html" class="btn btn-secondary">
+                🎥 Browse Movies
+            </a>
+        </div>
+        
+        <div class="suggestions">
+            <h3>📌 Popular Pages</h3>
+            <ul>
+                <li><a href="/movies.html">→ All Movies</a></li>
+                <li><a href="/series.html">→ TV Series</a></li>
+                <li><a href="/tv-stations.html">→ Live Uganda TV</a></li>
+                <li><a href="/vjs.html">→ Our VJs</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // Track 404 error
+        if (typeof gtag === 'function') {
+            gtag('event', 'page_not_found', {
+                'page_location': window.location.href,
+                'page_referrer': document.referrer
+            });
+        }
+    </script>
+</body>
+</html>

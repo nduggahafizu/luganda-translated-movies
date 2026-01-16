@@ -395,6 +395,7 @@
             <!-- Tabs -->
             <div class="tab-nav">
                 <button class="tab-btn active" onclick="showTab('send')">Send Notification</button>
+                <button class="tab-btn" onclick="showTab('email')">📧 Email Subscribers</button>
                 <button class="tab-btn" onclick="showTab('history')">History</button>
             </div>
             
@@ -506,6 +507,95 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Email Subscribers Tab -->
+            <div id="email-tab" class="tab-content">
+                <!-- Email Stats -->
+                <div class="stats-row" style="margin-bottom: 25px;">
+                    <div class="stat-card">
+                        <div class="stat-value" id="emailTotal">-</div>
+                        <div class="stat-label">Total Subscribers</div>
+                    </div>
+                    <div class="stat-card blue">
+                        <div class="stat-value" id="emailActive">-</div>
+                        <div class="stat-label">Active & Verified</div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="stat-value" id="emailUnverified">-</div>
+                        <div class="stat-label">Pending Verification</div>
+                    </div>
+                </div>
+                
+                <!-- Send Email to Movie -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">📧 Send New Movie Email Alert</h2>
+                    </div>
+                    
+                    <form id="emailMovieForm" onsubmit="sendMovieEmail(event)">
+                        <div class="form-group">
+                            <label for="movieSelect">Select Movie</label>
+                            <select id="movieSelect" required title="Select a movie" aria-label="Select movie">
+                                <option value="">-- Select a movie --</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Movie Title</label>
+                                <input type="text" id="emailMovieTitle" placeholder="Movie title" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Movie ID</label>
+                                <input type="text" id="emailMovieId" placeholder="Movie ID" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Poster URL</label>
+                            <input type="url" id="emailMoviePoster" placeholder="https://image.tmdb.org/...">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Description (Short)</label>
+                            <textarea id="emailMovieDesc" placeholder="A brief description of the movie..." rows="2"></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn-admin" style="width: 100%;" id="sendEmailBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                            Send Email to All Subscribers
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Weekly Digest -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">📅 Send Weekly Digest</h2>
+                    </div>
+                    
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                        Send a weekly digest email featuring the latest movies added this week.
+                    </p>
+                    
+                    <div id="weeklyMoviesList" style="margin-bottom: 20px;">
+                        <p style="color: var(--text-secondary);">Loading recent movies...</p>
+                    </div>
+                    
+                    <button type="button" class="btn-admin" onclick="sendWeeklyDigest()" id="sendDigestBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        Send Weekly Digest
+                    </button>
+                </div>
+            </div>
         </main>
     </div>
     
@@ -559,6 +649,9 @@
             
             if (tabName === 'history') {
                 loadHistory();
+            } else if (tabName === 'email') {
+                loadEmailStats();
+                loadMoviesForEmail();
             }
         }
         
@@ -734,6 +827,164 @@
                 document.getElementById('notificationTitle').value = template.title;
                 document.getElementById('notificationMessage').value = template.message;
                 showToast('Template loaded! Customize and send.', 'success');
+            }
+        }
+        
+        // =====================
+        // EMAIL FUNCTIONS
+        // =====================
+        
+        // Load email subscriber stats
+        async function loadEmailStats() {
+            try {
+                const response = await fetch(`${API_URL}/email/stats`, {
+                    headers: getAuthHeaders()
+                });
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    document.getElementById('emailTotal').textContent = data.data.total || 0;
+                    document.getElementById('emailActive').textContent = data.data.active || 0;
+                    document.getElementById('emailUnverified').textContent = data.data.unverified || 0;
+                }
+            } catch (error) {
+                console.error('Error loading email stats:', error);
+            }
+        }
+        
+        // Load movies for email dropdown
+        async function loadMoviesForEmail() {
+            try {
+                const response = await fetch(`${API_URL}/luganda-movies?limit=50&sort=-createdAt`, {
+                    headers: getAuthHeaders()
+                });
+                const data = await response.json();
+                
+                const select = document.getElementById('movieSelect');
+                const weeklyList = document.getElementById('weeklyMoviesList');
+                
+                if (data.data && data.data.movies) {
+                    const movies = data.data.movies;
+                    
+                    // Populate dropdown
+                    select.innerHTML = '<option value="">-- Select a movie --</option>';
+                    movies.forEach(movie => {
+                        select.innerHTML += `<option value="${movie._id}" data-title="${movie.title}" data-poster="${movie.poster || ''}" data-desc="${movie.overview || ''}">${movie.title}</option>`;
+                    });
+                    
+                    // Show last 5 movies for weekly digest
+                    const recentMovies = movies.slice(0, 5);
+                    weeklyList.innerHTML = recentMovies.map(m => `
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: var(--background-dark); border-radius: 8px; margin-bottom: 10px;">
+                            <img src="${m.poster || 'assets/images/placeholder.png'}" alt="${m.title}" style="width: 50px; height: 75px; object-fit: cover; border-radius: 6px;">
+                            <div>
+                                <strong style="color: #fff;">${m.title}</strong>
+                                <br><small style="color: var(--text-secondary);">${m.vj || 'VJ Unknown'}</small>
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    // Store for digest
+                    window.recentMoviesForDigest = recentMovies.map(m => ({
+                        id: m._id,
+                        title: m.title,
+                        poster: m.poster || ''
+                    }));
+                }
+            } catch (error) {
+                console.error('Error loading movies:', error);
+            }
+        }
+        
+        // Handle movie selection
+        document.addEventListener('DOMContentLoaded', () => {
+            const movieSelect = document.getElementById('movieSelect');
+            if (movieSelect) {
+                movieSelect.addEventListener('change', function() {
+                    const option = this.options[this.selectedIndex];
+                    if (option.value) {
+                        document.getElementById('emailMovieId').value = option.value;
+                        document.getElementById('emailMovieTitle').value = option.dataset.title || '';
+                        document.getElementById('emailMoviePoster').value = option.dataset.poster || '';
+                        document.getElementById('emailMovieDesc').value = option.dataset.desc || '';
+                    }
+                });
+            }
+        });
+        
+        // Send movie email alert
+        async function sendMovieEmail(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('sendEmailBtn');
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Sending...';
+            
+            const movieData = {
+                movieId: document.getElementById('emailMovieId').value,
+                movieTitle: document.getElementById('emailMovieTitle').value,
+                moviePoster: document.getElementById('emailMoviePoster').value,
+                movieDescription: document.getElementById('emailMovieDesc').value
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/email/notify/new-movie`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(movieData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    showToast(`✅ Email sent to ${data.data.sent} subscribers!`, 'success');
+                    document.getElementById('emailMovieForm').reset();
+                    loadEmailStats();
+                } else {
+                    showToast(data.message || 'Failed to send email', 'error');
+                }
+            } catch (error) {
+                console.error('Error sending email:', error);
+                showToast('Failed to send email', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> Send Email to All Subscribers`;
+            }
+        }
+        
+        // Send weekly digest
+        async function sendWeeklyDigest() {
+            if (!window.recentMoviesForDigest || window.recentMoviesForDigest.length === 0) {
+                showToast('No recent movies to send', 'error');
+                return;
+            }
+            
+            const btn = document.getElementById('sendDigestBtn');
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Sending...';
+            
+            try {
+                const response = await fetch(`${API_URL}/email/notify/weekly-digest`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        movies: window.recentMoviesForDigest
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    showToast(`✅ Weekly digest sent to ${data.data.sent} subscribers!`, 'success');
+                } else {
+                    showToast(data.message || 'Failed to send digest', 'error');
+                }
+            } catch (error) {
+                console.error('Error sending digest:', error);
+                showToast('Failed to send weekly digest', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Send Weekly Digest`;
             }
         }
     </script>

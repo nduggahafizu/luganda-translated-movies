@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Something Went Wrong - Unruly Movies</title>
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 600px;
+        }
+        .error-icon {
+            font-size: 6rem;
+            margin-bottom: 1rem;
+            animation: shake 0.5s ease-in-out infinite;
+        }
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+        .error-title {
+            font-size: 2rem;
+            margin: 1rem 0;
+            color: #ff6b6b;
+        }
+        .error-message {
+            color: #adb5bd;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #66BB6A, #4CAF50);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 187, 106, 0.4);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: #66BB6A;
+            border: 2px solid #66BB6A;
+        }
+        .btn-secondary:hover {
+            background: rgba(102, 187, 106, 0.1);
+        }
+        .tips {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            text-align: left;
+        }
+        .tips h3 {
+            color: #66BB6A;
+            margin-bottom: 1rem;
+        }
+        .tips ul {
+            list-style: none;
+        }
+        .tips li {
+            padding: 0.5rem 0;
+            color: #adb5bd;
+        }
+        .tips li::before {
+            content: "✓ ";
+            color: #66BB6A;
+        }
+        .status-check {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(102, 187, 106, 0.1);
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+        .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            animation: blink 1s infinite;
+        }
+        .status-checking { background: #ffc107; }
+        .status-online { background: #66BB6A; }
+        .status-offline { background: #ff6b6b; }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-icon">🎬💥</div>
+        <h1 class="error-title">Oops! Something Went Wrong</h1>
+        <p class="error-message">
+            We're experiencing some technical difficulties. Our team is working on it!
+            In the meantime, here are some things you can try:
+        </p>
+        
+        <div class="tips">
+            <h3>💡 Quick Fixes</h3>
+            <ul>
+                <li>Refresh the page</li>
+                <li>Check your internet connection</li>
+                <li>Clear your browser cache</li>
+                <li>Try again in a few minutes</li>
+            </ul>
+        </div>
+        
+        <div class="status-check" id="statusCheck">
+            <span class="status-dot status-checking" id="statusDot"></span>
+            <span id="statusText">Checking server status...</span>
+        </div>
+        
+        <div class="buttons" style="margin-top: 2rem;">
+            <button class="btn btn-primary" onclick="location.reload()">
+                🔄 Refresh Page
+            </button>
+            <a href="/" class="btn btn-secondary">
+                🏠 Go Home
+            </a>
+        </div>
+        
+        <p style="margin-top: 2rem; color: #6c757d; font-size: 0.9rem;">
+            If the problem persists, contact us at 
+            <a href="mailto:support@unrulymovies.com" style="color: #66BB6A;">support@unrulymovies.com</a>
+        </p>
+    </div>
+    
+    <script>
+        // Check server status
+        async function checkStatus() {
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            
+            try {
+                const response = await fetch('/api/health', { timeout: 5000 });
+                if (response.ok) {
+                    dot.className = 'status-dot status-online';
+                    text.textContent = 'Server is online - try refreshing';
+                } else {
+                    throw new Error('Server error');
+                }
+            } catch (e) {
+                dot.className = 'status-dot status-offline';
+                text.textContent = 'Server is temporarily unavailable';
+            }
+        }
+        
+        setTimeout(checkStatus, 1000);
+        
+        // Track error
+        if (typeof gtag === 'function') {
+            gtag('event', 'error_page', {
+                'page_location': window.location.href,
+                'page_referrer': document.referrer
+            });
+        }
+    </script>
+</body>
+</html>
