@@ -92,17 +92,21 @@ SETUP_NOW.md
 *PESAPAL*.md
 *_URI*.txt
 
-# Redis dump
-dump.rdb
+# Block ALL sensitive patterns
+*.bat
+*SETUP*.md
+*GUIDE*.md
+*REPORT*.md
+*COMPLETE*.md
+*TEST*.md
+*FIX*.md
+*CONFIG*.md
+*SUMMARY*.md
+*GOOGLE*.md
+*GOOGLE*.txt
+*SECRET*.md
+*KEY*.md
+server/scripts/
+add-*.js
+update-*.js
 
-# Coverage
-coverage/
-.nyc_output/
-
-# Uploads
-uploads/
-server/uploads/
-
-# Backups
-backups/
-*.backup
