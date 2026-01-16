@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const EmailSubscription = require('../models/EmailSubscription');
 const nodemailer = require('nodemailer');
-const { protect, adminOnly } = require('../middleware/auth');
+const { protect, admin } = require('../middleware/auth');
 
 // Email transporter configuration
 const createTransporter = () => {
@@ -248,7 +248,7 @@ router.put('/preferences', protect, async (req, res) => {
 });
 
 // Admin: Send new movie notification
-router.post('/notify/new-movie', protect, adminOnly, async (req, res) => {
+router.post('/notify/new-movie', protect, admin, async (req, res) => {
     try {
         const { movieId, movieTitle, moviePoster, movieDescription } = req.body;
         
@@ -317,7 +317,7 @@ router.post('/notify/new-movie', protect, adminOnly, async (req, res) => {
 });
 
 // Admin: Send weekly digest
-router.post('/notify/weekly-digest', protect, adminOnly, async (req, res) => {
+router.post('/notify/weekly-digest', protect, admin, async (req, res) => {
     try {
         const { movies } = req.body; // Array of { id, title, poster }
         
@@ -372,7 +372,7 @@ router.post('/notify/weekly-digest', protect, adminOnly, async (req, res) => {
 });
 
 // Admin: Get subscriber stats
-router.get('/stats', protect, adminOnly, async (req, res) => {
+router.get('/stats', protect, admin, async (req, res) => {
     try {
         const total = await EmailSubscription.countDocuments();
         const active = await EmailSubscription.countDocuments({ isActive: true, verified: true });
