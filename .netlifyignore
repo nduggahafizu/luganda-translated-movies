@@ -1,0 +1,18 @@
+# Exclude native app folder from Netlify deployment
+# Contains Firebase google-services.json which triggers false positive secret detection
+native-app/
+
+# Exclude server folder (deployed on Railway)
+server/
+
+# Exclude node_modules
+node_modules/
+
+# Exclude test files
+*.test.js
+test-*.js
+*-test.js
+
+# Exclude build scripts
+*.bat
+*.sh

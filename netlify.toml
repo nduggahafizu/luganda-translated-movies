@@ -1,6 +1,14 @@
 [build]
   publish = "."
   command = "echo 'Static site - no build needed'"
+  ignore = "native-app/"
+
+# Exclude native app from publish (contains Firebase config that triggers false positive)
+[build.processing]
+  skip_processing = false
+
+[build.environment]
+  SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES = "AIzaSyDPFQ7pjH_hP8LU-C8FGo6U_QLwQ_G7l4o"
 
 # Only redirect 404s to index.html, not all requests
 [[redirects]]
