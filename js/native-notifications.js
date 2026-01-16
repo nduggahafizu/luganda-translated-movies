@@ -127,12 +127,12 @@
     async function sendTokenToServer(token) {
         const userId = localStorage.getItem('userId');
         if (!userId) {
-            console.log('No user logged in, will register token after login');
             return;
         }
 
         try {
-            const response = await fetch('https://luganda-movies-api.onrender.com/api/notifications/register', {
+            const API_BASE = (window.API_CONFIG && window.API_CONFIG.BASE_URL) || 'https://luganda-translated-movies-production.up.railway.app';
+            const response = await fetch(`${API_BASE}/api/notifications/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -144,12 +144,8 @@
                     platform: 'android'
                 })
             });
-
-            if (response.ok) {
-                console.log('Push token registered with server');
-            }
         } catch (error) {
-            console.error('Error sending token to server:', error);
+            // Silently fail - notifications registration is not critical
         }
     }
 

@@ -7,6 +7,7 @@
 (function() {
     const hostname = window.location.hostname;
     const isProd = hostname.includes('netlify.app') || 
+                   hostname.includes('translatedmovies') ||
                    hostname === 'unrulymovies.com' || 
                    hostname === 'watch.unrulymovies.com';
     if (isProd) {
