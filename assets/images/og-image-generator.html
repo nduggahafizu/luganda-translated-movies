@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OG Image Generator - Unruly Movies</title>
+    <style>
+        body { margin: 0; padding: 20px; background: #1a1a2e; font-family: Arial, sans-serif; }
+        .og-image {
+            width: 1200px;
+            height: 630px;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0d1117 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid #7CFC00;
+        }
+        .og-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #7CFC00, #00D9FF, #9D4EDD);
+        }
+        .logo-text {
+            font-size: 80px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #7CFC00 0%, #00D9FF 50%, #9D4EDD 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+        .tagline {
+            font-size: 36px;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+        .subtitle {
+            font-size: 24px;
+            color: #888;
+        }
+        .movie-icons {
+            position: absolute;
+            bottom: 40px;
+            display: flex;
+            gap: 40px;
+            font-size: 50px;
+        }
+        .badge {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            background: linear-gradient(135deg, #7CFC00, #00D9FF);
+            color: #000;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 20px;
+        }
+        .instructions {
+            margin-top: 30px;
+            color: #fff;
+            padding: 20px;
+            background: #333;
+            border-radius: 10px;
+            max-width: 1200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="og-image" id="ogImage">
+        <div class="badge">🇺🇬 Made in Uganda</div>
+        <div class="logo-text">🎬 Unruly Movies</div>
+        <div class="tagline">Luganda VJ Translations Platform</div>
+        <div class="subtitle">Watch Movies Translated by Licensed Video Jockeys</div>
+        <div class="movie-icons">
+            🎥 🎬 📺 🍿 🎭
+        </div>
+    </div>
+    
+    <div class="instructions">
+        <h2>How to save this as OG Image:</h2>
+        <ol>
+            <li>Open this file in Chrome browser</li>
+            <li>Right-click on the image above</li>
+            <li>Select "Inspect" to open DevTools</li>
+            <li>In DevTools, right-click on the .og-image element</li>
+            <li>Select "Capture node screenshot"</li>
+            <li>Save as <strong>og-image.png</strong> in the same folder</li>
+        </ol>
+        <p>OR use a screenshot tool to capture the 1200x630 box above and save it as og-image.png</p>
+    </div>
+</body>
+</html>
