@@ -133,10 +133,11 @@ const lugandaMovieSchema = new mongoose.Schema({
         }
     },
     
-    // Categories
+    // Categories - accepts any string to support all TMDB genres
     genres: [{
         type: String,
-        enum: ['action', 'comedy', 'drama', 'horror', 'sci-fi', 'romance', 'thriller', 'animation', 'fantasy', 'documentary', 'crime', 'mystery', 'adventure', 'family', 'war', 'history', 'western', 'music', 'tv movie', 'science fiction', 'other']
+        lowercase: true,
+        trim: true
     }],
     
     // Cast and Crew
