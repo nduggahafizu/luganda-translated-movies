@@ -1,4 +1,43 @@
-const Series = require('../models/Series');
+const LugandaMovie = require('../models/LugandaMovie');
+
+// Helper function to transform LugandaMovie to series format for frontend compatibility
+const transformToSeriesFormat = (movie) => {
+    if (!movie) return null;
+    
+    const data = movie.toObject ? movie.toObject() : movie;
+    
+    return {
+        _id: data._id,
+        slug: data.slug,
+        title: data.originalTitle || data.lugandaTitle,
+        originalTitle: data.originalTitle,
+        lugandaTitle: data.lugandaTitle,
+        description: data.description,
+        poster: data.poster,
+        backdrop: data.backdrop,
+        year: data.year,
+        startYear: data.year,
+        genres: data.genres || [],
+        rating: data.rating,
+        status: data.seriesStatus === 'Ended' ? 'completed' : 'ongoing',
+        translator: {
+            name: data.vjName || 'Unknown VJ'
+        },
+        vjName: data.vjName,
+        seasons: data.seasons || [],
+        totalSeasons: data.totalSeasons || 0,
+        totalEpisodes: data.totalEpisodes || 0,
+        cast: data.cast || [],
+        director: data.director,
+        networks: data.networks || [],
+        views: data.views || 0,
+        likes: data.likes || 0,
+        isFeatured: data.featured,
+        isTrending: data.trending,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt
+    };
+};
 
 // Get all series with pagination and filters
 exports.getAllSeries = async (req, res) => {
@@ -7,23 +46,28 @@ exports.getAllSeries = async (req, res) => {
         const limit = parseInt(req.query.limit) || 20;
         const skip = (page - 1) * limit;
         
-        // Build filter object
-        const filter = {};
+        // Build filter object - always filter for series content type
+        const filter = { 
+            contentType: 'series',
+            status: 'published' // Only show published series
+        };
         
         if (req.query.genre) {
-            filter.genres = { $in: [req.query.genre] };
+            filter.genres = { $in: [new RegExp(req.query.genre, 'i')] };
         }
         
         if (req.query.year) {
-            filter.startYear = parseInt(req.query.year);
+            filter.year = parseInt(req.query.year);
         }
         
-        if (req.query.status) {
-            filter.status = req.query.status;
+        if (req.query.status === 'ongoing') {
+            filter.seriesStatus = { $ne: 'Ended' };
+        } else if (req.query.status === 'completed') {
+            filter.seriesStatus = 'Ended';
         }
         
         if (req.query.vj) {
-            filter['translator.name'] = new RegExp(req.query.vj, 'i');
+            filter.vjName = new RegExp(req.query.vj, 'i');
         }
         
         // Build sort object
@@ -33,22 +77,22 @@ exports.getAllSeries = async (req, res) => {
         } else if (req.query.sort === 'views') {
             sort = { views: -1 };
         } else if (req.query.sort === 'title') {
-            sort = { title: 1 };
+            sort = { originalTitle: 1 };
         } else if (req.query.sort === 'year') {
-            sort = { startYear: -1 };
+            sort = { year: -1 };
         }
         
-        const series = await Series.find(filter)
+        const series = await LugandaMovie.find(filter)
             .sort(sort)
             .skip(skip)
             .limit(limit)
             .select('-seasons.episodes.video');
             
-        const total = await Series.countDocuments(filter);
+        const total = await LugandaMovie.countDocuments(filter);
         
         res.json({
             success: true,
-            data: series,
+            data: series.map(transformToSeriesFormat),
             pagination: {
                 page,
                 limit,
@@ -57,6 +101,7 @@ exports.getAllSeries = async (req, res) => {
             }
         });
     } catch (error) {
+        console.error('Error fetching series:', error);
         res.status(500).json({
             success: false,
             message: 'Error fetching series',
@@ -72,9 +117,9 @@ exports.getSeriesById = async (req, res) => {
         
         let series;
         if (id.match(/^[0-9a-fA-F]{24}$/)) {
-            series = await Series.findById(id);
+            series = await LugandaMovie.findOne({ _id: id, contentType: 'series' });
         } else {
-            series = await Series.findOne({ slug: id });
+            series = await LugandaMovie.findOne({ slug: id, contentType: 'series' });
         }
         
         if (!series) {
@@ -85,12 +130,12 @@ exports.getSeriesById = async (req, res) => {
         }
         
         // Increment views
-        series.views += 1;
+        series.views = (series.views || 0) + 1;
         await series.save();
         
         res.json({
             success: true,
-            data: series
+            data: transformToSeriesFormat(series)
         });
     } catch (error) {
         res.status(500).json({
@@ -106,7 +151,12 @@ exports.getSeasonEpisodes = async (req, res) => {
     try {
         const { id, seasonNumber } = req.params;
         
-        const series = await Series.findById(id);
+        let series;
+        if (id.match(/^[0-9a-fA-F]{24}$/)) {
+            series = await LugandaMovie.findOne({ _id: id, contentType: 'series' });
+        } else {
+            series = await LugandaMovie.findOne({ slug: id, contentType: 'series' });
+        }
         
         if (!series) {
             return res.status(404).json({
@@ -127,9 +177,12 @@ exports.getSeasonEpisodes = async (req, res) => {
         res.json({
             success: true,
             data: {
-                seriesTitle: series.title,
+                seriesId: series._id,
+                seriesTitle: series.originalTitle,
                 seasonNumber: season.seasonNumber,
-                seasonTitle: season.title,
+                seasonTitle: season.name,
+                posterPath: season.posterPath,
+                overview: season.overview,
                 episodes: season.episodes
             }
         });
@@ -147,14 +200,18 @@ exports.getFeaturedSeries = async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 10;
         
-        const series = await Series.find({ isFeatured: true })
+        const series = await LugandaMovie.find({ 
+            contentType: 'series', 
+            status: 'published',
+            featured: true 
+        })
             .sort({ 'rating.imdb': -1 })
             .limit(limit)
             .select('-seasons.episodes.video');
             
         res.json({
             success: true,
-            data: series
+            data: series.map(transformToSeriesFormat)
         });
     } catch (error) {
         res.status(500).json({
@@ -170,14 +227,17 @@ exports.getTrendingSeries = async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 10;
         
-        const series = await Series.find()
+        const series = await LugandaMovie.find({ 
+            contentType: 'series',
+            status: 'published'
+        })
             .sort({ views: -1, 'rating.imdb': -1 })
             .limit(limit)
             .select('-seasons.episodes.video');
             
         res.json({
             success: true,
-            data: series
+            data: series.map(transformToSeriesFormat)
         });
     } catch (error) {
         res.status(500).json({
@@ -191,11 +251,16 @@ exports.getTrendingSeries = async (req, res) => {
 // Create new series (Admin only)
 exports.createSeries = async (req, res) => {
     try {
-        const series = await Series.create(req.body);
+        const seriesData = {
+            ...req.body,
+            contentType: 'series'
+        };
+        
+        const series = await LugandaMovie.create(seriesData);
         
         res.status(201).json({
             success: true,
-            data: series,
+            data: transformToSeriesFormat(series),
             message: 'Series created successfully'
         });
     } catch (error) {
@@ -210,8 +275,8 @@ exports.createSeries = async (req, res) => {
 // Update series (Admin only)
 exports.updateSeries = async (req, res) => {
     try {
-        const series = await Series.findByIdAndUpdate(
-            req.params.id,
+        const series = await LugandaMovie.findOneAndUpdate(
+            { _id: req.params.id, contentType: 'series' },
             req.body,
             { new: true, runValidators: true }
         );
@@ -225,7 +290,7 @@ exports.updateSeries = async (req, res) => {
         
         res.json({
             success: true,
-            data: series,
+            data: transformToSeriesFormat(series),
             message: 'Series updated successfully'
         });
     } catch (error) {
@@ -240,7 +305,10 @@ exports.updateSeries = async (req, res) => {
 // Delete series (Admin only)
 exports.deleteSeries = async (req, res) => {
     try {
-        const series = await Series.findByIdAndDelete(req.params.id);
+        const series = await LugandaMovie.findOneAndDelete({ 
+            _id: req.params.id, 
+            contentType: 'series' 
+        });
         
         if (!series) {
             return res.status(404).json({
@@ -267,7 +335,7 @@ exports.addEpisode = async (req, res) => {
     try {
         const { id, seasonNumber } = req.params;
         
-        const series = await Series.findById(id);
+        const series = await LugandaMovie.findOne({ _id: id, contentType: 'series' });
         
         if (!series) {
             return res.status(404).json({
@@ -286,6 +354,7 @@ exports.addEpisode = async (req, res) => {
         }
         
         series.seasons[seasonIndex].episodes.push(req.body);
+        series.totalEpisodes = series.seasons.reduce((sum, s) => sum + s.episodes.length, 0);
         await series.save();
         
         res.status(201).json({
@@ -314,11 +383,14 @@ exports.searchSeries = async (req, res) => {
             });
         }
         
-        const series = await Series.find({
+        const series = await LugandaMovie.find({
+            contentType: 'series',
+            status: 'published',
             $or: [
-                { title: { $regex: q, $options: 'i' } },
+                { originalTitle: { $regex: q, $options: 'i' } },
+                { lugandaTitle: { $regex: q, $options: 'i' } },
                 { description: { $regex: q, $options: 'i' } },
-                { 'translator.name': { $regex: q, $options: 'i' } }
+                { vjName: { $regex: q, $options: 'i' } }
             ]
         })
         .limit(20)
@@ -326,7 +398,7 @@ exports.searchSeries = async (req, res) => {
         
         res.json({
             success: true,
-            data: series,
+            data: series.map(transformToSeriesFormat),
             count: series.length
         });
     } catch (error) {
@@ -344,14 +416,18 @@ exports.getSeriesByGenre = async (req, res) => {
         const { genre } = req.params;
         const limit = parseInt(req.query.limit) || 20;
         
-        const series = await Series.find({ genres: { $in: [genre] } })
+        const series = await LugandaMovie.find({ 
+            contentType: 'series',
+            status: 'published',
+            genres: { $in: [new RegExp(genre, 'i')] } 
+        })
             .sort({ 'rating.imdb': -1 })
             .limit(limit)
             .select('-seasons.episodes.video');
             
         res.json({
             success: true,
-            data: series,
+            data: series.map(transformToSeriesFormat),
             count: series.length
         });
     } catch (error) {

@@ -729,6 +729,32 @@
                                 </div>
                             </div>
 
+                            <!-- New TV Series Section -->
+                            <div class="app-section movie-section">
+                                <div class="section-header">
+                                    <h2>
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#A855F7" stroke-width="2">
+                                            <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                                            <polyline points="17 2 12 7 7 2"></polyline>
+                                        </svg>
+                                        New TV Series
+                                    </h2>
+                                    <a href="series.html" class="view-all">
+                                        View All
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="9 18 15 12 9 6"></polyline>
+                                        </svg>
+                                    </a>
+                                </div>
+                                <div class="card-grid" id="newSeries">
+                                    <!-- Series will be loaded here dynamically -->
+                                    <div class="loading-state">
+                                        <div class="loading-spinner"></div>
+                                        <p class="loading-text">Loading TV series...</p>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Ad Container - Mid Page -->
                             <div class="ad-container" style="margin: 30px auto; max-width: 728px; text-align: center;">
                                 <ins class="adsbygoogle"
@@ -1232,6 +1258,9 @@
                         
                         // Load trending sidebar
                         loadTrendingSidebar(allMovies);
+                        
+                        // Load TV Series
+                        loadNewSeries();
                     } else {
                         // Show message if no movies
                         document.getElementById('allMovies').innerHTML = `
@@ -1737,6 +1766,117 @@
                     </a>
                 `;
                 cardsHTML += movieCard;
+            });
+            
+            container.innerHTML = cardsHTML;
+            
+            // Load posters with validation after DOM is updated
+            setTimeout(() => {
+                posterData.forEach(({ posterId, posterUrl, fallbackPoster }) => {
+                    const posterElement = document.getElementById(posterId);
+                    if (posterElement) {
+                        loadPosterImage(posterUrl, posterElement, fallbackPoster);
+                    }
+                });
+            }, 100);
+        }
+        
+        // Load New TV Series section
+        async function loadNewSeries() {
+            const container = document.getElementById('newSeries');
+            if (!container) return;
+            
+            try {
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/luganda-movies?contentType=series&status=all&limit=10`);
+                const data = await response.json();
+                const series = data.data || [];
+                
+                if (series.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state" style="text-align: center; padding: 40px; color: #888;">
+                            <p>No TV series available yet. Check back soon!</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                renderSeries(series, 'newSeries');
+            } catch (error) {
+                console.error('Error loading series:', error);
+                container.innerHTML = `
+                    <div class="empty-state" style="text-align: center; padding: 40px; color: #888;">
+                        <p>Unable to load TV series.</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Render TV Series cards
+        function renderSeries(seriesList, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            let cardsHTML = '';
+            const posterData = [];
+            
+            seriesList.forEach((series, index) => {
+                const rating = series.rating?.imdb || series.rating?.userRating || 0;
+                const fallbackPoster = getPlaceholderPoster(series.originalTitle, series.year);
+                const posterUrl = series.poster || fallbackPoster;
+                const vjName = series.vjName || 'Unknown';
+                const posterId = `${containerId}-poster-${index}`;
+                const seriesTitle = series.originalTitle || series.lugandaTitle || 'Unknown Series';
+                const year = series.year || '';
+                const totalSeasons = series.totalSeasons || 0;
+                const totalEpisodes = series.totalEpisodes || 0;
+                const genres = series.genres || [];
+                
+                // Store poster data for later loading
+                if (series.poster) {
+                    posterData.push({ posterId, posterUrl: series.poster, fallbackPoster });
+                }
+                
+                const seriesCard = `
+                    <a href="series-player.html?id=${series._id}" class="content-card">
+                        <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
+                            <div class="card-badges">
+                                <span class="badge-quality" style="background: linear-gradient(135deg, #A855F7, #7C3AED);">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 4px;">
+                                        <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                                        <polyline points="17 2 12 7 7 2" fill="none" stroke="currentColor" stroke-width="2"></polyline>
+                                    </svg>
+                                    SERIES
+                                </span>
+                            </div>
+                            <div class="play-overlay">
+                                <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </div>
+                            <div class="card-rating">
+                                <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                </svg>
+                                <span>${rating.toFixed(1)}</span>
+                            </div>
+                        </div>
+                        <div class="card-info">
+                            <h3 class="card-title">${seriesTitle}</h3>
+                            <div class="card-meta">
+                                ${year ? `<span>${year}</span>` : ''}
+                                ${totalSeasons > 0 ? `<span>${totalSeasons} Season${totalSeasons > 1 ? 's' : ''}</span>` : ''}
+                                ${totalEpisodes > 0 ? `<span>${totalEpisodes} Eps</span>` : ''}
+                            </div>
+                            <div class="card-meta" style="margin-top: 4px;">
+                                ${genres.length > 0 ? `<span>${genres.slice(0, 2).join(', ')}</span>` : ''}
+                                ${vjName !== 'Unknown' && vjName !== 'Unknown VJ' ? `<span>VJ ${vjName}</span>` : ''}
+                            </div>
+                        </div>
+                    </a>
+                `;
+                cardsHTML += seriesCard;
             });
             
             container.innerHTML = cardsHTML;

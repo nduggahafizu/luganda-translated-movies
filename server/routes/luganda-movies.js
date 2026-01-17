@@ -164,6 +164,20 @@ router.post('/import-series', async (req, res) => {
             });
         }
 
+        // Check if series already exists
+        const existingSeries = await LugandaMovie.findOne({ 
+            'metaData.tmdbId': tmdbId.toString(),
+            contentType: 'series'
+        });
+        
+        if (existingSeries) {
+            console.log('[IMPORT-SERIES] Series already exists:', existingSeries.originalTitle);
+            return res.status(400).json({ 
+                success: false, 
+                message: `This series "${existingSeries.originalTitle}" has already been imported. Check your TV Series Management.`
+            });
+        }
+
         // Check if TMDB API key is configured
         if (!process.env.TMDB_API_KEY) {
             console.error('[IMPORT-SERIES] TMDB_API_KEY not configured');
@@ -210,9 +224,22 @@ router.post('/import-series', async (req, res) => {
         });
     } catch (error) {
         console.error('[IMPORT-SERIES] Error:', error.message, error.stack);
+        
+        // Provide more specific error messages
+        let errorMessage = 'Failed to import TV series';
+        if (error.message.includes('ENOTFOUND') || error.message.includes('network')) {
+            errorMessage = 'Network error - cannot connect to TMDB. Check your internet connection.';
+        } else if (error.message.includes('duplicate key') || error.code === 11000) {
+            errorMessage = 'This series already exists in the database.';
+        } else if (error.message.includes('validation')) {
+            errorMessage = 'Data validation error: ' + error.message;
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+        
         res.status(500).json({ 
             success: false, 
-            message: 'Failed to import TV series', 
+            message: errorMessage,
             details: error.message 
         });
     }
