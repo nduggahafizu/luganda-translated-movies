@@ -155,6 +155,8 @@ router.post('/import-series', async (req, res) => {
     try {
         const { tmdbId, vjName, lugandaTitle } = req.body;
 
+        console.log('[IMPORT-SERIES] Starting import, tmdbId:', tmdbId);
+
         if (!tmdbId) {
             return res.status(400).json({ 
                 success: false, 
@@ -164,13 +166,14 @@ router.post('/import-series', async (req, res) => {
 
         // Check if TMDB API key is configured
         if (!process.env.TMDB_API_KEY) {
+            console.error('[IMPORT-SERIES] TMDB_API_KEY not configured');
             return res.status(500).json({ 
                 success: false, 
                 message: 'TMDB API key not configured. Please add TMDB_API_KEY to environment variables.' 
             });
         }
 
-        console.log('Importing series with TMDB ID:', tmdbId);
+        console.log('[IMPORT-SERIES] Fetching from TMDB...');
 
         // Fetch complete series data from TMDB
         const seriesData = await tmdbService.getTVSeriesComplete(tmdbId);
@@ -182,7 +185,7 @@ router.post('/import-series', async (req, res) => {
             });
         }
 
-        console.log('Series data fetched:', seriesData.originalTitle);
+        console.log('[IMPORT-SERIES] Series data fetched:', seriesData.originalTitle, 'Genres:', seriesData.genres);
 
         // Customize data if provided
         if (vjName) {
@@ -196,8 +199,9 @@ router.post('/import-series', async (req, res) => {
         seriesData.slug = generateSlug(seriesData.originalTitle) + '-series-' + Date.now();
 
         // Save to database
+        console.log('[IMPORT-SERIES] Saving to database...');
         const newSeries = await LugandaMovie.create(seriesData);
-        console.log('Series saved to database:', newSeries._id);
+        console.log('[IMPORT-SERIES] Series saved:', newSeries._id);
 
         res.status(201).json({ 
             success: true, 
@@ -205,7 +209,7 @@ router.post('/import-series', async (req, res) => {
             data: newSeries 
         });
     } catch (error) {
-        console.error('Error importing TV series:', error);
+        console.error('[IMPORT-SERIES] Error:', error.message, error.stack);
         res.status(500).json({ 
             success: false, 
             message: 'Failed to import TV series', 
@@ -536,7 +540,17 @@ router.get('/', async (req, res) => {
         const limit = parseInt(req.query.limit) || 20;
         const skip = (page - 1) * limit;
         
-        const query = { status: 'published' };
+        const query = {};
+        
+        // Handle status filter - 'all' returns everything, otherwise filter by status
+        if (req.query.status === 'all') {
+            // No status filter - return all
+        } else if (req.query.status) {
+            query.status = req.query.status;
+        } else {
+            // Default to published only for public requests
+            query.status = 'published';
+        }
         
         // Filter by contentType if provided (movie or series)
         if (req.query.contentType) {
@@ -642,11 +656,13 @@ router.get('/latest', async (req, res) => {
     setCorsHeaders(req, res);
     try {
         const limit = parseInt(req.query.limit) || 10;
+        console.log('[LATEST] Fetching latest movies, limit:', limit);
         const movies = await LugandaMovie.find({ status: 'published' }).sort({ createdAt: -1 }).limit(limit);
+        console.log('[LATEST] Found', movies.length, 'movies');
         res.json({ success: true, data: movies, count: movies.length });
     } catch (error) {
-        console.error('Error fetching latest movies:', error);
-        res.status(500).json({ success: false, message: 'Failed to fetch latest movies' });
+        console.error('[LATEST] Error fetching latest movies:', error.message, error.stack);
+        res.status(500).json({ success: false, message: 'Failed to fetch latest movies', error: error.message });
     }
 });
 
