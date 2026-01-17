@@ -114,6 +114,7 @@ exports.googleSignIn = async (req, res) => {
         
     } catch (error) {
         console.error('Google Sign-In Error:', error.message);
+        console.error('Google Sign-In Full Error:', error);
         logger.error('GoogleSignIn error', { error: error.message, stack: error.stack, requestId: req.requestId });
         
         // Provide more specific error messages
@@ -122,8 +123,9 @@ exports.googleSignIn = async (req, res) => {
             errorMessage = 'Login session expired. Please try again.';
         } else if (error.message.includes('Invalid token')) {
             errorMessage = 'Invalid Google token. Please try again.';
-        } else if (error.message.includes('audience')) {
-            errorMessage = 'Google OAuth configuration error. Please contact support.';
+        } else if (error.message.includes('audience') || error.message.includes('Wrong recipient')) {
+            errorMessage = 'Google OAuth configuration error. The app is not authorized for this domain.';
+            console.error('AUDIENCE MISMATCH - Check Google Cloud Console. Expected Client ID:', GOOGLE_CLIENT_ID);
         } else if (error.message.includes('network')) {
             errorMessage = 'Network error. Please check your connection.';
         }
