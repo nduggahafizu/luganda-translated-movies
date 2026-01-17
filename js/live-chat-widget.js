@@ -170,7 +170,7 @@ class LiveChatWidget {
                                     <span>support@unrulymovies.com</span>
                                 </div>
                             </a>
-                            <a href="https://wa.me/256700000000" target="_blank" class="contact-option whatsapp">
+                            <a href="https://wa.me/256743311809" target="_blank" class="contact-option whatsapp">
                                 <span class="contact-icon">📱</span>
                                 <div class="contact-info">
                                     <strong>WhatsApp</strong>

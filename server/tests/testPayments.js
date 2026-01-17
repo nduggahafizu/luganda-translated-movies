@@ -18,7 +18,7 @@ async function testPaymentEndpoints() {
             email: 'test@lugandamovies.com',
             firstName: 'Test',
             lastName: 'User',
-            phoneNumber: '+256700000000'
+            phoneNumber: '+256743311809'
         });
         
         console.log('✅ Status:', response.status);

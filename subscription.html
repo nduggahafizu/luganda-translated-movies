@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Choose Your Plan - Unruly Movies</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#7CFC00">
+    <meta name="description" content="Subscribe to Unruly Movies and enjoy unlimited access to Luganda-translated movies. Choose from affordable plans starting at UGX 1,000.">
+    <meta name="google-adsense-account" content="ca-pub-1904736753681797">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Subscribe - Unruly Movies">
+    <meta property="og:description" content="Get unlimited access to Luganda-translated movies. Plans starting at UGX 1,000.">
+    <meta property="og:image" content="https://unrulymovies.com/images/og-image.jpg">
+    <meta property="og:url" content="https://unrulymovies.com/subscription.html">
+    <meta property="og:type" content="website">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    
+    <!-- API Config -->
+    <script src="js/config.js"></script>
+    
+    <style>
+        .subscription-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+            padding: 40px 20px 80px;
+        }
+        
+        .subscription-header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-top: 20px;
+        }
+        
+        .subscription-header h1 {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #7CFC00, #00D9FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subscription-header p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .plans-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            padding: 0 10px;
+        }
+        
+        .plan-card {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px 25px;
+            text-align: center;
+            position: relative;
+            transition: all 0.4s ease;
+            overflow: hidden;
+        }
+        
+        .plan-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .plan-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-color);
+            box-shadow: 0 20px 60px rgba(124, 252, 0, 0.2);
+        }
+        
+        .plan-card:hover::before {
+            opacity: 1;
+        }
+        
+        .plan-card.popular {
+            border-color: var(--primary-color);
+            background: linear-gradient(145deg, #1a2e1a, #16213e);
+            transform: scale(1.05);
+        }
+        
+        .plan-card.popular:hover {
+            transform: scale(1.05) translateY(-10px);
+        }
+        
+        .popular-badge {
+            position: absolute;
+            top: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #7CFC00, #66CC00);
+            color: #000;
+            padding: 8px 25px;
+            border-radius: 0 0 15px 15px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .plan-name {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+            margin-top: 15px;
+        }
+        
+        .plan-duration {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .plan-duration svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--primary-color);
+        }
+        
+        .plan-price {
+            margin-bottom: 25px;
+        }
+        
+        .currency {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            vertical-align: top;
+        }
+        
+        .amount {
+            font-size: 48px;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+        }
+        
+        .plan-card.popular .amount {
+            color: var(--primary-color);
+        }
+        
+        .price-note {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+        
+        .savings-badge {
+            display: inline-block;
+            background: rgba(124, 252, 0, 0.15);
+            color: var(--primary-color);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .plan-features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 25px;
+            text-align: left;
+        }
+        
+        .plan-features li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .plan-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .plan-features li svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--primary-color);
+            flex-shrink: 0;
+        }
+        
+        .btn-subscribe {
+            width: 100%;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn-subscribe:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(124, 252, 0, 0.4);
+        }
+        
+        .plan-card.popular .btn-subscribe {
+            background: linear-gradient(135deg, #fff, #f0f0f0);
+            color: #000;
+        }
+        
+        /* Trust badges */
+        .trust-section {
+            max-width: 800px;
+            margin: 60px auto 0;
+            text-align: center;
+        }
+        
+        .trust-badges {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-top: 30px;
+        }
+        
+        .trust-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .trust-badge svg {
+            width: 40px;
+            height: 40px;
+            fill: var(--primary-color);
+        }
+        
+        .trust-badge span {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        /* Payment methods */
+        .payment-methods-info {
+            max-width: 600px;
+            margin: 40px auto 0;
+            text-align: center;
+        }
+        
+        .payment-methods-info h3 {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+        
+        .payment-logos {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .payment-logo {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #fff;
+            font-weight: 500;
+        }
+        
+        /* FAQ Section */
+        .faq-section {
+            max-width: 800px;
+            margin: 60px auto 0;
+        }
+        
+        .faq-section h2 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 30px;
+        }
+        
+        .faq-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+        
+        .faq-question:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+        }
+        
+        .faq-item.active .faq-answer {
+            padding: 0 20px 20px;
+            max-height: 200px;
+        }
+        
+        .faq-item.active .faq-icon {
+            transform: rotate(45deg);
+        }
+        
+        .faq-icon {
+            font-size: 24px;
+            transition: transform 0.3s ease;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .plans-container {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                max-width: 900px;
+            }
+            
+            .plan-card.popular {
+                transform: none;
+            }
+            
+            .plan-card.popular:hover {
+                transform: translateY(-10px);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .subscription-header h1 {
+                font-size: 32px;
+            }
+            
+            .plans-container {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+            }
+            
+            .amount {
+                font-size: 42px;
+            }
+        }
+        
+        /* Login prompt */
+        .login-prompt {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+        
+        .login-prompt p {
+            color: #ffc107;
+            margin-bottom: 15px;
+        }
+        
+        .login-prompt a {
+            color: var(--primary-color);
+            font-weight: 600;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <a href="index.html">
+                    <img src="images/logo.png" alt="Unruly Movies" class="logo">
+                </a>
+            </div>
+            <button class="menu d-md-none" id="menuToggle" aria-label="Toggle navigation menu">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                    <rect y="4" width="24" height="2" rx="1"/>
+                    <rect y="11" width="24" height="2" rx="1"/>
+                    <rect y="18" width="24" height="2" rx="1"/>
+                </svg>
+            </button>
+            <ul class="navbar-nav" id="navbarNav">
+                <li class="nav-item"><a class="nav-link" href="index.html">🏠 Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="movies.html">🎬 Movies</a></li>
+                <li class="nav-item"><a class="nav-link" href="genres.html">🎭 Genres</a></li>
+                <li class="nav-item"><a class="nav-link" href="vjs.html">🎤 VJs</a></li>
+                <li class="nav-item"><a class="nav-link" href="uganda-tv.html">📺 Uganda TV</a></li>
+                <li class="nav-item"><a class="nav-link active" href="subscription.html">💎 Subscribe</a></li>
+            </ul>
+            <div class="app-navbar">
+                <div class="header-search">
+                    <form action="search.html" method="GET">
+                        <input type="search" name="q" placeholder="Search movies..." class="search-input">
+                        <button type="submit" class="search-btn" aria-label="Search">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+                <a href="dashboard.html" class="user-icon" title="My Account" aria-label="User dashboard">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                        <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/>
+                    </svg>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="subscription-page">
+        <!-- Login Prompt (shown only if not logged in) -->
+        <div class="login-prompt" id="loginPrompt" style="display: none;">
+            <p>⚠️ Please log in to subscribe and start watching</p>
+            <a href="login.html?redirect=subscription.html">Log In</a> or <a href="register.html?redirect=subscription.html">Create Account</a>
+        </div>
+        
+        <div class="subscription-header">
+            <h1>Choose Your Plan</h1>
+            <p>Get unlimited access to the best Luganda-translated movies. No ads, no interruptions, just entertainment.</p>
+        </div>
+        
+        <div class="plans-container">
+            <!-- Starter Plan -->
+            <div class="plan-card" data-plan="starter" data-price="1000" data-duration="5">
+                <h3 class="plan-name">Starter</h3>
+                <div class="plan-duration">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/></svg>
+                    5 Days Access
+                </div>
+                <div class="plan-price">
+                    <span class="currency">UGX</span>
+                    <span class="amount">1,000</span>
+                    <p class="price-note">Perfect for trying us out</p>
+                </div>
+                <ul class="plan-features">
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        Unlimited watching
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        HD quality streaming
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        Watch on any device
+                    </li>
+                </ul>
+                <button class="btn-subscribe" onclick="selectPlan('starter', 1000, 5)">Get Started</button>
+            </div>
+            
+            <!-- Basic Plan -->
+            <div class="plan-card" data-plan="basic" data-price="3000" data-duration="14">
+                <h3 class="plan-name">Basic</h3>
+                <div class="plan-duration">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/></svg>
+                    2 Weeks Access
+                </div>
+                <div class="plan-price">
+                    <span class="currency">UGX</span>
+                    <span class="amount">3,000</span>
+                    <p class="price-note">UGX 214/day</p>
+                </div>
+                <ul class="plan-features">
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        Unlimited watching
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        HD quality streaming
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        Watch on any device
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        New releases weekly
+                    </li>
+                </ul>
+                <button class="btn-subscribe" onclick="selectPlan('basic', 3000, 14)">Subscribe Now</button>
+            </div>
+            
+            <!-- Monthly Plan (Popular) -->
+            <div class="plan-card popular" data-plan="monthly" data-price="5000" data-duration="30">
+                <div class="popular-badge">Most Popular</div>
+                <h3 class="plan-name">Monthly</h3>
+                <div class="plan-duration">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/></svg>
+                    1 Month Access
+                </div>
+                <div class="plan-price">
+                    <span class="currency">UGX</span>
+                    <span class="amount">5,000</span>
+                    <p class="price-note">UGX 167/day</p>
+                    <span class="savings-badge">Save 17%</span>
+                </div>
+                <ul class="plan-features">
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        Unlimited watching
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        HD quality streaming
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        Watch on any device
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        New releases weekly
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        Priority support
+                    </li>
+                </ul>
+                <button class="btn-subscribe" onclick="selectPlan('monthly', 5000, 30)">Subscribe Now</button>
+            </div>
+            
+            <!-- Professional Plan -->
+            <div class="plan-card" data-plan="professional" data-price="27000" data-duration="180">
+                <h3 class="plan-name">Professional</h3>
+                <div class="plan-duration">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/></svg>
+                    6 Months Access
+                </div>
+                <div class="plan-price">
+                    <span class="currency">UGX</span>
+                    <span class="amount">27,000</span>
+                    <p class="price-note">UGX 150/day</p>
+                    <span class="savings-badge">Save 25%</span>
+                </div>
+                <ul class="plan-features">
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        Unlimited watching
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        HD quality streaming
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        Watch on any device
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        New releases weekly
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        Priority support
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        Early access to new movies
+                    </li>
+                </ul>
+                <button class="btn-subscribe" onclick="selectPlan('professional', 27000, 180)">Subscribe Now</button>
+            </div>
+            
+            <!-- Premium Plan -->
+            <div class="plan-card" data-plan="premium" data-price="53000" data-duration="365">
+                <h3 class="plan-name">Premium</h3>
+                <div class="plan-duration">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/></svg>
+                    12 Months Access
+                </div>
+                <div class="plan-price">
+                    <span class="currency">UGX</span>
+                    <span class="amount">53,000</span>
+                    <p class="price-note">UGX 145/day</p>
+                    <span class="savings-badge">Save 28%</span>
+                </div>
+                <ul class="plan-features">
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        Unlimited watching
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        HD quality streaming
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        Watch on any device
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        New releases weekly
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        Priority support
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        Early access to new movies
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        Exclusive VJ content
+                    </li>
+                </ul>
+                <button class="btn-subscribe" onclick="selectPlan('premium', 53000, 365)">Subscribe Now</button>
+            </div>
+        </div>
+        
+        <!-- Trust Section -->
+        <div class="trust-section">
+            <h3 style="color: var(--text-secondary); margin-bottom: 10px;">Trusted by thousands of movie lovers</h3>
+            <div class="trust-badges">
+                <div class="trust-badge">
+                    <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                    <span>Secure Payments</span>
+                </div>
+                <div class="trust-badge">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    <span>Cancel Anytime</span>
+                </div>
+                <div class="trust-badge">
+                    <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+                    <span>24/7 Support</span>
+                </div>
+                <div class="trust-badge">
+                    <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM9 8h2v8H9zm4 0h2v8h-2z"/></svg>
+                    <span>HD Quality</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Payment Methods -->
+        <div class="payment-methods-info">
+            <h3>We Accept</h3>
+            <div class="payment-logos">
+                <div class="payment-logo">📱 MTN Mobile Money</div>
+                <div class="payment-logo">📱 Airtel Money</div>
+                <div class="payment-logo">💳 Visa / Mastercard</div>
+            </div>
+        </div>
+        
+        <!-- FAQ Section -->
+        <div class="faq-section">
+            <h2>Frequently Asked Questions</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>How do I pay for my subscription?</span>
+                    <span class="faq-icon">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>We accept MTN Mobile Money, Airtel Money, Visa, and Mastercard. After selecting your plan, you'll be redirected to our secure payment page to complete your transaction.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Can I cancel my subscription anytime?</span>
+                    <span class="faq-icon">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes! You can cancel your subscription at any time. Your access will remain active until the end of your current billing period.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>What devices can I watch on?</span>
+                    <span class="faq-icon">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>You can watch on any device with a web browser - smartphones, tablets, laptops, desktop computers, and smart TVs.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>How many movies are available?</span>
+                    <span class="faq-icon">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>We have a growing library of Luganda-translated movies featuring popular VJs. New movies are added every week!</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Unruly Movies</h4>
+                    <p>Your home for Luganda-translated movies</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <a href="index.html">Home</a>
+                    <a href="movies.html">Movies</a>
+                    <a href="vjs.html">VJs</a>
+                    <a href="subscription.html">Subscribe</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <a href="faq.html">FAQ</a>
+                    <a href="contact.html">Contact Us</a>
+                    <a href="privacy.html">Privacy Policy</a>
+                    <a href="terms.html">Terms of Service</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Unruly Movies. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/main.js"></script>
+    <script>
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+            const loginPrompt = document.getElementById('loginPrompt');
+            
+            if (!token) {
+                loginPrompt.style.display = 'block';
+            }
+            
+            // FAQ accordion
+            document.querySelectorAll('.faq-question').forEach(question => {
+                question.addEventListener('click', () => {
+                    const item = question.parentElement;
+                    item.classList.toggle('active');
+                });
+            });
+        });
+        
+        // Select plan and redirect to payment
+        function selectPlan(planName, price, duration) {
+            const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+            
+            if (!token) {
+                // Redirect to login with return URL
+                window.location.href = `login.html?redirect=subscription.html`;
+                return;
+            }
+            
+            // Store selected plan in session
+            sessionStorage.setItem('selectedPlan', JSON.stringify({
+                plan: planName,
+                price: price,
+                duration: duration,
+                currency: 'UGX'
+            }));
+            
+            // Redirect to payment page
+            window.location.href = `payment.html?plan=${planName}&amount=${price}&duration=${duration}`;
+        }
+        
+        // Add hover effects
+        document.querySelectorAll('.plan-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.cursor = 'pointer';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -2,8 +2,11 @@ const { OAuth2Client } = require('google-auth-library');
 const { logger } = require('../middleware/logger');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const { sendWelcomeNotification } = require('../utils/notificationService');
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+// Google Client ID - from env or fallback to hardcoded
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '573762962600-nr77v5emb2spn7aleg9p2l7c0d6be3a9.apps.googleusercontent.com';
+const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 /**
  * @desc    Google Sign-In
@@ -24,7 +27,7 @@ exports.googleSignIn = async (req, res) => {
         // Verify Google token
         const ticket = await client.verifyIdToken({
             idToken: token,
-            audience: process.env.GOOGLE_CLIENT_ID
+            audience: GOOGLE_CLIENT_ID
         });
         
         const payload = ticket.getPayload();
@@ -34,8 +37,10 @@ exports.googleSignIn = async (req, res) => {
         
         // Check if user exists
         let user = await User.findOne({ email });
+        let isNewUser = false;
         
         if (!user) {
+            isNewUser = true;
             // Create new user
             user = await User.create({
                 fullName: name,
@@ -44,6 +49,7 @@ exports.googleSignIn = async (req, res) => {
                 googleId,
                 provider: 'google',
                 verified: email_verified || true, // Google emails are pre-verified
+                isEmailVerified: true,
                 subscription: {
                     plan: 'free',
                     status: 'active',
@@ -52,18 +58,27 @@ exports.googleSignIn = async (req, res) => {
             });
             
             console.log('New user created:', user._id);
+            
+            // Send welcome notification
+            try {
+                await sendWelcomeNotification(user._id, user.fullName);
+            } catch (err) {
+                console.error('Failed to send welcome notification:', err);
+            }
         } else {
             // Update existing user with Google info
             user.googleId = googleId;
-            user.profileImage = picture;
+            user.profileImage = picture || user.profileImage;
             user.lastLogin = new Date();
+            user.provider = user.provider || 'google';
             
             // If user wasn't verified, mark as verified
             if (!user.verified) {
                 user.verified = true;
             }
-            
-            // Keep existing password if user has one (allows password login even after Google signup)
+            if (!user.isEmailVerified) {
+                user.isEmailVerified = true;
+            }
             
             await user.save();
             console.log('Existing user updated:', user._id);
@@ -98,10 +113,24 @@ exports.googleSignIn = async (req, res) => {
         });
         
     } catch (error) {
-        logger.error('GoogleSignIn error', { error, requestId: req.requestId });
+        console.error('Google Sign-In Error:', error.message);
+        logger.error('GoogleSignIn error', { error: error.message, stack: error.stack, requestId: req.requestId });
+        
+        // Provide more specific error messages
+        let errorMessage = 'Google sign-in failed';
+        if (error.message.includes('Token used too late')) {
+            errorMessage = 'Login session expired. Please try again.';
+        } else if (error.message.includes('Invalid token')) {
+            errorMessage = 'Invalid Google token. Please try again.';
+        } else if (error.message.includes('audience')) {
+            errorMessage = 'Google OAuth configuration error. Please contact support.';
+        } else if (error.message.includes('network')) {
+            errorMessage = 'Network error. Please check your connection.';
+        }
+        
         res.status(401).json({
             status: 'error',
-            message: 'Something went wrong',
+            message: errorMessage,
             requestId: req.requestId
         });
     }

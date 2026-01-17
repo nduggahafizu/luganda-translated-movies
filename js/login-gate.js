@@ -1,6 +1,7 @@
 /**
  * Login Gate for Video Player
- * Simple banner requiring users to login/signup before watching movies
+ * Full screen overlay requiring users to login/signup before watching movies
+ * Style inspired by KPSounds
  */
 
 class LoginGate {
@@ -25,45 +26,58 @@ class LoginGate {
     }
     
     init() {
-        this.createBanner();
+        this.createOverlay();
         this.addStyles();
-        this.showBanner();
+        this.blockVideo();
     }
     
-    createBanner() {
-        this.banner = document.createElement('div');
-        this.banner.id = 'login-gate';
-        this.banner.className = 'login-gate-banner';
-        this.banner.innerHTML = `
-            <div class="gate-content">
-                <span class="gate-text">🔒 Sign in to watch this movie</span>
-                <div class="gate-buttons">
-                    <button class="gate-btn login" onclick="loginGate.goToLogin()">Sign In</button>
-                    <button class="gate-btn signup" onclick="loginGate.goToSignup()">Create Account</button>
-                </div>
+    createOverlay() {
+        this.overlay = document.createElement('div');
+        this.overlay.id = 'login-gate';
+        this.overlay.className = 'login-gate-overlay';
+        this.overlay.innerHTML = `
+            <div class="gate-icon">
+                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
             </div>
+            <h2 class="gate-title">Members Only</h2>
+            <p class="gate-message">This content is only for members. <a href="/login.html" class="gate-link" onclick="loginGate.saveRedirect()">Login</a>, <a href="/register.html" class="gate-link" onclick="loginGate.saveRedirect()">Register</a></p>
         `;
         
-        document.body.appendChild(this.banner);
+        // Insert into the video container area
+        const embedContainer = document.querySelector('#playerWrapper, .player-wrapper, .embed-player-container, .video-container');
+        if (embedContainer) {
+            embedContainer.style.position = 'relative';
+            embedContainer.innerHTML = ''; // Clear the player content
+            embedContainer.appendChild(this.overlay);
+        } else {
+            // Fallback: fixed position overlay
+            this.overlay.classList.add('fixed-overlay');
+            document.body.appendChild(this.overlay);
+        }
     }
     
-    showBanner() {
-        // Block video playback
-        const checkVideo = setInterval(() => {
+    blockVideo() {
+        // Hide video/iframe elements
+        const checkMedia = setInterval(() => {
             const video = document.querySelector('video');
+            const iframe = document.querySelector('.embed-player-container iframe, .video-container iframe');
+            
             if (video) {
-                clearInterval(checkVideo);
-                video.pause();
-                video.addEventListener('play', (e) => {
-                    if (!this.isLoggedIn) {
-                        e.preventDefault();
-                        video.pause();
-                        this.banner.classList.add('shake');
-                        setTimeout(() => this.banner.classList.remove('shake'), 500);
-                    }
-                });
+                video.style.display = 'none';
+                clearInterval(checkMedia);
+            }
+            if (iframe) {
+                iframe.style.display = 'none';
+                clearInterval(checkMedia);
             }
         }, 500);
+        
+        // Stop after 10 seconds
+        setTimeout(() => clearInterval(checkMedia), 10000);
         
         // Track
         if (typeof gtag === 'function') {
@@ -71,14 +85,18 @@ class LoginGate {
         }
     }
     
-    goToLogin() {
+    saveRedirect() {
         localStorage.setItem('redirectAfterLogin', window.location.href);
+    }
+    
+    goToLogin() {
+        this.saveRedirect();
         window.location.href = '/login.html';
     }
     
     goToSignup() {
-        localStorage.setItem('redirectAfterLogin', window.location.href);
-        window.location.href = '/signup.html';
+        this.saveRedirect();
+        window.location.href = '/register.html';
     }
     
     addStyles() {
@@ -87,86 +105,78 @@ class LoginGate {
         const style = document.createElement('style');
         style.id = 'login-gate-styles';
         style.textContent = `
-            .login-gate-banner {
-                position: fixed;
-                bottom: 0;
+            .login-gate-overlay {
+                position: absolute;
+                top: 0;
                 left: 0;
                 right: 0;
-                background: linear-gradient(135deg, #1a1a2e 0%, #0d0d14 100%);
-                border-top: 2px solid #66BB6A;
-                padding: 15px 20px;
-                z-index: 10000;
-                animation: slideUp 0.3s ease;
-            }
-            @keyframes slideUp {
-                from { transform: translateY(100%); }
-                to { transform: translateY(0); }
-            }
-            .login-gate-banner.shake {
-                animation: shake 0.5s ease;
-            }
-            @keyframes shake {
-                0%, 100% { transform: translateX(0); }
-                25% { transform: translateX(-10px); }
-                75% { transform: translateX(10px); }
-            }
-            .gate-content {
-                max-width: 600px;
-                margin: 0 auto;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.95);
                 display: flex;
+                flex-direction: column;
                 align-items: center;
-                justify-content: space-between;
-                gap: 15px;
-                flex-wrap: wrap;
+                justify-content: center;
+                z-index: 100;
+                min-height: 300px;
+                border-radius: 12px;
             }
-            .gate-text {
+            .login-gate-overlay.fixed-overlay {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 90%;
+                max-width: 600px;
+                height: auto;
+                padding: 60px 40px;
+                border-radius: 16px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            }
+            .gate-icon {
+                color: #888;
+                margin-bottom: 20px;
+            }
+            .gate-icon svg {
+                width: 60px;
+                height: 60px;
+            }
+            .gate-title {
                 color: #fff;
+                font-size: 28px;
+                font-weight: 700;
+                margin: 0 0 15px 0;
+                text-align: center;
+            }
+            .gate-message {
+                color: #888;
                 font-size: 16px;
-                font-weight: 500;
+                margin: 0;
+                text-align: center;
             }
-            .gate-buttons {
-                display: flex;
-                gap: 10px;
+            .gate-link {
+                color: #fff;
+                font-weight: 700;
+                text-decoration: none;
+                transition: color 0.2s;
             }
-            .gate-btn {
-                padding: 10px 20px;
-                border-radius: 8px;
-                font-size: 14px;
-                font-weight: 600;
-                cursor: pointer;
-                border: none;
-                transition: all 0.2s;
-            }
-            .gate-btn.login {
-                background: #66BB6A;
-                color: #000;
-            }
-            .gate-btn.login:hover {
-                background: #81C784;
-                transform: translateY(-2px);
-            }
-            .gate-btn.signup {
-                background: transparent;
-                color: #66BB6A;
-                border: 1px solid #66BB6A;
-            }
-            .gate-btn.signup:hover {
-                background: rgba(102, 187, 106, 0.1);
+            .gate-link:hover {
+                color: #7CFC00;
+                text-decoration: underline;
             }
             @media (max-width: 480px) {
-                .gate-content {
-                    flex-direction: column;
-                    text-align: center;
+                .login-gate-overlay {
+                    padding: 40px 20px;
+                    min-height: 250px;
                 }
-                .gate-text {
+                .gate-icon svg {
+                    width: 50px;
+                    height: 50px;
+                }
+                .gate-title {
+                    font-size: 22px;
+                }
+                .gate-message {
                     font-size: 14px;
-                }
-                .gate-buttons {
-                    width: 100%;
-                }
-                .gate-btn {
-                    flex: 1;
-                    padding: 12px 15px;
                 }
             }
         `;

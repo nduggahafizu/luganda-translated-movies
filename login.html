@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     
     <!-- Google Sign-In - Load with onload callback -->
-    <script src="https://accounts.google.com/gsi/client" async defer onload="window.googleApiLoaded = true;"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer onload="window.googleApiLoaded = true; if(typeof initGoogleSignIn === 'function') initGoogleSignIn();"></script>
     
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>

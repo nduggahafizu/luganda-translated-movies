@@ -19,7 +19,7 @@
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
     <!-- Google Sign-In -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://accounts.google.com/gsi/client" async defer onload="window.googleApiLoaded = true; if(typeof initGoogleSignIn === 'function') initGoogleSignIn();"></script>
     
     <style>
         .auth-container {

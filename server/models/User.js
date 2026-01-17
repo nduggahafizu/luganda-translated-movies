@@ -83,11 +83,12 @@ const userSchema = new mongoose.Schema({
     watchlist: [{
         contentType: {
             type: String,
-            enum: ['movie', 'series']
+            enum: ['movie', 'series', 'LugandaMovie'],
+            default: 'LugandaMovie'
         },
         contentId: {
             type: mongoose.Schema.Types.ObjectId,
-            refPath: 'watchlist.contentType'
+            ref: 'LugandaMovie'
         },
         addedAt: {
             type: Date,

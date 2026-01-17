@@ -7,8 +7,8 @@ self.lary = ""
 importScripts('https://3nbf4.com/act/files/service-worker.min.js?r=sw')
 
 // Service Worker for Unruly Movies PWA
-const CACHE_NAME = 'unruly-movies-v2';
-const DYNAMIC_CACHE = 'unruly-dynamic-v2';
+const CACHE_NAME = 'unruly-movies-v3';
+const DYNAMIC_CACHE = 'unruly-dynamic-v3';
 
 // Files to cache immediately
 const STATIC_ASSETS = [

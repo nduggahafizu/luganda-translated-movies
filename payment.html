@@ -351,30 +351,43 @@
         const API_URL = (typeof API_CONFIG !== 'undefined' ? API_CONFIG.BASE_URL : 'https://luganda-translated-movies-production.up.railway.app') + '/api';
         const STRIPE_PUBLIC_KEY = 'pk_test_your_key'; // Add your Stripe public key
         
-        // Get plan details from URL
+        // Get plan details from URL (from subscription page)
         const urlParams = new URLSearchParams(window.location.search);
-        const plan = urlParams.get('plan') || 'basic';
-        const duration = urlParams.get('duration') || 'monthly';
+        const plan = urlParams.get('plan') || 'monthly';
+        const amount = parseInt(urlParams.get('amount')) || 5000;
+        const durationDays = parseInt(urlParams.get('duration')) || 30;
         
-        // Pricing
+        // Pricing in UGX (matching subscription page)
         const pricing = {
-            basic: {
-                monthly: { usd: 9.99, ugx: 37000 },
-                yearly: { usd: 99.99, ugx: 370000 }
-            },
-            premium: {
-                monthly: { usd: 14.99, ugx: 55000 },
-                yearly: { usd: 149.99, ugx: 550000 }
-            }
+            starter: { ugx: 1000, days: 5, usd: 0.27 },
+            basic: { ugx: 3000, days: 14, usd: 0.81 },
+            monthly: { ugx: 5000, days: 30, usd: 1.35 },
+            professional: { ugx: 27000, days: 180, usd: 7.30 },
+            premium: { ugx: 53000, days: 365, usd: 14.32 }
         };
         
+        // Get plan info
+        const planInfo = pricing[plan] || { ugx: amount, days: durationDays, usd: (amount / 3700).toFixed(2) };
+        
+        // Format duration text
+        function formatDuration(days) {
+            if (days <= 7) return `${days} Days`;
+            if (days <= 14) return '2 Weeks';
+            if (days <= 31) return '1 Month';
+            if (days <= 190) return '6 Months';
+            return '12 Months';
+        }
+        
         // Update plan details
-        document.getElementById('plan-name').textContent = plan.charAt(0).toUpperCase() + plan.slice(1);
-        document.getElementById('plan-name-mobile').textContent = plan.charAt(0).toUpperCase() + plan.slice(1);
-        document.getElementById('duration').textContent = duration.charAt(0).toUpperCase() + duration.slice(1);
-        document.getElementById('duration-mobile').textContent = duration.charAt(0).toUpperCase() + duration.slice(1);
-        document.getElementById('total-amount').textContent = `$${pricing[plan][duration].usd}`;
-        document.getElementById('total-amount-mobile').textContent = `UGX ${pricing[plan][duration].ugx.toLocaleString()}`;
+        const planName = plan.charAt(0).toUpperCase() + plan.slice(1);
+        const durationText = formatDuration(planInfo.days);
+        
+        document.getElementById('plan-name').textContent = planName;
+        document.getElementById('plan-name-mobile').textContent = planName;
+        document.getElementById('duration').textContent = durationText;
+        document.getElementById('duration-mobile').textContent = durationText;
+        document.getElementById('total-amount').textContent = `$${planInfo.usd}`;
+        document.getElementById('total-amount-mobile').textContent = `UGX ${planInfo.ugx.toLocaleString()}`;
         
         // Initialize Stripe
         const stripe = Stripe(STRIPE_PUBLIC_KEY);
@@ -459,8 +472,8 @@
                     },
                     body: JSON.stringify({
                         subscriptionPlan: plan,
-                        subscriptionDuration: duration,
-                        amount: pricing[plan][duration].usd,
+                        subscriptionDuration: planInfo.days,
+                        amount: planInfo.usd,
                         paymentMethod: 'stripe'
                     })
                 });
@@ -540,12 +553,12 @@
                     },
                     body: JSON.stringify({
                         subscriptionPlan: plan,
-                        subscriptionDuration: duration,
-                        amount: pricing[plan][duration].ugx,
+                        subscriptionDuration: planInfo.days,
+                        amount: planInfo.ugx,
                         currency: 'UGX',
                         phoneNumber: phone,
                         paymentMethod: network.toLowerCase() + '_money',
-                        description: `Unruly Movies ${plan} subscription (${duration})`
+                        description: `Unruly Movies ${planName} subscription (${durationText})`
                     })
                 });
                 

@@ -386,10 +386,10 @@ class TMDBService {
                             voteAverage: ep.vote_average || 0,
                             // Video URLs will be added manually by admin
                             video: {
-                                embedUrl: '',
-                                streamtapeId: '',
-                                archiveUrl: '',
-                                provider: ''
+                                embedUrl: null,
+                                streamtapeId: null,
+                                archiveUrl: null,
+                                provider: 'archive'
                             },
                             vjName: '',
                             isTranslated: false

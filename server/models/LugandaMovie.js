@@ -210,7 +210,7 @@ const lugandaMovieSchema = new mongoose.Schema({
         },
         provider: {
             type: String,
-            enum: ['local', 'streamtape', 'doodstream', 'filemoon', 'other'],
+            enum: ['local', 'streamtape', 'archive', 'doodstream', 'filemoon', 'other'],
             default: 'local'
         },
         quality: {
@@ -338,14 +338,11 @@ const lugandaMovieSchema = new mongoose.Schema({
     
     seriesStatus: {
         type: String,
-        enum: ['returning', 'ended', 'canceled', 'in_production', 'planned'],
+        enum: ['returning', 'ended', 'canceled', 'in_production', 'planned', 'Returning Series', 'Ended', 'Canceled', 'In Production', 'Planned', 'Unknown'],
         default: 'ended'
     },
     
-    networks: [{
-        name: String,
-        logo: String
-    }],
+    networks: [String],
     
     lastAirDate: {
         type: String,

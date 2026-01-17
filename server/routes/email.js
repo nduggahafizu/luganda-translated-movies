@@ -75,21 +75,25 @@ router.post('/subscribe', async (req, res) => {
             preferences: preferences || { newMovies: true, weeklyDigest: true },
             source,
             favoriteGenres: genres,
-            verified: false // Require email verification
+            verified: true // Auto-verify since email sending is not configured
         });
         
-        // Send verification email
+        // Try to send verification email (optional - won't fail if email not configured)
         try {
-            await sendVerificationEmail(subscription);
+            if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+                await sendVerificationEmail(subscription);
+            } else {
+                console.log('Email not configured - subscriber auto-verified:', email);
+            }
         } catch (emailError) {
             console.error('Failed to send verification email:', emailError);
-            // Continue anyway - subscription is created
+            // Continue anyway - subscription is created and auto-verified
         }
         
         res.status(201).json({
             status: 'success',
-            message: 'Subscribed! Please check your email to verify.',
-            data: { subscribed: true, requiresVerification: true }
+            message: 'Successfully subscribed to Unruly Movies updates!',
+            data: { subscribed: true, verified: true }
         });
         
     } catch (error) {
@@ -403,6 +407,102 @@ router.get('/stats', protect, admin, async (req, res) => {
         res.status(500).json({
             status: 'error',
             message: 'Failed to get stats'
+        });
+    }
+});
+
+// Admin: Manually verify a subscriber
+router.post('/verify-manual/:id', protect, admin, async (req, res) => {
+    try {
+        const subscription = await EmailSubscription.findById(req.params.id);
+        
+        if (!subscription) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Subscriber not found'
+            });
+        }
+        
+        subscription.verified = true;
+        subscription.verificationToken = null;
+        await subscription.save();
+        
+        res.json({
+            status: 'success',
+            message: `${subscription.email} has been verified`,
+            data: subscription
+        });
+        
+    } catch (error) {
+        console.error('Manual verify error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to verify subscriber'
+        });
+    }
+});
+
+// Admin: Verify all unverified subscribers
+router.post('/verify-all', protect, admin, async (req, res) => {
+    try {
+        const result = await EmailSubscription.updateMany(
+            { verified: false },
+            { $set: { verified: true, verificationToken: null } }
+        );
+        
+        res.json({
+            status: 'success',
+            message: `${result.modifiedCount} subscribers have been verified`,
+            data: { verified: result.modifiedCount }
+        });
+        
+    } catch (error) {
+        console.error('Verify all error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to verify subscribers'
+        });
+    }
+});
+
+// Admin: Get all subscribers with pagination
+router.get('/subscribers', protect, admin, async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
+        const skip = (page - 1) * limit;
+        const verified = req.query.verified;
+        
+        const filter = {};
+        if (verified === 'true') filter.verified = true;
+        if (verified === 'false') filter.verified = false;
+        
+        const subscribers = await EmailSubscription.find(filter)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .select('-verificationToken -unsubscribeToken');
+        
+        const total = await EmailSubscription.countDocuments(filter);
+        
+        res.json({
+            status: 'success',
+            data: {
+                subscribers,
+                pagination: {
+                    page,
+                    limit,
+                    total,
+                    pages: Math.ceil(total / limit)
+                }
+            }
+        });
+        
+    } catch (error) {
+        console.error('Get subscribers error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to get subscribers'
         });
     }
 });

@@ -2,6 +2,7 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { sendEmail } = require('../utils/email');
+const { sendWelcomeNotification } = require('../utils/notificationService');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'unruly-movies-jwt-secret-key-2024';
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'unruly-movies-jwt-refresh-secret-2024';
@@ -29,6 +30,14 @@ async function registerUser({ fullName, email, password, clientUrl }) {
     user.emailVerificationToken = crypto.createHash('sha256').update(verificationToken).digest('hex');
     user.emailVerificationExpire = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
     await user.save();
+    
+    // Send welcome notification
+    try {
+        await sendWelcomeNotification(user._id, user.fullName);
+    } catch (err) {
+        console.error('Failed to send welcome notification:', err);
+    }
+    
     // Send verification email
     const verificationUrl = `${clientUrl}/verify-email/${verificationToken}`;
     try {

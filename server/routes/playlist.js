@@ -1,431 +1,296 @@
 const express = require('express');
 const router = express.Router();
-
-// In-memory storage for playlists (replace with database in production)
-// Structure: { userId: { playlistId: { name, movies: [], createdAt, updatedAt } } }
-const playlistStore = new Map();
-
-// Dedicated watchlist storage (separate from general playlists)
-// Structure: { userId: [movieId1, movieId2, ...] }
-const watchlistStore = new Map();
+const User = require('../models/User');
+const LugandaMovie = require('../models/LugandaMovie');
+const { protect } = require('../middleware/auth');
 
 /**
  * @route   GET /api/playlist/watchlist
- * @desc    Get user's watchlist
- * @access  Private or Public with session
+ * @desc    Get user's watchlist from MongoDB
+ * @access  Private
  */
-router.get('/watchlist', async (req, res) => {
+router.get('/watchlist', protect, async (req, res) => {
     try {
-        const userId = req.user?.id || req.sessionID || 'anonymous';
-        const watchlist = watchlistStore.get(userId) || [];
-        
-        // If watchlist has items, fetch movie details
-        if (watchlist.length > 0) {
-            const LugandaMovie = require('../models/LugandaMovie');
-            const movies = await LugandaMovie.find({
-                _id: { $in: watchlist }
-            }).select('originalTitle lugandaTitle poster thumbnailUrl year duration vjName slug');
-            
-            return res.json({
-                success: true,
-                data: movies,
-                count: movies.length
+        const user = await User.findById(req.user._id);
+
+        if (!user) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'User not found'
             });
         }
-        
-        res.json({
-            success: true,
-            data: [],
-            count: 0
+
+        // Get all movie IDs from watchlist
+        const movieIds = user.watchlist
+            .filter(item => item.contentId)
+            .map(item => item.contentId);
+
+        // Fetch movies directly from LugandaMovie collection
+        const movies = await LugandaMovie.find({ _id: { $in: movieIds } })
+            .select('originalTitle lugandaTitle poster thumbnailUrl year duration vjName slug');
+
+        // Create a map for quick lookup
+        const movieMap = new Map();
+        movies.forEach(movie => {
+            movieMap.set(movie._id.toString(), movie);
         });
-        
+
+        // Build watchlist with movie details
+        const watchlist = user.watchlist
+            .filter(item => item.contentId && movieMap.has(item.contentId.toString()))
+            .map(item => {
+                const movie = movieMap.get(item.contentId.toString());
+                return {
+                    _id: movie._id,
+                    originalTitle: movie.originalTitle,
+                    lugandaTitle: movie.lugandaTitle,
+                    poster: movie.poster,
+                    thumbnailUrl: movie.thumbnailUrl,
+                    year: movie.year,
+                    duration: movie.duration,
+                    vjName: movie.vjName,
+                    slug: movie.slug,
+                    addedAt: item.addedAt
+                };
+            });
+
+        res.json({
+            status: 'success',
+            data: {
+                watchlist,
+                count: watchlist.length
+            }
+        });
+
     } catch (error) {
         console.error('Error fetching watchlist:', error);
         res.status(500).json({
-            success: false,
-            error: 'Failed to fetch watchlist'
+            status: 'error',
+            message: 'Failed to fetch watchlist'
         });
     }
 });
 
 /**
  * @route   POST /api/playlist/watchlist/:movieId
- * @desc    Add movie to watchlist
- * @access  Private or Public with session
+ * @desc    Add movie to watchlist in MongoDB
+ * @access  Private
  */
-router.post('/watchlist/:movieId', async (req, res) => {
+router.post('/watchlist/:movieId', protect, async (req, res) => {
     try {
         const { movieId } = req.params;
-        const userId = req.user?.id || req.sessionID || 'anonymous';
-        
-        if (!watchlistStore.has(userId)) {
-            watchlistStore.set(userId, []);
-        }
-        
-        const watchlist = watchlistStore.get(userId);
-        
-        // Check if movie already in watchlist
-        if (watchlist.includes(movieId)) {
-            return res.status(400).json({
-                success: false,
-                error: 'Movie already in watchlist'
+        const userId = req.user._id;
+
+        // Check if movie exists
+        const movie = await LugandaMovie.findById(movieId);
+        if (!movie) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Movie not found'
             });
         }
-        
-        watchlist.push(movieId);
-        
-        res.json({
-            success: true,
-            message: 'Movie added to watchlist',
-            count: watchlist.length
+
+        // Check if already in watchlist
+        const user = await User.findById(userId);
+        const alreadyInWatchlist = user.watchlist.some(
+            item => item.contentId && item.contentId.toString() === movieId
+        );
+
+        if (alreadyInWatchlist) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Movie already in watchlist'
+            });
+        }
+
+        // Add to watchlist
+        await User.findByIdAndUpdate(userId, {
+            $push: {
+                watchlist: {
+                    contentType: 'movie',
+                    contentId: movieId,
+                    addedAt: new Date()
+                }
+            }
         });
-        
+
+        res.json({
+            status: 'success',
+            message: 'Movie added to watchlist',
+            data: {
+                movieId,
+                title: movie.originalTitle || movie.lugandaTitle
+            }
+        });
+
     } catch (error) {
         console.error('Error adding to watchlist:', error);
         res.status(500).json({
-            success: false,
-            error: 'Failed to add to watchlist'
+            status: 'error',
+            message: 'Failed to add to watchlist'
         });
     }
 });
 
 /**
  * @route   DELETE /api/playlist/watchlist/:movieId
- * @desc    Remove movie from watchlist
- * @access  Private or Public with session
+ * @desc    Remove movie from watchlist in MongoDB
+ * @access  Private
  */
-router.delete('/watchlist/:movieId', async (req, res) => {
+router.delete('/watchlist/:movieId', protect, async (req, res) => {
     try {
         const { movieId } = req.params;
-        const userId = req.user?.id || req.sessionID || 'anonymous';
-        
-        if (!watchlistStore.has(userId)) {
-            return res.json({
-                success: true,
-                message: 'Watchlist is empty',
-                count: 0
-            });
-        }
-        
-        const watchlist = watchlistStore.get(userId);
-        const index = watchlist.indexOf(movieId);
-        
-        if (index > -1) {
-            watchlist.splice(index, 1);
-        }
-        
-        res.json({
-            success: true,
-            message: 'Movie removed from watchlist',
-            count: watchlist.length
+        const userId = req.user._id;
+
+        await User.findByIdAndUpdate(userId, {
+            $pull: {
+                watchlist: { contentId: movieId }
+            }
         });
-        
+
+        res.json({
+            status: 'success',
+            message: 'Movie removed from watchlist'
+        });
+
     } catch (error) {
         console.error('Error removing from watchlist:', error);
         res.status(500).json({
-            success: false,
-            error: 'Failed to remove from watchlist'
+            status: 'error',
+            message: 'Failed to remove from watchlist'
         });
     }
 });
 
 /**
- * @route   POST /api/playlist/create
- * @desc    Create a new playlist
- * @access  Private or Public with session
+ * @route   GET /api/playlist/watchlist/check/:movieId
+ * @desc    Check if movie is in watchlist
+ * @access  Private
  */
-router.post('/create', async (req, res) => {
+router.get('/watchlist/check/:movieId', protect, async (req, res) => {
     try {
-        const { name } = req.body;
-        
-        if (!name) {
-            return res.status(400).json({
-                success: false,
-                error: 'Playlist name is required'
-            });
-        }
-        
-        const userId = req.user?.id || req.sessionID || 'anonymous';
-        
-        // Initialize user playlists if not exists
-        if (!playlistStore.has(userId)) {
-            playlistStore.set(userId, new Map());
-        }
-        
-        const userPlaylists = playlistStore.get(userId);
-        const playlistId = `playlist_${Date.now()}`;
-        
-        userPlaylists.set(playlistId, {
-            id: playlistId,
-            name: name,
-            movies: [],
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        });
-        
+        const { movieId } = req.params;
+        const userId = req.user._id;
+
+        const user = await User.findById(userId);
+        const inWatchlist = user.watchlist.some(
+            item => item.contentId && item.contentId.toString() === movieId
+        );
+
         res.json({
-            success: true,
-            message: 'Playlist created successfully',
-            playlist: userPlaylists.get(playlistId)
+            status: 'success',
+            data: { inWatchlist }
         });
-        
+
     } catch (error) {
-        console.error('Error creating playlist:', error);
+        console.error('Error checking watchlist:', error);
         res.status(500).json({
-            success: false,
-            error: 'Failed to create playlist'
+            status: 'error',
+            message: 'Failed to check watchlist'
         });
     }
 });
 
 /**
- * @route   POST /api/playlist/:playlistId/add
- * @desc    Add movie to playlist
- * @access  Private or Public with session
+ * @route   GET /api/playlist/favorites
+ * @desc    Get user's favorites
+ * @access  Private
  */
-router.post('/:playlistId/add', async (req, res) => {
+router.get('/favorites', protect, async (req, res) => {
     try {
-        const { playlistId } = req.params;
-        const { movieId } = req.body;
-        
-        if (!movieId) {
-            return res.status(400).json({
-                success: false,
-                error: 'Movie ID is required'
+        const user = await User.findById(req.user._id)
+            .populate({
+                path: 'favorites',
+                select: 'originalTitle lugandaTitle poster thumbnailUrl year duration vjName slug'
             });
-        }
-        
-        const userId = req.user?.id || req.sessionID || 'anonymous';
-        const userPlaylists = playlistStore.get(userId);
-        
-        if (!userPlaylists || !userPlaylists.has(playlistId)) {
-            return res.status(404).json({
-                success: false,
-                error: 'Playlist not found'
-            });
-        }
-        
-        const playlist = userPlaylists.get(playlistId);
-        
-        // Check if movie already in playlist
-        if (playlist.movies.includes(movieId)) {
-            return res.status(400).json({
-                success: false,
-                error: 'Movie already in playlist'
-            });
-        }
-        
-        playlist.movies.push(movieId);
-        playlist.updatedAt = new Date().toISOString();
-        
-        res.json({
-            success: true,
-            message: 'Movie added to playlist',
-            playlist: playlist
-        });
-        
-    } catch (error) {
-        console.error('Error adding to playlist:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to add movie to playlist'
-        });
-    }
-});
 
-/**
- * @route   DELETE /api/playlist/:playlistId/remove/:movieId
- * @desc    Remove movie from playlist
- * @access  Private or Public with session
- */
-router.delete('/:playlistId/remove/:movieId', async (req, res) => {
-    try {
-        const { playlistId, movieId } = req.params;
-        const userId = req.user?.id || req.sessionID || 'anonymous';
-        
-        const userPlaylists = playlistStore.get(userId);
-        
-        if (!userPlaylists || !userPlaylists.has(playlistId)) {
-            return res.status(404).json({
-                success: false,
-                error: 'Playlist not found'
-            });
-        }
-        
-        const playlist = userPlaylists.get(playlistId);
-        playlist.movies = playlist.movies.filter(id => id !== movieId);
-        playlist.updatedAt = new Date().toISOString();
-        
         res.json({
-            success: true,
-            message: 'Movie removed from playlist',
-            playlist: playlist
-        });
-        
-    } catch (error) {
-        console.error('Error removing from playlist:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to remove movie from playlist'
-        });
-    }
-});
-
-/**
- * @route   GET /api/playlist/user/all
- * @desc    Get all playlists for current user
- * @access  Private or Public with session
- */
-router.get('/user/all', async (req, res) => {
-    try {
-        const userId = req.user?.id || req.sessionID || 'anonymous';
-        const userPlaylists = playlistStore.get(userId);
-        
-        if (!userPlaylists) {
-            return res.json({
-                success: true,
-                playlists: []
-            });
-        }
-        
-        // Convert Map to Array
-        const playlists = Array.from(userPlaylists.values());
-        
-        res.json({
-            success: true,
-            playlists: playlists
-        });
-        
-    } catch (error) {
-        console.error('Error fetching playlists:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to fetch playlists'
-        });
-    }
-});
-
-/**
- * @route   GET /api/playlist/:playlistId
- * @desc    Get playlist details with movies
- * @access  Private or Public with session
- */
-router.get('/:playlistId', async (req, res) => {
-    try {
-        const { playlistId } = req.params;
-        const userId = req.user?.id || req.sessionID || 'anonymous';
-        
-        const userPlaylists = playlistStore.get(userId);
-        
-        if (!userPlaylists || !userPlaylists.has(playlistId)) {
-            return res.status(404).json({
-                success: false,
-                error: 'Playlist not found'
-            });
-        }
-        
-        const playlist = userPlaylists.get(playlistId);
-        
-        // Fetch movie details for all movies in playlist
-        const LugandaMovie = require('../models/LugandaMovie');
-        const movies = await LugandaMovie.find({
-            _id: { $in: playlist.movies }
-        }).select('-__v');
-        
-        res.json({
-            success: true,
-            playlist: {
-                ...playlist,
-                movieDetails: movies
+            status: 'success',
+            data: {
+                favorites: user.favorites || [],
+                count: user.favorites?.length || 0
             }
         });
-        
+
     } catch (error) {
-        console.error('Error fetching playlist:', error);
+        console.error('Error fetching favorites:', error);
         res.status(500).json({
-            success: false,
-            error: 'Failed to fetch playlist'
+            status: 'error',
+            message: 'Failed to fetch favorites'
         });
     }
 });
 
 /**
- * @route   DELETE /api/playlist/:playlistId
- * @desc    Delete a playlist
- * @access  Private or Public with session
+ * @route   POST /api/playlist/favorites/:movieId
+ * @desc    Add movie to favorites
+ * @access  Private
  */
-router.delete('/:playlistId', async (req, res) => {
+router.post('/favorites/:movieId', protect, async (req, res) => {
     try {
-        const { playlistId } = req.params;
-        const userId = req.user?.id || req.sessionID || 'anonymous';
-        
-        const userPlaylists = playlistStore.get(userId);
-        
-        if (!userPlaylists || !userPlaylists.has(playlistId)) {
+        const { movieId } = req.params;
+        const userId = req.user._id;
+
+        // Check if movie exists
+        const movie = await LugandaMovie.findById(movieId);
+        if (!movie) {
             return res.status(404).json({
-                success: false,
-                error: 'Playlist not found'
+                status: 'error',
+                message: 'Movie not found'
             });
         }
-        
-        userPlaylists.delete(playlistId);
-        
-        res.json({
-            success: true,
-            message: 'Playlist deleted successfully'
-        });
-        
-    } catch (error) {
-        console.error('Error deleting playlist:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to delete playlist'
-        });
-    }
-});
 
-/**
- * @route   PUT /api/playlist/:playlistId
- * @desc    Update playlist name
- * @access  Private or Public with session
- */
-router.put('/:playlistId', async (req, res) => {
-    try {
-        const { playlistId } = req.params;
-        const { name } = req.body;
-        
-        if (!name) {
+        // Check if already in favorites
+        const user = await User.findById(userId);
+        if (user.favorites.includes(movieId)) {
             return res.status(400).json({
-                success: false,
-                error: 'Playlist name is required'
+                status: 'error',
+                message: 'Movie already in favorites'
             });
         }
-        
-        const userId = req.user?.id || req.sessionID || 'anonymous';
-        const userPlaylists = playlistStore.get(userId);
-        
-        if (!userPlaylists || !userPlaylists.has(playlistId)) {
-            return res.status(404).json({
-                success: false,
-                error: 'Playlist not found'
-            });
-        }
-        
-        const playlist = userPlaylists.get(playlistId);
-        playlist.name = name;
-        playlist.updatedAt = new Date().toISOString();
-        
-        res.json({
-            success: true,
-            message: 'Playlist updated successfully',
-            playlist: playlist
+
+        await User.findByIdAndUpdate(userId, {
+            $push: { favorites: movieId }
         });
-        
+
+        res.json({
+            status: 'success',
+            message: 'Movie added to favorites'
+        });
+
     } catch (error) {
-        console.error('Error updating playlist:', error);
+        console.error('Error adding to favorites:', error);
         res.status(500).json({
-            success: false,
-            error: 'Failed to update playlist'
+            status: 'error',
+            message: 'Failed to add to favorites'
+        });
+    }
+});
+
+/**
+ * @route   DELETE /api/playlist/favorites/:movieId
+ * @desc    Remove movie from favorites
+ * @access  Private
+ */
+router.delete('/favorites/:movieId', protect, async (req, res) => {
+    try {
+        const { movieId } = req.params;
+        const userId = req.user._id;
+
+        await User.findByIdAndUpdate(userId, {
+            $pull: { favorites: movieId }
+        });
+
+        res.json({
+            status: 'success',
+            message: 'Movie removed from favorites'
+        });
+
+    } catch (error) {
+        console.error('Error removing from favorites:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to remove from favorites'
         });
     }
 });

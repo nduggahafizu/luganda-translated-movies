@@ -193,11 +193,36 @@ async function createNotification(userId, { type, title, message, image = null, 
     }
 }
 
+/**
+ * Send welcome notification to new user
+ * @param {String} userId - User ID
+ * @param {String} userName - User's name
+ */
+async function sendWelcomeNotification(userId, userName) {
+    try {
+        await Notification.create({
+            user: userId,
+            type: 'system_announcement',
+            title: '🎉 Welcome to Unruly Movies!',
+            message: `Hi ${userName}! Thanks for joining us. Explore our collection of Luganda-translated movies and enjoy unlimited streaming. Subscribe now for premium access!`,
+            link: '/subscription.html',
+            data: { welcome: true, actionButton: 'Subscribe Now', actionLink: '/subscription.html' }
+        });
+
+        console.log(`Sent welcome notification to user ${userName}`);
+        return { success: true };
+    } catch (error) {
+        console.error('Error sending welcome notification:', error);
+        return { success: false, error: error.message };
+    }
+}
+
 module.exports = {
     notifyNewMovie,
     notifyVjFollowers,
     sendSystemAnnouncement,
     notifySubscriptionExpiring,
     notifySubscriptionExpired,
-    createNotification
+    createNotification,
+    sendWelcomeNotification
 };

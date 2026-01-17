@@ -89,6 +89,13 @@ function showGoogleFallback(container) {
 async function handleGoogleSignIn(response) {
     try {
         showLoading(true);
+        console.log('Google Sign-In response received');
+        
+        if (!response || !response.credential) {
+            console.error('No credential in Google response');
+            showNotification('Google sign-in failed. Please try again.', 'error');
+            return;
+        }
         
         // Send Google token to backend
         const res = await fetch(`${API_URL}/google`, {
@@ -102,6 +109,7 @@ async function handleGoogleSignIn(response) {
         });
         
         const data = await res.json();
+        console.log('Google auth API response:', data.status);
         
         if (data.status === 'success') {
             // Save auth data
@@ -119,11 +127,12 @@ async function handleGoogleSignIn(response) {
                 }
             }, 1000);
         } else {
+            console.error('Google sign-in failed:', data.message);
             showNotification(data.message || 'Google sign-in failed', 'error');
         }
     } catch (error) {
         console.error('Google sign-in error:', error);
-        showNotification('Error signing in with Google', 'error');
+        showNotification('Error signing in with Google. Please try again.', 'error');
     } finally {
         showLoading(false);
     }

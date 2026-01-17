@@ -297,9 +297,28 @@
             color: var(--text-secondary);
         }
         
+        .notification-action-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, var(--primary-color), #66CC00);
+            color: #000;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .notification-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(124, 252, 0, 0.4);
+        }
+        
         .notification-time {
             font-size: 12px;
             color: var(--text-secondary);
+            margin-top: 5px;
         }
         
         .settings-section {
@@ -519,6 +538,138 @@
 </head>
 
 <body>
+    <!-- Immediate auth check - show Members Only for non-logged users -->
+    <script>
+    (function() {
+        const token = localStorage.getItem('token');
+        const user = localStorage.getItem('user');
+        
+        if (!token || !user) {
+            // Block the entire page for non-members
+            document.documentElement.innerHTML = `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Members Only - Unruly Movies</title>
+                    <link rel="icon" type="image/png" href="assets/images/favicon.png">
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body {
+                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f1a 100%);
+                            min-height: 100vh;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: #fff;
+                        }
+                        .members-only-container {
+                            text-align: center;
+                            padding: 40px;
+                            max-width: 500px;
+                        }
+                        .alert-icon {
+                            width: 80px;
+                            height: 80px;
+                            background: rgba(255, 193, 7, 0.15);
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin: 0 auto 24px;
+                        }
+                        .alert-icon svg {
+                            width: 40px;
+                            height: 40px;
+                            color: #ffc107;
+                        }
+                        h1 {
+                            font-size: 28px;
+                            font-weight: 700;
+                            margin-bottom: 16px;
+                            color: #fff;
+                        }
+                        p {
+                            font-size: 16px;
+                            color: rgba(255,255,255,0.7);
+                            margin-bottom: 32px;
+                            line-height: 1.6;
+                        }
+                        .btn-group {
+                            display: flex;
+                            gap: 16px;
+                            justify-content: center;
+                            flex-wrap: wrap;
+                        }
+                        .btn {
+                            padding: 14px 32px;
+                            border-radius: 8px;
+                            font-size: 16px;
+                            font-weight: 600;
+                            text-decoration: none;
+                            transition: all 0.3s ease;
+                            display: inline-block;
+                        }
+                        .btn-primary {
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            color: #fff;
+                            border: none;
+                        }
+                        .btn-primary:hover {
+                            transform: translateY(-2px);
+                            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+                        }
+                        .btn-outline {
+                            background: transparent;
+                            color: #fff;
+                            border: 2px solid rgba(255,255,255,0.3);
+                        }
+                        .btn-outline:hover {
+                            border-color: #fff;
+                            background: rgba(255,255,255,0.1);
+                        }
+                        .home-link {
+                            margin-top: 24px;
+                        }
+                        .home-link a {
+                            color: rgba(255,255,255,0.6);
+                            text-decoration: none;
+                            font-size: 14px;
+                        }
+                        .home-link a:hover {
+                            color: #fff;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="members-only-container">
+                        <div class="alert-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                        </div>
+                        <h1>Members Only</h1>
+                        <p>Your dashboard is waiting! Log in or create a free account to access your watchlist, history, and personalized recommendations.</p>
+                        <div class="btn-group">
+                            <a href="login.html" class="btn btn-primary">Login</a>
+                            <a href="register.html" class="btn btn-outline">Register</a>
+                        </div>
+                        <div class="home-link">
+                            <a href="index.html">← Back to Home</a>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `;
+            throw new Error('Auth required');
+        }
+    })();
+    </script>
+
     <a class="skip-link" href="#maincontent">Skip to content</a>
 
     <div class="container">
@@ -1007,12 +1158,12 @@
 
         function createMovieCard(item, type = '') {
             const movie = item.movie || item;
-            const posterUrl = Sanitize.url(movie.poster || movie.posterPath) || 'assets/images/placeholder.svg';
+            const posterUrl = Sanitize.url(movie.poster || movie.thumbnailUrl || movie.posterPath) || 'assets/images/placeholder.svg';
             const progress = parseInt(item.progress) || 0;
             const movieId = Sanitize.attr(movie._id);
-            const movieTitle = Sanitize.text(movie.title || 'Unknown');
+            const movieTitle = Sanitize.text(movie.originalTitle || movie.lugandaTitle || movie.title || 'Unknown');
             const movieYear = Sanitize.text(movie.year || '');
-            const movieVj = movie.vj ? '• VJ ' + Sanitize.text(movie.vj) : '';
+            const movieVj = movie.vjName ? '• VJ ' + Sanitize.text(movie.vjName) : (movie.vj ? '• VJ ' + Sanitize.text(movie.vj) : '');
             
             return `
                 <div class="movie-card">
@@ -1057,6 +1208,14 @@
             const notifMessage = Sanitize.text(notif.message);
             const notifType = notif.type && iconMap[notif.type] ? notif.type : 'default';
             
+            // Check if notification has action button (e.g., welcome notification)
+            const hasActionButton = notif.data && notif.data.actionButton && notif.data.actionLink;
+            const actionButtonHtml = hasActionButton ? `
+                <a href="${Sanitize.url(notif.data.actionLink)}" class="notification-action-btn" onclick="event.stopPropagation();">
+                    ${Sanitize.text(notif.data.actionButton)}
+                </a>
+            ` : '';
+            
             return `
                 <div class="notification-item ${notif.isRead ? '' : 'unread'}" onclick="handleNotificationClick('${notifId}', '${notifLink}')">
                     <div class="notification-icon">
@@ -1067,6 +1226,7 @@
                     <div class="notification-content">
                         <div class="notification-title">${notifTitle}</div>
                         <div class="notification-message">${notifMessage}</div>
+                        ${actionButtonHtml}
                         <div class="notification-time">${timeAgo}</div>
                     </div>
                 </div>
@@ -1161,24 +1321,51 @@
         async function updateSetting(setting, value) {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
             
-            const preferences = {};
+            let body = {};
+            
+            // Map settings to API format
             if (setting === 'emailNotifications') {
-                preferences.notifications = { email: value };
+                body = { notifications: { email: value, push: document.getElementById('pushToggle').classList.contains('active') } };
             } else if (setting === 'pushNotifications') {
-                preferences.notifications = { push: value };
-            } else {
-                preferences[setting] = value;
+                body = { notifications: { email: document.getElementById('emailToggle').classList.contains('active'), push: value } };
+            } else if (setting === 'autoplay') {
+                body = { autoplay: value };
+            } else if (setting === 'quality') {
+                body = { quality: value };
+            } else if (setting === 'language') {
+                body = { language: value };
             }
             
             try {
-                await fetch(`${DASHBOARD_API_URL}/auth/update-profile`, {
+                const response = await fetch(`${DASHBOARD_API_URL}/users/preferences`, {
                     method: 'PUT',
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ preferences })
+                    body: JSON.stringify(body)
                 });
+                
+                if (response.ok) {
+                    // Update local user data
+                    const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+                    if (!storedUser.preferences) storedUser.preferences = {};
+                    
+                    if (setting === 'emailNotifications' || setting === 'pushNotifications') {
+                        storedUser.preferences.notifications = storedUser.preferences.notifications || {};
+                        if (setting === 'emailNotifications') storedUser.preferences.notifications.email = value;
+                        if (setting === 'pushNotifications') storedUser.preferences.notifications.push = value;
+                    } else {
+                        storedUser.preferences[setting] = value;
+                    }
+                    
+                    localStorage.setItem('user', JSON.stringify(storedUser));
+                    sessionStorage.setItem('user', JSON.stringify(storedUser));
+                    
+                    console.log('Setting saved:', setting, value);
+                } else {
+                    console.error('Failed to save setting');
+                }
             } catch (error) {
                 console.error('Update setting error:', error);
             }

@@ -179,11 +179,11 @@ const WatchlistManager = {
     
     // Sync with server
     syncWithServer: async function() {
-        const token = localStorage.getItem('auth_token');
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (!token) return;
         
         try {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/api/users/preferences`, {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/api/playlist/watchlist`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -193,11 +193,8 @@ const WatchlistManager = {
                 const data = await response.json();
                 
                 // Merge server data with local data
-                if (data.watchlist) {
-                    this.mergeData(this.storageKey, data.watchlist);
-                }
-                if (data.favorites) {
-                    this.mergeData(this.favoritesKey, data.favorites);
+                if (data.data?.watchlist) {
+                    this.mergeData(this.storageKey, data.data.watchlist);
                 }
             }
         } catch (error) {
@@ -211,8 +208,11 @@ const WatchlistManager = {
         const merged = [...localData];
         
         serverData.forEach(serverItem => {
-            if (!merged.some(item => item.id === serverItem.id)) {
-                merged.push(serverItem);
+            if (!merged.some(item => item.id === serverItem._id || item._id === serverItem._id)) {
+                merged.push({
+                    id: serverItem._id,
+                    ...serverItem
+                });
             }
         });
         
@@ -224,17 +224,20 @@ const WatchlistManager = {
     
     // Sync add to server
     syncAddToServer: async function(type, movieId) {
-        const token = localStorage.getItem('auth_token');
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (!token) return;
         
         try {
-            await fetch(`${API_CONFIG.BASE_URL}/api/users/${type}`, {
+            const endpoint = type === 'watchlist' 
+                ? `${API_CONFIG.BASE_URL}/api/playlist/watchlist/${movieId}`
+                : `${API_CONFIG.BASE_URL}/api/playlist/favorites/${movieId}`;
+            
+            await fetch(endpoint, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ movieId })
+                }
             });
         } catch (error) {
             console.error(`Error syncing ${type} to server:`, error);
@@ -243,11 +246,15 @@ const WatchlistManager = {
     
     // Sync remove from server
     syncRemoveFromServer: async function(type, movieId) {
-        const token = localStorage.getItem('auth_token');
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (!token) return;
         
         try {
-            await fetch(`${API_CONFIG.BASE_URL}/api/users/${type}/${movieId}`, {
+            const endpoint = type === 'watchlist' 
+                ? `${API_CONFIG.BASE_URL}/api/playlist/watchlist/${movieId}`
+                : `${API_CONFIG.BASE_URL}/api/playlist/favorites/${movieId}`;
+            
+            await fetch(endpoint, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -260,11 +267,11 @@ const WatchlistManager = {
     
     // Sync history to server
     syncHistoryToServer: async function(movieId, progress, duration) {
-        const token = localStorage.getItem('auth_token');
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (!token) return;
         
         try {
-            await fetch(`${API_CONFIG.BASE_URL}/api/users/history`, {
+            await fetch(`${API_CONFIG.BASE_URL}/api/watch-progress`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
