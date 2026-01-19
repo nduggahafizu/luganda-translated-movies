@@ -478,5 +478,11 @@ lugandaMovieSchema.index({ vjName: 1 });
 lugandaMovieSchema.index({ translationDate: -1 });
 lugandaMovieSchema.index({ 'rating.userRating': -1 });
 lugandaMovieSchema.index({ 'rating.translationRating': -1 });
+// Performance indexes for common queries
+lugandaMovieSchema.index({ status: 1, createdAt: -1 }); // For /latest endpoint
+lugandaMovieSchema.index({ status: 1, trending: 1, views: -1 }); // For /trending
+lugandaMovieSchema.index({ status: 1, featured: 1, createdAt: -1 }); // For /featured
+lugandaMovieSchema.index({ contentType: 1, status: 1 }); // For series/movies filter
+lugandaMovieSchema.index({ 'metaData.tmdbId': 1 }); // For TMDB lookups
 
 module.exports = mongoose.model('LugandaMovie', lugandaMovieSchema);

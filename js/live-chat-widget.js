@@ -273,7 +273,7 @@ class LiveChatWidget {
             },
             'subscription': {
                 user: 'I need help with subscription',
-                bot: `For subscription help:\n\n💳 **To Subscribe:** Click "Premium" in the menu\n🔄 **Payment Issues:** Contact Pesapal support or email us\n❌ **Cancel:** Go to Account → Subscription → Cancel\n\nNeed more help? Email us at support@unrulymovies.com`
+                bot: `For subscription help:\n\n💳 **To Subscribe:** Click "Subscribe" in the menu\n🔄 **Payment Issues:** Make sure you have funds in your Airtel Money account\n❌ **Cancel:** Go to Account → Subscription → Cancel\n\nNeed more help? Email us at support@unrulymovies.com`
             },
             'account': {
                 user: 'I have an account issue',

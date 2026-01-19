@@ -15,9 +15,19 @@
     <link rel="dns-prefetch" href="//archive.org">
     <link rel="dns-prefetch" href="//streamtape.com">
     <link rel="dns-prefetch" href="//ia601502.us.archive.org">
+    <link rel="dns-prefetch" href="//ia800101.us.archive.org">
+    <link rel="dns-prefetch" href="//ia800102.us.archive.org">
+    <link rel="dns-prefetch" href="//ia800103.us.archive.org">
+    <link rel="dns-prefetch" href="//ia800104.us.archive.org">
+    <link rel="dns-prefetch" href="//ia800105.us.archive.org">
     <link rel="dns-prefetch" href="//ia902802.us.archive.org">
     <link rel="preconnect" href="https://archive.org" crossorigin>
+    <link rel="preconnect" href="https://ia800101.us.archive.org" crossorigin>
     <link rel="preconnect" href="https://luganda-translated-movies-production.up.railway.app" crossorigin>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js" as="script">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/hls.js@latest" as="script">
     
     <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMF82HVT9G"></script>
@@ -1797,8 +1807,8 @@
             </div>
         </div>
         
-        <!-- Native Video Player (for direct video files) -->
-        <video id="player" playsinline controls style="display: none;">
+        <!-- Native Video Player (for direct video files) - OPTIMIZED FOR SPEED -->
+        <video id="player" playsinline controls preload="auto" style="display: none;">
             <source src="" type="video/mp4">
         </video>
         
@@ -1820,7 +1830,10 @@
                 src="" 
                 frameborder="0" 
                 loading="eager"
+                importance="high"
+                fetchpriority="high"
                 allow="autoplay; fullscreen; encrypted-media; picture-in-picture; accelerometer; gyroscope"
+                allowfullscreen
                 style="width: 100%; height: 100%; border: none;">
             </iframe>
         </div>
@@ -2097,6 +2110,42 @@
         let commentsPage = 1;
         const commentsPerPage = 10;
         let allComments = [];
+        
+        // ========== VIDEO PRELOADER FOR FASTER START ==========
+        // Prefetch video URL to prime DNS and TCP connections
+        function prefetchVideoUrl(url) {
+            if (!url) return;
+            
+            // Create a link prefetch element
+            const link = document.createElement('link');
+            link.rel = 'prefetch';
+            link.href = url;
+            link.as = 'video';
+            link.crossOrigin = 'anonymous';
+            document.head.appendChild(link);
+            
+            // Also try to prime the connection with a small range request
+            // This warms up the CDN edge server
+            try {
+                fetch(url, {
+                    method: 'GET',
+                    headers: { 'Range': 'bytes=0-1000' },  // Just get first 1KB
+                    mode: 'no-cors'  // Avoid CORS issues
+                }).catch(() => {}); // Ignore errors, this is just optimization
+            } catch (e) {}
+            
+            console.log('🚀 Prefetching video URL:', url.substring(0, 60));
+        }
+        
+        // Preload Archive.org embed by creating hidden iframe
+        function preloadArchiveEmbed(url) {
+            if (!url) return;
+            const preloader = document.createElement('link');
+            preloader.rel = 'prerender';
+            preloader.href = url;
+            document.head.appendChild(preloader);
+            console.log('🚀 Prerendering Archive.org embed');
+        }
 
         // ========== PRE-ROLL AD SYSTEM (AdSense Only) ==========
         const prerollAdConfig = {
@@ -2570,12 +2619,17 @@
             });
         }
 
-        // Initialize Plyr only for native video
+        // Initialize Plyr only for native video - OPTIMIZED FOR SPEED
         function initPlyr() {
             if (player) return player;
             
             // Remove crossorigin to avoid CORS issues with Archive.org
             video.removeAttribute('crossorigin');
+            
+            // Set video attributes for faster loading
+            video.preload = 'auto';  // Aggressive preloading
+            video.playsInline = true;
+            video.setAttribute('playsinline', '');
             
             player = new Plyr(video, {
                 controls: [
@@ -2603,11 +2657,26 @@
                 toggleInvert: true,
                 displayDuration: true,
                 ratio: '16:9',
-                fullscreen: { enabled: true, fallback: true, iosNative: true }
+                fullscreen: { enabled: true, fallback: true, iosNative: true },
+                // Speed optimizations
+                loadSprite: false,  // Don't load external sprite
+                iconUrl: null,      // Use inline SVGs
+                blankVideo: '',     // No blank video needed
+                autoplay: false,    // Don't autoplay but be ready
+                resetOnEnd: false,  // Keep video ready after end
+                disableContextMenu: false,
+                hideControls: true, // Auto-hide for cleaner experience
+                clickToPlay: true,
+                storage: { enabled: true, key: 'plyr' }  // Remember settings
             });
             
             // Setup auto-rotate for mobile
             setupAutoRotate(player);
+            
+            // Optimize buffering - try to buffer ahead
+            player.on('ready', () => {
+                console.log('🚀 Plyr ready - optimizing buffer');
+            });
             
             return player;
         }
@@ -2633,7 +2702,6 @@
                     if ((data.status === 'success' || data.success === true) && data.data) {
                         const movie = data.data;
                         console.log('🎥 Movie data:', movie);
-                        updateMovieInfo(movie);
                         
                         // Get embed URL from either location
                         let videoUrl = movie.embedUrl || movie.video?.embedUrl || movie.video?.url;
@@ -2645,6 +2713,20 @@
                         if (videoUrl) {
                             videoUrl = videoUrl.trim().replace(/\s+/g, '');
                         }
+                        
+                        // 🚀 SPEED: Start prefetching video immediately while UI updates
+                        if (directCdnUrl && directCdnUrl.match(/ia\d+\.us\.archive\.org/)) {
+                            prefetchVideoUrl(directCdnUrl);
+                        } else if (videoUrl) {
+                            if (isArchiveOrgUrl(videoUrl)) {
+                                preloadArchiveEmbed(getArchiveOrgEmbedUrl(videoUrl));
+                            } else if (isDirectVideoUrl(videoUrl)) {
+                                prefetchVideoUrl(videoUrl);
+                            }
+                        }
+                        
+                        // Update UI (can happen while video prefetches)
+                        updateMovieInfo(movie);
                         
                         console.log('🎬 Video URL:', videoUrl);
                         console.log('🎬 Direct CDN URL:', directCdnUrl);
@@ -2761,7 +2843,7 @@
                 console.warn('⚠️ Direct extraction failed, falling back to iframe:', error.message);
             }
             
-            // Fallback: Use iframe embed (has ads)
+            // Fallback: Use iframe embed (has ads) - SPEED OPTIMIZED
             console.log('📺 Using iframe embed (fallback)');
             isEmbedMode = true;
             
@@ -2773,21 +2855,36 @@
             }
             embedContainer.style.display = 'block';
             
+            // Optimize iframe for faster loading
+            embedPlayer.loading = 'eager';
+            embedPlayer.setAttribute('loading', 'eager');
+            embedPlayer.setAttribute('importance', 'high');
+            embedPlayer.allow = 'autoplay; fullscreen; encrypted-media; picture-in-picture';
+            
             // Set the embed URL
             embedPlayer.src = url;
             
+            // Track if loading was hidden
+            let loadingHidden = false;
+            
             // Hide loading when iframe loads
             embedPlayer.onload = () => {
-                loadingOverlay.style.display = 'none';
+                if (!loadingHidden) {
+                    loadingHidden = true;
+                    loadingOverlay.style.display = 'none';
+                }
             };
             
-            // Fallback hide loading after timeout
+            // Faster fallback - hide loading after 2 seconds
             setTimeout(() => {
-                loadingOverlay.style.display = 'none';
-            }, 3000);
+                if (!loadingHidden) {
+                    loadingHidden = true;
+                    loadingOverlay.style.display = 'none';
+                }
+            }, 2000);
         }
 
-        // Load Archive.org embed (works for MKV and all formats, NO ADS!)
+        // Load Archive.org embed (works for MKV and all formats, NO ADS!) - SPEED OPTIMIZED
         function loadArchiveOrgEmbed(url) {
             console.log('📦 Loading Archive.org embed:', url);
             isEmbedMode = true;
@@ -2806,16 +2903,34 @@
             }
             embedContainer.style.display = 'block';
             
+            // Optimize iframe loading - set attributes before src
+            embedPlayer.loading = 'eager';  // Load immediately
+            embedPlayer.setAttribute('loading', 'eager');
+            embedPlayer.setAttribute('importance', 'high');
+            embedPlayer.allow = 'autoplay; fullscreen; picture-in-picture; accelerometer; gyroscope';
+            embedPlayer.setAttribute('allowfullscreen', '');
+            
+            // Add autoplay to URL for faster start
+            let optimizedUrl = url;
+            if (!optimizedUrl.includes('autoplay=')) {
+                optimizedUrl += (optimizedUrl.includes('?') ? '&' : '?') + 'autoplay=1';
+            }
+            
             // Set the Archive.org embed URL
-            embedPlayer.src = url;
+            embedPlayer.src = optimizedUrl;
             
             // Setup auto-rotate for iframe embeds
             setupIframeFullscreenRotate(embedPlayer);
             
-            // Listen for iframe load
+            // Listen for iframe load - hide loading early
+            let loadingHidden = false;
+            
             embedPlayer.onload = () => {
                 console.log('✅ Archive.org iframe loaded');
-                loadingOverlay.style.display = 'none';
+                if (!loadingHidden) {
+                    loadingHidden = true;
+                    loadingOverlay.style.display = 'none';
+                }
                 
                 // Check for embedding error after a short delay
                 setTimeout(() => {
@@ -2829,10 +2944,13 @@
                 showEmbedErrorFallback(originalArchiveUrl);
             };
             
-            // Fallback hide loading after timeout
+            // Faster fallback - hide loading after 2 seconds regardless
             setTimeout(() => {
-                loadingOverlay.style.display = 'none';
-            }, 5000);
+                if (!loadingHidden) {
+                    loadingHidden = true;
+                    loadingOverlay.style.display = 'none';
+                }
+            }, 2000);
         }
         
         // Setup auto-rotate for iframe embeds (Archive.org, Streamtape, etc)
@@ -2933,15 +3051,27 @@
             `;
         }
 
-        // Load HLS source
+        // Load HLS source - SPEED OPTIMIZED
         function loadHLSSource(url) {
             if (Hls.isSupported()) {
                 const hls = new Hls({
-                    maxBufferLength: 30,
-                    maxMaxBufferLength: 60
+                    maxBufferLength: 60,          // 60 seconds buffer
+                    maxMaxBufferLength: 120,      // Max 2 minutes
+                    maxBufferSize: 60 * 1000 * 1000, // 60MB
+                    enableWorker: true,
+                    startLevel: -1,               // Auto quality
+                    abrBandWidthFactor: 0.95,     // Aggressive upgrade
+                    fragLoadingMaxRetry: 6,
+                    startFragPrefetch: true       // Prefetch first fragment
                 });
                 hls.loadSource(url);
                 hls.attachMedia(video);
+                
+                // Hide loading on first fragment
+                hls.on(Hls.Events.FRAG_LOADED, () => {
+                    loadingOverlay.style.display = 'none';
+                });
+                
                 hls.on(Hls.Events.MANIFEST_PARSED, () => {
                     initPlayer();
                     loadingOverlay.style.display = 'none';
@@ -3115,15 +3245,38 @@
             // Check if HLS stream
             if (url.includes('.m3u8')) {
                 if (Hls.isSupported()) {
+                    // Optimized HLS config for faster loading
                     const hls = new Hls({
-                        enableWorker: true,
-                        lowLatencyMode: true
+                        enableWorker: true,           // Use web worker for parsing
+                        lowLatencyMode: false,        // Disable for VOD (better buffering)
+                        maxBufferLength: 60,          // Buffer 60 seconds ahead
+                        maxMaxBufferLength: 120,      // Max 2 minutes buffer
+                        maxBufferSize: 60 * 1000 * 1000, // 60MB buffer
+                        maxBufferHole: 0.5,           // Allow 0.5s gaps
+                        startLevel: -1,               // Auto quality selection
+                        abrEwmaFastLive: 3,           // Fast quality switching
+                        abrEwmaSlowLive: 9,
+                        abrEwmaFastVoD: 3,
+                        abrEwmaSlowVoD: 9,
+                        abrBandWidthFactor: 0.95,     // Aggressive quality upgrade
+                        abrBandWidthUpFactor: 0.7,
+                        fragLoadingTimeOut: 20000,    // Longer timeout
+                        manifestLoadingTimeOut: 10000,
+                        levelLoadingTimeOut: 10000,
+                        fragLoadingMaxRetry: 6,       // More retries
+                        startFragPrefetch: true       // Prefetch first fragment
                     });
                     
                     hls.loadSource(url);
                     hls.attachMedia(video);
                     
+                    // Hide loading early - on first fragment load
+                    hls.on(Hls.Events.FRAG_LOADED, () => {
+                        loadingOverlay.style.display = 'none';
+                    });
+                    
                     hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                        console.log('🎬 HLS manifest parsed, levels:', hls.levels.length);
                         loadingOverlay.style.display = 'none';
                     });
                     
@@ -3131,29 +3284,66 @@
                         if (data.fatal) {
                             loadingOverlay.style.display = 'none';
                             console.error('HLS Error:', data);
+                            // Try to recover
+                            if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+                                hls.startLoad();
+                            } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+                                hls.recoverMediaError();
+                            }
                         }
                     });
                     
                     window.hlsPlayer = hls;
                 } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                     video.src = url;
+                    video.preload = 'auto';
                     video.addEventListener('loadedmetadata', () => {
                         loadingOverlay.style.display = 'none';
-                    });
+                    }, { once: true });
                 }
             } else {
                 // Regular video file (MP4, MKV, WebM, etc.)
                 console.log('🎬 Loading video file:', url);
                 
+                // Set aggressive preload for faster start
+                video.preload = 'auto';
+                video.setAttribute('preload', 'auto');
+                
+                // Use Range requests for faster initial load (Chrome-like behavior)
+                // This tells the browser we want to buffer aggressively
+                video.autobuffer = true;
+                
                 video.src = url;
-                video.addEventListener('loadedmetadata', () => {
-                    console.log('✅ Video loaded successfully');
+                
+                // Hide loading as soon as we have some data
+                video.addEventListener('loadeddata', () => {
+                    console.log('✅ Video data loaded - ready to play');
                     loadingOverlay.style.display = 'none';
-                });
+                }, { once: true });
+                
+                video.addEventListener('loadedmetadata', () => {
+                    console.log('✅ Video metadata loaded');
+                    // Start buffering more data
+                    if (video.buffered.length === 0) {
+                        video.load(); // Force buffer
+                    }
+                }, { once: true });
+                
                 video.addEventListener('canplay', () => {
                     console.log('✅ Video can play');
                     loadingOverlay.style.display = 'none';
-                });
+                }, { once: true });
+                
+                // Fast start - hide loading on first progress
+                video.addEventListener('progress', () => {
+                    if (video.buffered.length > 0) {
+                        const bufferedEnd = video.buffered.end(0);
+                        if (bufferedEnd > 0.5) { // At least 0.5 seconds buffered
+                            loadingOverlay.style.display = 'none';
+                        }
+                    }
+                }, { once: true });
+                
                 video.addEventListener('error', (e) => {
                     loadingOverlay.style.display = 'none';
                     console.error('❌ Video load error:', e);

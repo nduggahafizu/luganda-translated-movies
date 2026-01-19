@@ -148,7 +148,14 @@ const clearCacheKey = async (key) => {
  */
 const getCacheStats = async () => {
     if (!isRedisAvailable || !redisClient) {
-        return { available: false, message: 'Redis not configured or unavailable' };
+        return { 
+            available: false, 
+            message: 'Redis not configured - using in-memory cache',
+            memoryCache: {
+                keys: Object.keys(memoryCache).length,
+                maxSize: MEMORY_CACHE_MAX_SIZE
+            }
+        };
     }
 
     try {
@@ -165,10 +172,97 @@ const getCacheStats = async () => {
     }
 };
 
+// ============================================
+// IN-MEMORY CACHE (Fallback when Redis unavailable)
+// ============================================
+const memoryCache = {};
+const memoryCacheTimers = {};
+const MEMORY_CACHE_MAX_SIZE = 100;
+
+/**
+ * Simple in-memory cache middleware (fast fallback)
+ * @param {number} duration - Cache duration in seconds
+ */
+const memCache = (duration = 60) => {
+    return (req, res, next) => {
+        if (req.method !== 'GET') return next();
+        
+        const key = req.originalUrl || req.url;
+        const cached = memoryCache[key];
+        
+        if (cached && cached.expires > Date.now()) {
+            res.setHeader('X-Cache', 'HIT-MEMORY');
+            return res.json(cached.data);
+        }
+        
+        // Override res.json to cache response
+        const originalJson = res.json.bind(res);
+        res.json = (data) => {
+            // Clean old entries if cache is full
+            const keys = Object.keys(memoryCache);
+            if (keys.length >= MEMORY_CACHE_MAX_SIZE) {
+                // Remove oldest 20%
+                const toRemove = keys.slice(0, Math.floor(keys.length * 0.2));
+                toRemove.forEach(k => {
+                    delete memoryCache[k];
+                    if (memoryCacheTimers[k]) {
+                        clearTimeout(memoryCacheTimers[k]);
+                        delete memoryCacheTimers[k];
+                    }
+                });
+            }
+            
+            // Store in cache
+            memoryCache[key] = {
+                data,
+                expires: Date.now() + (duration * 1000)
+            };
+            
+            // Auto-cleanup after expiry
+            memoryCacheTimers[key] = setTimeout(() => {
+                delete memoryCache[key];
+                delete memoryCacheTimers[key];
+            }, duration * 1000);
+            
+            res.setHeader('X-Cache', 'MISS');
+            return originalJson(data);
+        };
+        
+        next();
+    };
+};
+
+/**
+ * Clear in-memory cache
+ */
+const clearMemoryCache = (pattern = null) => {
+    if (pattern) {
+        Object.keys(memoryCache).forEach(key => {
+            if (key.includes(pattern)) {
+                delete memoryCache[key];
+                if (memoryCacheTimers[key]) {
+                    clearTimeout(memoryCacheTimers[key]);
+                    delete memoryCacheTimers[key];
+                }
+            }
+        });
+    } else {
+        Object.keys(memoryCache).forEach(key => {
+            delete memoryCache[key];
+            if (memoryCacheTimers[key]) {
+                clearTimeout(memoryCacheTimers[key]);
+                delete memoryCacheTimers[key];
+            }
+        });
+    }
+};
+
 module.exports = {
     cache,
+    memCache,
     clearCache,
     clearCacheKey,
+    clearMemoryCache,
     getCacheStats,
     redisClient: redisClient,
     isRedisAvailable: () => isRedisAvailable

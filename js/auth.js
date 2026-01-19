@@ -430,7 +430,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Protect pages that require authentication
-    const protectedPages = ['profile.html', 'payment.html'];
+    const protectedPages = ['profile.html', 'subscription.html'];
     const currentPage = window.location.pathname.split('/').pop();
     
     if (protectedPages.includes(currentPage) && !isLoggedIn()) {

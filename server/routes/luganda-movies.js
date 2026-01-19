@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const LugandaMovie = require('../models/LugandaMovie');
 const axios = require('axios');
+const { memCache, clearMemoryCache } = require('../middleware/cache');
 
 // Import notification service (optional - won't break if not available)
 let notifyNewMovie, notifyVjFollowers;
@@ -37,6 +38,11 @@ const setCorsHeaders = (req, res) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cache-Control');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
+};
+
+// Set cache headers for public data (movies list)
+const setCacheHeaders = (res, maxAge = 30) => {
+    res.setHeader('Cache-Control', `public, max-age=${maxAge}, stale-while-revalidate=60`);
 };
 
 // Helper to generate slug
@@ -118,6 +124,9 @@ router.post('/simple-add', async (req, res) => {
         };
 
         const newMovie = await LugandaMovie.create(movieData);
+
+        // Clear cache so new movie shows immediately
+        clearMemoryCache('/api/luganda-movies');
 
         // Send notifications to users about the new movie
         try {
@@ -678,62 +687,60 @@ router.get('/new-releases', async (req, res) => {
     }
 });
 
-// GET /api/luganda-movies/latest - Get latest movies
-router.get('/latest', async (req, res) => {
+// GET /api/luganda-movies/latest - Get latest movies (CACHED for 30 seconds)
+router.get('/latest', memCache(30), async (req, res) => {
     setCorsHeaders(req, res);
+    setCacheHeaders(res, 30);
     try {
         const limit = parseInt(req.query.limit) || 10;
-        console.log('[LATEST] Fetching latest movies, limit:', limit);
-        const movies = await LugandaMovie.find({ status: 'published' }).sort({ createdAt: -1 }).limit(limit);
-        console.log('[LATEST] Found', movies.length, 'movies');
+        // Use lean() for faster queries (returns plain JS objects)
+        const movies = await LugandaMovie.find({ status: 'published' })
+            .sort({ createdAt: -1 })
+            .limit(limit)
+            .select('-__v') // Exclude version key
+            .lean();
         res.json({ success: true, data: movies, count: movies.length });
     } catch (error) {
-        console.error('[LATEST] Error fetching latest movies:', error.message, error.stack);
+        console.error('[LATEST] Error:', error.message);
         res.status(500).json({ success: false, message: 'Failed to fetch latest movies', error: error.message });
     }
 });
 
-// GET /api/luganda-movies/trending - Get trending movies (marked as trending + by views)
-router.get('/trending', async (req, res) => {
+// GET /api/luganda-movies/trending - Get trending movies (CACHED for 60 seconds)
+router.get('/trending', memCache(60), async (req, res) => {
     setCorsHeaders(req, res);
+    setCacheHeaders(res, 60);
     try {
         const limit = parseInt(req.query.limit) || 10;
         
-        // First get movies marked as trending
-        const markedTrending = await LugandaMovie.find({ 
-            status: 'published', 
-            trending: true 
-        }).sort({ views: -1 }).limit(limit);
+        // Combined query for better performance
+        const movies = await LugandaMovie.find({ 
+            status: 'published',
+            $or: [{ trending: true }, { views: { $gt: 0 } }]
+        })
+        .sort({ trending: -1, views: -1, 'rating.userRating': -1 })
+        .limit(limit)
+        .select('-__v')
+        .lean();
         
-        // If we don't have enough, fill with most viewed
-        if (markedTrending.length < limit) {
-            const markedIds = markedTrending.map(m => m._id);
-            const byViews = await LugandaMovie.find({ 
-                status: 'published',
-                _id: { $nin: markedIds }
-            })
-            .sort({ views: -1, 'rating.userRating': -1 })
-            .limit(limit - markedTrending.length);
-            
-            const combined = [...markedTrending, ...byViews];
-            res.json({ success: true, data: combined, count: combined.length });
-        } else {
-            res.json({ success: true, data: markedTrending, count: markedTrending.length });
-        }
+        res.json({ success: true, data: movies, count: movies.length });
     } catch (error) {
         console.error('Error fetching trending movies:', error);
         res.status(500).json({ success: false, message: 'Failed to fetch trending movies' });
     }
 });
 
-// GET /api/luganda-movies/featured - Get featured movies
-router.get('/featured', async (req, res) => {
+// GET /api/luganda-movies/featured - Get featured movies (CACHED for 60 seconds)
+router.get('/featured', memCache(60), async (req, res) => {
     setCorsHeaders(req, res);
+    setCacheHeaders(res, 60);
     try {
         const limit = parseInt(req.query.limit) || 10;
         const movies = await LugandaMovie.find({ status: 'published', featured: true })
             .sort({ createdAt: -1 })
-            .limit(limit);
+            .limit(limit)
+            .select('-__v')
+            .lean();
         res.json({ success: true, data: movies, count: movies.length });
     } catch (error) {
         console.error('Error fetching featured movies:', error);

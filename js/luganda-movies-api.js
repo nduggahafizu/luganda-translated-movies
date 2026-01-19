@@ -16,12 +16,9 @@ const LugandaMoviesAPI = (function() {
             const path = endpoint.replace(/^\//, '');
             const url = `${base}/${path}`;
             
-            // Add cache-busting for GET requests to ensure fresh data
-            const finalUrl = options.method && options.method !== 'GET' 
-                ? url 
-                : (url.includes('?') ? `${url}&_t=${Date.now()}` : `${url}?_t=${Date.now()}`);
-            
-            const response = await fetch(finalUrl, {
+            // Don't add cache-busting - let server cache work
+            // Browser caching is controlled via Cache-Control headers
+            const response = await fetch(url, {
                 headers: {
                     'Content-Type': 'application/json',
                     ...options.headers
