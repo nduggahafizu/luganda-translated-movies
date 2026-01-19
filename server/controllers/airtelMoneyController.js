@@ -17,15 +17,42 @@ const AIRTEL_CONFIG = {
     currency: 'UGX'
 };
 
-// Subscription pricing in UGX
+// Subscription pricing in UGX (5 tiers: 1,000 - 50,000)
 const SUBSCRIPTION_PRICES_UGX = {
+    starter: {
+        name: 'Starter',
+        price: 1000,
+        duration: 1, // 1 day
+        durationUnit: 'day',
+        features: ['SD Streaming', '1 Device', 'Ads Supported']
+    },
     basic: {
-        monthly: 17000,
-        yearly: 170000
+        name: 'Basic',
+        price: 5000,
+        duration: 7, // 1 week
+        durationUnit: 'week',
+        features: ['HD Streaming', '1 Device', 'Limited Ads']
+    },
+    standard: {
+        name: 'Standard',
+        price: 15000,
+        duration: 1, // 1 month
+        durationUnit: 'month',
+        features: ['Full HD Streaming', '2 Devices', 'No Ads', 'Downloads']
     },
     premium: {
-        monthly: 55000,
-        yearly: 550000
+        name: 'Premium',
+        price: 30000,
+        duration: 1, // 1 month
+        durationUnit: 'month',
+        features: ['4K Streaming', '4 Devices', 'No Ads', 'Downloads', 'Offline Mode']
+    },
+    vip: {
+        name: 'VIP',
+        price: 50000,
+        duration: 3, // 3 months
+        durationUnit: 'month',
+        features: ['4K Streaming', 'Unlimited Devices', 'No Ads', 'Downloads', 'Offline Mode', 'Early Access', 'VIP Support']
     }
 };
 
@@ -78,13 +105,22 @@ const getAccessToken = async () => {
  */
 exports.initiateAirtelPayment = async (req, res) => {
     try {
-        const { subscriptionPlan, subscriptionDuration = 'monthly', phoneNumber } = req.body;
+        const { subscriptionPlan, phoneNumber } = req.body;
 
         // Validate inputs
         if (!subscriptionPlan || !phoneNumber) {
             return res.status(400).json({
                 status: 'error',
                 message: 'Subscription plan and phone number are required'
+            });
+        }
+
+        // Validate plan exists
+        const plan = SUBSCRIPTION_PRICES_UGX[subscriptionPlan];
+        if (!plan) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Invalid subscription plan. Choose: starter, basic, standard, premium, or vip'
             });
         }
 
@@ -107,14 +143,8 @@ exports.initiateAirtelPayment = async (req, res) => {
             });
         }
 
-        // Get price
-        const amount = SUBSCRIPTION_PRICES_UGX[subscriptionPlan]?.[subscriptionDuration];
-        if (!amount) {
-            return res.status(400).json({
-                status: 'error',
-                message: 'Invalid subscription plan or duration'
-            });
-        }
+        // Get price from plan
+        const amount = plan.price;
 
         // Generate unique transaction reference
         const transactionRef = `UNRULY-${Date.now()}-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
@@ -164,13 +194,16 @@ exports.initiateAirtelPayment = async (req, res) => {
                 paymentProvider: 'airtel',
                 status: 'pending',
                 subscriptionPlan,
-                subscriptionDuration,
+                subscriptionDuration: plan.durationUnit,
+                subscriptionDays: plan.duration * (plan.durationUnit === 'day' ? 1 : plan.durationUnit === 'week' ? 7 : 30),
                 paymentDetails: {
                     airtelTransactionId: airtelResponse.data?.transaction?.id || transactionRef,
                     phoneNumber: `256${formattedPhone}`,
                     payerEmail: req.user.email,
                     payerName: req.user.fullName,
-                    reference: transactionRef
+                    reference: transactionRef,
+                    planName: plan.name,
+                    planFeatures: plan.features
                 }
             });
 
@@ -182,7 +215,9 @@ exports.initiateAirtelPayment = async (req, res) => {
                     transactionRef: transactionRef,
                     amount: amount,
                     currency: 'UGX',
-                    phoneNumber: `256${formattedPhone}`
+                    phoneNumber: `256${formattedPhone}`,
+                    plan: plan.name,
+                    duration: `${plan.duration} ${plan.durationUnit}${plan.duration > 1 ? 's' : ''}`
                 }
             });
         } else {

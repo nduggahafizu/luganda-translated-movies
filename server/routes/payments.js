@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const paymentController = require('../controllers/paymentController');
 const airtelMoneyController = require('../controllers/airtelMoneyController');
-const { protect } = require('../middleware/auth');
+const mtnMomoController = require('../controllers/mtnMomoController');
+const { protect, authorize } = require('../middleware/auth');
 const { validatePayment } = require('../middleware/validation');
 
 // Protected routes
@@ -19,6 +20,14 @@ router.post('/airtel/initiate', protect, airtelMoneyController.initiateAirtelPay
 router.get('/airtel/status/:transactionId', protect, airtelMoneyController.checkAirtelPaymentStatus);
 router.post('/airtel/callback', airtelMoneyController.airtelCallback);
 router.get('/airtel/config', airtelMoneyController.getAirtelConfig);
+
+// MTN Mobile Money Uganda routes
+router.get('/mtn/config', mtnMomoController.getMtnConfig);
+router.post('/mtn/initiate', protect, mtnMomoController.initiateMtnPayment);
+router.get('/mtn/status/:referenceId', protect, mtnMomoController.checkMtnPaymentStatus);
+router.post('/mtn/callback', mtnMomoController.mtnCallback);
+router.get('/mtn/history', protect, mtnMomoController.getMtnPaymentHistory);
+router.post('/mtn/setup-sandbox', protect, authorize('admin'), mtnMomoController.setupSandbox);
 
 // Webhook routes (public)
 router.post('/stripe/webhook', express.raw({ type: 'application/json' }), paymentController.stripeWebhook);

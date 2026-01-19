@@ -2098,18 +2098,15 @@
         const commentsPerPage = 10;
         let allComments = [];
 
-        // ========== PRE-ROLL AD SYSTEM ==========
+        // ========== PRE-ROLL AD SYSTEM (AdSense Only) ==========
         const prerollAdConfig = {
-            enabled: false,                   // DISABLED - Enable when Monetag verifies your site
+            enabled: false,                   // Set to true when you have AdSense video ads
             skipAfterSeconds: 5,              // Allow skip after X seconds
             maxAdDuration: 30,                // Maximum ad duration in seconds
-            fallbackToDisplay: false,         // DISABLED - No display ad fallback
+            fallbackToDisplay: false,         // Use AdSense display ad as fallback
             displayAdDuration: 5,             // Display ad duration in seconds
-            // Video ads - Add your Monetag/PropellerAds URLs here after verification
-            videoAdSources: [
-                // ADD YOUR MONETAG VIDEO AD URLs HERE AFTER VERIFICATION:
-                // 'https://your-monetag-vast-tag.com/ad.xml',
-            ]
+            // Note: AdSense video ads use Google Ad Manager, not direct URLs
+            videoAdSources: []
         };
 
         let prerollAdPlayed = false;          // Track if ad was already played this session
