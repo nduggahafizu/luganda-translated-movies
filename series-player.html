@@ -760,6 +760,21 @@
         }
     </script>
     
+    <!-- Back Button Handler - Prevent app close on Android -->
+    <script>
+        (function() {
+            // Push a state so back button doesn't close the app
+            if (window.history.length <= 2) {
+                window.history.pushState({ seriesPlayerPage: true }, '', window.location.href);
+            }
+            
+            // Handle back button - go to series page instead of closing
+            window.addEventListener('popstate', function(event) {
+                window.location.href = '/series.html';
+            });
+        })();
+    </script>
+    
     <!-- System Notification -->
     <script src="js/system-notification.js"></script>
 </body>

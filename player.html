@@ -335,6 +335,76 @@
             --plyr-menu-background: rgba(26, 26, 26, 0.95);
             --plyr-menu-color: #fff;
             --plyr-menu-border-color: #333;
+            --plyr-control-icon-size: 18px;
+            --plyr-control-spacing: 10px;
+        }
+        
+        /* Make Plyr control buttons visible */
+        .plyr__control {
+            color: #fff !important;
+            background: transparent;
+        }
+        
+        .plyr__control:hover {
+            color: var(--plyr-color-main) !important;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .plyr__control svg {
+            fill: currentColor !important;
+            color: inherit !important;
+        }
+        
+        /* Fullscreen button specifically */
+        .plyr__control[data-plyr="fullscreen"],
+        .plyr__control[data-plyr="pip"],
+        .plyr__control[data-plyr="airplay"],
+        .plyr__control[data-plyr="settings"],
+        .plyr__control[data-plyr="mute"],
+        .plyr__control[data-plyr="captions"] {
+            color: #fff !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        
+        .plyr__control[data-plyr="fullscreen"] svg,
+        .plyr__control[data-plyr="pip"] svg,
+        .plyr__control[data-plyr="airplay"] svg,
+        .plyr__control[data-plyr="settings"] svg,
+        .plyr__control[data-plyr="mute"] svg,
+        .plyr__control[data-plyr="captions"] svg {
+            fill: #fff !important;
+        }
+        
+        .plyr__control[data-plyr="fullscreen"]:hover svg,
+        .plyr__control[data-plyr="pip"]:hover svg,
+        .plyr__control[data-plyr="settings"]:hover svg {
+            fill: var(--plyr-color-main) !important;
+        }
+        
+        /* Volume slider */
+        .plyr__volume {
+            color: #fff;
+        }
+        
+        .plyr__volume input[type="range"] {
+            color: var(--plyr-color-main);
+        }
+        
+        /* Time display */
+        .plyr__time {
+            color: #fff !important;
+        }
+        
+        /* Progress bar */
+        .plyr__progress input[type="range"] {
+            color: var(--plyr-color-main);
+        }
+        
+        /* Tooltip */
+        .plyr__tooltip {
+            background: var(--plyr-color-main);
+            color: #000;
         }
         
         /* Embed Container Styles */
@@ -488,6 +558,36 @@
         .plyr__controls {
             background: linear-gradient(transparent, rgba(0,0,0,0.9));
             padding: 20px 15px 15px;
+        }
+        
+        /* Ensure all control buttons in the bar are visible */
+        .plyr__controls__item {
+            color: #fff !important;
+        }
+        
+        .plyr__controls__item svg {
+            fill: #fff !important;
+        }
+        
+        .plyr__controls__item:hover {
+            color: var(--plyr-color-main) !important;
+        }
+        
+        .plyr__controls__item:hover svg {
+            fill: var(--plyr-color-main) !important;
+        }
+        
+        /* Menu items */
+        .plyr__menu__container {
+            background: rgba(26, 26, 26, 0.98);
+        }
+        
+        .plyr__menu__container .plyr__control {
+            color: #fff !important;
+        }
+        
+        .plyr__menu__container .plyr__control:hover {
+            background: rgba(124, 252, 0, 0.2);
         }
         
         /* Content Section */
@@ -2088,6 +2188,25 @@
     <script src="js/social-share.js"></script>
     <script src="js/watchlist-manager.js"></script>
     <script src="js/notifications.js"></script>
+    
+    <!-- Back Button Handler - Prevent app close on Android -->
+    <script>
+        (function() {
+            // Push a state so back button doesn't close the app
+            if (window.history.length <= 2) {
+                window.history.pushState({ playerPage: true }, '', window.location.href);
+            }
+            
+            // Handle back button - go to home instead of closing
+            window.addEventListener('popstate', function(event) {
+                // Always go to home page from player
+                window.location.href = '/';
+            });
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        })();
+    </script>
     
     <script>
         // Initialize Plyr

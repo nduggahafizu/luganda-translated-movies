@@ -6,6 +6,61 @@
     'use strict';
 
     // ===================================
+    // Scroll Position Fix for Back Navigation
+    // ===================================
+    // Disable browser's automatic scroll restoration that causes jumping to bottom
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
+    
+    // Scroll to top on page load/navigation
+    window.scrollTo(0, 0);
+
+    // ===================================
+    // Back Button Handler - Prevent App Close
+    // ===================================
+    // When user presses back and there's no history, go to home instead of closing
+    (function setupBackButtonHandler() {
+        // Track if we've added a history entry for this page
+        const isHomePage = window.location.pathname === '/' || 
+                          window.location.pathname.endsWith('index.html') ||
+                          window.location.pathname === '/index.html';
+        
+        // If not on home page, ensure there's something to go back to
+        if (!isHomePage) {
+            // Check if there's actual history (user didn't land directly on this page)
+            const hasHistory = window.history.length > 1 && document.referrer !== '';
+            
+            if (!hasHistory) {
+                // Push home page to history so back button goes there instead of closing
+                window.history.pushState({ page: 'current' }, '', window.location.href);
+            }
+        }
+        
+        // Handle back button press
+        window.addEventListener('popstate', function(event) {
+            // Check if we should go to home page
+            const referrer = document.referrer;
+            const isFromSameSite = referrer && referrer.includes(window.location.hostname);
+            
+            // If there's no referrer or referrer is from external site, go to home
+            if (!referrer || !isFromSameSite) {
+                // Prevent closing by redirecting to home
+                if (!isHomePage) {
+                    event.preventDefault();
+                    window.location.href = '/';
+                }
+            }
+        });
+        
+        // Also handle Android back button more aggressively
+        // Push an extra state on page load for non-home pages
+        if (!isHomePage && window.history.length <= 2) {
+            window.history.pushState({ unrulyPage: true }, '', window.location.href);
+        }
+    })();
+
+    // ===================================
     // Global Image Error Handler
     // ===================================
     // Handle broken images site-wide
