@@ -413,6 +413,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update UI based on auth state
     updateAuthUI();
     
+    // Setup token refresh if logged in
+    if (token) {
+        setupTokenRefresh();
+    }
+    
     // Only redirect if user has VALID token AND user data
     const isOnLoginPage = window.location.pathname.includes('login.html') || window.location.pathname.includes('register.html');
     const hasValidAuth = token && user && user.email;
@@ -436,11 +441,236 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// ============ TOKEN REFRESH SYSTEM ============
+
+let refreshTokenTimeout = null;
+
+/**
+ * Setup automatic token refresh
+ * Refreshes token before expiry to maintain session
+ */
+function setupTokenRefresh() {
+    // Clear any existing timeout
+    if (refreshTokenTimeout) {
+        clearTimeout(refreshTokenTimeout);
+    }
+    
+    const token = getAuthToken();
+    if (!token) return;
+    
+    try {
+        // Decode token to get expiry (JWT payload is base64)
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const expiryTime = payload.exp * 1000; // Convert to milliseconds
+        const currentTime = Date.now();
+        
+        // Refresh 5 minutes before expiry
+        const refreshTime = expiryTime - currentTime - (5 * 60 * 1000);
+        
+        if (refreshTime > 0) {
+            console.log(`Token refresh scheduled in ${Math.round(refreshTime / 1000 / 60)} minutes`);
+            refreshTokenTimeout = setTimeout(refreshToken, refreshTime);
+        } else if (expiryTime > currentTime) {
+            // Token valid but expiring soon, refresh now
+            refreshToken();
+        } else {
+            // Token expired
+            console.log('Token expired, logging out');
+            handleSessionExpired();
+        }
+    } catch (error) {
+        console.error('Error setting up token refresh:', error);
+    }
+}
+
+/**
+ * Refresh the access token using refresh token
+ */
+async function refreshToken() {
+    const refreshTokenStr = localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken');
+    
+    if (!refreshTokenStr) {
+        console.log('No refresh token available');
+        return false;
+    }
+    
+    try {
+        const response = await fetch(`${API_URL}/refresh-token`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ refreshToken: refreshTokenStr })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            // Update stored tokens
+            const rememberMe = localStorage.getItem('rememberMe') === 'true';
+            
+            if (rememberMe) {
+                localStorage.setItem('token', data.data.token);
+                localStorage.setItem('refreshToken', data.data.refreshToken);
+            }
+            sessionStorage.setItem('token', data.data.token);
+            sessionStorage.setItem('refreshToken', data.data.refreshToken);
+            
+            console.log('Token refreshed successfully');
+            
+            // Setup next refresh
+            setupTokenRefresh();
+            
+            return true;
+        } else {
+            console.error('Token refresh failed:', data.message);
+            handleSessionExpired();
+            return false;
+        }
+    } catch (error) {
+        console.error('Token refresh error:', error);
+        return false;
+    }
+}
+
+/**
+ * Handle expired session
+ */
+function handleSessionExpired() {
+    clearAuthData();
+    showNotification('Your session has expired. Please login again.', 'error');
+    
+    // Store current page for redirect after login
+    if (!window.location.pathname.includes('login.html')) {
+        localStorage.setItem('redirectAfterLogin', window.location.href);
+    }
+    
+    setTimeout(() => {
+        window.location.href = 'login.html';
+    }, 1500);
+}
+
+/**
+ * Enhanced save auth data with refresh token
+ */
+function saveAuthDataWithRefresh(token, refreshToken, user, rememberMe = false) {
+    // Normalize user data
+    const normalizedUser = {
+        id: user.id || user._id,
+        fullName: user.fullName || user.name || 'User',
+        name: user.fullName || user.name || 'User',
+        email: user.email,
+        picture: user.picture || user.profileImage,
+        profileImage: user.picture || user.profileImage,
+        subscription: user.subscription,
+        verified: user.verified,
+        role: user.role || 'user'
+    };
+    
+    // Always save to localStorage for persistence
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(normalizedUser));
+    
+    if (refreshToken) {
+        localStorage.setItem('refreshToken', refreshToken);
+    }
+    
+    // Also save to sessionStorage as backup
+    sessionStorage.setItem('token', token);
+    sessionStorage.setItem('user', JSON.stringify(normalizedUser));
+    
+    if (refreshToken) {
+        sessionStorage.setItem('refreshToken', refreshToken);
+    }
+    
+    localStorage.setItem('rememberMe', rememberMe ? 'true' : 'false');
+    
+    // Setup token refresh
+    setupTokenRefresh();
+}
+
+/**
+ * Logout from all devices (security feature)
+ */
+async function logoutAll() {
+    const token = getAuthToken();
+    
+    if (!token) {
+        logout();
+        return;
+    }
+    
+    try {
+        await fetch(`${API_URL}/logout-all`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+    } catch (error) {
+        console.error('Logout all error:', error);
+    }
+    
+    // Clear local data and redirect
+    clearAuthData();
+    showNotification('Logged out from all devices', 'success');
+    
+    setTimeout(() => {
+        window.location.replace('login.html');
+    }, 500);
+}
+
+/**
+ * Make authenticated API request with auto-refresh
+ */
+async function authFetch(url, options = {}) {
+    const token = getAuthToken();
+    
+    if (!token) {
+        throw new Error('Not authenticated');
+    }
+    
+    // Add auth header
+    options.headers = {
+        ...options.headers,
+        'Authorization': `Bearer ${token}`
+    };
+    
+    let response = await fetch(url, options);
+    
+    // If token expired, try refresh and retry
+    if (response.status === 401) {
+        const data = await response.json();
+        
+        if (data.code === 'TOKEN_EXPIRED') {
+            const refreshed = await refreshToken();
+            
+            if (refreshed) {
+                // Retry with new token
+                options.headers['Authorization'] = `Bearer ${getAuthToken()}`;
+                response = await fetch(url, options);
+            } else {
+                handleSessionExpired();
+                throw new Error('Session expired');
+            }
+        } else if (data.code === 'TOKEN_REVOKED' || data.code === 'SECURITY_UPDATE') {
+            handleSessionExpired();
+            throw new Error(data.message);
+        }
+    }
+    
+    return response;
+}
+
 // Export functions for use in HTML
 window.loginWithEmail = loginWithEmail;
 window.registerWithEmail = registerWithEmail;
 window.logout = logout;
+window.logoutAll = logoutAll;
 window.clearAuthData = clearAuthData;
 window.isLoggedIn = isLoggedIn;
 window.getCurrentUser = getCurrentUser;
 window.getAuthToken = getAuthToken;
+window.authFetch = authFetch;
+window.saveAuthDataWithRefresh = saveAuthDataWithRefresh;

@@ -163,6 +163,40 @@ const userSchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true
+    },
+    // Security features
+    lastSecurityUpdate: {
+        type: Date,
+        default: null
+    },
+    refreshTokens: [{
+        token: String,
+        device: String,
+        ip: String,
+        createdAt: { type: Date, default: Date.now },
+        expiresAt: Date
+    }],
+    // Device tracking for security
+    trustedDevices: [{
+        deviceId: String,
+        deviceName: String,
+        browser: String,
+        os: String,
+        ip: String,
+        lastUsed: { type: Date, default: Date.now },
+        addedAt: { type: Date, default: Date.now }
+    }],
+    // Security settings
+    security: {
+        twoFactorEnabled: { type: Boolean, default: false },
+        twoFactorSecret: String,
+        loginAlerts: { type: Boolean, default: true },
+        deviceAlerts: { type: Boolean, default: true }
+    },
+    // Push notification subscriptions count
+    pushSubscriptionsCount: {
+        type: Number,
+        default: 0
     }
 }, {
     timestamps: true

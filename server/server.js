@@ -43,6 +43,7 @@ const r2UploadRoutes = require('./routes/r2-upload');
 const requestsRoutes = require('./routes/requests');
 const seriesRoutes = require('./routes/series');
 const emailRoutes = require('./routes/email');
+const pushRoutes = require('./routes/push');
 
 // Initialize Express app
 const app = express();
@@ -260,6 +261,7 @@ app.use('/api/r2', r2UploadRoutes); // Cloudflare R2 video uploads
 app.use('/api/requests', requestsRoutes); // User requests/contact form
 app.use('/api/series', cache(300), seriesRoutes); // TV Series with 5 min cache
 app.use('/api/email', emailRoutes); // Email subscriptions and notifications
+app.use('/api/push', pushRoutes); // Web Push notifications
 
 // Token refresh endpoint
 app.post('/api/auth/refresh', refreshTokenHandler);
