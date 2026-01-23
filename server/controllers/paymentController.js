@@ -297,7 +297,7 @@ exports.initiatePesapalPayment = async (req, res) => {
                 currency: 'UGX',
                 amount: paymentAmount,
                 description: description || `Unruly Movies ${subscriptionPlan || 'basic'} subscription (${subscriptionDuration || 'monthly'})`,
-                callback_url: `https://watch.unrulymovies.com/payment-success.html?ref=${merchantReference}`,
+                callback_url: `https://unrulymovies.com/payment-success.html?ref=${merchantReference}`,
                 notification_id: ipnId,
                 billing_address: {
                     email_address: userEmail,
@@ -391,7 +391,7 @@ exports.pesapalCallback = async (req, res) => {
 
         if (!payment) {
             logger.warn('Payment not found for callback', { OrderTrackingId, OrderMerchantReference });
-            return res.redirect('https://watch.unrulymovies.com/payment-failed.html');
+            return res.redirect('https://unrulymovies.com/payment-failed.html');
         }
 
         try {
@@ -410,22 +410,22 @@ exports.pesapalCallback = async (req, res) => {
 
             if (statusCode === 1) { // Completed
                 await processSuccessfulPesapalPayment(payment, statusResponse.data);
-                res.redirect(`https://watch.unrulymovies.com/payment-success.html?ref=${OrderMerchantReference}`);
+                res.redirect(`https://unrulymovies.com/payment-success.html?ref=${OrderMerchantReference}`);
             } else if (statusCode === 2) { // Failed
                 payment.status = 'failed';
                 payment.paymentDetails.failureReason = statusResponse.data?.message || 'Payment failed';
                 await payment.save();
-                res.redirect('https://watch.unrulymovies.com/payment-failed.html');
+                res.redirect('https://unrulymovies.com/payment-failed.html');
             } else { // Pending
-                res.redirect(`https://watch.unrulymovies.com/payment-pending.html?ref=${OrderMerchantReference}`);
+                res.redirect(`https://unrulymovies.com/payment-pending.html?ref=${OrderMerchantReference}`);
             }
         } catch (statusError) {
             logger.error('Status check error', { error: statusError.message });
-            res.redirect(`https://watch.unrulymovies.com/payment-pending.html?ref=${OrderMerchantReference}`);
+            res.redirect(`https://unrulymovies.com/payment-pending.html?ref=${OrderMerchantReference}`);
         }
     } catch (error) {
         logger.error('PesaPal callback error', { error: error.message });
-        res.redirect('https://watch.unrulymovies.com/payment-failed.html');
+        res.redirect('https://unrulymovies.com/payment-failed.html');
     }
 };
 

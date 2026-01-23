@@ -1,5 +1,5 @@
 Param(
-    [string]$NetlifySite = 'https://watch.unrulymovies.com',
+    [string]$NetlifySite = 'https://unrulymovies.com',
     [string]$RailwayApi = 'https://luganda-translated-movies-production.up.railway.app'
 )
 

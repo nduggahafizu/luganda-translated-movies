@@ -63,7 +63,7 @@ const templates = {
                             <li>💬 Join the community with reviews and comments</li>
                         </ul>
                         <p style="text-align: center; margin-top: 30px;">
-                            <a href="${process.env.FRONTEND_URL || 'https://watch.unrulymovies.com'}" class="button">Start Watching</a>
+                            <a href="${process.env.FRONTEND_URL || 'https://unrulymovies.com'}" class="button">Start Watching</a>
                         </p>
                     </div>
                     <div class="footer">
@@ -201,7 +201,7 @@ const templates = {
                             `}
                         </ul>
                         <p style="text-align: center; margin-top: 30px;">
-                            <a href="${process.env.FRONTEND_URL || 'https://watch.unrulymovies.com'}" class="button">Start Watching</a>
+                            <a href="${process.env.FRONTEND_URL || 'https://unrulymovies.com'}" class="button">Start Watching</a>
                         </p>
                     </div>
                     <div class="footer">

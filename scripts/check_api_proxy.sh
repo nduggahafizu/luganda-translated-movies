@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-NETLIFY_SITE=${1:-https://watch.unrulymovies.com}
+NETLIFY_SITE=${1:-https://unrulymovies.com}
 RAILWAY_API=${2:-https://luganda-translated-movies-production.up.railway.app}
 
 echo "Checking Netlify-hosted site: $NETLIFY_SITE/api/health"

@@ -3,6 +3,17 @@
    Hero slider for featured movies
    =================================== */
 
+function formatVjBadge(vjName) {
+    const name = (vjName || '').toString().trim();
+    if (!name) return '';
+    if (/^unknown\b/i.test(name)) return '';
+
+    const cleaned = name.replace(/^vj[\s:\-\.]*?/i, '').trim();
+    if (!cleaned) return '';
+
+    return `VJ ${cleaned}`;
+}
+
 const FeaturedCarousel = {
     container: null,
     slides: [],
@@ -54,7 +65,7 @@ const FeaturedCarousel = {
                         <p class="carousel-description">${this.slides[0]?.description || ''}</p>
                         <div class="carousel-vj">
                             <img src="${this.slides[0]?.vjAvatar || 'assets/images/default-avatar.svg'}" alt="VJ" class="vj-avatar">
-                            <span>Translated by <strong>VJ ${this.slides[0]?.vjName || ''}</strong></span>
+                            <span>Translated by <strong>${formatVjBadge(this.slides[0]?.vjName) || ''}</strong></span>
                         </div>
                         <div class="carousel-actions">
                             <a href="player.html?id=${this.slides[0]?.id}" class="btn-play">
@@ -129,7 +140,7 @@ const FeaturedCarousel = {
         `;
         content.querySelector('.carousel-description').textContent = movie.description || '';
         content.querySelector('.vj-avatar').src = movie.vjAvatar || 'assets/images/default-avatar.svg';
-        content.querySelector('.carousel-vj strong').textContent = `VJ ${movie.vjName || ''}`;
+        content.querySelector('.carousel-vj strong').textContent = formatVjBadge(movie.vjName) || '';
         content.querySelector('.btn-play').href = `player.html?id=${movie.id}`;
         content.querySelector('.btn-add-list').dataset.movieId = movie.id;
         content.querySelector('.btn-info').dataset.movieId = movie.id;

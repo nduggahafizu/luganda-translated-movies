@@ -9,6 +9,7 @@
     const isProd = hostname.includes('netlify.app') || 
                    hostname.includes('translatedmovies') ||
                    hostname === 'unrulymovies.com' || 
+                   hostname === 'www.unrulymovies.com' ||
                    hostname === 'watch.unrulymovies.com';
     if (isProd) {
         const noop = function() {};
@@ -27,6 +28,7 @@ const API_CONFIG = (function() {
     const protocol = window.location.protocol;
     const isProduction = hostname === 'watch.unrulymovies.com' ||
                         hostname === 'unrulymovies.com' ||
+                        hostname === 'www.unrulymovies.com' ||
                         hostname.includes('netlify.app'); // Include Netlify previews as production
     const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
 

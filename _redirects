@@ -1,16 +1,17 @@
 # Canonical host handling
-# - Keep the primary brand domain on https://watch.unrulymovies.com
-# - Redirect the Netlify hostname to the canonical domain
+# - Keep the primary brand domain on https://unrulymovies.com
+# - Redirect the Netlify hostname + watch subdomain + www to the canonical domain
 
-https://translatedmovies.netlify.app/* https://watch.unrulymovies.com/:splat 301!
-http://translatedmovies.netlify.app/* https://watch.unrulymovies.com/:splat 301!
+https://translatedmovies.netlify.app/* https://unrulymovies.com/:splat 301!
+http://translatedmovies.netlify.app/* https://unrulymovies.com/:splat 301!
 
-# Optional: redirect apex + www to the watch subdomain
-https://unrulymovies.com/* https://watch.unrulymovies.com/:splat 301!
-http://unrulymovies.com/* https://watch.unrulymovies.com/:splat 301!
+https://watch.unrulymovies.com/* https://unrulymovies.com/:splat 301!
+http://watch.unrulymovies.com/* https://unrulymovies.com/:splat 301!
 
-https://www.unrulymovies.com/* https://watch.unrulymovies.com/:splat 301!
-http://www.unrulymovies.com/* https://watch.unrulymovies.com/:splat 301!
+https://www.unrulymovies.com/* https://unrulymovies.com/:splat 301!
+http://www.unrulymovies.com/* https://unrulymovies.com/:splat 301!
+
+http://unrulymovies.com/* https://unrulymovies.com/:splat 301!
 
 # API proxy
 /api/* https://luganda-translated-movies-production.up.railway.app/:splat 200

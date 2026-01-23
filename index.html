@@ -12,7 +12,7 @@
     <meta http-equiv="cleartype" content="on">
     <meta name="author" content="Nduga Hafizu">
     <meta name="keywords" content="Luganda movies, VJ translations, Uganda entertainment, Nduga Hafizu, licensed VJ, Luganda translation platform">
-    <link rel="canonical" href="https://watch.unrulymovies.com/">
+    <link rel="canonical" href="https://unrulymovies.com/">
     <meta name="google-adsense-account" content="ca-pub-1904736753681797">
     <meta name="google-site-verification" content="ZETgIS2RUYfcmNN7z0_OCZ7CjNP4LbfPI-F1MD7uiyY">
     <meta name="google-site-verification" content="LhqhmhY1yPoQxVg8znDH4aKifHlXtc8S8m-UMHtBrXY">
@@ -35,11 +35,11 @@
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://watch.unrulymovies.com/">
+    <meta property="og:url" content="https://unrulymovies.com/">
     <meta property="og:title" content="Unruly Movies - Luganda VJ Translations Platform">
     <meta property="og:description" content="Uganda's legitimate platform for Luganda VJ translations. Watch movies translated by licensed Video Jockeys.">
     <meta property="og:site_name" content="Unruly Movies">
-    <meta property="og:image" content="https://watch.unrulymovies.com/assets/images/og-image.png">
+    <meta property="og:image" content="https://unrulymovies.com/assets/images/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     
@@ -47,7 +47,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Unruly Movies - Luganda VJ Translations">
     <meta name="twitter:description" content="Uganda's legitimate platform for Luganda VJ translations by licensed Video Jockeys.">
-    <meta name="twitter:image" content="https://watch.unrulymovies.com/assets/images/og-image.png">
+    <meta name="twitter:image" content="https://unrulymovies.com/assets/images/og-image.png">
     
     <!-- Schema.org structured data for Organization -->
     <script type="application/ld+json">
@@ -56,7 +56,7 @@
         "@type": "WebSite",
         "name": "Unruly Movies",
         "alternateName": ["Luganda Movies", "UnrulyMovies"],
-        "url": "https://watch.unrulymovies.com",
+        "url": "https://unrulymovies.com",
         "description": "Uganda's premier legitimate platform for Luganda-translated movies featuring licensed Video Jockeys (VJs)",
         "inLanguage": ["en", "lg"],
         "publisher": {
@@ -76,7 +76,7 @@
         },
         "potentialAction": {
             "@type": "SearchAction",
-            "target": "https://watch.unrulymovies.com/search.html?q={search_term_string}",
+            "target": "https://unrulymovies.com/search.html?q={search_term_string}",
             "query-input": "required name=search_term_string"
         }
     }
@@ -89,7 +89,7 @@
         "@type": "EntertainmentBusiness",
         "name": "Unruly Movies",
         "description": "Legitimate Ugandan entertainment platform showcasing Luganda translations by licensed Video Jockeys",
-        "url": "https://watch.unrulymovies.com",
+        "url": "https://unrulymovies.com",
         "founder": "Nduga Hafizu",
         "areaServed": "Uganda",
         "serviceType": "Video Streaming - Luganda VJ Translations",
@@ -1408,7 +1408,7 @@
                 const rating = movie.rating?.translationRating || movie.rating?.userRating || 4.0;
                 const fallbackPoster = getPlaceholderPoster(movie.originalTitle, movie.year);
                 const posterUrl = movie.poster || fallbackPoster;
-                const vjName = movie.vjName || 'Unknown';
+                const vjBadge = formatVjBadge(movie.vjName);
                 const posterId = `${containerId}-poster-${index}`;
                 const movieTitle = movie.originalTitle || movie.lugandaTitle || 'Unknown Title';
                 const year = movie.year || '';
@@ -1444,7 +1444,7 @@
                             <div class="card-meta">
                                 ${year ? `<span>${year}</span>` : ''}
                                 ${genres.length > 0 ? `<span>${genres[0]}</span>` : ''}
-                                <span>VJ ${vjName}</span>
+                                ${vjBadge ? `<span>${vjBadge}</span>` : ''}
                             </div>
                         </div>
                     </a>
@@ -1465,10 +1465,23 @@
             }, 100);
         }
         
+        function getStoredAuthToken() {
+            return (
+                localStorage.getItem('token') ||
+                localStorage.getItem('authToken') ||
+                sessionStorage.getItem('token') ||
+                sessionStorage.getItem('authToken')
+            );
+        }
+
+        function getStoredUserJson() {
+            return localStorage.getItem('user') || sessionStorage.getItem('user');
+        }
+
         // Check user login state and update UI
         function checkUserLoginState() {
-            const token = localStorage.getItem('token');
-            const user = localStorage.getItem('user');
+            const token = getStoredAuthToken();
+            const user = getStoredUserJson();
             const loginBtn = document.getElementById('loginBtn');
             const sidebarLoginItem = document.getElementById('sidebarLoginItem');
             const userMenu = document.getElementById('userMenu');
@@ -1510,11 +1523,15 @@
                     e.preventDefault();
                     // Clear all auth data
                     localStorage.removeItem('token');
+                    localStorage.removeItem('authToken');
                     localStorage.removeItem('user');
                     localStorage.removeItem('rememberMe');
                     localStorage.removeItem('tokenExpiry');
+                    localStorage.removeItem('refreshToken');
                     sessionStorage.removeItem('token');
+                    sessionStorage.removeItem('authToken');
                     sessionStorage.removeItem('user');
+                    sessionStorage.removeItem('refreshToken');
                     // Redirect to login page
                     window.location.href = 'login.html';
                 });
@@ -1525,6 +1542,16 @@
         }
         
         // Load notifications from API
+        function sanitizeHTML(value) {
+            const str = value === null || value === undefined ? '' : String(value);
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         async function loadNotifications(token) {
             const badge = document.getElementById('notificationBadge');
             const list = document.getElementById('notificationList');
@@ -1572,10 +1599,29 @@
                                 </div>
                             </a>
                         `}).join('');
+                    } else if (list) {
+                        list.innerHTML = `
+                            <div class="notification-empty">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                                </svg>
+                                <p>No notifications yet</p>
+                            </div>
+                        `;
+                    }
+                } else {
+                    // If unauthorized or API error, keep dropdown usable (don't crash)
+                    if (list) {
+                        list.innerHTML = `
+                            <div class="notification-empty">
+                                <p>Unable to load notifications</p>
+                            </div>
+                        `;
                     }
                 }
             } catch (err) {
-                console.log('Notifications API not available');
+                console.warn('Failed to load notifications:', err);
             }
         }
         
@@ -1618,7 +1664,7 @@
             
             if (markAllBtn) {
                 markAllBtn.addEventListener('click', async () => {
-                    const token = localStorage.getItem('token');
+                    const token = getStoredAuthToken();
                     if (!token) return;
                     
                     try {
@@ -1688,7 +1734,10 @@
                 
                 // Update slide content
                 const vjElement = slide.querySelector('.imdb');
-                if (vjElement) vjElement.textContent = `VJ: ${vjName}`;
+                if (vjElement) {
+                    const vjBadge = formatVjBadge(vjName);
+                    vjElement.textContent = vjBadge ? vjBadge.replace(/^VJ\s+/, 'VJ: ') : '';
+                }
                 
                 const yearElement = slide.querySelector('.slide-header > div:nth-child(2)');
                 if (yearElement) yearElement.textContent = year;
@@ -1722,6 +1771,18 @@
             };
             img.src = posterUrl;
         }
+
+        function formatVjBadge(vjName) {
+            const name = (vjName || '').toString().trim();
+            if (!name) return '';
+            if (/^unknown\b/i.test(name)) return '';
+
+            // Remove a duplicated or pre-existing VJ prefix (e.g., "VJ Ice P" -> "Ice P")
+            const cleaned = name.replace(/^vj[\s:\-\.]*?/i, '').trim();
+            if (!cleaned) return '';
+
+            return `VJ ${cleaned}`;
+        }
         
         function renderMovies(movies, containerId) {
             const container = document.getElementById(containerId);
@@ -1738,7 +1799,7 @@
                 const rating = movie.rating?.translationRating || movie.rating?.userRating || 4.0;
                 const fallbackPoster = getPlaceholderPoster(movie.originalTitle, movie.year);
                 const posterUrl = movie.poster || fallbackPoster;
-                const vjName = movie.vjName || 'Unknown';
+                const vjBadge = formatVjBadge(movie.vjName);
                 const posterId = `${containerId}-poster-${index}`;
                 const tmdbId = movie.tmdbId || movie.metaData?.tmdbId || movie.externalIds?.tmdbId || null;
                 const movieTitle = movie.originalTitle || movie.lugandaTitle || 'Unknown Title';
@@ -1773,7 +1834,7 @@
                             <div class="card-meta">
                                 ${year ? `<span>${year}</span>` : ''}
                                 ${genres.length > 0 ? `<span>${genres[0]}</span>` : ''}
-                                <span>VJ ${vjName}</span>
+                                ${vjBadge ? `<span>${vjBadge}</span>` : ''}
                             </div>
                         </div>
                     </a>
@@ -1838,7 +1899,7 @@
                 const rating = series.rating?.imdb || series.rating?.userRating || 0;
                 const fallbackPoster = getPlaceholderPoster(series.originalTitle, series.year);
                 const posterUrl = series.poster || fallbackPoster;
-                const vjName = series.vjName || 'Unknown';
+                const vjBadge = formatVjBadge(series.vjName);
                 const posterId = `${containerId}-poster-${index}`;
                 const seriesTitle = series.originalTitle || series.lugandaTitle || 'Unknown Series';
                 const year = series.year || '';
@@ -1884,7 +1945,7 @@
                             </div>
                             <div class="card-meta" style="margin-top: 4px;">
                                 ${genres.length > 0 ? `<span>${genres.slice(0, 2).join(', ')}</span>` : ''}
-                                ${vjName !== 'Unknown' && vjName !== 'Unknown VJ' ? `<span>VJ ${vjName}</span>` : ''}
+                                ${vjBadge ? `<span>${vjBadge}</span>` : ''}
                             </div>
                         </div>
                     </a>

@@ -23,6 +23,7 @@ const setCorsHeaders = (req, res) => {
     const allowedOrigins = [
         'https://watch.unrulymovies.com',
         'https://unrulymovies.com',
+        'https://www.unrulymovies.com',
         'https://translatedmovies.netlify.app',
         'http://localhost:3000',
         'http://localhost:5000',

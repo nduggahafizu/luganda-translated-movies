@@ -91,6 +91,30 @@
             margin: -20px -20px 0 -20px;
             overflow: hidden;
         }
+
+        .embed-fullscreen-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 50;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            border: 1px solid rgba(124, 252, 0, 0.65);
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            -webkit-backdrop-filter: blur(6px);
+            backdrop-filter: blur(6px);
+        }
+
+        .embed-fullscreen-btn:hover {
+            background: rgba(124, 252, 0, 0.18);
+            color: var(--primary-color);
+        }
         
         .series-backdrop {
             position: absolute;
@@ -563,6 +587,14 @@
         let currentEpisode = (Number.isFinite(requestedEpisode) && requestedEpisode > 0)
             ? { season: currentSeason, episode: requestedEpisode }
             : null;
+
+        function requestVideoContainerFullscreen(event) {
+            if (event) event.preventDefault();
+            const container = document.querySelector('.video-container');
+            if (!container) return;
+            const req = container.requestFullscreen || container.webkitRequestFullscreen || container.msRequestFullscreen;
+            if (req) req.call(container);
+        }
         
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
@@ -661,7 +693,17 @@
                     <section class="player-section">
                         <div class="video-container">
                             ${currentEp?.video?.embedUrl 
-                                ? `<iframe src="${currentEp.video.embedUrl}" allowfullscreen allow="autoplay; encrypted-media" loading="lazy"></iframe>`
+                                ? `
+                                    <button class="embed-fullscreen-btn" type="button" aria-label="Fullscreen" onclick="requestVideoContainerFullscreen(event)">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+                                            <path d="M16 3h3a2 2 0 0 1 2 2v3" />
+                                            <path d="M8 21H5a2 2 0 0 1-2-2v-3" />
+                                            <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+                                        </svg>
+                                    </button>
+                                    <iframe src="${currentEp.video.embedUrl}" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" loading="lazy" allowfullscreen></iframe>
+                                `
                                 : `<div class="no-video-message">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <polygon points="5 3 19 12 5 21 5 3"></polygon>

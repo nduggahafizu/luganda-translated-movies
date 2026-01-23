@@ -1,5 +1,5 @@
 # Robots.txt for Unruly Movies
-# https://watch.unrulymovies.com
+# https://unrulymovies.com
 # Developed by Nduga Hafizu - A legitimate Ugandan Luganda Translation Platform
 
 User-agent: *
@@ -35,7 +35,7 @@ Allow: /js/
 Allow: /assets/
 
 # Sitemap location
-Sitemap: https://watch.unrulymovies.com/sitemap.xml
+Sitemap: https://unrulymovies.com/sitemap.xml
 
 # Crawl delay for politeness
 Crawl-delay: 1

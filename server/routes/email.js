@@ -267,7 +267,7 @@ router.post('/notify/new-movie', protect, admin, async (req, res) => {
             });
         }
         
-        const siteUrl = process.env.SITE_URL || 'https://watch.unrulymovies.com';
+        const siteUrl = process.env.SITE_URL || 'https://unrulymovies.com';
         const apiUrl = process.env.API_URL || 'https://luganda-translated-movies-production.up.railway.app';
         const transporter = createTransporter();
         
@@ -336,7 +336,7 @@ router.post('/notify/weekly-digest', protect, admin, async (req, res) => {
             });
         }
         
-        const siteUrl = process.env.SITE_URL || 'https://watch.unrulymovies.com';
+        const siteUrl = process.env.SITE_URL || 'https://unrulymovies.com';
         const apiUrl = process.env.API_URL || 'https://luganda-translated-movies-production.up.railway.app';
         const transporter = createTransporter();
         
@@ -509,7 +509,7 @@ router.get('/subscribers', protect, admin, async (req, res) => {
 
 // Helper: Send verification email
 async function sendVerificationEmail(subscription) {
-    const siteUrl = process.env.SITE_URL || 'https://watch.unrulymovies.com';
+    const siteUrl = process.env.SITE_URL || 'https://unrulymovies.com';
     const apiUrl = process.env.API_URL || 'https://luganda-translated-movies-production.up.railway.app';
     const transporter = createTransporter();
     

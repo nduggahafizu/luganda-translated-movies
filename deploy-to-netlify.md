@@ -1,7 +1,7 @@
-# 🚀 Quick Deploy to watch.unrulymovies.com
+# 🚀 Quick Deploy to unrulymovies.com
 
 ## Prerequisites
-- ✅ Netlify account with `watch.unrulymovies.com` configured
+- ✅ Netlify account with `unrulymovies.com` configured
 - ✅ Backend deployed (Render/Railway/Heroku)
 - ✅ All files ready in this folder
 
@@ -22,7 +22,7 @@ All necessary files are ready:
 
 ### Step 3: Configure Domain
 1. Go to Site settings → Domain management
-2. Add custom domain: `watch.unrulymovies.com`
+2. Add custom domain: `unrulymovies.com`
 3. Add DNS record at your domain registrar:
    ```
    Type: CNAME
@@ -79,7 +79,7 @@ git push -u origin main
 6. Click "Deploy site"
 
 ### Step 3: Configure Domain
-Add `watch.unrulymovies.com` in Domain settings
+Add `unrulymovies.com` in Domain settings
 
 ## After Deployment Checklist
 
@@ -96,7 +96,7 @@ const API_URL = 'https://your-backend-url.onrender.com/api';
 ```
 
 ### 2. Test Your Site
-- [ ] Visit https://watch.unrulymovies.com
+- [ ] Visit https://unrulymovies.com
 - [ ] Test all pages load
 - [ ] Test movie search
 - [ ] Test navigation
@@ -104,9 +104,9 @@ const API_URL = 'https://your-backend-url.onrender.com/api';
 
 ### 3. Submit to Google
 1. Go to https://search.google.com/search-console
-2. Add property: `watch.unrulymovies.com`
+2. Add property: `unrulymovies.com`
 3. Verify ownership
-4. Submit sitemap: `https://watch.unrulymovies.com/sitemap.xml`
+4. Submit sitemap: `https://unrulymovies.com/sitemap.xml`
 
 ### 4. Monitor Performance
 - Check Netlify Analytics
@@ -132,7 +132,7 @@ const API_URL = 'https://your-backend-url.onrender.com/api';
 
 ## Your Deployment URLs
 
-- **Frontend:** https://watch.unrulymovies.com
+- **Frontend:** https://unrulymovies.com
 - **Backend:** (Deploy to Render/Railway first)
 - **Netlify Dashboard:** https://app.netlify.com/
 

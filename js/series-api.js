@@ -362,10 +362,14 @@ const SAMPLE_SERIES = [
 async function getSeriesWithFallback(params = {}) {
     try {
         const response = await seriesAPI.getAllSeries(params);
-        if (response.success && response.data.length > 0) {
+
+        // Treat an empty list as a valid outcome (UI will show an empty state).
+        if (response && response.success === true && Array.isArray(response.data)) {
             return response;
         }
-        throw new Error('No data from API');
+
+        // Anything else is an unexpected/invalid response shape.
+        throw new Error('Invalid response from API');
     } catch (error) {
         // Avoid showing fake content in production.
         // Allow sample fallback only for localhost/dev or when explicitly enabled via ?demo=1.

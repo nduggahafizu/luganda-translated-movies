@@ -23,6 +23,12 @@
     padding: 0 16px;
 }
 
+@media (max-width: 480px) {
+    .container {
+        padding: 0 8px;
+    }
+}
+
 /* ===== RESPONSIVE MOVIE GRID ===== */
 .row-cols-2,
 .row-cols-md-5,
