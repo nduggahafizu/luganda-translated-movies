@@ -562,8 +562,10 @@ input:focus {
     }
     
     .navbar-brand img {
-        height: 45px;
+        max-height: 45px;
+        height: auto;
         width: auto;
+        display: block;
     }
     
     .header-search {

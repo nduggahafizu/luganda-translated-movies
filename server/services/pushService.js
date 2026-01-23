@@ -35,15 +35,15 @@ async function sendToSubscription(subscription, payload) {
         const pushPayload = JSON.stringify({
             title: payload.title || 'Unruly Movies',
             body: payload.body || '',
-            icon: payload.icon || '/assets/images/icons/icon-192x192.png',
-            badge: payload.badge || '/assets/images/icons/badge-72x72.png',
+            icon: payload.icon || '/assets/images/logo.png',
+            badge: payload.badge || '/assets/images/icons/icon-72x72.png',
             image: payload.image || null,
             tag: payload.tag || 'general',
             url: payload.url || '/',
             data: payload.data || {},
             actions: payload.actions || [
-                { action: 'open', title: 'View' },
-                { action: 'dismiss', title: 'Dismiss' }
+                { action: 'open', title: 'Watch Now' },
+                { action: 'dismiss', title: 'Later' }
             ],
             vibrate: payload.vibrate || [100, 50, 100],
             requireInteraction: payload.requireInteraction || false,

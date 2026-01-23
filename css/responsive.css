@@ -187,7 +187,10 @@
     }
     
     .navbar-brand img {
-        height: 35px;
+        max-height: 35px;
+        height: auto;
+        width: auto;
+        display: block;
     }
     
     /* Search button styling */

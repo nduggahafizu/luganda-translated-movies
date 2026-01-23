@@ -162,16 +162,16 @@ self.addEventListener('push', event => {
     
     const options = {
         body: data.body || 'New update from Unruly Movies',
-        icon: '/assets/images/icons/icon-192x192.png',
-        badge: '/assets/images/icons/badge-72x72.png',
+        icon: data.icon || '/assets/images/logo.png',
+        badge: data.badge || '/assets/images/icons/icon-72x72.png',
         vibrate: [100, 50, 100],
         data: {
             url: data.url || '/',
             dateOfArrival: Date.now()
         },
         actions: [
-            { action: 'open', title: 'View' },
-            { action: 'dismiss', title: 'Dismiss' }
+            { action: 'open', title: 'Watch Now' },
+            { action: 'dismiss', title: 'Later' }
         ],
         tag: data.tag || 'general',
         renotify: true
@@ -193,20 +193,22 @@ self.addEventListener('notificationclick', event => {
     }
     
     const urlToOpen = event.notification.data?.url || '/';
+    const absoluteUrlToOpen = new URL(urlToOpen, self.location.origin).href;
     
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true })
             .then(windowClients => {
                 // Check if there's already a window open
                 for (const client of windowClients) {
-                    if (client.url === urlToOpen && 'focus' in client) {
+                    if ((client.url === absoluteUrlToOpen || client.url.startsWith(self.location.origin)) && 'focus' in client) {
+                        client.navigate(absoluteUrlToOpen);
                         return client.focus();
                     }
                 }
                 
                 // Open new window
                 if (clients.openWindow) {
-                    return clients.openWindow(urlToOpen);
+                    return clients.openWindow(absoluteUrlToOpen);
                 }
             })
     );

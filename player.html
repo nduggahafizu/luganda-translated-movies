@@ -722,6 +722,103 @@
             padding: 0;
             margin-bottom: 15px;
         }
+
+        /* Playback Preferences */
+        .playback-preferences {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 12px 14px;
+            margin: 0 0 15px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .playback-preferences .prefs-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .playback-preferences .prefs-title svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.9;
+        }
+
+        .pref-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .pref-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .pref-text .pref-label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #fff;
+        }
+
+        .pref-text .pref-hint {
+            font-size: 12px;
+            color: rgba(255,255,255,0.65);
+        }
+
+        .toggle {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            width: 44px;
+            height: 26px;
+            flex: 0 0 auto;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle .track {
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.20);
+            border-radius: 999px;
+            transition: all 0.2s ease;
+        }
+
+        .toggle .thumb {
+            position: absolute;
+            top: 50%;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            transform: translateY(-50%);
+            border-radius: 50%;
+            background: rgba(255,255,255,0.92);
+            transition: all 0.2s ease;
+        }
+
+        .toggle input:checked + .track {
+            background: rgba(124, 252, 0, 0.35);
+            border-color: rgba(124, 252, 0, 0.55);
+        }
+
+        .toggle input:checked + .track .thumb {
+            left: 21px;
+            background: #d9ffb8;
+        }
         
         /* Action Buttons */
         .action-buttons {
@@ -1720,7 +1817,7 @@
         </a>
         
         <a href="index.html">
-            <img src="assets/images/logo.png" alt="Unruly Movies" class="header-logo">
+            <img src="assets/images/logo-wordmark.png" alt="Unruly Movies" class="header-logo">
         </a>
         
         <div class="header-actions">
@@ -1738,137 +1835,7 @@
 
     <!-- Video Player -->
     <div class="player-wrapper" id="playerWrapper">
-        <!-- LOGIN GATE - Blocks video for non-members -->
-        <script>
-            (function() {
-                const token = localStorage.getItem('token');
-                const user = localStorage.getItem('user');
-                if (!token || !user) {
-                    // Replace entire page for non-members
-                    document.documentElement.innerHTML = `
-                        <!DOCTYPE html>
-                        <html lang="en">
-                        <head>
-                            <meta charset="UTF-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <title>Members Only - Unruly Movies</title>
-                            <link rel="icon" type="image/png" href="/assets/images/favicon.png">
-                            <style>
-                                * { margin: 0; padding: 0; box-sizing: border-box; }
-                                body {
-                                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                                    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f1a 100%);
-                                    min-height: 100vh;
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    color: #fff;
-                                }
-                                .members-only-container {
-                                    text-align: center;
-                                    padding: 40px;
-                                    max-width: 500px;
-                                }
-                                .alert-icon {
-                                    width: 80px;
-                                    height: 80px;
-                                    background: rgba(255, 193, 7, 0.15);
-                                    border-radius: 50%;
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    margin: 0 auto 24px;
-                                }
-                                .alert-icon svg {
-                                    width: 40px;
-                                    height: 40px;
-                                    color: #ffc107;
-                                }
-                                h1 {
-                                    font-size: 28px;
-                                    font-weight: 700;
-                                    margin-bottom: 16px;
-                                    color: #fff;
-                                }
-                                p {
-                                    font-size: 16px;
-                                    color: rgba(255,255,255,0.7);
-                                    margin-bottom: 32px;
-                                    line-height: 1.6;
-                                }
-                                .btn-group {
-                                    display: flex;
-                                    gap: 16px;
-                                    justify-content: center;
-                                    flex-wrap: wrap;
-                                }
-                                .btn {
-                                    padding: 14px 32px;
-                                    border-radius: 8px;
-                                    font-size: 16px;
-                                    font-weight: 600;
-                                    text-decoration: none;
-                                    transition: all 0.3s ease;
-                                    display: inline-block;
-                                }
-                                .btn-primary {
-                                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                                    color: #fff;
-                                    border: none;
-                                }
-                                .btn-primary:hover {
-                                    transform: translateY(-2px);
-                                    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-                                }
-                                .btn-outline {
-                                    background: transparent;
-                                    color: #fff;
-                                    border: 2px solid rgba(255,255,255,0.3);
-                                }
-                                .btn-outline:hover {
-                                    border-color: #fff;
-                                    background: rgba(255,255,255,0.1);
-                                }
-                                .home-link {
-                                    margin-top: 24px;
-                                }
-                                .home-link a {
-                                    color: rgba(255,255,255,0.6);
-                                    text-decoration: none;
-                                    font-size: 14px;
-                                }
-                                .home-link a:hover {
-                                    color: #fff;
-                                }
-                            </style>
-                        </head>
-                        <body>
-                            <div class="members-only-container">
-                                <div class="alert-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <line x1="12" y1="8" x2="12" y2="12"></line>
-                                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                                    </svg>
-                                </div>
-                                <h1>Members Only</h1>
-                                <p>This content is exclusively for registered members. Create a free account to start watching!</p>
-                                <div class="btn-group">
-                                    <a href="/login.html" class="btn btn-primary" onclick="localStorage.setItem('redirectAfterLogin', window.location.href)">Login</a>
-                                    <a href="/register.html" class="btn btn-outline" onclick="localStorage.setItem('redirectAfterLogin', window.location.href)">Register</a>
-                                </div>
-                                <div class="home-link">
-                                    <a href="/index.html">← Back to Home</a>
-                                </div>
-                            </div>
-                        </body>
-                        </html>
-                    `;
-                    // Stop all scripts from running
-                    throw new Error('Auth required');
-                }
-            })();
-        </script>
+        <!-- Smart login/subscription gate is handled by js/login-gate.js (do not hard-block the page here). -->
         
         <!-- PRE-ROLL VIDEO AD CONTAINER -->
         <div class="preroll-ad-container" id="prerollAdContainer">
@@ -1922,7 +1889,7 @@
             <div class="embed-right-cover"></div>
             <!-- Unruly Movies branding -->
             <div class="embed-brand-bar">
-                <img src="assets/images/logo.png" alt="Unruly Movies">
+                <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
                 <span>UNRULY MOVIES</span>
             </div>
             <iframe 
@@ -2003,6 +1970,38 @@
                 Loading description...
             </p>
             <button class="show-more-btn" id="showMoreBtn">Show more</button>
+
+            <div class="playback-preferences" id="playbackPreferences">
+                <div class="prefs-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    Player settings
+                </div>
+
+                <div class="pref-row">
+                    <div class="pref-text">
+                        <div class="pref-label">Resume playback</div>
+                        <div class="pref-hint">Prompt to continue where you stopped</div>
+                    </div>
+                    <label class="toggle" aria-label="Toggle resume playback">
+                        <input type="checkbox" id="prefResume" checked>
+                        <span class="track"><span class="thumb"></span></span>
+                    </label>
+                </div>
+
+                <div class="pref-row">
+                    <div class="pref-text">
+                        <div class="pref-label">Auto-next</div>
+                        <div class="pref-hint">Play the next recommended movie automatically</div>
+                    </div>
+                    <label class="toggle" aria-label="Toggle auto-next">
+                        <input type="checkbox" id="prefAutoNext">
+                        <span class="track"><span class="thumb"></span></span>
+                    </label>
+                </div>
+            </div>
             
             <div class="action-buttons">
                 <button class="action-btn btn-trailer" id="trailerBtn">
@@ -2153,7 +2152,7 @@
         </section>
 
         <!-- Related Content -->
-        <section class="related-section">
+        <section class="related-section" id="relatedSection">
             <h2 class="section-title">You May Also Like</h2>
             
             <!-- Ad Banner in Related Section -->
@@ -2216,6 +2215,8 @@
         const loadingOverlay = document.getElementById('loadingOverlay');
         let player = null;
         let isEmbedMode = false;
+        let currentArchiveFallbackEmbedUrl = null;
+        let currentMovieRequiredPlan = 'free';
 
         // Get URL parameters
         const urlParams = new URLSearchParams(window.location.search);
@@ -2224,6 +2225,117 @@
         const embedUrl = urlParams.get('embed');
         const isSeries = urlParams.has('series');
         const isStation = urlParams.has('station');
+        // Station playback uses the movie player but should not show movie-specific UI (VJ, recommendations, comments, etc.)
+        const isNonMoviePlayback = isStation;
+
+        // Expose key playback mode flags for shared scripts (e.g., js/login-gate.js)
+        window.isNonMoviePlayback = isNonMoviePlayback;
+        window.isEmbedMode = isEmbedMode;
+        window.currentMovieRequiredPlan = currentMovieRequiredPlan;
+
+        function setEmbedMode(next) {
+            isEmbedMode = !!next;
+            window.isEmbedMode = isEmbedMode;
+        }
+
+        function setCurrentMovieRequiredPlan(plan, idForEvent) {
+            currentMovieRequiredPlan = (plan ? String(plan) : 'free');
+            window.currentMovieRequiredPlan = currentMovieRequiredPlan;
+
+            // Notify shared UX layers (e.g., smart login/subscription gate)
+            try {
+                window.dispatchEvent(new CustomEvent('unruly:requiredPlan', {
+                    detail: {
+                        requiredPlan: currentMovieRequiredPlan,
+                        movieId: String(idForEvent || movieId || '')
+                    }
+                }));
+            } catch (e) {}
+        }
+
+        function initPlaybackPreferencesUi() {
+            const resumeToggle = document.getElementById('prefResume');
+            const autoNextToggle = document.getElementById('prefAutoNext');
+            const prefsBox = document.getElementById('playbackPreferences');
+
+            if (!resumeToggle || !autoNextToggle || !prefsBox) return;
+
+            // Hide preferences in non-movie playback modes
+            if (isNonMoviePlayback) {
+                prefsBox.style.display = 'none';
+                return;
+            }
+
+            // Resume: default ON unless explicitly disabled
+            const resumeEnabled = localStorage.getItem('unruly_resume_enabled') !== 'false';
+            resumeToggle.checked = resumeEnabled;
+
+            // Auto-next: default OFF
+            const autoNextEnabled = localStorage.getItem('unruly_autonext') === 'true';
+            autoNextToggle.checked = autoNextEnabled;
+
+            resumeToggle.addEventListener('change', () => {
+                localStorage.setItem('unruly_resume_enabled', resumeToggle.checked ? 'true' : 'false');
+            });
+
+            autoNextToggle.addEventListener('change', () => {
+                localStorage.setItem('unruly_autonext', autoNextToggle.checked ? 'true' : 'false');
+            });
+        }
+
+        // If this is a legacy TV-series link, redirect to the dedicated series player.
+        // Example legacy URL: player.html?series=<id>&season=1&episode=1
+        if (isSeries) {
+            const legacySeriesId = urlParams.get('series');
+            const season = urlParams.get('season');
+            const episode = urlParams.get('episode');
+
+            if (legacySeriesId) {
+                const redirectParams = new URLSearchParams();
+                redirectParams.set('id', legacySeriesId);
+                if (season) redirectParams.set('season', season);
+                if (episode) redirectParams.set('episode', episode);
+                window.location.replace(`series-player.html?${redirectParams.toString()}`);
+            }
+        }
+
+        function applyNonMoviePlaybackUi() {
+            const vjInfo = document.getElementById('vjInfo');
+            if (vjInfo) vjInfo.style.display = 'none';
+
+            const relatedSection = document.getElementById('relatedSection');
+            if (relatedSection) relatedSection.style.display = 'none';
+
+            const commentsSection = document.getElementById('commentsSection');
+            if (commentsSection) commentsSection.style.display = 'none';
+
+            const qualitySelector = document.getElementById('qualitySelector');
+            if (qualitySelector) qualitySelector.style.display = 'none';
+
+            const watchlistBtn = document.getElementById('watchlistBtn');
+            if (watchlistBtn) watchlistBtn.style.display = 'none';
+
+            const likeBtn = document.getElementById('likeBtn');
+            if (likeBtn) likeBtn.style.display = 'none';
+
+            const downloadBtn = document.getElementById('downloadBtn');
+            if (downloadBtn) downloadBtn.style.display = 'none';
+
+            const showMoreBtn = document.getElementById('showMoreBtn');
+            if (showMoreBtn) showMoreBtn.style.display = 'none';
+
+            const movieMeta = document.getElementById('movieMeta');
+            if (movieMeta) movieMeta.style.display = 'none';
+
+            const playbackPreferences = document.getElementById('playbackPreferences');
+            if (playbackPreferences) playbackPreferences.style.display = 'none';
+        }
+
+        if (isNonMoviePlayback) {
+            applyNonMoviePlaybackUi();
+        }
+
+        initPlaybackPreferencesUi();
 
         // Comments system variables (declared early to avoid temporal dead zone)
         let commentsPage = 1;
@@ -2497,6 +2609,74 @@
             }
         }
         // ========== END PRE-ROLL AD SYSTEM ==========
+
+        function getStoredAuthToken() {
+            return localStorage.getItem('token') || sessionStorage.getItem('token');
+        }
+
+        async function getPlaybackToken(apiUrl, movieId) {
+            const token = getStoredAuthToken();
+            if (!token) return null;
+
+            const response = await fetch(`${apiUrl}/api/video/playback-token`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ movieId })
+            });
+
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                const message = data?.message || 'Subscription required to play this content.';
+                throw new Error(message);
+            }
+
+            return data?.token || null;
+        }
+
+        async function getSecureArchiveStreamUrl(apiUrl, movie) {
+            const id = movie?._id || movie?.id || movieId;
+            const requiredPlan = movie?.requiredPlan || 'free';
+            setCurrentMovieRequiredPlan(requiredPlan, id);
+
+            // Free content streams without token
+            if (requiredPlan === 'free') {
+                return `${apiUrl}/api/video/stream/luganda/${id}`;
+            }
+
+            // Paid content needs a short-lived playback token (video tags can't attach Authorization headers)
+            let playbackToken = null;
+            try {
+                playbackToken = await getPlaybackToken(apiUrl, id);
+            } catch (e) {
+                try {
+                    window.dispatchEvent(new CustomEvent('unruly:playbackDenied', {
+                        detail: {
+                            requiredPlan,
+                            message: e?.message || 'Subscription required to play this content.'
+                        }
+                    }));
+                } catch (err) {}
+                throw e;
+            }
+
+            if (!playbackToken) {
+                const err = new Error('Please login to play this content.');
+                try {
+                    window.dispatchEvent(new CustomEvent('unruly:playbackDenied', {
+                        detail: {
+                            requiredPlan,
+                            message: err.message
+                        }
+                    }));
+                } catch (e) {}
+                throw err;
+            }
+
+            return `${apiUrl}/api/video/stream/luganda/${id}?token=${encodeURIComponent(playbackToken)}`;
+        }
 
         // Check if URL is a direct video file (can be played natively)
         function isDirectVideoUrl(url) {
@@ -2821,12 +3001,16 @@
                     if ((data.status === 'success' || data.success === true) && data.data) {
                         const movie = data.data;
                         console.log('🎥 Movie data:', movie);
+
+                        setCurrentMovieRequiredPlan(movie.requiredPlan || 'free', movie._id || movie.id || movieId);
                         
                         // Get embed URL from either location
                         let videoUrl = movie.embedUrl || movie.video?.embedUrl || movie.video?.url;
                         const streamtapeId = movie.video?.streamtapeId;
                         // Get direct CDN URL if available (works without CORS issues)
                         const directCdnUrl = movie.video?.originalVideoPath;
+                        const secureStreamPath = movie.video?.secureStreamPath;
+                        const declaredProvider = movie.video?.provider;
                         
                         // Clean up URL if it exists
                         if (videoUrl) {
@@ -2834,7 +3018,13 @@
                         }
                         
                         // 🚀 SPEED: Start prefetching video immediately while UI updates
-                        if (directCdnUrl && directCdnUrl.match(/ia\d+\.us\.archive\.org/)) {
+                        // Note: secure streaming URLs may require a short-lived token for paid plans, so prefetching is best-effort.
+                        if (secureStreamPath) {
+                            // Only prefetch free content (paid needs token)
+                            if ((movie.requiredPlan || 'free') === 'free') {
+                                prefetchVideoUrl(`${apiUrl}${secureStreamPath}`);
+                            }
+                        } else if (directCdnUrl && directCdnUrl.match(/ia\d+\.us\.archive\.org/)) {
                             prefetchVideoUrl(directCdnUrl);
                         } else if (videoUrl) {
                             if (isArchiveOrgUrl(videoUrl)) {
@@ -2849,25 +3039,51 @@
                         
                         console.log('🎬 Video URL:', videoUrl);
                         console.log('🎬 Direct CDN URL:', directCdnUrl);
+
+                        // Build a safe Archive.org embed fallback URL if we have an archive-ish source
+                        // If the API hides Archive URLs, try to construct fallback from archiveItemId.
+                        const firstArchiveCandidate = directCdnUrl || videoUrl;
+                        if (firstArchiveCandidate && isArchiveOrgUrl(firstArchiveCandidate)) {
+                            currentArchiveFallbackEmbedUrl = getArchiveOrgEmbedUrl(firstArchiveCandidate);
+                        } else if (movie.video?.archiveItemId) {
+                            currentArchiveFallbackEmbedUrl = getArchiveOrgEmbedUrl(`https://archive.org/embed/${movie.video.archiveItemId}`);
+                        } else {
+                            currentArchiveFallbackEmbedUrl = null;
+                        }
                         
                         // Check if video URL is valid
                         if (!isValidVideoUrl(videoUrl) && !streamtapeId && !directCdnUrl) {
                             console.log('⚠️ No valid video URL available for this movie');
                             showVideoUnavailable(movie.originalTitle);
-                            loadRelatedMovies(movie.genres?.[0] || 'action');
+                            if (!isNonMoviePlayback) {
+                                loadRelatedMovies({
+                                    genre: movie.genres?.[0],
+                                    vjName: movie.vjName,
+                                    currentMovieId: movie._id,
+                                    limit: 8
+                                });
+                            }
                             return;
                         }
                         
+                        // PRIORITY 0: Secure stream path (backend proxy) if provided
+                        if (secureStreamPath || declaredProvider === 'archive') {
+                            console.log('✅ Archive.org source detected - using secure stream proxy');
+                            const secureUrl = await getSecureArchiveStreamUrl(apiUrl, movie);
+                            initPrerollAd(secureUrl, 'direct');
+                        }
                         // PRIORITY 1: Use direct CDN URL if available (ia800101.us.archive.org/...)
                         // These work without CORS issues because there's no redirect
-                        if (directCdnUrl && directCdnUrl.match(/ia\d+\.us\.archive\.org/)) {
-                            console.log('✅ Direct Archive.org CDN URL found - using native player');
-                            initPrerollAd(directCdnUrl, 'direct');
+                        else if (directCdnUrl && directCdnUrl.match(/ia\d+\.us\.archive\.org/)) {
+                            console.log('✅ Archive.org source detected - using secure stream proxy');
+                            const secureUrl = await getSecureArchiveStreamUrl(apiUrl, movie);
+                            initPrerollAd(secureUrl, 'direct');
                         }
                         // PRIORITY 2: Check if videoUrl/embedUrl is already a direct CDN URL
                         else if (videoUrl && videoUrl.match(/ia\d+\.us\.archive\.org/) && videoUrl.endsWith('.mp4')) {
-                            console.log('✅ Video URL is direct CDN URL - using native player');
-                            initPrerollAd(videoUrl, 'direct');
+                            console.log('✅ Archive.org source detected - using secure stream proxy');
+                            const secureUrl = await getSecureArchiveStreamUrl(apiUrl, movie);
+                            initPrerollAd(secureUrl, 'direct');
                         }
                         // PRIORITY 3: Check if it's an Archive.org URL (embed/details/download) - Use EMBED
                         else if (videoUrl && isArchiveOrgUrl(videoUrl)) {
@@ -2877,8 +3093,25 @@
                             const archiveEmbedUrl = getArchiveOrgEmbedUrl(videoUrl);
                             console.log('🎬 Using Archive.org embed URL:', archiveEmbedUrl);
                             
-                            // Load directly into iframe (skip pre-roll for now with embed)
-                            loadArchiveOrgEmbed(archiveEmbedUrl);
+                            // For paid content, block embed playback unless tokenized streaming is available
+                            if ((movie.requiredPlan || 'free') !== 'free') {
+                                try {
+                                    const secureUrl = await getSecureArchiveStreamUrl(apiUrl, movie);
+                                    initPrerollAd(secureUrl, 'direct');
+                                } catch (e) {
+                                    try {
+                                        window.dispatchEvent(new CustomEvent('unruly:playbackDenied', {
+                                            detail: {
+                                                requiredPlan: movie.requiredPlan || 'free',
+                                                message: e?.message || 'Please login/upgrade to watch this content.'
+                                            }
+                                        }));
+                                    } catch (err) {}
+                                }
+                            } else {
+                                // Load directly into iframe (free content)
+                                loadArchiveOrgEmbed(archiveEmbedUrl);
+                            }
                         }
                         // Check if it's a direct playable URL (MP4, WebM only)
                         else if (videoUrl && isDirectVideoUrl(videoUrl)) {
@@ -2896,7 +3129,14 @@
                             initPrerollAd(movie.video?.originalVideoPath || movie.streamUrl, 'direct');
                         }
                         
-                        loadRelatedMovies(movie.genres?.[0] || 'action');
+                        if (!isNonMoviePlayback) {
+                            loadRelatedMovies({
+                                genre: movie.genres?.[0],
+                                vjName: movie.vjName,
+                                currentMovieId: movie._id,
+                                limit: 8
+                            });
+                        }
                     } else {
                         console.error('❌ API returned error or no data:', data);
                         document.getElementById('movieDescription').textContent = 'Unable to load movie description. Please try refreshing the page.';
@@ -2905,6 +3145,9 @@
                     // Direct embed URL from query param - use pre-roll
                     initPrerollAd(embedUrl, 'embed');
                     document.getElementById('movieTitle').textContent = urlParams.get('title') || 'Now Playing';
+                    if (!isStation) {
+                        loadRelatedMovies('action');
+                    }
                 } else if (streamUrl) {
                     // For live TV/streams, skip pre-roll ad
                     loadVideoSource(streamUrl);
@@ -2913,6 +3156,9 @@
                     // Hide trailer button for direct streams/TV
                     const trailerBtn = document.getElementById('trailerBtn');
                     if (trailerBtn) trailerBtn.style.display = 'none';
+                    if (!isStation) {
+                        loadRelatedMovies('action');
+                    }
                 } else {
                     // No movie ID or stream URL - show unavailable message
                     showVideoUnavailable('Unknown');
@@ -2922,6 +3168,17 @@
                 showVideoUnavailable('this movie');
             }
         }
+
+        // If direct/native playback fails and we have an Archive fallback embed, switch to embed mode.
+        video.addEventListener('error', () => {
+            if (!currentArchiveFallbackEmbedUrl) return;
+
+            // Only attempt fallback when we are in native mode (not already embed)
+            if (!isEmbedMode) {
+                console.log('⚠️ Native playback failed - falling back to Archive.org embed');
+                loadArchiveOrgEmbed(currentArchiveFallbackEmbedUrl);
+            }
+        });
 
         // Load embed video (Streamtape, etc.) - Try ad-free extraction first
         async function loadEmbedVideo(url) {
@@ -2942,7 +3199,7 @@
                     console.log('✅ Direct URL extracted! Playing ad-free.');
                     
                     // Use our own player with the direct URL
-                    isEmbedMode = false;
+                    setEmbedMode(false);
                     embedContainer.style.display = 'none';
                     video.style.display = 'block';
                     
@@ -2964,7 +3221,7 @@
             
             // Fallback: Use iframe embed (has ads) - SPEED OPTIMIZED
             console.log('📺 Using iframe embed (fallback)');
-            isEmbedMode = true;
+            setEmbedMode(true);
             
             // Hide native player, show embed container
             video.style.display = 'none';
@@ -3006,7 +3263,7 @@
         // Load Archive.org embed (works for MKV and all formats, NO ADS!) - SPEED OPTIMIZED
         function loadArchiveOrgEmbed(url) {
             console.log('📦 Loading Archive.org embed:', url);
-            isEmbedMode = true;
+            setEmbedMode(true);
             
             // Extract the original Archive.org URL for fallback
             let originalArchiveUrl = url;
@@ -3212,7 +3469,7 @@
         // Fallback to iframe embed
         function loadEmbedFallback(originalUrl) {
             console.log('📺 Falling back to iframe embed');
-            isEmbedMode = true;
+            setEmbedMode(true);
             video.style.display = 'none';
             embedContainer.style.display = 'block';
             embedPlayer.src = originalUrl;
@@ -3268,18 +3525,20 @@
             }
             
             // Update VJ info
-            if (movie.vjName) {
-                document.getElementById('vjName').textContent = `VJ ${movie.vjName}`;
-            }
-            if (movie.vjAvatar) {
-                document.getElementById('vjAvatar').src = movie.vjAvatar;
+            if (!isNonMoviePlayback) {
+                if (movie.vjName) {
+                    document.getElementById('vjName').textContent = `VJ ${movie.vjName}`;
+                }
+                if (movie.vjAvatar) {
+                    document.getElementById('vjAvatar').src = movie.vjAvatar;
+                }
             }
             
             // Setup trailer button if movie has TMDB ID (hide for TV stations)
             const trailerBtn = document.getElementById('trailerBtn');
             
             // Hide trailer button for TV stations
-            if (isStation || isSeries) {
+            if (isNonMoviePlayback || isSeries) {
                 if (trailerBtn) {
                     trailerBtn.style.display = 'none';
                 }
@@ -3349,7 +3608,7 @@
                 return;
             }
             
-            isEmbedMode = false;
+            setEmbedMode(false);
             
             // Show native player, hide embed
             video.style.display = 'block';
@@ -3558,19 +3817,98 @@
         }
 
         // Load related movies
-        async function loadRelatedMovies(genre) {
+        async function loadRelatedMovies(input) {
             const grid = document.getElementById('relatedGrid');
+
+            if (isNonMoviePlayback) {
+                const relatedSection = document.getElementById('relatedSection');
+                if (relatedSection) relatedSection.style.display = 'none';
+                if (grid) grid.innerHTML = '';
+                return;
+            }
+
+            const relatedSection = document.getElementById('relatedSection');
+            if (relatedSection) relatedSection.style.display = '';
+
+            const options = typeof input === 'string'
+                ? { genre: input, limit: 8 }
+                : (input || {});
+
+            const limit = Number(options.limit) > 0 ? Number(options.limit) : 8;
+            const genre = options.genre ? String(options.genre) : null;
+            const vjName = options.vjName ? String(options.vjName) : null;
+            const currentMovieId = options.currentMovieId ? String(options.currentMovieId) : null;
+
+            const uniqById = (movies) => {
+                const seen = new Set();
+                return (movies || []).filter(m => {
+                    const id = m && (m._id || m.id);
+                    if (!id) return false;
+                    if (seen.has(id)) return false;
+                    seen.add(id);
+                    return true;
+                });
+            };
+
+            const shuffle = (arr) => {
+                const a = [...(arr || [])];
+                for (let i = a.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+                return a;
+            };
             
             try {
                 const apiUrl = typeof API_CONFIG !== 'undefined' 
                     ? API_CONFIG.BASE_URL 
                     : 'https://luganda-translated-movies-production.up.railway.app';
-                
-                const response = await fetch(`${apiUrl}/api/luganda-movies/latest?limit=8`);
-                const data = await response.json();
-                
-                if (data.status === 'success' && data.data) {
-                    grid.innerHTML = data.data.map(movie => `
+
+                const results = [];
+
+                // Prefer same VJ first
+                if (vjName) {
+                    try {
+                        const vjRes = await fetch(`${apiUrl}/api/luganda-movies/vj/${encodeURIComponent(vjName)}?limit=${Math.max(limit * 2, 12)}`);
+                        const vjData = await vjRes.json();
+                        if (vjData?.success && Array.isArray(vjData.data)) {
+                            results.push(...vjData.data);
+                        }
+                    } catch (e) {
+                        console.warn('Related by VJ failed:', e);
+                    }
+                }
+
+                // Then same genre
+                if (genre) {
+                    try {
+                        const gRes = await fetch(`${apiUrl}/api/luganda-movies/genre/${encodeURIComponent(genre)}?limit=${Math.max(limit * 2, 12)}`);
+                        const gData = await gRes.json();
+                        if (gData?.success && Array.isArray(gData.data)) {
+                            results.push(...gData.data);
+                        }
+                    } catch (e) {
+                        console.warn('Related by genre failed:', e);
+                    }
+                }
+
+                // Fallback: latest
+                if (results.length < limit) {
+                    const latestRes = await fetch(`${apiUrl}/api/luganda-movies/latest?limit=${Math.max(limit * 2, 12)}`);
+                    const latestData = await latestRes.json();
+                    if ((latestData?.status === 'success' || latestData?.success === true) && Array.isArray(latestData.data)) {
+                        results.push(...latestData.data);
+                    }
+                }
+
+                let finalMovies = uniqById(results);
+                if (currentMovieId) {
+                    finalMovies = finalMovies.filter(m => String(m._id || m.id) !== currentMovieId);
+                }
+                finalMovies = shuffle(finalMovies).slice(0, limit);
+
+                if (finalMovies.length > 0) {
+                    grid.innerHTML = finalMovies.map(movie => `
                         <a href="player.html?id=${movie._id}" class="movie-card">
                             <div class="movie-card-poster">
                                 <img src="${movie.poster || 'assets/images/placeholder-poster.jpg'}" alt="${movie.originalTitle}" loading="lazy">
@@ -3589,6 +3927,8 @@
                             </div>
                         </a>
                     `).join('');
+                } else {
+                    grid.innerHTML = '<p style="color: #888; text-align: center; grid-column: 1/-1;">No recommendations available</p>';
                 }
             } catch (error) {
                 console.error('Error loading related movies:', error);
@@ -4179,30 +4519,227 @@
             }, 3000);
         }
         
-        // Save watch progress to localStorage for Continue Watching feature
+        // ===================================
+        // Smart Player: Resume + Progress Sync
+        // ===================================
+
+        function formatClock(seconds) {
+            const s = Math.max(0, Math.floor(Number(seconds) || 0));
+            const h = Math.floor(s / 3600);
+            const m = Math.floor((s % 3600) / 60);
+            const sec = s % 60;
+            if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+            return `${m}:${String(sec).padStart(2, '0')}`;
+        }
+
+        function getMovieMetaForProgress() {
+            return {
+                id: movieId,
+                title: document.getElementById('movieTitle')?.textContent || 'Unknown',
+                poster: document.getElementById('moviePoster')?.src || '',
+                vj: document.getElementById('vjName')?.textContent || undefined
+            };
+        }
+
         function saveWatchProgress(currentTime, duration) {
-            if (!movieId || !duration) return;
-            
-            const percentage = (currentTime / duration) * 100;
+            if (!movieId || !duration || isNonMoviePlayback || isEmbedMode) return;
+
+            const safeTime = Math.max(0, Math.min(Number(currentTime) || 0, Number(duration) || 0));
+            const safeDuration = Math.max(0, Number(duration) || 0);
+
+            // Legacy/local key (kept for backwards compatibility)
+            const percentage = safeDuration > 0 ? (safeTime / safeDuration) * 100 : 0;
             const watchProgress = JSON.parse(localStorage.getItem('watchProgress') || '{}');
-            
             watchProgress[movieId] = {
-                currentTime: currentTime,
-                duration: duration,
-                percentage: percentage,
+                currentTime: safeTime,
+                duration: safeDuration,
+                percentage,
                 lastWatched: new Date().toISOString(),
                 title: document.getElementById('movieTitle')?.textContent || 'Unknown',
                 poster: document.getElementById('moviePoster')?.src || ''
             };
-            
             localStorage.setItem('watchProgress', JSON.stringify(watchProgress));
+
+            // Preferred: WatchlistManager history + server sync
+            if (typeof WatchlistManager !== 'undefined' && WatchlistManager?.addToHistory) {
+                WatchlistManager.addToHistory(getMovieMetaForProgress(), safeTime, safeDuration);
+            }
         }
-        
-        // Track video progress for Continue Watching
+
+        function getResumeCandidate() {
+            if (!movieId) return null;
+
+            const candidates = [];
+
+            // Prefer WatchlistManager history
+            if (typeof WatchlistManager !== 'undefined' && WatchlistManager?.getHistory) {
+                const history = WatchlistManager.getHistory();
+                const item = (history || []).find(h => String(h.id) === String(movieId));
+                if (item && typeof item.progress === 'number' && typeof item.duration === 'number') {
+                    candidates.push({
+                        source: 'history',
+                        time: item.progress,
+                        duration: item.duration,
+                        last: item.watchedAt ? Date.parse(item.watchedAt) : 0
+                    });
+                }
+            }
+
+            // Fallback to legacy watchProgress
+            try {
+                const wp = JSON.parse(localStorage.getItem('watchProgress') || '{}');
+                const item = wp && wp[movieId];
+                if (item && typeof item.currentTime === 'number' && typeof item.duration === 'number') {
+                    candidates.push({
+                        source: 'legacy',
+                        time: item.currentTime,
+                        duration: item.duration,
+                        last: item.lastWatched ? Date.parse(item.lastWatched) : 0
+                    });
+                }
+            } catch {
+                // ignore
+            }
+
+            if (candidates.length === 0) return null;
+            candidates.sort((a, b) => (b.last || 0) - (a.last || 0));
+            return candidates[0];
+        }
+
+        function showResumePrompt(resumeTime) {
+            const wrapper = document.querySelector('.video-wrapper');
+            if (!wrapper) return;
+
+            // Prevent duplicates
+            if (document.getElementById('resumePrompt')) return;
+
+            const el = document.createElement('div');
+            el.id = 'resumePrompt';
+            el.style.cssText = `
+                position:absolute;
+                left:16px;
+                right:16px;
+                bottom:16px;
+                background: rgba(0,0,0,0.75);
+                border: 1px solid rgba(255,255,255,0.12);
+                border-radius: 14px;
+                padding: 14px 14px;
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+                gap:12px;
+                z-index: 50;
+                backdrop-filter: blur(8px);
+            `;
+
+            el.innerHTML = `
+                <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
+                    <div style="font-weight:700;color:#fff;">Resume watching?</div>
+                    <div style="color:rgba(255,255,255,0.75);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Continue from ${formatClock(resumeTime)}</div>
+                </div>
+                <div style="display:flex;gap:10px;flex-shrink:0;">
+                    <button type="button" id="resumeBtn" class="btn btn-primary" style="padding:10px 14px;">Resume</button>
+                    <button type="button" id="restartBtn" class="btn btn-secondary" style="padding:10px 14px;">Start over</button>
+                </div>
+            `;
+
+            wrapper.style.position = wrapper.style.position || 'relative';
+            wrapper.appendChild(el);
+
+            const cleanup = () => {
+                const node = document.getElementById('resumePrompt');
+                if (node) node.remove();
+            };
+
+            const resumeBtn = document.getElementById('resumeBtn');
+            const restartBtn = document.getElementById('restartBtn');
+
+            if (resumeBtn) {
+                resumeBtn.addEventListener('click', async () => {
+                    try {
+                        video.currentTime = resumeTime;
+                        await video.play().catch(() => {});
+                    } finally {
+                        cleanup();
+                    }
+                });
+            }
+
+            if (restartBtn) {
+                restartBtn.addEventListener('click', () => {
+                    try {
+                        video.currentTime = 0;
+                    } finally {
+                        cleanup();
+                    }
+                });
+            }
+
+            // Auto-dismiss after 12 seconds
+            setTimeout(cleanup, 12000);
+        }
+
+        let lastProgressSaveAt = 0;
+        let resumeChecked = false;
+
         if (video) {
+            // Offer resume once per page load, after metadata available
+            video.addEventListener('loadedmetadata', () => {
+                if (resumeChecked) return;
+                resumeChecked = true;
+                if (isNonMoviePlayback || isEmbedMode) return;
+
+                // Allow explicit disabling
+                if (urlParams.get('resume') === '0') return;
+
+                // Allow user preference to disable resume prompt
+                if (localStorage.getItem('unruly_resume_enabled') === 'false') return;
+
+                const candidate = getResumeCandidate();
+                if (!candidate || !candidate.duration) return;
+
+                const duration = Number(video.duration) || Number(candidate.duration) || 0;
+                const time = Math.max(0, Math.min(Number(candidate.time) || 0, duration));
+                const percent = duration > 0 ? (time / duration) * 100 : 0;
+
+                // Only prompt for meaningful progress
+                if (time < 30) return;
+                if (duration > 0 && (duration - time) < 30) return;
+                if (percent < 5 || percent > 90) return;
+
+                showResumePrompt(time);
+            }, { once: true });
+
+            // Track video progress (throttled)
             video.addEventListener('timeupdate', () => {
+                if (!video.duration || !video.currentTime) return;
+                const now = Date.now();
+                if (now - lastProgressSaveAt < 10_000) return;
+                lastProgressSaveAt = now;
+                saveWatchProgress(video.currentTime, video.duration);
+            });
+
+            // Save on pause/seek
+            video.addEventListener('pause', () => {
                 if (video.duration && video.currentTime) {
                     saveWatchProgress(video.currentTime, video.duration);
+                }
+            });
+
+            // Mark completion + suggest next
+            video.addEventListener('ended', () => {
+                if (video.duration) {
+                    saveWatchProgress(video.duration, video.duration);
+                }
+
+                // Simple autoplay-next (if enabled)
+                const autoNext = localStorage.getItem('unruly_autonext') === 'true';
+                if (!autoNext) return;
+
+                const firstRelated = document.querySelector('#relatedGrid a.movie-card');
+                const href = firstRelated?.getAttribute('href');
+                if (href) {
+                    window.location.href = href;
                 }
             });
         }

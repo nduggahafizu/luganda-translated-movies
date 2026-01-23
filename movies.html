@@ -52,10 +52,6 @@
     <link rel="shortcut icon" type="image/png" href="/assets/images/favicon.png">
     <link rel="apple-touch-icon" href="/assets/images/logo.png">
     
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797"
-            crossorigin="anonymous"></script>
-    
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/card-grid.css">
@@ -81,7 +77,7 @@
                     </div>
                     <div class="app-navbar">
                         <a href="index.html" class="navbar-brand">
-                            <img src="assets/images/logo.png" alt="Luganda Movies" width="180" height="50">
+                            <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
                         </a>
                     </div>
                     <div class="search-btn d-md-none d-block" id="mobileSearchBtn">
@@ -289,13 +285,19 @@
                                             <option value="title">Title A-Z</option>
                                         </select>
                                     </div>
+
+                                    <div class="filter-group filter-group-style">
+                                        <label class="filter-label">Style</label>
+                                        <button type="button" id="styleToggle" class="filter-button" aria-pressed="true" aria-label="Toggle movies grid style">
+                                            Poster Grid (Munowatch-like)
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Ad Banner - Below Filters -->
-                            <div class="ad-container" style="margin: 20px 0; text-align: center;">
+                            <div class="ad-container">
                                 <ins class="adsbygoogle"
-                                     style="display:block"
                                      data-ad-client="ca-pub-1904736753681797"
                                      data-ad-slot="auto"
                                      data-ad-format="horizontal"
@@ -337,7 +339,7 @@
                     <div class="footer-grid">
                         <div class="footer-brand">
                             <a href="index.html" class="footer-logo">
-                                <img src="assets/images/logo.png" alt="Unruly Movies" height="40">
+                                <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
                             </a>
                             <p class="footer-tagline">Uganda's premier platform for Luganda VJ translated movies.</p>
                             <div class="footer-social">
@@ -404,6 +406,30 @@
         let movies = [];
         let currentPage = 1;
         let totalPages = 1;
+
+        // Style toggle (poster-first grid like Munowatch)
+        function applyGridStyleFromStorage() {
+            const grid = document.getElementById('moviesGrid');
+            const btn = document.getElementById('styleToggle');
+            if (!grid || !btn) return;
+
+            const mode = localStorage.getItem('moviesGridStyle') || 'muno';
+            if (mode === 'muno') {
+                grid.classList.add('muno-style');
+                btn.textContent = 'Poster Grid (Munowatch-like)';
+                btn.setAttribute('aria-pressed', 'true');
+            } else {
+                grid.classList.remove('muno-style');
+                btn.textContent = 'Detailed Grid (Current)';
+                btn.setAttribute('aria-pressed', 'false');
+            }
+        }
+
+        function toggleGridStyle() {
+            const current = localStorage.getItem('moviesGridStyle') || 'muno';
+            localStorage.setItem('moviesGridStyle', current === 'muno' ? 'detailed' : 'muno');
+            applyGridStyleFromStorage();
+        }
 
         // Load movies from API
         async function loadMovies(params = {}) {
@@ -522,9 +548,19 @@
             img.src = posterUrl;
         }
 
+        function formatVjBadge(vjName) {
+            const name = (vjName || '').toString().trim();
+            if (!name || name.toLowerCase() === 'unknown') return '';
+            if (/^vj\b/i.test(name)) return name.replace(/^vj\b/i, 'Vj').trim();
+            return `Vj ${name}`;
+        }
+
         function renderMovies(moviesToRender) {
             const grid = document.getElementById('moviesGrid');
             grid.innerHTML = '';
+
+            // Ensure style class is applied before adding cards
+            applyGridStyleFromStorage();
             
             if (moviesToRender.length === 0) {
                 grid.innerHTML = `
@@ -550,22 +586,20 @@
                 const quality = movie.video?.quality || 'HD';
                 const rating = movie.rating?.translationRating || movie.rating?.userRating || 4.0;
                 const fallbackPoster = getPlaceholderPoster(movie.originalTitle, movie.year);
-                const posterUrl = movie.poster || fallbackPoster;
                 const vjName = movie.vjName || 'Unknown';
+                const vjBadge = formatVjBadge(vjName);
                 const posterId = `poster-${index}`;
                 const title = movie.originalTitle || movie.lugandaTitle || 'Unknown Title';
                 
-                // Store poster data for later loading
-                if (movie.poster) {
-                    posterData.push({ posterId, posterUrl: movie.poster, fallbackPoster });
-                }
+                // Store poster data for later loading (always set fallback; swap to real poster when available)
+                posterData.push({ posterId, posterUrl: movie.poster || null, fallbackPoster });
                 
                 const movieCard = `
                     <a href="player.html?id=${movie._id}" class="content-card">
-                        <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
+                        <div class="card-poster" id="${posterId}" data-fallback-poster="${fallbackPoster}">
                             <div class="card-badges">
                                 <span class="card-badge badge-quality">${quality.toUpperCase()}</span>
-                                ${vjName !== 'Unknown' ? `<span class="card-badge badge-vj">VJ ${vjName}</span>` : ''}
+                                ${vjBadge ? `<span class="card-badge badge-vj">${vjBadge}</span>` : ''}
                             </div>
                             <div class="card-rating">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
@@ -601,11 +635,16 @@
                 posterData.forEach(({ posterId, posterUrl, fallbackPoster }) => {
                     const posterElement = document.getElementById(posterId);
                     if (posterElement) {
-                        loadPosterImage(posterUrl, posterElement, fallbackPoster);
+                        posterElement.style.backgroundImage = `url('${fallbackPoster}')`;
+                        if (posterUrl) {
+                            loadPosterImage(posterUrl, posterElement, fallbackPoster);
+                        }
                     }
                 });
             }, 100);
         }
+
+        document.getElementById('styleToggle')?.addEventListener('click', toggleGridStyle);
 
 // Initial load from API
         loadMovies();
@@ -616,6 +655,15 @@
                 currentPage = 1; // Reset to first page on filter change
                 applyFilters();
             });
+        });
+
+        // Style toggle wiring
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('styleToggle');
+            applyGridStyleFromStorage();
+            if (btn) {
+                btn.addEventListener('click', toggleGridStyle);
+            }
         });
     </script>
     

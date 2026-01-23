@@ -6,7 +6,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = 3000;
+const BASE_PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 const ROOT_DIR = __dirname;
 
 // MIME types
@@ -60,24 +60,33 @@ const server = http.createServer((req, res) => {
     });
 });
 
-server.listen(PORT, () => {
+function printStartupInfo(port) {
     console.log('='.repeat(60));
     console.log('🚀 Uganda TV Server Started!');
     console.log('='.repeat(60));
-    console.log(`Server running at http://localhost:${PORT}/`);
+    console.log(`Server running at http://localhost:${port}/`);
     console.log(`\nAvailable pages:`);
-    console.log(`  📺 Uganda TV: http://localhost:${PORT}/uganda-tv.html`);
-    console.log(`  🎬 Home: http://localhost:${PORT}/index.html`);
-    console.log(`  ▶️  Player: http://localhost:${PORT}/player.html`);
+    console.log(`  🎬 Movies: http://localhost:${port}/movies.html`);
+    console.log(`  📺 Uganda TV: http://localhost:${port}/uganda-tv.html`);
+    console.log(`  🎬 Home: http://localhost:${port}/index.html`);
+    console.log(`  ▶️  Player: http://localhost:${port}/player.html`);
     console.log('\nPress Ctrl+C to stop the server');
     console.log('='.repeat(60));
-});
+}
+
+function startListening(port) {
+    server.listen(port, () => printStartupInfo(port));
+}
+
+startListening(BASE_PORT);
 
 // Handle errors
 server.on('error', (error) => {
     if (error.code === 'EADDRINUSE') {
-        console.error(`❌ Port ${PORT} is already in use`);
-        process.exit(1);
+        const fallbackPort = BASE_PORT + 1;
+        console.error(`❌ Port ${BASE_PORT} is already in use`);
+        console.log(`➡️  Trying port ${fallbackPort}...`);
+        startListening(fallbackPort);
     } else {
         console.error('❌ Server error:', error);
     }

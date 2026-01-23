@@ -185,7 +185,7 @@
                     </div>
                     <div class="app-navbar">
                         <a href="index.html" class="navbar-brand">
-                            <img src="assets/images/logo.png" alt="Unruly Movies" width="180" height="50">
+                            <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
                         </a>
                     </div>
                     <div class="search-btn d-md-none d-block" id="mobileSearchBtn">
@@ -905,7 +905,7 @@
                         <!-- Brand Section -->
                         <div class="footer-brand">
                             <a href="index.html" class="footer-logo">
-                                <img src="assets/images/logo.png" alt="Unruly Movies" height="40">
+                                <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
                             </a>
                             <p class="footer-tagline">Uganda's premier platform for Luganda VJ translated movies. Watch your favorite films with authentic local translations by licensed Video Jockeys.</p>
                             <div class="footer-social">
@@ -1800,7 +1800,7 @@
             if (!container) return;
             
             try {
-                const response = await fetch(`${API_CONFIG.BASE_URL}/api/luganda-movies?contentType=series&status=all&limit=10`);
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/luganda-movies?contentType=series&limit=10`);
                 const data = await response.json();
                 const series = data.data || [];
                 
@@ -1852,7 +1852,7 @@
                 }
                 
                 const seriesCard = `
-                    <a href="series-player.html?id=${series._id}" class="content-card">
+                    <a href="series-detail.html?id=${series._id}" class="content-card">
                         <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
                             <div class="card-badges">
                                 <span class="badge-quality" style="background: linear-gradient(135deg, #A855F7, #7C3AED);">

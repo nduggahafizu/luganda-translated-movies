@@ -23,10 +23,11 @@ class UnrulyNotifications {
             this.permissionGranted = Notification.permission === 'granted';
         }
         
-        // Register service worker if supported
+        // Get the existing main service worker registration (sw.js)
+        // Do NOT register a different SW here; it would conflict with sw.js scope.
         if ('serviceWorker' in navigator) {
             try {
-                this.swRegistration = await navigator.serviceWorker.register('/sw-push.js');
+                this.swRegistration = await navigator.serviceWorker.ready;
             } catch (error) {
                 // Silent fail
             }

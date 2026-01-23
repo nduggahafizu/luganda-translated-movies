@@ -36,15 +36,32 @@
                     </div>
                     <div class="app-navbar">
                         <a href="index.html" class="navbar-brand">
-                            <img src="assets/images/logo.png" alt="Unruly Movies" width="180" height="50">
+                            <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
                         </a>
                     </div>
-                    <div class="search-btn d-md-none d-block">
+                    <div class="search-btn d-md-none d-block" id="mobileSearchBtn">
                         <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="11" cy="11" r="8"></circle>
                             <path d="m21 21-4.35-4.35"></path>
                         </svg>
                     </div>
+
+                    <!-- Mobile Search Form (Hidden by default) -->
+                    <form class="mobile-search-form" id="mobileSearchForm" method="get" action="search.html">
+                        <input type="text" name="q" placeholder="Search movies, VJs..." class="mobile-search-input" id="mobileSearchInput" required>
+                        <button type="submit" class="mobile-search-submit" title="Search">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+                        </button>
+                        <button type="button" class="mobile-search-close" id="mobileSearchClose" title="Close search">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </form>
                     
                     <form class="header-search input-group d-md-block d-none" method="get" action="search.html">
                         <div class="typeahead__container app-search">
@@ -249,7 +266,7 @@
                     <div class="footer-grid">
                         <div class="footer-brand">
                             <a href="index.html" class="footer-logo">
-                                <img src="assets/images/logo.png" alt="Unruly Movies" height="40">
+                                <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
                             </a>
                             <p class="footer-tagline">Uganda's premier platform for Luganda VJ translated movies.</p>
                             <div class="footer-social">

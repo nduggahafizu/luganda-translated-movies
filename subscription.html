@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="css/modern-ui.css">
     <link rel="stylesheet" href="css/payment-modal.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
     
     <script src="js/config.js"></script>
     
@@ -341,7 +341,7 @@
         <nav class="navbar">
             <div class="navbar-brand">
                 <a href="index.html">
-                    <img src="images/logo.png" alt="Unruly Movies" class="logo">
+                    <img src="assets/images/logo-wordmark.png" alt="Unruly Movies" class="logo">
                 </a>
             </div>
             <button class="menu d-md-none" id="menuToggle" aria-label="Toggle navigation menu">
@@ -567,9 +567,34 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="js/main.js"></script>
     <script src="js/payment-manager.js"></script>
     <script>
+        // Mobile navbar toggle for this page (subscription.html uses navbarNav, not the app sidebar)
+        (function() {
+            const menuToggle = document.getElementById('menuToggle');
+            const navbarNav = document.getElementById('navbarNav');
+            if (!menuToggle || !navbarNav) return;
+
+            const toggleMenu = () => navbarNav.classList.toggle('open');
+
+            menuToggle.addEventListener('click', toggleMenu);
+            menuToggle.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleMenu();
+                }
+            });
+
+            navbarNav.addEventListener('click', (e) => {
+                const link = e.target?.closest('a');
+                if (link) navbarNav.classList.remove('open');
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') navbarNav.classList.remove('open');
+            });
+        })();
+
         // Check login status
         document.addEventListener('DOMContentLoaded', function() {
             const token = localStorage.getItem('token') || localStorage.getItem('authToken');

@@ -112,6 +112,79 @@
     margin-bottom: 40px;
 }
 
+/* ===== OPTIONAL: MUNO-STYLE POSTER GRID (movies.html) ===== */
+.card-grid.muno-style {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 26px;
+}
+
+.card-grid.muno-style .content-card {
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+}
+
+.card-grid.muno-style .content-card:hover {
+    transform: translateY(-4px);
+    box-shadow: none;
+    border-color: transparent;
+}
+
+.card-grid.muno-style .content-card::before {
+    content: none;
+}
+
+.card-grid.muno-style .card-poster {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5);
+}
+
+.card-grid.muno-style .card-info {
+    display: none;
+}
+
+.card-grid.muno-style .card-meta {
+    display: none;
+}
+
+.card-grid.muno-style .card-rating {
+    display: none;
+}
+
+.card-grid.muno-style .card-badges {
+    left: 0;
+    right: 0;
+    top: 12px;
+    justify-content: center;
+}
+
+.card-grid.muno-style .badge-quality {
+    display: none;
+}
+
+.card-grid.muno-style .badge-vj {
+    background: #66cc00;
+    color: #06110a;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: none;
+    letter-spacing: 0;
+    border-radius: 6px;
+    padding: 6px 12px;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.35);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+@media (max-width: 480px) {
+    .card-grid.muno-style {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 14px;
+    }
+}
+
 /* ===== MOVIE/SERIES CARD ===== */
 .content-card {
     background: linear-gradient(145deg, #1a1a2e, #12121a);
@@ -419,6 +492,33 @@
 }
 
 .filter-select:focus {
+    outline: none;
+    border-color: #7CFC00;
+    box-shadow: 0 0 0 3px rgba(124, 252, 0, 0.15);
+}
+
+.filter-group-style {
+    min-width: 170px;
+}
+
+.filter-button {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(124, 252, 0, 0.2);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+}
+
+.filter-button:hover {
+    border-color: rgba(124, 252, 0, 0.4);
+}
+
+.filter-button:focus {
     outline: none;
     border-color: #7CFC00;
     box-shadow: 0 0 0 3px rgba(124, 252, 0, 0.15);

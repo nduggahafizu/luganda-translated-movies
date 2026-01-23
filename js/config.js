@@ -24,6 +24,7 @@ const API_CONFIG = (function() {
 
     // Detect environment
     const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
     const isProduction = hostname === 'watch.unrulymovies.com' ||
                         hostname === 'unrulymovies.com' ||
                         hostname.includes('netlify.app'); // Include Netlify previews as production
@@ -33,8 +34,21 @@ const API_CONFIG = (function() {
     const PRODUCTION_API_URL = 'https://luganda-translated-movies-production.up.railway.app';
     const DEVELOPMENT_API_URL = 'http://localhost:5000'; // Use local server for development
 
+    // Allow forcing production API when running the frontend locally.
+    // Example: http://localhost:3000/test-push.html?api=prod
+    const params = new URLSearchParams(window.location.search);
+    const apiParam = (params.get('api') || '').toLowerCase();
+    const apiBaseParam = params.get('apiBase');
+    const apiBaseOverride = apiBaseParam || localStorage.getItem('API_BASE_OVERRIDE');
+
     // Select appropriate URL based on environment
-    const BASE_URL = isLocalhost ? DEVELOPMENT_API_URL : PRODUCTION_API_URL;
+    let BASE_URL = isLocalhost ? DEVELOPMENT_API_URL : PRODUCTION_API_URL;
+    if (apiParam === 'prod' || apiParam === 'production') {
+        BASE_URL = PRODUCTION_API_URL;
+    }
+    if (apiBaseOverride && typeof apiBaseOverride === 'string') {
+        BASE_URL = apiBaseOverride;
+    }
 
     // Retry configuration
     const RETRY_CONFIG = {
@@ -85,6 +99,8 @@ const API_CONFIG = (function() {
 
     // Pre-warm the backend on page load
     function warmupBackend() {
+        // Don't attempt network warmup from file:// (origin null)
+        if (protocol !== 'https:' && protocol !== 'http:') return;
         fetch(`${BASE_URL}/api/health`, { 
             method: 'GET',
             cache: 'no-store'
@@ -153,4 +169,16 @@ API_CONFIG.logConfig();
 // Export for use in other scripts
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = API_CONFIG;
+}
+
+// Ensure the main service worker is registered on all pages that load config.js.
+// This avoids having multiple SW scripts fighting for the same scope and ensures
+// push notifications are handled by the same SW that owns the PushSubscription.
+if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        // Service workers require http(s); file:// will throw SecurityError.
+        if (window.location.protocol === 'https:' || window.location.protocol === 'http:') {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
+    });
 }

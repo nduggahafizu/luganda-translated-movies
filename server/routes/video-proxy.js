@@ -1,6 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
+const jwt = require('jsonwebtoken');
+const LugandaMovie = require('../models/LugandaMovie');
+const User = require('../models/User');
+const { protect, optionalAuth } = require('../middleware/auth');
+
+const PLAYBACK_TOKEN_SECRET = process.env.PLAYBACK_TOKEN_SECRET || process.env.JWT_SECRET || 'unruly-movies-playback-token-secret';
+const PLAYBACK_TOKEN_EXPIRES_IN = process.env.PLAYBACK_TOKEN_EXPIRES_IN || '10m';
 
 /**
  * Video Proxy API
@@ -34,6 +41,335 @@ const setCorsHeaders = (req, res) => {
 router.options('*', (req, res) => {
     setCorsHeaders(req, res);
     res.sendStatus(200);
+});
+
+function sanitizeUrl(input) {
+    if (!input || typeof input !== 'string') return null;
+    return input.trim().replace(/\s+/g, '');
+}
+
+function isArchiveUrl(url) {
+    const u = sanitizeUrl(url);
+    if (!u) return false;
+    return u.includes('archive.org/') || /ia\d+\.us\.archive\.org/i.test(u);
+}
+
+function extractArchiveItemId(url) {
+    const u = sanitizeUrl(url);
+    if (!u) return null;
+
+    const embedMatch = u.match(/archive\.org\/embed\/([^/?#]+)/i);
+    if (embedMatch) return embedMatch[1];
+
+    const detailsMatch = u.match(/archive\.org\/details\/([^/?#]+)/i);
+    if (detailsMatch) return detailsMatch[1];
+
+    const downloadMatch = u.match(/archive\.org\/download\/([^/?#]+)/i);
+    if (downloadMatch) return downloadMatch[1];
+
+    const cdnMatch = u.match(/\/items\/([^/?#]+)/i);
+    if (cdnMatch) return cdnMatch[1];
+
+    return null;
+}
+
+function archiveEmbedToDefaultDirectMp4(url) {
+    const u = sanitizeUrl(url);
+    if (!u) return null;
+    const itemId = extractArchiveItemId(u);
+    if (!itemId) return null;
+    return `https://archive.org/download/${itemId}/${itemId}.ia.mp4`;
+}
+
+function buildArchiveFallbackUrls(primaryUrl) {
+    const u = sanitizeUrl(primaryUrl);
+    if (!u) return [];
+
+    const urls = [];
+    urls.push(u);
+
+    const itemId = extractArchiveItemId(u);
+    if (itemId) {
+        // A commonly playable default derivative
+        urls.push(`https://archive.org/download/${itemId}/${itemId}.ia.mp4`);
+        urls.push(`https://archive.org/download/${itemId}/${itemId}.mp4`);
+    }
+
+    // If this is a CDN URL (ia*.us.archive.org/.../items/{itemId}/{file}), also try archive.org/download
+    const cdnFileMatch = u.match(/\/items\/([^/]+)\/(.+)$/i);
+    if (cdnFileMatch) {
+        const cdnItemId = cdnFileMatch[1];
+        const cdnFile = cdnFileMatch[2];
+        urls.push(`https://archive.org/download/${cdnItemId}/${cdnFile}`);
+    }
+
+    // If embed/details, prefer the default direct derivative
+    if (u.includes('archive.org/embed/') || u.includes('archive.org/details/')) {
+        const direct = archiveEmbedToDefaultDirectMp4(u);
+        if (direct) urls.unshift(direct);
+    }
+
+    // Deduplicate while preserving order
+    const seen = new Set();
+    return urls.filter(x => {
+        const key = x.toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+}
+
+async function streamRemoteVideo(req, res, sourceUrl) {
+    const range = req.headers.range;
+
+    const upstreamHeaders = {
+        'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0',
+        'Accept': '*/*',
+        'Referer': 'https://archive.org/'
+    };
+    if (range) upstreamHeaders['Range'] = range;
+
+    const upstream = await axios({
+        method: 'GET',
+        url: sourceUrl,
+        responseType: 'stream',
+        headers: upstreamHeaders,
+        timeout: 30000,
+        maxRedirects: 5,
+        validateStatus: () => true
+    });
+
+    if (upstream.status >= 400) {
+        const err = new Error(`Upstream error ${upstream.status}`);
+        err.status = upstream.status;
+        throw err;
+    }
+
+    // Pass through key headers for video playback (Range/seek support)
+    const passthroughHeaders = [
+        'content-type',
+        'content-length',
+        'accept-ranges',
+        'content-range',
+        'etag',
+        'last-modified'
+    ];
+    passthroughHeaders.forEach(h => {
+        if (upstream.headers[h]) res.setHeader(h, upstream.headers[h]);
+    });
+
+    // CORS + expose range headers
+    res.setHeader('Access-Control-Expose-Headers', 'Content-Length, Content-Range, Accept-Ranges');
+    res.setHeader('Cache-Control', 'private, max-age=0, no-store');
+
+    res.status(upstream.status);
+
+    // Pipe and handle aborts
+    upstream.data.on('error', () => {
+        try { res.end(); } catch (e) {}
+    });
+    req.on('close', () => {
+        try { upstream.data.destroy(); } catch (e) {}
+    });
+
+    upstream.data.pipe(res);
+}
+
+async function resolveMovieSourceUrl(movie) {
+    if (!movie) return null;
+
+    // Prefer explicit direct path if present
+    const direct = sanitizeUrl(movie.video?.originalVideoPath);
+    if (direct) return direct;
+
+    // Fall back to embedUrl fields
+    const embed = sanitizeUrl(movie.embedUrl || movie.video?.embedUrl || movie.video?.url);
+    if (embed) return embed;
+
+    return null;
+}
+
+function requirePlaybackAuthIfNeeded(movie, req) {
+    const requiredPlan = movie?.requiredPlan || 'free';
+    if (requiredPlan === 'free') return { requiredPlan, tokenPayload: null };
+
+    const token = sanitizeUrl(req.query.token);
+    if (!token) {
+        const error = new Error('Playback token required');
+        error.code = 'PLAYBACK_TOKEN_REQUIRED';
+        error.httpStatus = 401;
+        throw error;
+    }
+
+    let payload;
+    try {
+        payload = jwt.verify(token, PLAYBACK_TOKEN_SECRET, { issuer: 'unruly-movies' });
+    } catch (e) {
+        const error = new Error('Invalid or expired playback token');
+        error.code = 'INVALID_PLAYBACK_TOKEN';
+        error.httpStatus = 401;
+        throw error;
+    }
+
+    return { requiredPlan, tokenPayload: payload };
+}
+
+async function assertUserCanPlay(requiredPlan, tokenPayload) {
+    if (requiredPlan === 'free') return;
+
+    const userId = tokenPayload?.uid;
+    if (!userId) {
+        const error = new Error('Invalid playback token payload');
+        error.code = 'INVALID_PLAYBACK_TOKEN';
+        error.httpStatus = 401;
+        throw error;
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+        const error = new Error('User not found');
+        error.code = 'USER_NOT_FOUND';
+        error.httpStatus = 401;
+        throw error;
+    }
+
+    if (!user.canAccessContent(requiredPlan)) {
+        const error = new Error(`This content requires a ${requiredPlan} plan or higher`);
+        error.code = 'SUBSCRIPTION_REQUIRED';
+        error.httpStatus = 403;
+        throw error;
+    }
+}
+
+/**
+ * Create a short-lived playback token for a specific movie.
+ * Client uses this token as a query param for <video> src (since <video> cannot attach Authorization headers).
+ * POST /api/video/playback-token
+ * Body: { movieId: "..." }
+ */
+router.post('/playback-token', protect, async (req, res) => {
+    setCorsHeaders(req, res);
+
+    try {
+        const movieId = req.body?.movieId;
+        if (!movieId) {
+            return res.status(400).json({
+                success: false,
+                message: 'movieId is required'
+            });
+        }
+
+        const movie = await LugandaMovie.findById(movieId);
+        if (!movie) {
+            return res.status(404).json({
+                success: false,
+                message: 'Movie not found'
+            });
+        }
+
+        const requiredPlan = movie.requiredPlan || 'free';
+        if (!req.user.canAccessContent(requiredPlan)) {
+            return res.status(403).json({
+                success: false,
+                message: `This content requires a ${requiredPlan} subscription or higher`,
+                requiredPlan,
+                currentPlan: req.user.subscription?.plan
+            });
+        }
+
+        const token = jwt.sign(
+            {
+                type: 'playback',
+                uid: req.user.id,
+                movieId: String(movieId)
+            },
+            PLAYBACK_TOKEN_SECRET,
+            {
+                expiresIn: PLAYBACK_TOKEN_EXPIRES_IN,
+                issuer: 'unruly-movies'
+            }
+        );
+
+        return res.json({
+            success: true,
+            token,
+            expiresIn: PLAYBACK_TOKEN_EXPIRES_IN
+        });
+    } catch (error) {
+        console.error('Playback token error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to create playback token'
+        });
+    }
+});
+
+/**
+ * Stream a LugandaMovie through the backend with Range support.
+ * This hides direct Archive.org links and provides retry/fallback.
+ * GET /api/video/stream/luganda/:movieId?token=...
+ */
+router.get('/stream/luganda/:movieId', optionalAuth, async (req, res) => {
+    setCorsHeaders(req, res);
+
+    try {
+        const { movieId } = req.params;
+        const movie = await LugandaMovie.findById(movieId).lean();
+
+        if (!movie) {
+            return res.status(404).json({
+                success: false,
+                message: 'Movie not found'
+            });
+        }
+
+        // Enforce subscription via short-lived playback token for paid plans
+        const { requiredPlan, tokenPayload } = requirePlaybackAuthIfNeeded(movie, req);
+        await assertUserCanPlay(requiredPlan, tokenPayload);
+
+        let sourceUrl = await resolveMovieSourceUrl(movie);
+        if (!sourceUrl) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing video URL for this movie'
+            });
+        }
+
+        // Only proxy Archive.org URLs here (safe + predictable). For other URLs, return 400 to avoid open proxy.
+        if (!isArchiveUrl(sourceUrl)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Streaming proxy only supports Archive.org sources for now'
+            });
+        }
+
+        const candidates = buildArchiveFallbackUrls(sourceUrl);
+
+        let lastErr = null;
+        for (const candidate of candidates) {
+            try {
+                await streamRemoteVideo(req, res, candidate);
+                return;
+            } catch (err) {
+                lastErr = err;
+                // Try next candidate
+            }
+        }
+
+        console.error('All Archive.org stream candidates failed', { movieId, error: lastErr?.message });
+        return res.status(502).json({
+            success: false,
+            message: 'Failed to stream video from Archive.org'
+        });
+    } catch (error) {
+        const httpStatus = error.httpStatus || 500;
+        const code = error.code;
+        return res.status(httpStatus).json({
+            success: false,
+            code,
+            message: error.message || 'Streaming error'
+        });
+    }
 });
 
 /**

@@ -530,7 +530,7 @@
             Back
         </button>
         <a href="index.html">
-            <img src="assets/images/logo.png" alt="Unruly Movies" class="logo">
+            <img src="assets/images/logo-wordmark.png" alt="Unruly Movies" class="logo">
         </a>
     </header>
 
@@ -542,19 +542,27 @@
         </div>
     </main>
 
+    <script src="js/config.js"></script>
+
     <script>
         // API Configuration
-        const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-            ? 'http://localhost:5001'
-            : 'https://luganda-translated-movies-production.up.railway.app';
+        const API_BASE_URL = (window.API_CONFIG && window.API_CONFIG.BASE_URL)
+            ? window.API_CONFIG.BASE_URL
+            : ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+                ? 'http://localhost:5000'
+                : 'https://luganda-translated-movies-production.up.railway.app');
         
         // Get series ID from URL
         const urlParams = new URLSearchParams(window.location.search);
         const seriesId = urlParams.get('id');
+        const requestedSeason = parseInt(urlParams.get('season') || '1', 10);
+        const requestedEpisode = parseInt(urlParams.get('episode') || '0', 10);
         
         let seriesData = null;
-        let currentSeason = 1;
-        let currentEpisode = null;
+        let currentSeason = Number.isFinite(requestedSeason) && requestedSeason > 0 ? requestedSeason : 1;
+        let currentEpisode = (Number.isFinite(requestedEpisode) && requestedEpisode > 0)
+            ? { season: currentSeason, episode: requestedEpisode }
+            : null;
         
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
@@ -567,7 +575,7 @@
         
         async function loadSeries() {
             try {
-                const response = await fetch(`${API_BASE_URL}/api/luganda-movies/series/${seriesId}`);
+                const response = await fetch(`${API_BASE_URL}/api/series/${seriesId}`);
                 const data = await response.json();
                 
                 if (!data.success || !data.data) {
@@ -592,6 +600,12 @@
             
             // Get current season data
             const seasonData = seriesData.seasons?.find(s => s.seasonNumber === currentSeason) || seriesData.seasons?.[0];
+            if (seasonData?.seasonNumber && seasonData.seasonNumber !== currentSeason) {
+                currentSeason = seasonData.seasonNumber;
+                if (currentEpisode) {
+                    currentEpisode.season = currentSeason;
+                }
+            }
             
             // Find first available episode
             if (!currentEpisode && seasonData?.episodes?.length > 0) {

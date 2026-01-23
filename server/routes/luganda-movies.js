@@ -53,6 +53,60 @@ const generateSlug = (title) => {
         .replace(/(^-|-$)/g, '');
 };
 
+// Helper: sanitize movie objects for public responses (avoid leaking Archive.org URLs)
+const sanitizeMovieForPublic = (movie) => {
+    if (!movie) return movie;
+
+    const movieObj = typeof movie.toObject === 'function' ? movie.toObject() : { ...movie };
+
+    const clean = (v) => (typeof v === 'string' ? v.trim().replace(/\s+/g, '') : v);
+    const urlCandidates = [
+        clean(movieObj?.video?.originalVideoPath),
+        clean(movieObj?.video?.embedUrl),
+        clean(movieObj?.embedUrl),
+        clean(movieObj?.video?.url)
+    ].filter(Boolean);
+
+    const isArchiveSource = urlCandidates.some(u =>
+        u.includes('archive.org/') || /ia\d+\.us\.archive\.org/i.test(u)
+    );
+
+    const extractArchiveItemId = (u) => {
+        const s = clean(u);
+        if (!s) return null;
+        const embedMatch = s.match(/archive\.org\/embed\/([^/?#]+)/i);
+        if (embedMatch) return embedMatch[1];
+        const detailsMatch = s.match(/archive\.org\/details\/([^/?#]+)/i);
+        if (detailsMatch) return detailsMatch[1];
+        const downloadMatch = s.match(/archive\.org\/download\/([^/?#]+)/i);
+        if (downloadMatch) return downloadMatch[1];
+        const cdnMatch = s.match(/\/items\/([^/?#]+)/i);
+        if (cdnMatch) return cdnMatch[1];
+        return null;
+    };
+
+    if (isArchiveSource) {
+        if (!movieObj.video) movieObj.video = {};
+        movieObj.video.provider = 'archive';
+        movieObj.video.secureStreamPath = `/api/video/stream/luganda/${movieObj._id}`;
+        movieObj.video.archiveItemId = extractArchiveItemId(urlCandidates[0] || '') || null;
+
+        delete movieObj.embedUrl;
+        if (movieObj.video) {
+            delete movieObj.video.originalVideoPath;
+            delete movieObj.video.embedUrl;
+            delete movieObj.video.url;
+        }
+    }
+
+    return movieObj;
+};
+
+const sanitizeMoviesForPublic = (movies) => {
+    if (!Array.isArray(movies)) return movies;
+    return movies.map(sanitizeMovieForPublic);
+};
+
 // Valid genres for the model
 const VALID_GENRES = ['action', 'comedy', 'drama', 'horror', 'sci-fi', 'romance', 'thriller', 'animation', 'fantasy', 'documentary', 'crime', 'mystery', 'adventure', 'family', 'war', 'history', 'western', 'music', 'tv movie', 'science fiction', 'other'];
 
@@ -597,10 +651,12 @@ router.get('/', async (req, res) => {
             LugandaMovie.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
             LugandaMovie.countDocuments(query)
         ]);
+
+        const isAdminLikeRequest = req.query.status === 'all';
         
         res.json({
             success: true,
-            data: movies,
+            data: isAdminLikeRequest ? movies : sanitizeMoviesForPublic(movies),
             pagination: {
                 page,
                 limit,
@@ -620,7 +676,7 @@ router.get('/all', async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 100;
         const movies = await LugandaMovie.find({ status: 'published' }).sort({ createdAt: -1 }).limit(limit);
-        res.json({ success: true, data: movies, count: movies.length });
+        res.json({ success: true, data: sanitizeMoviesForPublic(movies), count: movies.length });
     } catch (error) {
         console.error('Error fetching all movies:', error);
         res.status(500).json({ success: false, message: 'Failed to fetch movies' });
@@ -680,7 +736,7 @@ router.get('/new-releases', async (req, res) => {
             createdAt: { $gte: thirtyDaysAgo }
         }).sort({ createdAt: -1 }).limit(limit);
         
-        res.json({ success: true, data: movies, count: movies.length });
+        res.json({ success: true, data: sanitizeMoviesForPublic(movies), count: movies.length });
     } catch (error) {
         console.error('Error fetching new releases:', error);
         res.status(500).json({ success: false, message: 'Failed to fetch new releases' });
@@ -699,7 +755,7 @@ router.get('/latest', memCache(30), async (req, res) => {
             .limit(limit)
             .select('-__v') // Exclude version key
             .lean();
-        res.json({ success: true, data: movies, count: movies.length });
+        res.json({ success: true, data: sanitizeMoviesForPublic(movies), count: movies.length });
     } catch (error) {
         console.error('[LATEST] Error:', error.message);
         res.status(500).json({ success: false, message: 'Failed to fetch latest movies', error: error.message });
@@ -723,7 +779,7 @@ router.get('/trending', memCache(60), async (req, res) => {
         .select('-__v')
         .lean();
         
-        res.json({ success: true, data: movies, count: movies.length });
+        res.json({ success: true, data: sanitizeMoviesForPublic(movies), count: movies.length });
     } catch (error) {
         console.error('Error fetching trending movies:', error);
         res.status(500).json({ success: false, message: 'Failed to fetch trending movies' });
@@ -741,7 +797,7 @@ router.get('/featured', memCache(60), async (req, res) => {
             .limit(limit)
             .select('-__v')
             .lean();
-        res.json({ success: true, data: movies, count: movies.length });
+        res.json({ success: true, data: sanitizeMoviesForPublic(movies), count: movies.length });
     } catch (error) {
         console.error('Error fetching featured movies:', error);
         res.status(500).json({ success: false, message: 'Failed to fetch featured movies' });
@@ -770,7 +826,7 @@ router.get('/genre/:genre', async (req, res) => {
             status: 'published',
             genres: { $regex: new RegExp(genre, 'i') }
         }).sort({ createdAt: -1 }).limit(limit);
-        res.json({ success: true, data: movies, count: movies.length, genre });
+        res.json({ success: true, data: sanitizeMoviesForPublic(movies), count: movies.length, genre });
     } catch (error) {
         console.error('Error fetching movies by genre:', error);
         res.status(500).json({ success: false, message: 'Failed to fetch movies by genre' });
@@ -808,7 +864,7 @@ router.get('/vj/:vjName', async (req, res) => {
             status: 'published',
             vjName: { $regex: new RegExp(vjName, 'i') }
         }).sort({ createdAt: -1 }).limit(limit);
-        res.json({ success: true, data: movies, count: movies.length, vjName });
+        res.json({ success: true, data: sanitizeMoviesForPublic(movies), count: movies.length, vjName });
     } catch (error) {
         console.error('Error fetching movies by VJ:', error);
         res.status(500).json({ success: false, message: 'Failed to fetch movies by VJ' });
@@ -836,7 +892,7 @@ router.get('/search', async (req, res) => {
         if (year) query.year = parseInt(year);
         
         const movies = await LugandaMovie.find(query).sort({ createdAt: -1 }).limit(limit);
-        res.json({ success: true, data: movies, count: movies.length });
+        res.json({ success: true, data: sanitizeMoviesForPublic(movies), count: movies.length });
     } catch (error) {
         console.error('Error searching movies:', error);
         res.status(500).json({ success: false, message: 'Failed to search movies' });
@@ -869,10 +925,54 @@ router.get('/:id', async (req, res) => {
         
         // Increment view count
         await movie.incrementViews();
+
+        // Build a response-safe object (avoid leaking Archive.org direct URLs)
+        const movieObj = movie.toObject();
+
+        const clean = (v) => (typeof v === 'string' ? v.trim().replace(/\s+/g, '') : v);
+        const urlCandidates = [
+            clean(movieObj?.video?.originalVideoPath),
+            clean(movieObj?.video?.embedUrl),
+            clean(movieObj?.embedUrl),
+            clean(movieObj?.video?.url)
+        ].filter(Boolean);
+
+        const isArchiveSource = urlCandidates.some(u =>
+            u.includes('archive.org/') || /ia\d+\.us\.archive\.org/i.test(u)
+        );
+
+        const extractArchiveItemId = (u) => {
+            const s = clean(u);
+            if (!s) return null;
+            const embedMatch = s.match(/archive\.org\/embed\/([^/?#]+)/i);
+            if (embedMatch) return embedMatch[1];
+            const detailsMatch = s.match(/archive\.org\/details\/([^/?#]+)/i);
+            if (detailsMatch) return detailsMatch[1];
+            const downloadMatch = s.match(/archive\.org\/download\/([^/?#]+)/i);
+            if (downloadMatch) return downloadMatch[1];
+            const cdnMatch = s.match(/\/items\/([^/?#]+)/i);
+            if (cdnMatch) return cdnMatch[1];
+            return null;
+        };
+
+        if (isArchiveSource) {
+            if (!movieObj.video) movieObj.video = {};
+            movieObj.video.provider = 'archive';
+            movieObj.video.secureStreamPath = `/api/video/stream/luganda/${movieObj._id}`;
+            movieObj.video.archiveItemId = extractArchiveItemId(urlCandidates[0] || '') || null;
+
+            // Strip raw Archive URLs from the public response
+            delete movieObj.embedUrl;
+            if (movieObj.video) {
+                delete movieObj.video.originalVideoPath;
+                delete movieObj.video.embedUrl;
+                delete movieObj.video.url;
+            }
+        }
         
         res.json({
             success: true,
-            data: movie
+            data: movieObj
         });
     } catch (error) {
         console.error('Error fetching movie:', error);

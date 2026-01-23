@@ -3,7 +3,7 @@
  * Handles subscription, permission requests, and notification preferences
  */
 
-const PushManager = {
+const UnrulyPush = {
     // VAPID public key - fetched from server
     vapidPublicKey: null,
     
@@ -11,7 +11,9 @@ const PushManager = {
     subscription: null,
     
     // API URL
-    apiUrl: typeof API_CONFIG !== 'undefined' ? API_CONFIG.BASE_URL : 'https://unrulymovies-production.up.railway.app',
+    apiUrl: (typeof API_CONFIG !== 'undefined' && API_CONFIG.BASE_URL)
+        ? API_CONFIG.BASE_URL
+        : 'https://luganda-translated-movies-production.up.railway.app',
 
     /**
      * Initialize push notifications
@@ -21,6 +23,18 @@ const PushManager = {
         if (!this.isSupported()) {
             console.log('Push notifications not supported');
             return false;
+        }
+
+        // Ensure the main PWA service worker is registered (this SW also handles push events)
+        try {
+            if ('serviceWorker' in navigator) {
+                const existing = await navigator.serviceWorker.getRegistration('/');
+                if (!existing) {
+                    await navigator.serviceWorker.register('/sw.js');
+                }
+            }
+        } catch (e) {
+            // Non-fatal; we'll still try to proceed with ready registration
         }
 
         // Get VAPID public key from server
@@ -120,10 +134,10 @@ const PushManager = {
                     <h3>Stay Updated!</h3>
                     <p>Get notified when new movies and series are added. Never miss a new release!</p>
                     <div class="push-prompt-buttons">
-                        <button class="push-btn-enable" onclick="PushManager.requestPermission()">
+                        <button class="push-btn-enable" onclick="UnrulyPush.requestPermission()">
                             Enable Notifications
                         </button>
-                        <button class="push-btn-later" onclick="PushManager.dismissPrompt()">
+                        <button class="push-btn-later" onclick="UnrulyPush.dismissPrompt()">
                             Maybe Later
                         </button>
                     </div>
@@ -531,10 +545,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Wait for service worker to be ready
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.ready.then(() => {
-            PushManager.init();
+            UnrulyPush.init();
         });
     }
 });
 
 // Export for global access
-window.PushManager = PushManager;
+window.UnrulyPush = UnrulyPush;

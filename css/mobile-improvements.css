@@ -439,8 +439,10 @@
 }
 
 .navbar-brand img {
-    height: 36px;
+    max-height: 36px;
+    height: auto;
     width: auto;
+    display: block;
 }
 
 @media (min-width: 768px) {
@@ -450,7 +452,8 @@
     }
     
     .navbar-brand img {
-        height: 42px;
+        max-height: 42px;
+        height: auto;
     }
 }
 

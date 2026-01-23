@@ -1,6 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const Payment = require('../models/Payment');
+const Review = require('../models/Review');
+const Comment = require('../models/Comment');
+const Notification = require('../models/Notification');
+const PushSubscription = require('../models/PushSubscription');
+const EmailSubscription = require('../models/EmailSubscription');
+const UserRequest = require('../models/UserRequest');
+const TokenBlacklist = require('../models/TokenBlacklist');
 const { protect: auth } = require('../middleware/auth');
 
 // @route   GET /api/users/preferences
@@ -215,6 +223,47 @@ router.delete('/history', auth, async (req, res) => {
         res.status(500).json({
             status: 'error',
             message: 'Server error'
+        });
+    }
+});
+
+// @route   DELETE /api/users/me
+// @desc    Permanently delete the authenticated user's account and user-owned data
+// @access  Private
+router.delete('/me', auth, async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'User not found'
+            });
+        }
+
+        await Promise.all([
+            Payment.deleteMany({ user: userId }),
+            Review.deleteMany({ user: userId }),
+            Comment.deleteMany({ user: userId }),
+            Notification.deleteMany({ user: userId }),
+            PushSubscription.deleteMany({ user: userId }),
+            EmailSubscription.deleteMany({ user: userId }),
+            UserRequest.deleteMany({ user: userId }),
+            TokenBlacklist.deleteMany({ userId: userId })
+        ]);
+
+        await User.findByIdAndDelete(userId);
+
+        return res.json({
+            status: 'success',
+            message: 'Account deleted successfully'
+        });
+    } catch (error) {
+        console.error('Error deleting account:', error);
+        return res.status(500).json({
+            status: 'error',
+            message: 'Server error deleting account'
         });
     }
 });

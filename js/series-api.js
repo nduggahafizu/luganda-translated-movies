@@ -5,7 +5,10 @@
 
 class SeriesAPI {
     constructor() {
-        this.baseUrl = window.CONFIG?.API_BASE_URL || 'http://localhost:5000';
+        // Prefer centralized API_CONFIG when available (loaded via js/config.js)
+        this.baseUrl = (window.API_CONFIG && window.API_CONFIG.BASE_URL)
+            ? window.API_CONFIG.BASE_URL
+            : 'http://localhost:5000';
         this.cache = new Map();
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
     }
@@ -364,6 +367,16 @@ async function getSeriesWithFallback(params = {}) {
         }
         throw new Error('No data from API');
     } catch (error) {
+        // Avoid showing fake content in production.
+        // Allow sample fallback only for localhost/dev or when explicitly enabled via ?demo=1.
+        const allowSampleFallback =
+            ((window.API_CONFIG && window.API_CONFIG.ENVIRONMENT && window.API_CONFIG.ENVIRONMENT.isLocalhost) === true) ||
+            (new URLSearchParams(window.location.search).get('demo') === '1');
+
+        if (!allowSampleFallback) {
+            throw error;
+        }
+
         console.log('Using sample series data (API unavailable)');
         let filteredSeries = [...SAMPLE_SERIES];
         

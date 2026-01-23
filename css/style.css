@@ -58,8 +58,10 @@ html, body {
         padding: 10px 5px;
     }
     .navbar-brand img {
-        width: 120px;
-        height: 32px;
+        max-height: 32px;
+        height: auto;
+        width: auto;
+        max-width: 190px;
     }
 }
 
@@ -207,8 +209,10 @@ img {
 }
 
 .navbar-brand img {
-    height: 42px;
+    max-height: 42px;
+    height: auto;
     width: auto;
+    display: block;
     transition: transform 0.3s ease;
 }
 
@@ -3348,6 +3352,10 @@ a:focus-visible {
     margin: 30px auto;
     max-width: 728px;
     text-align: center;
+}
+
+.ad-container ins.adsbygoogle {
+    display: block;
 }
 
 .ad-container-search {

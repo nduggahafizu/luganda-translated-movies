@@ -397,9 +397,32 @@
                     </div>
                     <div class="app-navbar">
                         <a href="index.html" class="navbar-brand">
-                            <img src="assets/images/logo.png" alt="Unruly Movies" width="180" height="50">
+                            <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
                         </a>
                     </div>
+                    <div class="search-btn d-md-none d-block" id="mobileSearchBtn" role="button" aria-label="Open search" tabindex="0">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </div>
+
+                    <!-- Mobile Search Form -->
+                    <form class="mobile-search-form" id="mobileSearchForm" method="get" action="search.html">
+                        <input type="text" name="q" placeholder="Search movies, VJs..." class="mobile-search-input" id="mobileSearchInput" required>
+                        <button type="submit" class="mobile-search-submit" title="Search" aria-label="Search">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+                        </button>
+                        <button type="button" class="mobile-search-close" id="mobileSearchClose" title="Close search" aria-label="Close search">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </form>
                     <ul class="navbar-nav navbar-user ml-auto align-items-center text-nowrap">
                         <li class="nav-item">
                             <a class="nav-link" href="series.html" aria-label="Back to Series">
@@ -542,7 +565,7 @@
                             </div>
                             <div class="series-actions">
                                 ${seasonCount > 0 && series.seasons[0].episodes?.length > 0 ? `
-                                <a href="player.html?series=${series._id}&season=1&episode=1" class="btn-play">
+                                <a href="series-player.html?id=${series._id}&season=1&episode=1" class="btn-play">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                                         <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                     </svg>
@@ -607,7 +630,7 @@
                 const duration = ep.duration ? formatDuration(ep.duration) : '45 min';
                 
                 return `
-                    <a href="player.html?series=${currentSeries._id}&season=${season.seasonNumber || currentSeason}&episode=${ep.episodeNumber || i + 1}" class="episode-card">
+                    <a href="series-player.html?id=${currentSeries._id}&season=${season.seasonNumber || currentSeason}&episode=${ep.episodeNumber || i + 1}" class="episode-card">
                         <div class="episode-thumbnail" style="background-image: url('${thumbnail}');">
                             <span class="episode-number">E${ep.episodeNumber || i + 1}</span>
                             <span class="episode-duration">${duration}</span>
@@ -697,34 +720,41 @@
                     throw new Error('Series not found');
                 }
             } catch (error) {
-                console.log('API error, checking sample data');
-                
-                // Try to find in sample data
-                const sampleSeries = SAMPLE_SERIES.find(s => s._id === seriesId || s.title.toLowerCase().replace(/\s+/g, '-') === seriesId);
-                
-                if (sampleSeries) {
-                    // Add some sample episodes
-                    sampleSeries.seasons = sampleSeries.seasons.map((s, i) => ({
-                        ...s,
-                        seasonNumber: i + 1,
-                        episodes: Array.from({ length: 8 }, (_, j) => ({
-                            episodeNumber: j + 1,
-                            title: `Episode ${j + 1}`,
-                            description: `${sampleSeries.title} Season ${i + 1} Episode ${j + 1}`,
-                            duration: 45,
-                            thumbnail: sampleSeries.poster
-                        }))
-                    }));
-                    renderSeriesDetails(sampleSeries);
-                } else {
-                    document.getElementById('seriesContent').innerHTML = `
-                        <div style="text-align: center; padding: 100px 20px;">
-                            <h2 style="color: var(--text-primary);">Series Not Found</h2>
-                            <p style="color: var(--text-muted);">The series you're looking for doesn't exist.</p>
-                            <a href="series.html" class="btn btn-glow" style="margin-top: 20px;">Browse Series</a>
-                        </div>
-                    `;
+                const allowSampleFallback =
+                    ((window.API_CONFIG && window.API_CONFIG.ENVIRONMENT && window.API_CONFIG.ENVIRONMENT.isLocalhost) === true) ||
+                    (new URLSearchParams(window.location.search).get('demo') === '1');
+
+                if (allowSampleFallback) {
+                    console.log('API error, checking sample data');
+                    
+                    // Try to find in sample data
+                    const sampleSeries = SAMPLE_SERIES.find(s => s._id === seriesId || s.title.toLowerCase().replace(/\s+/g, '-') === seriesId);
+                    
+                    if (sampleSeries) {
+                        // Add some sample episodes
+                        sampleSeries.seasons = sampleSeries.seasons.map((s, i) => ({
+                            ...s,
+                            seasonNumber: i + 1,
+                            episodes: Array.from({ length: 8 }, (_, j) => ({
+                                episodeNumber: j + 1,
+                                title: `Episode ${j + 1}`,
+                                description: `${sampleSeries.title} Season ${i + 1} Episode ${j + 1}`,
+                                duration: 45,
+                                thumbnail: sampleSeries.poster
+                            }))
+                        }));
+                        renderSeriesDetails(sampleSeries);
+                        return;
+                    }
                 }
+
+                document.getElementById('seriesContent').innerHTML = `
+                    <div style="text-align: center; padding: 100px 20px;">
+                        <h2 style="color: var(--text-primary);">Series Not Found</h2>
+                        <p style="color: var(--text-muted);">Failed to load this series from the server.</p>
+                        <a href="series.html" class="btn btn-glow" style="margin-top: 20px;">Browse Series</a>
+                    </div>
+                `;
             }
         }
 

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Push Notifications Test - Unruly Movies</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+  <link rel="apple-touch-icon" href="assets/images/logo.png" />
+  <style>
+    body { background: var(--background-dark); color: var(--text-primary); }
+    .container { max-width: 900px; margin: 0 auto; padding: 24px; }
+    .card { background: var(--background-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 18px; margin: 14px 0; }
+    .title { margin: 0 0 8px; }
+    .subtitle { margin: 0 0 18px; }
+    .card h3 { margin-top: 0; }
+    .tip { margin: 12px 0 0; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; }
+    button { padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-color); background: #111; color: #fff; cursor: pointer; }
+    button.primary { background: var(--primary-color); color: #000; border: none; font-weight: 700; }
+    button.danger { background: #ff4444; color: #fff; border: none; font-weight: 700; }
+    pre { background: #0f0f16; border: 1px solid #222; padding: 12px; border-radius: 12px; overflow: auto; }
+    .muted { color: #aaa; }
+    .ok { color: #7CFC00; }
+    .bad { color: #ff6666; }
+    .banner { padding: 12px 14px; border-radius: 14px; border: 1px solid #2a2a35; background: rgba(255, 215, 0, 0.08); color: #FFD700; margin: 0 0 14px; }
+    .banner code { color: #fff; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="protoBanner" class="banner hidden"></div>
+    <h1 class="title">Push Notifications Diagnostics</h1>
+    <p class="muted subtitle">Use this page to verify Service Worker + Push subscription + server VAPID configuration.</p>
+
+    <div class="card">
+      <h3>Quick Actions</h3>
+      <div class="row">
+        <button class="primary" id="btn-refresh">Refresh Status</button>
+        <button id="btn-permission">Request Permission</button>
+        <button id="btn-subscribe">Subscribe (requires login)</button>
+        <button class="danger" id="btn-unsubscribe">Unsubscribe</button>
+        <button id="btn-test">Send Test Push (requires login)</button>
+      </div>
+      <p class="muted tip">Tip: open DevTools Console to see detailed logs.</p>
+    </div>
+
+    <div class="card">
+      <h3>Status</h3>
+      <pre id="status">Loading...</pre>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/push-notifications.js"></script>
+  <script>
+    function isHttpOrigin() {
+      return location.protocol === 'https:' || location.protocol === 'http:';
+    }
+
+    function showProtocolBannerIfNeeded() {
+      const banner = document.getElementById('protoBanner');
+      if (!banner) return;
+
+      if (isHttpOrigin()) {
+        banner.classList.add('hidden');
+        banner.textContent = '';
+        return;
+      }
+
+      banner.classList.remove('hidden');
+      banner.innerHTML = `
+        Service Workers + Push Notifications do NOT work when opened as <code>file://</code> (origin is <code>null</code>).
+        <br/>Run a local server, then open: <code>http://localhost:3000/test-push.html?api=prod</code>
+        <br/>Command: <code>node start-server.js</code>
+      `;
+    }
+
+    async function getServerJson(path) {
+      const base = (window.API_CONFIG && API_CONFIG.BASE_URL) ? API_CONFIG.BASE_URL : '';
+      const res = await fetch(base + path, { cache: 'no-store' });
+      let json = null;
+      try { json = await res.json(); } catch (e) {}
+      return { ok: res.ok, status: res.status, json };
+    }
+
+    async function getSwInfo() {
+      if (!isHttpOrigin()) return { supported: false, reason: 'Requires http(s) origin' };
+      if (!('serviceWorker' in navigator)) return { supported: false, reason: 'ServiceWorker not supported' };
+      const reg = await navigator.serviceWorker.getRegistration('/');
+      return {
+        supported: true,
+        controller: !!navigator.serviceWorker.controller,
+        scope: reg ? reg.scope : null,
+        scriptURL: reg && reg.active ? reg.active.scriptURL : null,
+        state: reg && reg.active ? reg.active.state : null
+      };
+    }
+
+    async function refresh() {
+      showProtocolBannerIfNeeded();
+
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      let sw = null;
+      try {
+        sw = await getSwInfo();
+      } catch (e) {
+        sw = { supported: false, error: String(e && e.message ? e.message : e) };
+      }
+      const pushSupport = {
+        notification: 'Notification' in window,
+        pushManager: 'PushManager' in window,
+        permission: (('Notification' in window) ? Notification.permission : 'n/a')
+      };
+
+      let serverStatus = null;
+      let serverKey = null;
+      try {
+        serverStatus = await getServerJson('/api/push/status');
+      } catch (e) {
+        serverStatus = { ok: false, error: String(e && e.message ? e.message : e) };
+      }
+      try {
+        serverKey = await getServerJson('/api/push/vapid-public-key');
+      } catch (e) {
+        serverKey = { ok: false, error: String(e && e.message ? e.message : e) };
+      }
+
+      let subscription = null;
+      try {
+        if (isHttpOrigin() && 'serviceWorker' in navigator) {
+          const reg = await navigator.serviceWorker.ready;
+          subscription = await reg.pushManager.getSubscription();
+        }
+      } catch (e) {}
+
+      const clientPush = (window.UnrulyPush && typeof window.UnrulyPush.getStatus === 'function')
+        ? window.UnrulyPush.getStatus()
+        : null;
+
+      const payload = {
+        time: new Date().toISOString(),
+        origin: location.origin,
+        protocol: location.protocol,
+        authTokenPresent: !!token,
+        serviceWorker: sw,
+        browserPushSupport: pushSupport,
+        clientPushModule: clientPush,
+        hasSubscription: !!subscription,
+        subscriptionEndpoint: subscription ? subscription.endpoint : null,
+        server: {
+          pushStatus: serverStatus,
+          vapidKey: {
+            ok: !!(serverKey && serverKey.ok),
+            status: serverKey && serverKey.status,
+            configured: !!(serverKey && serverKey.json && serverKey.json.status === 'success' && serverKey.json.data && serverKey.json.data.publicKey)
+          }
+        }
+      };
+
+      document.getElementById('status').textContent = JSON.stringify(payload, null, 2);
+    }
+
+    document.getElementById('btn-refresh').addEventListener('click', refresh);
+
+    document.getElementById('btn-permission').addEventListener('click', async () => {
+      if (!('Notification' in window)) return alert('Notifications not supported in this browser');
+      await Notification.requestPermission();
+      await refresh();
+    });
+
+    document.getElementById('btn-subscribe').addEventListener('click', async () => {
+      if (!window.UnrulyPush) return alert('UnrulyPush module not loaded');
+      const ok = await window.UnrulyPush.subscribe();
+      if (!ok) alert('Subscribe failed (check login token + VAPID on server).');
+      await refresh();
+    });
+
+    document.getElementById('btn-unsubscribe').addEventListener('click', async () => {
+      if (!window.UnrulyPush) return alert('UnrulyPush module not loaded');
+      await window.UnrulyPush.unsubscribe();
+      await refresh();
+    });
+
+    document.getElementById('btn-test').addEventListener('click', async () => {
+      if (!window.UnrulyPush) return alert('UnrulyPush module not loaded');
+      await window.UnrulyPush.sendTest();
+      await refresh();
+    });
+
+    // Initial load
+    refresh();
+  </script>
+</body>
+</html>
