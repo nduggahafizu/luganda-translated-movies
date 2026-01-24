@@ -338,6 +338,21 @@
             --plyr-control-icon-size: 18px;
             --plyr-control-spacing: 10px;
         }
+        
+        /* Ensure native video player is visible with proper sizing */
+        #player {
+            width: 100%;
+            max-width: 100%;
+            aspect-ratio: 16/9;
+            min-height: 200px;
+            background: #000;
+        }
+        
+        /* Plyr wrapper should also have proper sizing */
+        .plyr--video {
+            aspect-ratio: 16/9;
+            min-height: 200px;
+        }
 
         /* Always keep controls visible (especially on mobile where hover doesn't exist) */
         .plyr--video .plyr__controls {
@@ -589,6 +604,13 @@
         .plyr__control--overlaid {
             background: rgba(124, 252, 0, 0.9);
             color: #000;
+            opacity: 1 !important;
+            visibility: visible !important;
+            z-index: 5 !important;
+        }
+        
+        .plyr__control--overlaid svg {
+            fill: #000 !important;
         }
         
         .plyr__control--overlaid:hover {
@@ -598,14 +620,41 @@
         .plyr__controls {
             background: linear-gradient(transparent, rgba(0,0,0,0.9));
             padding: 20px 15px 15px;
+            z-index: 10 !important;
         }
         
         /* Ensure all control buttons in the bar are visible */
         .plyr__controls__item {
             color: #fff !important;
+            opacity: 1 !important;
+            visibility: visible !important;
         }
         
         .plyr__controls__item svg {
+            fill: #fff !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        
+        /* Play button specifically */
+        .plyr__control[data-plyr="play"] {
+            color: #fff !important;
+            opacity: 1 !important;
+        }
+        
+        .plyr__control[data-plyr="play"] svg {
+            fill: #fff !important;
+        }
+        
+        /* Rewind and fast-forward buttons */
+        .plyr__control[data-plyr="rewind"],
+        .plyr__control[data-plyr="fast-forward"] {
+            color: #fff !important;
+            opacity: 1 !important;
+        }
+        
+        .plyr__control[data-plyr="rewind"] svg,
+        .plyr__control[data-plyr="fast-forward"] svg {
             fill: #fff !important;
         }
         
@@ -2764,11 +2813,20 @@
             const loadingOverlay = document.getElementById('loadingOverlay');
             loadingOverlay.style.display = 'none';
             
+            // Hide the video and embed elements
+            const videoEl = document.getElementById('player');
+            const embedEl = document.getElementById('embedContainer');
+            if (videoEl) videoEl.style.display = 'none';
+            if (embedEl) embedEl.style.display = 'none';
+            
             // Show message in player area
-            const playerContainer = document.querySelector('.player-container') || document.querySelector('.video-container');
+            const playerContainer = document.getElementById('playerWrapper') || document.querySelector('.player-wrapper');
             if (playerContainer) {
-                playerContainer.innerHTML = `
-                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 300px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 12px; padding: 40px; text-align: center;">
+                // Create unavailable message element
+                const unavailableDiv = document.createElement('div');
+                unavailableDiv.className = 'video-unavailable-message';
+                unavailableDiv.style.cssText = 'display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; aspect-ratio: 16/9; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 12px; padding: 40px; text-align: center;';
+                unavailableDiv.innerHTML = `
                         <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="1.5" style="margin-bottom: 20px;">
                             <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
                             <line x1="7" y1="2" x2="7" y2="22"></line>
@@ -2789,8 +2847,8 @@
                             </svg>
                             Browse Available Movies
                         </a>
-                    </div>
                 `;
+                playerContainer.appendChild(unavailableDiv);
             }
         }
         
@@ -3116,7 +3174,9 @@
                         }
                         
                         // Check if video URL is valid
-                        if (!isValidVideoUrl(videoUrl) && !streamtapeId && !directCdnUrl) {
+                        // Note: secureStreamPath and provider='archive' with archiveItemId are valid even without direct videoUrl
+                        const hasSecureStream = secureStreamPath || (declaredProvider === 'archive' && movie.video?.archiveItemId);
+                        if (!isValidVideoUrl(videoUrl) && !streamtapeId && !directCdnUrl && !hasSecureStream) {
                             console.log('⚠️ No valid video URL available for this movie');
                             showVideoUnavailable(movie.originalTitle);
                             if (!isNonMoviePlayback) {
@@ -3133,21 +3193,60 @@
                         // PRIORITY 0: Secure stream path (backend proxy) if provided
                         if (secureStreamPath || declaredProvider === 'archive') {
                             console.log('✅ Archive.org source detected - using secure stream proxy');
-                            const secureUrl = await getSecureArchiveStreamUrl(apiUrl, movie);
-                            initPrerollAd(secureUrl, 'direct');
+                            try {
+                                const secureUrl = await getSecureArchiveStreamUrl(apiUrl, movie);
+                                initPrerollAd(secureUrl, 'direct');
+                            } catch (streamErr) {
+                                console.warn('⚠️ Secure stream failed, falling back to embed:', streamErr.message);
+                                // Fallback to Archive.org embed for free content
+                                if ((movie.requiredPlan || 'free') === 'free' && currentArchiveFallbackEmbedUrl) {
+                                    loadArchiveOrgEmbed(currentArchiveFallbackEmbedUrl);
+                                } else if (directCdnUrl) {
+                                    initPrerollAd(directCdnUrl, 'direct');
+                                } else if (videoUrl) {
+                                    const archiveEmbedUrl = getArchiveOrgEmbedUrl(videoUrl);
+                                    loadArchiveOrgEmbed(archiveEmbedUrl);
+                                } else {
+                                    showVideoUnavailable(movie.originalTitle || 'this movie');
+                                }
+                            }
                         }
                         // PRIORITY 1: Use direct CDN URL if available (ia800101.us.archive.org/...)
                         // These work without CORS issues because there's no redirect
                         else if (directCdnUrl && directCdnUrl.match(/ia\d+\.us\.archive\.org/)) {
                             console.log('✅ Archive.org source detected - using secure stream proxy');
-                            const secureUrl = await getSecureArchiveStreamUrl(apiUrl, movie);
-                            initPrerollAd(secureUrl, 'direct');
+                            try {
+                                const secureUrl = await getSecureArchiveStreamUrl(apiUrl, movie);
+                                initPrerollAd(secureUrl, 'direct');
+                            } catch (streamErr) {
+                                console.warn('⚠️ Secure stream failed, falling back to direct CDN:', streamErr.message);
+                                // Fallback: use direct CDN URL (works for free content)
+                                if ((movie.requiredPlan || 'free') === 'free') {
+                                    initPrerollAd(directCdnUrl, 'direct');
+                                } else if (currentArchiveFallbackEmbedUrl) {
+                                    loadArchiveOrgEmbed(currentArchiveFallbackEmbedUrl);
+                                } else {
+                                    showVideoUnavailable(movie.originalTitle || 'this movie');
+                                }
+                            }
                         }
                         // PRIORITY 2: Check if videoUrl/embedUrl is already a direct CDN URL
                         else if (videoUrl && videoUrl.match(/ia\d+\.us\.archive\.org/) && videoUrl.endsWith('.mp4')) {
                             console.log('✅ Archive.org source detected - using secure stream proxy');
-                            const secureUrl = await getSecureArchiveStreamUrl(apiUrl, movie);
-                            initPrerollAd(secureUrl, 'direct');
+                            try {
+                                const secureUrl = await getSecureArchiveStreamUrl(apiUrl, movie);
+                                initPrerollAd(secureUrl, 'direct');
+                            } catch (streamErr) {
+                                console.warn('⚠️ Secure stream failed, falling back to direct URL:', streamErr.message);
+                                // Fallback: use direct video URL
+                                if ((movie.requiredPlan || 'free') === 'free') {
+                                    initPrerollAd(videoUrl, 'direct');
+                                } else if (currentArchiveFallbackEmbedUrl) {
+                                    loadArchiveOrgEmbed(currentArchiveFallbackEmbedUrl);
+                                } else {
+                                    showVideoUnavailable(movie.originalTitle || 'this movie');
+                                }
+                            }
                         }
                         // PRIORITY 3: Check if it's an Archive.org URL (embed/details/download) - Use EMBED
                         else if (videoUrl && isArchiveOrgUrl(videoUrl)) {
@@ -4102,6 +4201,15 @@
             console.log('✅ TrailerPlayer ready, loading movie data...');
             loadMovieData();
         });
+        
+        // Failsafe: hide loading overlay after 15 seconds if something goes wrong
+        setTimeout(() => {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay && overlay.style.display !== 'none') {
+                console.warn('⚠️ Failsafe: hiding loading overlay after timeout');
+                overlay.style.display = 'none';
+            }
+        }, 15000);
         
         // Load comments when movie is loaded
         if (movieId) {

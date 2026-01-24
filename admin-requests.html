@@ -812,7 +812,7 @@
 
         // Check admin auth
         document.addEventListener('DOMContentLoaded', async function() {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
             if (!token) {
                 window.location.href = 'login.html';
                 return;
@@ -824,7 +824,9 @@
                 });
                 const data = await response.json();
                 
-                if (!data.success || data.user.role !== 'admin') {
+                // Handle both response formats: data.data.user.role or data.user.role
+                const user = data.data?.user || data.user || data.data;
+                if (!user || user.role !== 'admin') {
                     alert('Access denied. Admin only.');
                     window.location.href = 'index.html';
                     return;
@@ -856,11 +858,11 @@
                 });
                 const data = await response.json();
 
-                if (data.success) {
-                    const stats = data.stats;
-                    document.getElementById('pendingCount').textContent = stats.statusCounts.pending || 0;
-                    document.getElementById('inProgressCount').textContent = stats.statusCounts.in_progress || 0;
-                    document.getElementById('resolvedCount').textContent = stats.statusCounts.resolved || 0;
+                if (data.success && data.data) {
+                    const stats = data.data.statusCounts || {};
+                    document.getElementById('pendingCount').textContent = stats.pending || 0;
+                    document.getElementById('inProgressCount').textContent = stats.in_progress || 0;
+                    document.getElementById('resolvedCount').textContent = stats.resolved || 0;
                     document.getElementById('totalCount').textContent = stats.total || 0;
                 }
             } catch (error) {

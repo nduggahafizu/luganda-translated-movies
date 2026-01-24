@@ -1012,7 +1012,9 @@ router.put('/:id', async (req, res) => {
             genres,
             embedUrl,
             featured,
-            trending
+            trending,
+            status,
+            requiredPlan
         } = req.body;
 
         // Build update object with only provided fields
@@ -1031,6 +1033,8 @@ router.put('/:id', async (req, res) => {
         if (genres) updateData.genres = mapGenres(genres);
         if (featured !== undefined) updateData.featured = featured;
         if (trending !== undefined) updateData.trending = trending;
+        if (status) updateData.status = status;
+        if (requiredPlan) updateData.requiredPlan = requiredPlan;
         
         // Handle video/embed URL update
         if (embedUrl) {
