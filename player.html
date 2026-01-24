@@ -328,15 +328,19 @@
             }
         }
         
-        /* Plyr Customization */
+        /* Plyr Customization - Professional Netflix/YouTube-inspired theme */
         .plyr {
-            --plyr-color-main: #7CFC00;
+            --plyr-color-main: #E50914; /* Netflix red for accent */
             --plyr-video-background: #000;
-            --plyr-menu-background: rgba(26, 26, 26, 0.95);
+            --plyr-menu-background: rgba(20, 20, 20, 0.98);
             --plyr-menu-color: #fff;
             --plyr-menu-border-color: #333;
-            --plyr-control-icon-size: 18px;
-            --plyr-control-spacing: 10px;
+            --plyr-control-icon-size: 20px;
+            --plyr-control-spacing: 12px;
+            --plyr-range-thumb-background: #E50914;
+            --plyr-range-fill-background: #E50914;
+            --plyr-badge-background: #E50914;
+            --plyr-font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
         /* Ensure native video player is visible with proper sizing */
@@ -354,19 +358,30 @@
             min-height: 200px;
         }
 
-        /* Always keep controls visible (especially on mobile where hover doesn't exist) */
+        /* Controls auto-hide during playback - show on hover/tap */
         .plyr--video .plyr__controls {
-            opacity: 1 !important;
-            visibility: visible !important;
-            transform: translateY(0) !important;
-            pointer-events: auto !important;
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
         }
 
+        /* Hide controls when video is playing and user is idle */
         .plyr--video.plyr--hide-controls .plyr__controls {
-            opacity: 1 !important;
-            visibility: visible !important;
-            transform: translateY(0) !important;
-            pointer-events: auto !important;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(100%);
+            pointer-events: none;
+        }
+        
+        /* Show controls on hover */
+        .plyr--video:hover .plyr__controls,
+        .plyr--video.plyr--paused .plyr__controls {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
         }
         
         /* Make Plyr control buttons visible */
@@ -385,19 +400,47 @@
             color: inherit !important;
         }
         
-        /* Fullscreen button specifically */
-        .plyr__control[data-plyr="fullscreen"],
+        /* Fullscreen button - professional rounded style */
+        .plyr__control[data-plyr="fullscreen"] {
+            color: #fff !important;
+            background: rgba(255, 255, 255, 0.15) !important;
+            border-radius: 6px;
+            margin-left: 8px;
+            padding: 8px !important;
+            transition: all 0.2s ease;
+        }
+        
+        .plyr__control[data-plyr="fullscreen"]:hover {
+            background: rgba(229, 9, 20, 0.9) !important;
+            transform: scale(1.05);
+        }
+        
+        .plyr__control[data-plyr="fullscreen"] svg {
+            fill: #fff !important;
+            width: 20px !important;
+            height: 20px !important;
+        }
+        
+        /* Other control buttons - clean professional style */
         .plyr__control[data-plyr="pip"],
         .plyr__control[data-plyr="airplay"],
         .plyr__control[data-plyr="settings"],
         .plyr__control[data-plyr="mute"],
         .plyr__control[data-plyr="captions"] {
             color: #fff !important;
-            opacity: 1 !important;
-            visibility: visible !important;
+            border-radius: 6px;
+            padding: 8px !important;
+            transition: all 0.2s ease;
         }
         
-        .plyr__control[data-plyr="fullscreen"] svg,
+        .plyr__control[data-plyr="pip"]:hover,
+        .plyr__control[data-plyr="airplay"]:hover,
+        .plyr__control[data-plyr="settings"]:hover,
+        .plyr__control[data-plyr="mute"]:hover,
+        .plyr__control[data-plyr="captions"]:hover {
+            background: rgba(255, 255, 255, 0.15) !important;
+        }
+        
         .plyr__control[data-plyr="pip"] svg,
         .plyr__control[data-plyr="airplay"] svg,
         .plyr__control[data-plyr="settings"] svg,
@@ -406,35 +449,51 @@
             fill: #fff !important;
         }
         
-        .plyr__control[data-plyr="fullscreen"]:hover svg,
         .plyr__control[data-plyr="pip"]:hover svg,
-        .plyr__control[data-plyr="settings"]:hover svg {
-            fill: var(--plyr-color-main) !important;
+        .plyr__control[data-plyr="settings"]:hover svg,
+        .plyr__control[data-plyr="fullscreen"]:hover svg {
+            fill: #fff !important;
         }
         
-        /* Volume slider */
+        /* Volume slider - modern styling */
         .plyr__volume {
             color: #fff;
+            max-width: 100px;
         }
         
         .plyr__volume input[type="range"] {
             color: var(--plyr-color-main);
         }
         
-        /* Time display */
+        /* Time display - clean modern font */
         .plyr__time {
-            color: #fff !important;
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
         }
         
-        /* Progress bar */
+        /* Progress bar - sleek styling */
         .plyr__progress input[type="range"] {
             color: var(--plyr-color-main);
+            height: 5px;
         }
         
-        /* Tooltip */
+        .plyr__progress input[type="range"]::-webkit-slider-runnable-track {
+            height: 5px;
+        }
+        
+        .plyr__progress__buffer {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        /* Tooltip - clean modern style */
         .plyr__tooltip {
-            background: var(--plyr-color-main);
-            color: #000;
+            background: rgba(20, 20, 20, 0.95);
+            color: #fff;
+            font-size: 13px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
         
         /* Embed Container Styles */
@@ -486,29 +545,30 @@
             pointer-events: auto;
         }
 
-        /* Custom fullscreen button for iframe embeds (so fullscreen is always available) */
+        /* Custom fullscreen button for iframe embeds - professional style */
         .embed-fullscreen-btn {
             position: absolute;
             top: 14px;
             right: 14px;
             z-index: 120;
-            width: 42px;
-            height: 42px;
-            border-radius: 10px;
-            border: 1px solid rgba(124, 252, 0, 0.65);
-            background: rgba(0, 0, 0, 0.7);
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(0, 0, 0, 0.8);
             color: #fff;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            -webkit-backdrop-filter: blur(6px);
-            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+            transition: all 0.2s ease;
         }
 
         .embed-fullscreen-btn:hover {
-            background: rgba(124, 252, 0, 0.18);
-            color: var(--primary-color);
+            background: rgba(229, 9, 20, 0.9);
+            transform: scale(1.05);
         }
         
         /* Left side cover - hides Archive.org logo/account link */
@@ -601,56 +661,87 @@
             color: var(--plyr-color-main);
         }
         
+        /* Big center play button - Netflix/YouTube style */
         .plyr__control--overlaid {
-            background: rgba(124, 252, 0, 0.9);
-            color: #000;
-            opacity: 1 !important;
-            visibility: visible !important;
-            z-index: 5 !important;
+            background: rgba(229, 9, 20, 0.95) !important;
+            color: #fff !important;
+            z-index: 5;
+            width: 70px !important;
+            height: 70px !important;
+            border-radius: 50% !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
         }
         
         .plyr__control--overlaid svg {
-            fill: #000 !important;
+            fill: #fff !important;
+            width: 30px !important;
+            height: 30px !important;
         }
         
         .plyr__control--overlaid:hover {
-            background: #7CFC00;
+            background: #ff1a1a !important;
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(229, 9, 20, 0.6);
         }
         
+        /* Control bar - sleek gradient background */
         .plyr__controls {
-            background: linear-gradient(transparent, rgba(0,0,0,0.9));
-            padding: 20px 15px 15px;
+            background: linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 50%, transparent 100%);
+            padding: 60px 16px 16px;
             z-index: 10 !important;
         }
         
-        /* Ensure all control buttons in the bar are visible */
+        /* Control buttons styling - clean and modern */
         .plyr__controls__item {
             color: #fff !important;
-            opacity: 1 !important;
-            visibility: visible !important;
+            transition: all 0.2s ease;
+        }
+        
+        .plyr__controls__item:hover {
+            transform: scale(1.1);
         }
         
         .plyr__controls__item svg {
             fill: #fff !important;
-            opacity: 1 !important;
-            visibility: visible !important;
         }
         
-        /* Play button specifically */
+        /* Play/Pause button in control bar */
         .plyr__control[data-plyr="play"] {
             color: #fff !important;
-            opacity: 1 !important;
+            border-radius: 50%;
+            padding: 10px !important;
+            transition: all 0.2s ease;
+        }
+        
+        .plyr__control[data-plyr="play"]:hover {
+            background: rgba(229, 9, 20, 0.8) !important;
         }
         
         .plyr__control[data-plyr="play"] svg {
             fill: #fff !important;
+            width: 22px !important;
+            height: 22px !important;
         }
         
         /* Rewind and fast-forward buttons */
         .plyr__control[data-plyr="rewind"],
         .plyr__control[data-plyr="fast-forward"] {
             color: #fff !important;
-            opacity: 1 !important;
+            border-radius: 50%;
+            padding: 8px !important;
+            transition: all 0.2s ease;
+        }
+        
+        .plyr__control[data-plyr="rewind"]:hover,
+        .plyr__control[data-plyr="fast-forward"]:hover {
+            background: rgba(255, 255, 255, 0.15) !important;
+        }
+        
+        .plyr__control[data-plyr="rewind"] svg,
+        .plyr__control[data-plyr="fast-forward"] svg {
+            fill: #fff !important;
+        }
         }
         
         .plyr__control[data-plyr="rewind"] svg,
@@ -3061,7 +3152,7 @@
                 toggleInvert: true,
                 displayDuration: true,
                 ratio: '16:9',
-                fullscreen: { enabled: true, fallback: true, iosNative: true },
+                fullscreen: { enabled: true, fallback: true, iosNative: true, container: null },
                 // Speed optimizations
                 loadSprite: false,  // Don't load external sprite
                 iconUrl: null,      // Use inline SVGs
@@ -3069,7 +3160,7 @@
                 autoplay: false,    // Don't autoplay but be ready
                 resetOnEnd: false,  // Keep video ready after end
                 disableContextMenu: false,
-                hideControls: false, // Keep controls visible (play/seek/volume/fullscreen)
+                hideControls: true, // Auto-hide controls during playback (normal behavior)
                 clickToPlay: true,
                 storage: { enabled: true, key: 'plyr' }  // Remember settings
             });

@@ -481,13 +481,33 @@
             };
             
             try {
-                const response = await getSeriesWithFallback(params);
+                // Debug log API URL being used
+                if (window.API_CONFIG) {
+                    console.warn('[Series] Using API:', window.API_CONFIG.BASE_URL);
+                }
                 
-                if (response.success) {
-                    renderSeries(response.data);
-                    renderPagination(response.pagination);
+                const response = await getSeriesWithFallback(params);
+                console.warn('[Series] API Response:', response);
+                
+                if (response && response.success) {
+                    if (response.data && response.data.length > 0) {
+                        renderSeries(response.data);
+                        renderPagination(response.pagination);
+                    } else {
+                        // Empty array - show empty state
+                        grid.innerHTML = `
+                            <div class="empty-state">
+                                <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                                    <polyline points="17 2 12 7 7 2"></polyline>
+                                </svg>
+                                <p class="empty-text">No Series Available Yet</p>
+                                <p class="empty-subtext">Check back soon for new TV series</p>
+                            </div>
+                        `;
+                    }
                 } else {
-                    throw new Error('Failed to load series');
+                    throw new Error(response?.message || 'Failed to load series');
                 }
             } catch (error) {
                 console.error('Error loading series:', error);
@@ -499,7 +519,7 @@
                             <line x1="12" y1="16" x2="12.01" y2="16"></line>
                         </svg>
                         <p class="empty-text">Error Loading Series</p>
-                        <p class="empty-subtext">Please try again later</p>
+                        <p class="empty-subtext">${error.message || 'Please try again later'}</p>
                         <button onclick="loadSeries()" class="btn btn-glow" style="margin-top: 20px;">Retry</button>
                     </div>
                 `;

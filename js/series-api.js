@@ -5,12 +5,19 @@
 
 class SeriesAPI {
     constructor() {
-        // Prefer centralized API_CONFIG when available (loaded via js/config.js)
-        this.baseUrl = (window.API_CONFIG && window.API_CONFIG.BASE_URL)
-            ? window.API_CONFIG.BASE_URL
-            : 'http://localhost:5000';
+        // Defer URL resolution to method call time to ensure API_CONFIG is loaded
+        this._baseUrl = null;
         this.cache = new Map();
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
+    }
+
+    get baseUrl() {
+        // Always get fresh from API_CONFIG at call time
+        if (window.API_CONFIG && window.API_CONFIG.BASE_URL) {
+            return window.API_CONFIG.BASE_URL;
+        }
+        // Fallback
+        return this._baseUrl || 'https://luganda-translated-movies-production.up.railway.app';
     }
 
     async fetchWithCache(url, options = {}) {
@@ -361,7 +368,9 @@ const SAMPLE_SERIES = [
  */
 async function getSeriesWithFallback(params = {}) {
     try {
+        console.warn('[getSeriesWithFallback] Fetching from:', seriesAPI.baseUrl);
         const response = await seriesAPI.getAllSeries(params);
+        console.warn('[getSeriesWithFallback] Response:', response);
 
         // Treat an empty list as a valid outcome (UI will show an empty state).
         if (response && response.success === true && Array.isArray(response.data)) {
@@ -371,6 +380,7 @@ async function getSeriesWithFallback(params = {}) {
         // Anything else is an unexpected/invalid response shape.
         throw new Error('Invalid response from API');
     } catch (error) {
+        console.error('[getSeriesWithFallback] Error:', error.message);
         // Avoid showing fake content in production.
         // Allow sample fallback only for localhost/dev or when explicitly enabled via ?demo=1.
         const allowSampleFallback =
