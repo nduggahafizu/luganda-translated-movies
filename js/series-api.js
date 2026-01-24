@@ -5,19 +5,29 @@
 
 class SeriesAPI {
     constructor() {
-        // Defer URL resolution to method call time to ensure API_CONFIG is loaded
-        this._baseUrl = null;
+        // Production API URL (always use this in production)
+        this.productionUrl = 'https://luganda-translated-movies-production.up.railway.app';
         this.cache = new Map();
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
     }
 
     get baseUrl() {
-        // Always get fresh from API_CONFIG at call time
+        // Check if we're in production (not localhost)
+        const isProduction = window.location.hostname !== 'localhost' && 
+                            window.location.hostname !== '127.0.0.1';
+        
+        if (isProduction) {
+            // Always use production API in production environment
+            return this.productionUrl;
+        }
+        
+        // For local development, try API_CONFIG first
         if (window.API_CONFIG && window.API_CONFIG.BASE_URL) {
             return window.API_CONFIG.BASE_URL;
         }
-        // Fallback
-        return this._baseUrl || 'https://luganda-translated-movies-production.up.railway.app';
+        
+        // Default fallback
+        return this.productionUrl;
     }
 
     async fetchWithCache(url, options = {}) {
