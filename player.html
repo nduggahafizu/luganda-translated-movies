@@ -10,23 +10,16 @@
     <meta name="author" content="Nduga Hafizu">
     <meta name="robots" content="noindex">
     <meta name="google-adsense-account" content="ca-pub-1904736753681797">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     
     <!-- DNS Prefetch and Preconnect for faster video loading -->
-    <link rel="dns-prefetch" href="//archive.org">
     <link rel="dns-prefetch" href="//streamtape.com">
-    <link rel="dns-prefetch" href="//ia601502.us.archive.org">
-    <link rel="dns-prefetch" href="//ia800101.us.archive.org">
-    <link rel="dns-prefetch" href="//ia800102.us.archive.org">
-    <link rel="dns-prefetch" href="//ia800103.us.archive.org">
-    <link rel="dns-prefetch" href="//ia800104.us.archive.org">
-    <link rel="dns-prefetch" href="//ia800105.us.archive.org">
-    <link rel="dns-prefetch" href="//ia902802.us.archive.org">
-    <link rel="preconnect" href="https://archive.org" crossorigin>
-    <link rel="preconnect" href="https://ia800101.us.archive.org" crossorigin>
     <link rel="preconnect" href="https://luganda-translated-movies-production.up.railway.app" crossorigin>
     
     <!-- Preload critical resources -->
-    <link rel="preload" href="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js" as="script">
+    <link rel="preload" href="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js?v=2024" as="script">
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/hls.js@latest" as="script">
     
     <!-- Google Analytics 4 -->
@@ -53,7 +46,7 @@
     <link rel="manifest" href="manifest.json">
     
     <!-- Plyr CSS - Legal open-source player -->
-    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css?v=2024">
     
     <!-- Main Styles -->
     <link rel="stylesheet" href="css/style.css">
@@ -514,36 +507,6 @@
             height: 100%;
             border: none;
         }
-        
-        /* Hide Archive.org branding, account links and share button in embed */
-        #embedContainer {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        /* Full top overlay bar - completely covers Archive.org header */
-        .embed-top-cover {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 70px;
-            background: #000;
-            z-index: 100;
-            pointer-events: auto; /* Block clicks on Archive.org buttons */
-        }
-        
-        /* Right side cover - hides share button and all right-side controls */
-        .embed-right-cover {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 200px;
-            height: 80px;
-            background: #000;
-            z-index: 101;
-            pointer-events: auto;
-        }
 
         /* Custom fullscreen button for iframe embeds - professional style */
         .embed-fullscreen-btn {
@@ -569,92 +532,6 @@
         .embed-fullscreen-btn:hover {
             background: rgba(229, 9, 20, 0.9);
             transform: scale(1.05);
-        }
-        
-        /* Left side cover - hides Archive.org logo/account link */
-        .embed-left-cover {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 350px;
-            height: 70px;
-            background: #000;
-            z-index: 101;
-            pointer-events: auto;
-        }
-        
-        /* Custom branding bar for embed player */
-        .embed-brand-bar {
-            position: absolute;
-            top: 12px;
-            left: 15px;
-            z-index: 25;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 15px;
-            background: rgba(0, 0, 0, 0.9);
-            border-radius: 8px;
-            border: 1px solid var(--primary-color);
-            pointer-events: none;
-        }
-        
-        .embed-brand-bar img {
-            height: 24px;
-            width: auto;
-        }
-        
-        .embed-brand-bar span {
-            color: var(--primary-color);
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-        
-        /* Gradient fade below the top cover for smooth transition */
-        .embed-top-cover::after {
-            content: '';
-            position: absolute;
-            bottom: -20px;
-            left: 0;
-            right: 0;
-            height: 20px;
-            background: linear-gradient(to bottom, #000 0%, transparent 100%);
-            pointer-events: none;
-        }
-        
-        @media (max-width: 767px) {
-            #embedContainer {
-                border-radius: 0;
-            }
-            
-            .embed-top-cover {
-                height: 60px;
-            }
-            
-            .embed-left-cover {
-                width: 200px;
-                height: 60px;
-            }
-            
-            .embed-right-cover {
-                width: 150px;
-                height: 65px;
-            }
-            
-            .embed-brand-bar {
-                top: 15px;
-                left: 10px;
-                padding: 5px 10px;
-            }
-            
-            .embed-brand-bar img {
-                height: 18px;
-            }
-            
-            .embed-brand-bar span {
-                font-size: 10px;
-            }
         }
         
         .plyr--full-ui input[type=range] {
@@ -683,6 +560,23 @@
             background: #ff1a1a !important;
             transform: scale(1.1);
             box-shadow: 0 6px 30px rgba(229, 9, 20, 0.6);
+        }
+        
+        /* Ensure all Plyr controls are visible and properly styled */
+        .plyr__controls {
+            background: linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 50%, transparent 100%);
+            padding: 60px 16px 16px;
+            z-index: 10 !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        
+        /* Make sure all control buttons are visible */
+        .plyr__control {
+            display: inline-flex !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            color: #fff !important;
         }
         
         /* Control bar - sleek gradient background */
@@ -2099,23 +1993,12 @@
         </div>
         
         <!-- Native Video Player (for direct video files) - OPTIMIZED FOR SPEED -->
-        <video id="player" playsinline controls preload="auto" style="display: none;">
+        <video id="player" playsinline controls preload="auto" data-plyr-config='{"controls":["play-large","rewind","play","fast-forward","progress","current-time","duration","mute","volume","captions","settings","pip","airplay","fullscreen"]}' style="display: none;">
             <source src="" type="video/mp4">
         </video>
         
-        <!-- Embed Player Container (for Streamtape, Archive.org, etc.) -->
+        <!-- Embed Player Container (for Streamtape, etc.) -->
         <div id="embedContainer" style="display: none; width: 100%; min-height: 400px; aspect-ratio: 16/9; background: #000; position: relative;">
-            <!-- Top cover bar - completely hides Archive.org header -->
-            <div class="embed-top-cover"></div>
-            <!-- Left cover - hides Archive.org logo and account link -->
-            <div class="embed-left-cover"></div>
-            <!-- Right cover - hides share button -->
-            <div class="embed-right-cover"></div>
-            <!-- Unruly Movies branding -->
-            <div class="embed-brand-bar">
-                <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
-                <span>UNRULY MOVIES</span>
-            </div>
             <button class="embed-fullscreen-btn" id="embedFullscreenBtn" type="button" aria-label="Fullscreen">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M8 3H5a2 2 0 0 0-2 2v3" />
@@ -2410,7 +2293,7 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js?v=2024"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
@@ -2600,16 +2483,6 @@
             console.log('🚀 Prefetching video URL:', url.substring(0, 60));
         }
         
-        // Preload Archive.org embed by creating hidden iframe
-        function preloadArchiveEmbed(url) {
-            if (!url) return;
-            const preloader = document.createElement('link');
-            preloader.rel = 'prerender';
-            preloader.href = url;
-            document.head.appendChild(preloader);
-            console.log('🚀 Prerendering Archive.org embed');
-        }
-
         // ========== PRE-ROLL AD SYSTEM (AdSense Only) ==========
         const prerollAdConfig = {
             enabled: false,                   // Set to true when you have AdSense video ads
@@ -2776,70 +2649,11 @@
                 case 'embed':
                     loadEmbedVideo(url);
                     break;
-                case 'archive':
-                    loadArchiveOrgEmbed(url);
-                    break;
                 default:
                     loadVideoSource(url);
             }
         }
 
-        // Convert Archive.org URL to direct MP4 (for native player with ad support)
-        function getArchiveOrgDirectUrl(url) {
-            // If it's already a CDN direct URL (ia800101.us.archive.org/...)
-            // These are already direct playable URLs
-            if (url.match(/ia\d+\.us\.archive\.org/) && 
-                (url.endsWith('.mp4') || url.endsWith('.ia.mp4'))) {
-                console.log('✅ Already a direct CDN URL:', url.substring(0, 60));
-                return url;
-            }
-            
-            // If it's already a direct download URL with .mp4 or .ia.mp4
-            if (url.includes('archive.org/download/') && 
-                (url.endsWith('.mp4') || url.endsWith('.ia.mp4'))) {
-                return url;
-            }
-            
-            // Convert embed URL to potential direct URL
-            // archive.org/embed/item-id → archive.org/download/item-id/item-id.ia.mp4
-            const embedMatch = url.match(/archive\.org\/embed\/([^\/\?]+)/);
-            if (embedMatch) {
-                const itemId = embedMatch[1];
-                // Archive.org creates .ia.mp4 versions that are browser-compatible
-                return `https://archive.org/download/${itemId}/${itemId}.ia.mp4`;
-            }
-            
-            // Convert details URL
-            const detailsMatch = url.match(/archive\.org\/details\/([^\/\?]+)/);
-            if (detailsMatch) {
-                const itemId = detailsMatch[1];
-                return `https://archive.org/download/${itemId}/${itemId}.ia.mp4`;
-            }
-            
-            return url;
-        }
-
-        // Try direct MP4 URL first, fall back to embed if it fails
-        async function tryDirectMp4WithFallback(directMp4Url, originalEmbedUrl) {
-            console.log('🔍 Checking if direct MP4 exists:', directMp4Url);
-            
-            try {
-                // Quick HEAD request to check if MP4 exists
-                const response = await fetch(directMp4Url, { 
-                    method: 'HEAD',
-                    mode: 'no-cors' // Archive.org may block CORS on HEAD
-                });
-                
-                // If no error, try to use direct MP4
-                console.log('✅ Direct MP4 URL accessible, using native player with pre-roll');
-                initPrerollAd(directMp4Url, 'direct');
-                
-            } catch (error) {
-                console.log('⚠️ Direct MP4 not available, falling back to embed:', error.message);
-                const archiveEmbedUrl = getArchiveOrgEmbedUrl(originalEmbedUrl);
-                initPrerollAd(archiveEmbedUrl, 'archive');
-            }
-        }
         // ========== END PRE-ROLL AD SYSTEM ==========
 
         function getStoredAuthToken() {
@@ -2909,6 +2723,112 @@
 
             return `${apiUrl}/api/video/stream/luganda/${id}?token=${encodeURIComponent(playbackToken)}`;
         }
+
+        // ========== CLOUD VIDEO LINK CONVERTERS ==========
+        
+        // Check if URL is a Cloudflare Stream URL
+        function isCloudflareStreamUrl(url) {
+            if (!url) return false;
+            return url.includes('cloudflarestream.com') || url.includes('videodelivery.net');
+        }
+        
+        // Convert Cloudflare Stream URL to direct playable format
+        // Input: https://customer-xxx.cloudflarestream.com/VIDEO_ID/watch
+        // Output: { hls: 'manifest URL', mp4: 'download URL' }
+        function getCloudflareDirectUrls(url) {
+            if (!url) return null;
+            
+            // Extract customer subdomain and video ID from various Cloudflare URL formats
+            let customerId = null;
+            let videoId = null;
+            
+            // Format: https://customer-xxx.cloudflarestream.com/VIDEO_ID/watch
+            const watchMatch = url.match(/customer-([^.]+)\.cloudflarestream\.com\/([a-f0-9]+)/i);
+            if (watchMatch) {
+                customerId = watchMatch[1];
+                videoId = watchMatch[2];
+            }
+            
+            // Format: https://videodelivery.net/VIDEO_ID
+            const deliveryMatch = url.match(/videodelivery\.net\/([a-f0-9]+)/i);
+            if (deliveryMatch) {
+                videoId = deliveryMatch[1];
+            }
+            
+            // Format: https://watch.cloudflarestream.com/VIDEO_ID
+            const watchCfMatch = url.match(/watch\.cloudflarestream\.com\/([a-f0-9]+)/i);
+            if (watchCfMatch) {
+                videoId = watchCfMatch[1];
+            }
+            
+            // Format: https://iframe.cloudflarestream.com/VIDEO_ID or with params
+            const iframeMatch = url.match(/iframe\.cloudflarestream\.com\/([a-f0-9]+)/i);
+            if (iframeMatch) {
+                videoId = iframeMatch[1];
+            }
+            
+            if (!videoId) {
+                console.log('⚠️ Could not extract video ID from Cloudflare URL:', url);
+                return null;
+            }
+            
+            // Build direct URLs
+            const baseUrl = customerId 
+                ? `https://customer-${customerId}.cloudflarestream.com/${videoId}`
+                : `https://videodelivery.net/${videoId}`;
+            
+            return {
+                hls: `${baseUrl}/manifest/video.m3u8`,
+                dash: `${baseUrl}/manifest/video.mpd`,
+                mp4: `${baseUrl}/downloads/default.mp4`,
+                thumbnail: `${baseUrl}/thumbnails/thumbnail.jpg`,
+                poster: `${baseUrl}/thumbnails/thumbnail.jpg?time=0s`,
+                original: url
+            };
+        }
+        
+        // Check if URL is from other cloud providers and convert to direct link
+        function convertCloudVideoUrl(url) {
+            if (!url) return { type: 'direct', url: url };
+            
+            // Cloudflare Stream
+            if (isCloudflareStreamUrl(url)) {
+                const cfUrls = getCloudflareDirectUrls(url);
+                if (cfUrls) {
+                    console.log('☁️ Cloudflare Stream detected, using HLS:', cfUrls.hls);
+                    return { 
+                        type: 'hls', 
+                        url: cfUrls.hls, 
+                        fallbackUrl: cfUrls.mp4,
+                        poster: cfUrls.poster,
+                        allUrls: cfUrls 
+                    };
+                }
+            }
+            
+            // Bunny.net CDN (bunnycdn.com or b-cdn.net)
+            if (url.includes('bunnycdn.com') || url.includes('b-cdn.net')) {
+                // Bunny CDN URLs are usually direct, but check for HLS
+                if (url.includes('/play/')) {
+                    // Convert play URL to HLS
+                    const hlsUrl = url.replace('/play/', '/').replace(/\/?$/, '/playlist.m3u8');
+                    console.log('🐰 Bunny CDN detected, trying HLS:', hlsUrl);
+                    return { type: 'hls', url: hlsUrl, fallbackUrl: url };
+                }
+                return { type: 'direct', url: url };
+            }
+            
+            // Vimeo (if direct URL provided)
+            if (url.includes('vimeocdn.com') || url.includes('player.vimeo.com')) {
+                console.log('📹 Vimeo CDN detected');
+                return { type: 'direct', url: url };
+            }
+            
+            // Default: treat as direct video URL
+            return { type: 'direct', url: url };
+        }
+        
+        // ========== END CLOUD VIDEO LINK CONVERTERS ==========
 
         // Check if URL is a direct video file (can be played natively)
         function isDirectVideoUrl(url) {
@@ -2988,23 +2908,6 @@
             }
         }
         
-        // Check if URL is an Archive.org URL (any format)
-        function isArchiveOrgUrl(url) {
-            if (!url) {
-                console.log('🔍 isArchiveOrgUrl: URL is empty/null');
-                return false;
-            }
-            // Clean up URL (remove spaces that might be added accidentally)
-            const cleanUrl = url.trim().replace(/\s+/g, '');
-            // Check for all Archive.org URL formats including CDN subdomains (ia800101.us.archive.org, etc.)
-            const isArchive = cleanUrl.includes('archive.org/embed/') || 
-                   cleanUrl.includes('archive.org/details/') ||
-                   cleanUrl.includes('archive.org/download/') ||
-                   cleanUrl.match(/ia\d+\.us\.archive\.org/) !== null; // CDN URLs like ia800101.us.archive.org
-            console.log('🔍 isArchiveOrgUrl check:', cleanUrl.substring(0, 60), '... =', isArchive);
-            return isArchive;
-        }
-        
         // Check if URL is a valid video URL (not placeholder/pending)
         function isValidVideoUrl(url) {
             if (!url) return false;
@@ -3021,43 +2924,6 @@
             return true;
         }
         
-        // Convert Archive.org URL to embed URL with minimal UI
-        function getArchiveOrgEmbedUrl(url) {
-            if (!url) return null;
-            
-            let embedUrl = url;
-            
-            // Already an embed URL
-            if (url.includes('archive.org/embed/')) {
-                embedUrl = url;
-            }
-            // Convert details URL to embed
-            else if (url.includes('archive.org/details/')) {
-                embedUrl = url.replace('/details/', '/embed/');
-            }
-            // Convert download URL to embed (extract item ID)
-            else if (url.includes('archive.org/download/')) {
-                const match = url.match(/archive\.org\/download\/([^\/]+)/);
-                if (match) {
-                    embedUrl = `https://archive.org/embed/${match[1]}`;
-                }
-            }
-            // Handle CDN URLs like ia800101.us.archive.org/14/items/item-id/file.mp4
-            else if (url.match(/ia\d+\.us\.archive\.org/)) {
-                const match = url.match(/items\/([^\/]+)/);
-                if (match) {
-                    embedUrl = `https://archive.org/embed/${match[1]}`;
-                }
-            }
-            
-            // Add parameters to hide Archive.org branding and account links
-            // ui=min - minimal UI, playlist=0 - no playlist, autoplay=1
-            const separator = embedUrl.includes('?') ? '&' : '?';
-            embedUrl += `${separator}ui=min&playlist=0&autoplay=1&output=embed`;
-            
-            return embedUrl;
-        }
-
         // Auto-rotate to landscape on fullscreen (like YouTube)
         function setupAutoRotate(playerInstance) {
             // Check if Screen Orientation API is supported
@@ -3171,6 +3037,11 @@
             video.playsInline = true;
             video.setAttribute('playsinline', '');
             
+            // Ensure video is visible before Plyr initialization
+            video.style.display = 'block';
+            video.style.width = '100%';
+            video.style.height = 'auto';
+            
             player = new Plyr(video, {
                 controls: [
                     'play-large',
@@ -3216,6 +3087,22 @@
             // Optimize buffering - try to buffer ahead
             player.on('ready', () => {
                 console.log('🚀 Plyr ready - optimizing buffer');
+                
+                // Force all controls to be visible
+                const controls = document.querySelectorAll('.plyr__control');
+                controls.forEach(control => {
+                    control.style.display = 'inline-flex';
+                    control.style.visibility = 'visible';
+                    control.style.opacity = '1';
+                });
+                
+                // Ensure controls bar is visible
+                const controlsBar = document.querySelector('.plyr__controls');
+                if (controlsBar) {
+                    controlsBar.style.display = 'flex';
+                    controlsBar.style.visibility = 'visible';
+                    controlsBar.style.opacity = '1';
+                }
             });
             
             return player;
@@ -3559,173 +3446,6 @@
             }, 2000);
         }
 
-        // Load Archive.org embed (works for MKV and all formats, NO ADS!) - SPEED OPTIMIZED
-        function loadArchiveOrgEmbed(url) {
-            console.log('📦 Loading Archive.org embed:', url);
-            setEmbedMode(true);
-            
-            // Extract the original Archive.org URL for fallback
-            let originalArchiveUrl = url;
-            if (url.includes('/embed/')) {
-                originalArchiveUrl = url.replace('/embed/', '/details/').split('?')[0];
-            }
-            
-            // Hide native player, show embed container
-            video.style.display = 'none';
-            if (player) {
-                player.destroy();
-                player = null;
-            }
-            embedContainer.style.display = 'block';
-            
-            // Optimize iframe loading - set attributes before src
-            embedPlayer.loading = 'eager';  // Load immediately
-            embedPlayer.setAttribute('loading', 'eager');
-            embedPlayer.setAttribute('importance', 'high');
-            embedPlayer.allow = 'autoplay; fullscreen; picture-in-picture; accelerometer; gyroscope';
-            // Fullscreen permission is controlled via the iframe `allow` attribute.
-            
-            // Add autoplay to URL for faster start
-            let optimizedUrl = url;
-            if (!optimizedUrl.includes('autoplay=')) {
-                optimizedUrl += (optimizedUrl.includes('?') ? '&' : '?') + 'autoplay=1';
-            }
-            
-            // Set the Archive.org embed URL
-            embedPlayer.src = optimizedUrl;
-            
-            // Setup auto-rotate for iframe embeds
-            setupIframeFullscreenRotate(embedPlayer);
-            
-            // Listen for iframe load - hide loading early
-            let loadingHidden = false;
-            
-            embedPlayer.onload = () => {
-                console.log('✅ Archive.org iframe loaded');
-                if (!loadingHidden) {
-                    loadingHidden = true;
-                    loadingOverlay.style.display = 'none';
-                }
-                
-                // Check for embedding error after a short delay
-                setTimeout(() => {
-                    checkForEmbedError(originalArchiveUrl);
-                }, 1500);
-            };
-            
-            // Also check for error on iframe error event
-            embedPlayer.onerror = () => {
-                console.log('❌ Archive.org embed failed');
-                showEmbedErrorFallback(originalArchiveUrl);
-            };
-            
-            // Faster fallback - hide loading after 2 seconds regardless
-            setTimeout(() => {
-                if (!loadingHidden) {
-                    loadingHidden = true;
-                    loadingOverlay.style.display = 'none';
-                }
-            }, 2000);
-        }
-        
-        // Setup auto-rotate for iframe embeds (Archive.org, Streamtape, etc)
-        function setupIframeFullscreenRotate(iframe) {
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            if (!isMobile) return;
-            
-            // Add fullscreen button for iframe
-            const embedContainer = document.getElementById('embed-container');
-            if (!embedContainer) return;
-            
-            // Create fullscreen button if not exists
-            let fsButton = document.getElementById('iframe-fullscreen-btn');
-            if (!fsButton) {
-                fsButton = document.createElement('button');
-                fsButton.id = 'iframe-fullscreen-btn';
-                fsButton.innerHTML = '⛶';
-                fsButton.title = 'Fullscreen';
-                fsButton.style.cssText = `
-                    position: absolute;
-                    bottom: 60px;
-                    right: 15px;
-                    z-index: 100;
-                    background: rgba(0,0,0,0.7);
-                    color: white;
-                    border: none;
-                    padding: 10px 15px;
-                    border-radius: 5px;
-                    cursor: pointer;
-                    font-size: 20px;
-                `;
-                embedContainer.style.position = 'relative';
-                embedContainer.appendChild(fsButton);
-                
-                fsButton.addEventListener('click', async () => {
-                    try {
-                        // Request fullscreen on the container (includes iframe)
-                        if (embedContainer.requestFullscreen) {
-                            await embedContainer.requestFullscreen();
-                        } else if (embedContainer.webkitRequestFullscreen) {
-                            await embedContainer.webkitRequestFullscreen();
-                        } else if (embedContainer.mozRequestFullScreen) {
-                            await embedContainer.mozRequestFullScreen();
-                        } else if (embedContainer.msRequestFullscreen) {
-                            await embedContainer.msRequestFullscreen();
-                        }
-                        
-                        // Rotate to landscape
-                        const screenOrientation = screen.orientation;
-                        if (screenOrientation && screenOrientation.lock) {
-                            await screenOrientation.lock('landscape');
-                        }
-                    } catch (e) {
-                        console.log('⚠️ Fullscreen/rotation error:', e.message);
-                    }
-                });
-            }
-        }
-        
-        // Check if embed shows error (embedding disabled)
-        function checkForEmbedError(originalUrl) {
-            // We can't access iframe content due to cross-origin, so provide a manual option
-            // Add a "Not working?" button below the player
-            addEmbedFallbackButton(originalUrl);
-        }
-        
-        // Add fallback button for embed issues - DISABLED
-        function addEmbedFallbackButton(originalUrl) {
-            // Button removed - users will use direct video player
-            console.log('Embed fallback button disabled');
-        }
-        
-        // Show embed error fallback UI
-        function showEmbedErrorFallback(originalUrl) {
-            loadingOverlay.style.display = 'none';
-            embedContainer.innerHTML = `
-                <div style="
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    height: 100%;
-                    min-height: 300px;
-                    background: #0a0a0a;
-                    padding: 40px 20px;
-                    text-align: center;
-                ">
-                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="1.5" style="margin-bottom: 20px;">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="15" y1="9" x2="9" y2="15"/>
-                        <line x1="9" y1="9" x2="15" y2="15"/>
-                    </svg>
-                    <h3 style="color: #fff; font-size: 18px; margin-bottom: 10px;">Video Unavailable</h3>
-                    <p style="color: #888; font-size: 14px; margin-bottom: 25px; max-width: 400px;">
-                        This video is temporarily unavailable. Please try another movie or check back later.
-                    </p>
-                </div>
-            `;
-        }
-
         // Load HLS source - SPEED OPTIMIZED
         function loadHLSSource(url) {
             if (Hls.isSupported()) {
@@ -3907,20 +3627,32 @@
                 return;
             }
             
+            // Convert cloud video URLs to direct playable format
+            const cloudVideo = convertCloudVideoUrl(url);
+            let videoUrl = cloudVideo.url;
+            let videoType = cloudVideo.type;
+            
+            // Set poster if available from cloud provider
+            if (cloudVideo.poster && video) {
+                video.poster = cloudVideo.poster;
+            }
+            
+            console.log('🎬 Loading video:', videoType, videoUrl);
+            
             setEmbedMode(false);
             
             // Show native player, hide embed
             video.style.display = 'block';
             embedContainer.style.display = 'none';
             
-            // IMPORTANT: Remove crossorigin attribute to avoid CORS issues with Archive.org
+            // IMPORTANT: Remove crossorigin attribute to avoid CORS issues
             video.removeAttribute('crossorigin');
             
-            // Initialize Plyr (without crossorigin)
+            // Initialize Plyr
             initPlyr();
             
-            // Check if HLS stream
-            if (url.includes('.m3u8')) {
+            // Check if HLS stream (either .m3u8 extension or detected as HLS type)
+            if (videoUrl.includes('.m3u8') || videoType === 'hls') {
                 if (Hls.isSupported()) {
                     // Optimized HLS config for faster loading
                     const hls = new Hls({
@@ -3944,7 +3676,7 @@
                         startFragPrefetch: true       // Prefetch first fragment
                     });
                     
-                    hls.loadSource(url);
+                    hls.loadSource(videoUrl);
                     hls.attachMedia(video);
                     
                     // Hide loading early - on first fragment load
@@ -3959,28 +3691,50 @@
                     
                     hls.on(Hls.Events.ERROR, (event, data) => {
                         if (data.fatal) {
-                            loadingOverlay.style.display = 'none';
                             console.error('HLS Error:', data);
-                            // Try to recover
-                            if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-                                hls.startLoad();
-                            } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
-                                hls.recoverMediaError();
+                            
+                            // Try fallback URL if available (e.g., MP4 from Cloudflare)
+                            if (cloudVideo.fallbackUrl) {
+                                console.log('⚠️ HLS failed, trying fallback MP4:', cloudVideo.fallbackUrl);
+                                hls.destroy();
+                                video.src = cloudVideo.fallbackUrl;
+                                video.load();
+                                loadingOverlay.style.display = 'none';
+                            } else {
+                                // Try to recover
+                                if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+                                    hls.startLoad();
+                                } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+                                    hls.recoverMediaError();
+                                } else {
+                                    loadingOverlay.style.display = 'none';
+                                    showMessage('Video playback error. Please try again.', 'error');
+                                }
                             }
                         }
                     });
                     
                     window.hlsPlayer = hls;
                 } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                    video.src = url;
+                    // Safari native HLS support
+                    video.src = videoUrl;
                     video.preload = 'auto';
                     video.addEventListener('loadedmetadata', () => {
                         loadingOverlay.style.display = 'none';
                     }, { once: true });
+                    
+                    // Fallback on error for Safari
+                    video.addEventListener('error', () => {
+                        if (cloudVideo.fallbackUrl) {
+                            console.log('⚠️ Native HLS failed, trying fallback:', cloudVideo.fallbackUrl);
+                            video.src = cloudVideo.fallbackUrl;
+                            video.load();
+                        }
+                    }, { once: true });
                 }
             } else {
                 // Regular video file (MP4, MKV, WebM, etc.)
-                console.log('🎬 Loading video file:', url);
+                console.log('🎬 Loading video file:', videoUrl);
                 
                 // Set aggressive preload for faster start
                 video.preload = 'auto';
@@ -3990,7 +3744,7 @@
                 // This tells the browser we want to buffer aggressively
                 video.autobuffer = true;
                 
-                video.src = url;
+                video.src = videoUrl;
                 
                 // Hide loading as soon as we have some data
                 video.addEventListener('loadeddata', () => {
@@ -4025,13 +3779,21 @@
                     loadingOverlay.style.display = 'none';
                     console.error('❌ Video load error:', e);
                     
+                    // Try fallback URL if available
+                    if (cloudVideo.fallbackUrl && video.src !== cloudVideo.fallbackUrl) {
+                        console.log('⚠️ Video failed, trying fallback:', cloudVideo.fallbackUrl);
+                        video.src = cloudVideo.fallbackUrl;
+                        video.load();
+                        return;
+                    }
+                    
                     // Check if it's a format issue (MKV not supported in some browsers)
-                    const urlLower = url.toLowerCase();
+                    const urlLower = videoUrl.toLowerCase();
                     if (urlLower.includes('.mkv')) {
                         // Show helpful message for MKV files
-                        showVideoError('MKV format may not be supported in this browser. Try using Chrome/Edge, or download the video to watch locally.', url);
+                        showVideoError('MKV format may not be supported in this browser. Try using Chrome/Edge, or download the video to watch locally.', videoUrl);
                     } else {
-                        showVideoError('Error loading video. The file may be unavailable or your browser may not support this format.', url);
+                        showVideoError('Error loading video. The file may be unavailable or your browser may not support this format.', videoUrl);
                     }
                 });
             }
