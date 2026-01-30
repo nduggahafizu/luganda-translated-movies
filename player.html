@@ -321,18 +321,18 @@
             }
         }
         
-        /* Plyr Customization - Professional Netflix/YouTube-inspired theme */
+        /* Plyr Customization - Professional clean theme */
         .plyr {
-            --plyr-color-main: #E50914; /* Netflix red for accent */
+            --plyr-color-main: #00ff88; /* Green accent to match site theme */
             --plyr-video-background: #000;
             --plyr-menu-background: rgba(20, 20, 20, 0.98);
             --plyr-menu-color: #fff;
             --plyr-menu-border-color: #333;
             --plyr-control-icon-size: 20px;
             --plyr-control-spacing: 12px;
-            --plyr-range-thumb-background: #E50914;
-            --plyr-range-fill-background: #E50914;
-            --plyr-badge-background: #E50914;
+            --plyr-range-thumb-background: #00ff88;
+            --plyr-range-fill-background: #00ff88;
+            --plyr-badge-background: #00ff88;
             --plyr-font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
@@ -400,12 +400,12 @@
             border-radius: 6px;
             margin-left: 8px;
             padding: 8px !important;
-            transition: all 0.2s ease;
+            transition: background 0.2s ease, color 0.2s ease;
         }
         
         .plyr__control[data-plyr="fullscreen"]:hover {
-            background: rgba(229, 9, 20, 0.9) !important;
-            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.3) !important;
+            color: #fff !important;
         }
         
         .plyr__control[data-plyr="fullscreen"] svg {
@@ -538,28 +538,37 @@
             color: var(--plyr-color-main);
         }
         
-        /* Big center play button - Netflix/YouTube style */
+        /* Big center play button - Clean professional style */
         .plyr__control--overlaid {
-            background: rgba(229, 9, 20, 0.95) !important;
-            color: #fff !important;
+            background: rgba(255, 255, 255, 0.95) !important;
+            color: #000 !important;
             z-index: 5;
-            width: 70px !important;
-            height: 70px !important;
+            width: 68px !important;
+            height: 68px !important;
             border-radius: 50% !important;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            transition: background 0.2s ease, box-shadow 0.2s ease;
+            position: absolute !important;
+            left: 50% !important;
+            top: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            margin: 0 !important;
         }
         
         .plyr__control--overlaid svg {
-            fill: #fff !important;
-            width: 30px !important;
-            height: 30px !important;
+            fill: #000 !important;
+            width: 28px !important;
+            height: 28px !important;
+            margin-left: 3px; /* Optical centering for play icon */
         }
         
         .plyr__control--overlaid:hover {
-            background: #ff1a1a !important;
-            transform: scale(1.1);
-            box-shadow: 0 6px 30px rgba(229, 9, 20, 0.6);
+            background: #fff !important;
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .plyr__control--overlaid:active {
+            background: rgba(230, 230, 230, 0.95) !important;
         }
         
         /* Ensure all Plyr controls are visible and properly styled */
@@ -589,11 +598,11 @@
         /* Control buttons styling - clean and modern */
         .plyr__controls__item {
             color: #fff !important;
-            transition: all 0.2s ease;
+            transition: color 0.2s ease, background 0.2s ease;
         }
         
         .plyr__controls__item:hover {
-            transform: scale(1.1);
+            color: var(--plyr-color-main) !important;
         }
         
         .plyr__controls__item svg {
