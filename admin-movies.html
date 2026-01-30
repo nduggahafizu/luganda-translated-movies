@@ -800,6 +800,31 @@
                                 </small>
                             </div>
                             
+                            <!-- Cloudflare Stream Direct Link Generator -->
+                            <div class="form-group full-width" style="background: rgba(245, 158, 11, 0.05); padding: 15px; border-radius: 10px; border: 1px dashed #f59e0b;">
+                                <label style="color: #f59e0b;">☁️ Cloudflare Stream Direct Link Generator</label>
+                                <div style="margin-top: 10px;">
+                                    <input type="text" id="cloudflare-stream-url" placeholder="Paste Cloudflare Stream URL (e.g., https://customer-xxx.cloudflarestream.com/VIDEO_ID/watch)" style="width: 100%;">
+                                </div>
+                                <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
+                                    <button type="button" class="btn-secondary" onclick="getCloudflareDirectLink('hls')" style="flex: 2; background: #f59e0b; color: #000;">
+                                        📺 Get HLS Stream (Best Quality)
+                                    </button>
+                                    <button type="button" class="btn-secondary" onclick="getCloudflareDirectLink('mp4')" style="flex: 1; background: #10b981; color: #fff;">
+                                        ⬇️ MP4 Download
+                                    </button>
+                                    <a href="https://dash.cloudflare.com/" target="_blank" rel="noopener" class="btn-secondary" style="text-align: center; text-decoration: none; flex: 1;">
+                                        Dashboard →
+                                    </a>
+                                </div>
+                                <div id="cloudflare-status" style="margin-top: 10px; padding: 10px; border-radius: 8px; display: none;"></div>
+                                <small style="color: var(--text-secondary); margin-top: 8px; display: block;">
+                                    <strong>📺 HLS:</strong> Adaptive quality, best for streaming (recommended)<br>
+                                    <strong>⬇️ MP4:</strong> Direct download link (if downloads enabled)<br>
+                                    <strong>Supports:</strong> cloudflarestream.com, videodelivery.net, iframe embed URLs
+                                </small>
+                            </div>
+                            
                             <!-- Cloudflare R2 Upload (Fast for Africa) -->
                             <div class="form-group full-width" id="r2-upload-section" style="background: rgba(246, 135, 18, 0.05); padding: 15px; border-radius: 10px; border: 1px dashed #f68712; display: none;">
                                 <label style="color: #f68712;">☁️ Cloudflare R2 Upload (FREE Bandwidth, Fast in Africa)</label>
@@ -1356,6 +1381,113 @@
             
             showToast('Archive.org embed URL generated! ✓', 'success');
         }
+        
+        // ========== CLOUDFLARE STREAM DIRECT LINK GENERATOR ==========
+        
+        // Extract video ID from Cloudflare Stream URL
+        function extractCloudflareVideoId(input) {
+            if (!input) return null;
+            input = input.trim();
+            
+            // Various Cloudflare Stream URL patterns
+            const patterns = [
+                // customer-xxx.cloudflarestream.com/VIDEO_ID/watch
+                /customer-[^.]+\.cloudflarestream\.com\/([a-f0-9]+)/i,
+                // videodelivery.net/VIDEO_ID
+                /videodelivery\.net\/([a-f0-9]+)/i,
+                // watch.cloudflarestream.com/VIDEO_ID
+                /watch\.cloudflarestream\.com\/([a-f0-9]+)/i,
+                // iframe.cloudflarestream.com/VIDEO_ID
+                /iframe\.cloudflarestream\.com\/([a-f0-9]+)/i,
+                // cloudflarestream.com/VIDEO_ID
+                /cloudflarestream\.com\/([a-f0-9]+)/i
+            ];
+            
+            for (const pattern of patterns) {
+                const match = input.match(pattern);
+                if (match) return { videoId: match[1], customerId: extractCloudflareCustomerId(input) };
+            }
+            
+            // If it looks like just a video ID (hex string)
+            if (/^[a-f0-9]{32}$/i.test(input)) {
+                return { videoId: input, customerId: null };
+            }
+            
+            return null;
+        }
+        
+        // Extract customer ID from Cloudflare URL
+        function extractCloudflareCustomerId(url) {
+            const match = url.match(/customer-([^.]+)\.cloudflarestream\.com/i);
+            return match ? match[1] : null;
+        }
+        
+        // Get Cloudflare Stream direct link (HLS or MP4)
+        function getCloudflareDirectLink(format = 'hls') {
+            const input = document.getElementById('cloudflare-stream-url').value.trim();
+            const statusDiv = document.getElementById('cloudflare-status');
+            
+            if (!input) {
+                showToast('Please enter a Cloudflare Stream URL', 'error');
+                return;
+            }
+            
+            const extracted = extractCloudflareVideoId(input);
+            if (!extracted || !extracted.videoId) {
+                showToast('Could not extract Video ID from URL', 'error');
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = 'rgba(255, 0, 0, 0.1)';
+                statusDiv.innerHTML = `
+                    <span style="color: #ff6b6b;">❌ Invalid Cloudflare Stream URL</span><br>
+                    <small>Make sure you're using a valid Cloudflare Stream URL like:<br>
+                    • https://customer-xxx.cloudflarestream.com/VIDEO_ID/watch<br>
+                    • https://videodelivery.net/VIDEO_ID</small>
+                `;
+                return;
+            }
+            
+            const { videoId, customerId } = extracted;
+            
+            // Build the base URL
+            const baseUrl = customerId 
+                ? `https://customer-${customerId}.cloudflarestream.com/${videoId}`
+                : `https://videodelivery.net/${videoId}`;
+            
+            // Generate URLs based on format
+            let directUrl;
+            let formatLabel;
+            
+            if (format === 'mp4') {
+                directUrl = `${baseUrl}/downloads/default.mp4`;
+                formatLabel = 'MP4 Download';
+            } else {
+                // HLS is default and recommended
+                directUrl = `${baseUrl}/manifest/video.m3u8`;
+                formatLabel = 'HLS Stream';
+            }
+            
+            // Set the URL in the form
+            document.getElementById('movie-embed-url').value = directUrl;
+            
+            // Show success status
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = 'rgba(245, 158, 11, 0.15)';
+            statusDiv.innerHTML = `
+                <span style="color: #f59e0b;">✅ ${formatLabel} Link Ready!</span><br>
+                <small style="color: var(--text-secondary);">
+                    <strong>Video ID:</strong> ${videoId}<br>
+                    <strong>Format:</strong> ${format.toUpperCase()}<br>
+                    <strong>All Links:</strong><br>
+                    • HLS: <code style="font-size: 10px;">${baseUrl}/manifest/video.m3u8</code><br>
+                    • MP4: <code style="font-size: 10px;">${baseUrl}/downloads/default.mp4</code><br>
+                    • Thumbnail: <code style="font-size: 10px;">${baseUrl}/thumbnails/thumbnail.jpg</code>
+                </small>
+            `;
+            
+            showToast(`Cloudflare ${formatLabel} link generated! ☁️`, 'success');
+        }
+        
+        // ========== END CLOUDFLARE STREAM GENERATOR ==========
         
         // Load movies from API
         async function loadMovies() {

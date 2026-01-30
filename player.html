@@ -2330,7 +2330,6 @@
         const loadingOverlay = document.getElementById('loadingOverlay');
         let player = null;
         let isEmbedMode = false;
-        let currentArchiveFallbackEmbedUrl = null;
         let currentMovieRequiredPlan = 'free';
 
         // Get URL parameters
@@ -3169,14 +3168,10 @@
                             if ((movie.requiredPlan || 'free') === 'free') {
                                 prefetchVideoUrl(`${apiUrl}${secureStreamPath}`);
                             }
-                        } else if (directCdnUrl && directCdnUrl.match(/ia\d+\.us\.archive\.org/)) {
+                        } else if (directCdnUrl) {
                             prefetchVideoUrl(directCdnUrl);
-                        } else if (videoUrl) {
-                            if (isArchiveOrgUrl(videoUrl)) {
-                                preloadArchiveEmbed(getArchiveOrgEmbedUrl(videoUrl));
-                            } else if (isDirectVideoUrl(videoUrl)) {
-                                prefetchVideoUrl(videoUrl);
-                            }
+                        } else if (videoUrl && isDirectVideoUrl(videoUrl)) {
+                            prefetchVideoUrl(videoUrl);
                         }
                         
                         // Update UI (can happen while video prefetches)
@@ -3184,17 +3179,6 @@
                         
                         console.log('🎬 Video URL:', videoUrl);
                         console.log('🎬 Direct CDN URL:', directCdnUrl);
-
-                        // Build a safe Archive.org embed fallback URL if we have an archive-ish source
-                        // If the API hides Archive URLs, try to construct fallback from archiveItemId.
-                        const firstArchiveCandidate = directCdnUrl || videoUrl;
-                        if (firstArchiveCandidate && isArchiveOrgUrl(firstArchiveCandidate)) {
-                            currentArchiveFallbackEmbedUrl = getArchiveOrgEmbedUrl(firstArchiveCandidate);
-                        } else if (movie.video?.archiveItemId) {
-                            currentArchiveFallbackEmbedUrl = getArchiveOrgEmbedUrl(`https://archive.org/embed/${movie.video.archiveItemId}`);
-                        } else {
-                            currentArchiveFallbackEmbedUrl = null;
-                        }
                         
                         // Check if video URL is valid
                         // Note: secureStreamPath and provider='archive' with archiveItemId are valid even without direct videoUrl
@@ -3215,96 +3199,33 @@
                         
                         // PRIORITY 0: Secure stream path (backend proxy) if provided
                         if (secureStreamPath || declaredProvider === 'archive') {
-                            console.log('✅ Archive.org source detected - using secure stream proxy');
+                            console.log('✅ Using secure stream proxy');
                             try {
                                 const secureUrl = await getSecureArchiveStreamUrl(apiUrl, movie);
                                 initPrerollAd(secureUrl, 'direct');
                             } catch (streamErr) {
-                                console.warn('⚠️ Secure stream failed, falling back to embed:', streamErr.message);
-                                // Fallback to Archive.org embed for free content
-                                if ((movie.requiredPlan || 'free') === 'free' && currentArchiveFallbackEmbedUrl) {
-                                    loadArchiveOrgEmbed(currentArchiveFallbackEmbedUrl);
-                                } else if (directCdnUrl) {
+                                console.warn('⚠️ Secure stream failed:', streamErr.message);
+                                // Fallback to direct CDN URL or video URL
+                                if (directCdnUrl) {
                                     initPrerollAd(directCdnUrl, 'direct');
-                                } else if (videoUrl) {
-                                    const archiveEmbedUrl = getArchiveOrgEmbedUrl(videoUrl);
-                                    loadArchiveOrgEmbed(archiveEmbedUrl);
-                                } else {
-                                    showVideoUnavailable(movie.originalTitle || 'this movie');
-                                }
-                            }
-                        }
-                        // PRIORITY 1: Use direct CDN URL if available (ia800101.us.archive.org/...)
-                        // These work without CORS issues because there's no redirect
-                        else if (directCdnUrl && directCdnUrl.match(/ia\d+\.us\.archive\.org/)) {
-                            console.log('✅ Archive.org source detected - using secure stream proxy');
-                            try {
-                                const secureUrl = await getSecureArchiveStreamUrl(apiUrl, movie);
-                                initPrerollAd(secureUrl, 'direct');
-                            } catch (streamErr) {
-                                console.warn('⚠️ Secure stream failed, falling back to direct CDN:', streamErr.message);
-                                // Fallback: use direct CDN URL (works for free content)
-                                if ((movie.requiredPlan || 'free') === 'free') {
-                                    initPrerollAd(directCdnUrl, 'direct');
-                                } else if (currentArchiveFallbackEmbedUrl) {
-                                    loadArchiveOrgEmbed(currentArchiveFallbackEmbedUrl);
-                                } else {
-                                    showVideoUnavailable(movie.originalTitle || 'this movie');
-                                }
-                            }
-                        }
-                        // PRIORITY 2: Check if videoUrl/embedUrl is already a direct CDN URL
-                        else if (videoUrl && videoUrl.match(/ia\d+\.us\.archive\.org/) && videoUrl.endsWith('.mp4')) {
-                            console.log('✅ Archive.org source detected - using secure stream proxy');
-                            try {
-                                const secureUrl = await getSecureArchiveStreamUrl(apiUrl, movie);
-                                initPrerollAd(secureUrl, 'direct');
-                            } catch (streamErr) {
-                                console.warn('⚠️ Secure stream failed, falling back to direct URL:', streamErr.message);
-                                // Fallback: use direct video URL
-                                if ((movie.requiredPlan || 'free') === 'free') {
+                                } else if (videoUrl && isDirectVideoUrl(videoUrl)) {
                                     initPrerollAd(videoUrl, 'direct');
-                                } else if (currentArchiveFallbackEmbedUrl) {
-                                    loadArchiveOrgEmbed(currentArchiveFallbackEmbedUrl);
                                 } else {
                                     showVideoUnavailable(movie.originalTitle || 'this movie');
                                 }
                             }
                         }
-                        // PRIORITY 3: Check if it's an Archive.org URL (embed/details/download) - Use EMBED
-                        else if (videoUrl && isArchiveOrgUrl(videoUrl)) {
-                            console.log('📦 Archive.org URL detected - using embed (CORS workaround)');
-                            
-                            // Get embed URL for iframe player (bypasses CORS)
-                            const archiveEmbedUrl = getArchiveOrgEmbedUrl(videoUrl);
-                            console.log('🎬 Using Archive.org embed URL:', archiveEmbedUrl);
-                            
-                            // For paid content, block embed playback unless tokenized streaming is available
-                            if ((movie.requiredPlan || 'free') !== 'free') {
-                                try {
-                                    const secureUrl = await getSecureArchiveStreamUrl(apiUrl, movie);
-                                    initPrerollAd(secureUrl, 'direct');
-                                } catch (e) {
-                                    try {
-                                        window.dispatchEvent(new CustomEvent('unruly:playbackDenied', {
-                                            detail: {
-                                                requiredPlan: movie.requiredPlan || 'free',
-                                                message: e?.message || 'Please login/upgrade to watch this content.'
-                                            }
-                                        }));
-                                    } catch (err) {}
-                                }
-                            } else {
-                                // Load directly into iframe (free content)
-                                loadArchiveOrgEmbed(archiveEmbedUrl);
-                            }
+                        // PRIORITY 1: Use direct CDN URL if available (Archive.org CDN, Cloudflare, etc.)
+                        else if (directCdnUrl) {
+                            console.log('✅ Direct CDN URL detected');
+                            initPrerollAd(directCdnUrl, 'direct');
                         }
-                        // Check if it's a direct playable URL (MP4, WebM only)
+                        // PRIORITY 2: Check if videoUrl is a direct playable URL (MP4, WebM, HLS, etc.)
                         else if (videoUrl && isDirectVideoUrl(videoUrl)) {
                             console.log('✅ Direct video URL detected');
                             initPrerollAd(videoUrl, 'direct');
                         }
-                        // Check for embed URL (Streamtape, etc.)
+                        // PRIORITY 3: Check for embed URL (Streamtape, etc.)
                         else if (videoUrl || streamtapeId) {
                             const embedSrc = videoUrl || 
                                 `https://streamtape.com/e/${streamtapeId}`;
@@ -3354,17 +3275,6 @@
                 showVideoUnavailable('this movie');
             }
         }
-
-        // If direct/native playback fails and we have an Archive fallback embed, switch to embed mode.
-        video.addEventListener('error', () => {
-            if (!currentArchiveFallbackEmbedUrl) return;
-
-            // Only attempt fallback when we are in native mode (not already embed)
-            if (!isEmbedMode) {
-                console.log('⚠️ Native playback failed - falling back to Archive.org embed');
-                loadArchiveOrgEmbed(currentArchiveFallbackEmbedUrl);
-            }
-        });
 
         // Load embed video (Streamtape, etc.) - Try ad-free extraction first
         async function loadEmbedVideo(url) {
