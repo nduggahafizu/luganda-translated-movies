@@ -3358,33 +3358,32 @@
                             return;
                         }
                         
-                        // PRIORITY 0: Secure stream path (backend proxy) if provided
-                        if (secureStreamPath || declaredProvider === 'archive') {
+                        // PRIORITY 0: Use direct CDN URL/MP4 if available (Archive.org CDN, Cloudflare, etc.)
+                        // Direct playback is faster and more reliable than proxy streaming
+                        if (directCdnUrl && isDirectVideoUrl(directCdnUrl)) {
+                            console.log('✅ Direct MP4/CDN URL detected - using direct playback');
+                            initPrerollAd(directCdnUrl, 'direct');
+                        }
+                        // PRIORITY 1: Check if videoUrl is a direct playable URL (MP4, WebM, HLS, etc.)
+                        else if (videoUrl && isDirectVideoUrl(videoUrl)) {
+                            console.log('✅ Direct video URL detected');
+                            initPrerollAd(videoUrl, 'direct');
+                        }
+                        // PRIORITY 2: Secure stream path (backend proxy) if provided and no direct URL
+                        else if (secureStreamPath || declaredProvider === 'archive') {
                             console.log('✅ Using secure stream proxy');
                             try {
                                 const secureUrl = await getSecureArchiveStreamUrl(apiUrl, movie);
                                 initPrerollAd(secureUrl, 'direct');
                             } catch (streamErr) {
                                 console.warn('⚠️ Secure stream failed:', streamErr.message);
-                                // Fallback to direct CDN URL or video URL
-                                if (directCdnUrl) {
-                                    initPrerollAd(directCdnUrl, 'direct');
-                                } else if (videoUrl && isDirectVideoUrl(videoUrl)) {
+                                // Fallback to any available URL
+                                if (videoUrl) {
                                     initPrerollAd(videoUrl, 'direct');
                                 } else {
                                     showVideoUnavailable(movie.originalTitle || 'this movie');
                                 }
                             }
-                        }
-                        // PRIORITY 1: Use direct CDN URL if available (Archive.org CDN, Cloudflare, etc.)
-                        else if (directCdnUrl) {
-                            console.log('✅ Direct CDN URL detected');
-                            initPrerollAd(directCdnUrl, 'direct');
-                        }
-                        // PRIORITY 2: Check if videoUrl is a direct playable URL (MP4, WebM, HLS, etc.)
-                        else if (videoUrl && isDirectVideoUrl(videoUrl)) {
-                            console.log('✅ Direct video URL detected');
-                            initPrerollAd(videoUrl, 'direct');
                         }
                         // PRIORITY 3: Check for embed URL (Streamtape, etc.)
                         else if (videoUrl || streamtapeId) {

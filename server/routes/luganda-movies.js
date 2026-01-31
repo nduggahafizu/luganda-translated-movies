@@ -93,11 +93,21 @@ const sanitizeMovieForPublic = (movie) => {
         movieObj.video.secureStreamPath = `/api/video/stream/luganda/${movieObj._id}`;
         movieObj.video.archiveItemId = extractArchiveItemId(urlCandidates[0] || '') || null;
 
-        delete movieObj.embedUrl;
-        if (movieObj.video) {
-            delete movieObj.video.originalVideoPath;
-            delete movieObj.video.embedUrl;
-            delete movieObj.video.url;
+        // Keep direct MP4 URLs for direct playback (better performance)
+        const firstUrl = urlCandidates[0] || '';
+        const isDirectMp4 = firstUrl.match(/\.(mp4|webm|mkv|m3u8)(\?|$)/i);
+        
+        if (isDirectMp4) {
+            // Keep the direct URL for MP4/video files
+            movieObj.video.originalVideoPath = firstUrl;
+        } else {
+            // For embed URLs, remove them and use proxy only
+            delete movieObj.embedUrl;
+            if (movieObj.video) {
+                delete movieObj.video.originalVideoPath;
+                delete movieObj.video.embedUrl;
+                delete movieObj.video.url;
+            }
         }
     }
 
