@@ -2074,6 +2074,21 @@
             .episode-play-icon {
                 opacity: 1;
             }
+            
+            /* Fullscreen controls auto-hide on mobile */
+            .plyr--fullscreen.plyr--playing.plyr--hide-controls .plyr__controls {
+                opacity: 0 !important;
+                pointer-events: none !important;
+                transform: translateY(100%) !important;
+                transition: all 0.3s ease !important;
+            }
+            
+            .plyr--fullscreen.plyr--playing:active .plyr__controls,
+            .plyr--fullscreen.plyr--paused .plyr__controls {
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                transform: translateY(0) !important;
+            }
         }
         
         /* Safe Area for notched devices */

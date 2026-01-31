@@ -309,9 +309,9 @@ router.post('/playback-token', protect, async (req, res) => {
  * Stream a LugandaMovie through the backend with Range support.
  * This hides direct Archive.org links and provides retry/fallback.
  * GET /api/video/stream/luganda/:movieId?token=...
- * PROTECTED: Requires authentication to stream videos
+ * PUBLIC: Free content available without authentication
  */
-router.get('/stream/luganda/:movieId', protect, async (req, res) => {
+router.get('/stream/luganda/:movieId', optionalAuth, async (req, res) => {
     setCorsHeaders(req, res);
 
     try {
