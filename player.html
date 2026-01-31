@@ -359,27 +359,44 @@
             --plyr-menu-background: rgba(20, 20, 20, 0.98);
             --plyr-menu-color: #fff;
             --plyr-menu-border-color: #333;
-            --plyr-control-icon-size: 20px;
-            --plyr-control-spacing: 12px;
+            --plyr-control-icon-size: 18px;
+            --plyr-control-spacing: 10px;
             --plyr-range-thumb-background: #00ff88;
             --plyr-range-fill-background: #00ff88;
             --plyr-badge-background: #00ff88;
             --plyr-font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            width: 100% !important;
+            height: 100% !important;
         }
         
         /* Ensure native video player is visible with proper sizing */
         #player {
-            width: 100%;
+            width: 100% !important;
+            height: 100% !important;
             max-width: 100%;
-            aspect-ratio: 16/9;
-            min-height: 200px;
+            object-fit: contain;
             background: #000;
         }
         
-        /* Plyr wrapper should also have proper sizing */
-        .plyr--video {
+        /* Player wrapper responsive sizing */
+        #playerWrapper, .player-wrapper {
+            width: 100%;
+            max-width: 100%;
             aspect-ratio: 16/9;
-            min-height: 200px;
+            background: #000;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Plyr wrapper should fill container */
+        .plyr--video {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        .plyr__video-wrapper {
+            width: 100% !important;
+            height: 100% !important;
         }
 
         /* Controls auto-hide during playback - show on hover/tap */
@@ -389,6 +406,8 @@
             transform: translateY(0);
             pointer-events: auto;
             transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+            background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 50%, transparent 100%) !important;
+            padding: 50px 10px 10px 10px !important;
         }
 
         /* Hide controls when video is playing and user is idle */
@@ -816,16 +835,18 @@
         @media (hover: none) and (pointer: coarse) {
             /* Mobile: elegant touch targets */
             .plyr__control {
-                padding: 12px !important;
+                padding: 14px !important;
+                min-width: 44px;
+                min-height: 44px;
             }
             
             .plyr__control--overlaid {
-                width: 62px !important;
-                height: 62px !important;
+                width: 70px !important;
+                height: 70px !important;
             }
             
             .plyr__controls {
-                padding: 32px 10px 14px 10px !important;
+                padding: 40px 8px 12px 8px !important;
             }
             
             .plyr__volume {
@@ -834,11 +855,86 @@
             
             .plyr__time--current {
                 display: inline-block !important;
+                font-size: 12px !important;
             }
             
             .plyr__time--duration {
                 display: inline-block !important;
+                font-size: 12px !important;
             }
+            
+            /* Mobile controls auto-hide - more aggressive */
+            .plyr--video.plyr--playing .plyr__controls {
+                opacity: 0;
+                pointer-events: none;
+                transform: translateY(100%);
+                transition: all 0.3s ease;
+            }
+            
+            .plyr--video.plyr--playing.plyr--show-controls .plyr__controls,
+            .plyr--video.plyr--paused .plyr__controls {
+                opacity: 1;
+                pointer-events: auto;
+                transform: translateY(0);
+            }
+            
+            /* Hide play button when playing on mobile */
+            .plyr--video.plyr--playing .plyr__control--overlaid {
+                opacity: 0 !important;
+                pointer-events: none;
+            }
+            
+            .plyr--video.plyr--paused .plyr__control--overlaid {
+                opacity: 1 !important;
+                pointer-events: auto;
+            }
+            
+            /* Larger progress bar for touch */
+            .plyr__progress__container {
+                height: 24px !important;
+            }
+            
+            .plyr__progress input[type="range"] {
+                height: 6px !important;
+            }
+        }
+        
+        /* Small screens */
+        @media (max-width: 480px) {
+            .plyr__controls {
+                padding: 30px 6px 8px 6px !important;
+            }
+            
+            .plyr__control {
+                padding: 10px !important;
+            }
+            
+            .plyr__control--overlaid {
+                width: 60px !important;
+                height: 60px !important;
+            }
+            
+            .plyr__time {
+                font-size: 11px !important;
+            }
+            
+            /* Hide some controls on very small screens */
+            .plyr__control[data-plyr="pip"],
+            .plyr__control[data-plyr="settings"] {
+                display: none !important;
+            }
+        }
+        
+        /* Fullscreen mode */
+        .plyr--fullscreen-active .plyr__controls,
+        .plyr:fullscreen .plyr__controls {
+            padding: 60px 20px 20px 20px !important;
+        }
+        
+        .plyr--fullscreen-active .plyr__control--overlaid,
+        .plyr:fullscreen .plyr__control--overlaid {
+            width: 80px !important;
+            height: 80px !important;
         }
         
         /* ========== END YOUTUBE-STYLE PLYR ========== */
@@ -3350,63 +3446,90 @@
             if (!playerInstance || !playerInstance.elements || !playerInstance.elements.container) return;
             
             const container = playerInstance.elements.container;
-            let touchTimeout = null;
-            let controlsVisible = true;
+            let hideTimeout = null;
+            const HIDE_DELAY = 3000; // 3 seconds
             
             // Detect if touch device
             const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-            if (!isTouchDevice) return;
             
-            // Show controls temporarily on tap
-            function showControlsTemporarily() {
-                container.classList.add('plyr--touch-active');
+            // Show controls function
+            function showControls() {
+                container.classList.add('plyr--show-controls');
                 container.classList.remove('plyr--hide-controls');
-                controlsVisible = true;
-                
-                // Clear any existing timeout
-                if (touchTimeout) {
-                    clearTimeout(touchTimeout);
-                }
-                
-                // Hide controls after 3 seconds if still playing
-                touchTimeout = setTimeout(() => {
-                    if (playerInstance.playing) {
-                        container.classList.remove('plyr--touch-active');
-                        container.classList.add('plyr--hide-controls');
-                        controlsVisible = false;
-                    }
-                }, 3000);
             }
             
-            // Toggle controls on tap (not on control buttons)
-            container.addEventListener('touchstart', (e) => {
-                // Don't toggle if tapping on controls
-                if (e.target.closest('.plyr__controls') || e.target.closest('.plyr__control')) {
-                    return;
-                }
-                
+            // Hide controls function
+            function hideControls() {
                 if (playerInstance.playing) {
-                    showControlsTemporarily();
+                    container.classList.remove('plyr--show-controls');
+                    container.classList.add('plyr--hide-controls');
                 }
-            }, { passive: true });
+            }
             
-            // Show controls when paused
+            // Start/restart hide timer
+            function startHideTimer() {
+                if (hideTimeout) clearTimeout(hideTimeout);
+                hideTimeout = setTimeout(hideControls, HIDE_DELAY);
+            }
+            
+            // Show controls temporarily
+            function showControlsTemporarily() {
+                showControls();
+                startHideTimer();
+            }
+            
+            if (isTouchDevice) {
+                // Touch devices: tap to toggle controls
+                container.addEventListener('touchend', (e) => {
+                    // Ignore taps on controls
+                    if (e.target.closest('.plyr__controls') || e.target.closest('.plyr__control')) {
+                        startHideTimer();
+                        return;
+                    }
+                    
+                    if (playerInstance.playing) {
+                        if (container.classList.contains('plyr--show-controls')) {
+                            hideControls();
+                        } else {
+                            showControlsTemporarily();
+                        }
+                    }
+                }, { passive: true });
+            } else {
+                // Desktop: mouse movement shows controls
+                container.addEventListener('mousemove', () => {
+                    showControlsTemporarily();
+                });
+                
+                container.addEventListener('mouseleave', () => {
+                    if (playerInstance.playing) {
+                        hideControls();
+                    }
+                });
+            }
+            
+            // Always show when paused
             playerInstance.on('pause', () => {
-                if (touchTimeout) clearTimeout(touchTimeout);
-                container.classList.add('plyr--touch-active');
-                container.classList.remove('plyr--hide-controls');
-                controlsVisible = true;
+                if (hideTimeout) clearTimeout(hideTimeout);
+                showControls();
             });
             
-            // Start hiding timer when playing
+            // Start hide timer when playing
             playerInstance.on('play', () => {
                 showControlsTemporarily();
             });
             
-            // Clear timeout on destroy
-            playerInstance.on('destroy', () => {
-                if (touchTimeout) clearTimeout(touchTimeout);
+            // Show controls when seeking
+            playerInstance.on('seeking', () => {
+                showControlsTemporarily();
             });
+            
+            // Cleanup
+            playerInstance.on('destroy', () => {
+                if (hideTimeout) clearTimeout(hideTimeout);
+            });
+            
+            console.log('📱 Mobile touch controls initialized');
         }
 
         function requestElementFullscreen(el) {
@@ -3953,58 +4076,72 @@
                 }
             } else {
                 // Regular video file (MP4, MKV, WebM, etc.)
-                console.log('🎬 Loading video file:', videoUrl);
+                console.log('🎬 Loading direct video file:', videoUrl);
                 
-                // Set aggressive preload for faster start
+                // Clear any previous source
+                video.pause();
+                video.removeAttribute('src');
+                video.load();
+                
+                // Set video attributes for optimal playback
                 video.preload = 'auto';
                 video.setAttribute('preload', 'auto');
-                
-                // Use Range requests for faster initial load (Chrome-like behavior)
-                // This tells the browser we want to buffer aggressively
+                video.setAttribute('playsinline', '');
+                video.playsInline = true;
                 video.autobuffer = true;
                 
-                video.src = videoUrl;
+                // Track load attempts
+                let loadAttempts = 0;
+                const maxAttempts = 3;
                 
-                // Hide loading as soon as we have some data
-                video.addEventListener('loadeddata', () => {
-                    console.log('✅ Video data loaded - ready to play');
-                    loadingOverlay.style.display = 'none';
-                }, { once: true });
+                // Function to try loading the video
+                function attemptLoad(srcUrl) {
+                    loadAttempts++;
+                    console.log(`🎬 Load attempt ${loadAttempts}/${maxAttempts}: ${srcUrl.substring(0, 80)}...`);
+                    
+                    video.src = srcUrl;
+                    video.load();
+                }
                 
-                video.addEventListener('loadedmetadata', () => {
+                // Hide loading as soon as we have metadata
+                const onLoadedMetadata = () => {
                     console.log('✅ Video metadata loaded');
-                    // Start buffering more data
-                    if (video.buffered.length === 0) {
-                        video.load(); // Force buffer
-                    }
-                }, { once: true });
+                    loadingOverlay.style.display = 'none';
+                };
                 
-                video.addEventListener('canplay', () => {
+                const onCanPlay = () => {
                     console.log('✅ Video can play');
                     loadingOverlay.style.display = 'none';
-                }, { once: true });
+                };
                 
-                // Fast start - hide loading on first progress
-                video.addEventListener('progress', () => {
+                const onProgress = () => {
                     if (video.buffered.length > 0) {
                         const bufferedEnd = video.buffered.end(0);
-                        if (bufferedEnd > 0.5) { // At least 0.5 seconds buffered
+                        console.log(`📊 Buffered: ${bufferedEnd.toFixed(2)}s`);
+                        if (bufferedEnd > 0.5) {
                             loadingOverlay.style.display = 'none';
                         }
                     }
-                }, { once: true });
+                };
                 
-                video.addEventListener('error', (e) => {
-                    loadingOverlay.style.display = 'none';
-                    console.error('❌ Video load error:', e);
+                const onError = (e) => {
+                    console.error('❌ Video load error:', e, video.error);
                     
-                    // Try fallback URL if available
-                    if (cloudVideo.fallbackUrl && video.src !== cloudVideo.fallbackUrl) {
-                        console.log('⚠️ Video failed, trying fallback:', cloudVideo.fallbackUrl);
-                        video.src = cloudVideo.fallbackUrl;
-                        video.load();
+                    // Try fallback URL
+                    if (cloudVideo.fallbackUrl && video.src !== cloudVideo.fallbackUrl && loadAttempts < maxAttempts) {
+                        console.log('⚠️ Trying fallback URL:', cloudVideo.fallbackUrl);
+                        attemptLoad(cloudVideo.fallbackUrl);
                         return;
                     }
+                    
+                    // Retry with same URL (network issues)
+                    if (loadAttempts < maxAttempts) {
+                        console.log('⚠️ Retrying same URL...');
+                        setTimeout(() => attemptLoad(videoUrl), 1000);
+                        return;
+                    }
+                    
+                    loadingOverlay.style.display = 'none';
                     
                     // Check if it's a format issue (MKV not supported in some browsers)
                     const urlLower = videoUrl.toLowerCase();
@@ -4014,7 +4151,16 @@
                     } else {
                         showVideoError('Error loading video. The file may be unavailable or your browser may not support this format.', videoUrl);
                     }
-                });
+                };
+                
+                // Add event listeners
+                video.addEventListener('loadedmetadata', onLoadedMetadata, { once: true });
+                video.addEventListener('canplay', onCanPlay, { once: true });
+                video.addEventListener('progress', onProgress, { once: true });
+                video.addEventListener('error', onError, { once: true });
+                
+                // Start loading
+                attemptLoad(videoUrl);
             }
         }
         
