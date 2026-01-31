@@ -10,7 +10,123 @@
 [build.environment]
   SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES = "AIzaSyDPFQ7pjH_hP8LU-C8FGo6U_QLwQ_G7l4o"
 
-# Only redirect 404s to index.html, not all requests
+# Clean URLs - serve HTML files without .html extension
+[[redirects]]
+  from = "/movies"
+  to = "/movies.html"
+  status = 200
+
+[[redirects]]
+  from = "/player"
+  to = "/player.html"
+  status = 200
+
+[[redirects]]
+  from = "/series"
+  to = "/series.html"
+  status = 200
+
+[[redirects]]
+  from = "/series-player"
+  to = "/series-player.html"
+  status = 200
+
+[[redirects]]
+  from = "/search"
+  to = "/search.html"
+  status = 200
+
+[[redirects]]
+  from = "/login"
+  to = "/login.html"
+  status = 200
+
+[[redirects]]
+  from = "/register"
+  to = "/register.html"
+  status = 200
+
+[[redirects]]
+  from = "/dashboard"
+  to = "/dashboard.html"
+  status = 200
+
+[[redirects]]
+  from = "/profile"
+  to = "/profile.html"
+  status = 200
+
+[[redirects]]
+  from = "/subscribe"
+  to = "/subscribe.html"
+  status = 200
+
+[[redirects]]
+  from = "/subscription"
+  to = "/subscription.html"
+  status = 200
+
+[[redirects]]
+  from = "/uganda-tv"
+  to = "/uganda-tv.html"
+  status = 200
+
+[[redirects]]
+  from = "/tv-stations"
+  to = "/tv-stations.html"
+  status = 200
+
+[[redirects]]
+  from = "/vjs"
+  to = "/vjs.html"
+  status = 200
+
+[[redirects]]
+  from = "/vj"
+  to = "/vj.html"
+  status = 200
+
+[[redirects]]
+  from = "/genres"
+  to = "/genres.html"
+  status = 200
+
+[[redirects]]
+  from = "/trending"
+  to = "/trending.html"
+  status = 200
+
+[[redirects]]
+  from = "/about"
+  to = "/about.html"
+  status = 200
+
+[[redirects]]
+  from = "/contact"
+  to = "/contact.html"
+  status = 200
+
+[[redirects]]
+  from = "/terms"
+  to = "/terms.html"
+  status = 200
+
+[[redirects]]
+  from = "/privacy"
+  to = "/privacy.html"
+  status = 200
+
+[[redirects]]
+  from = "/dmca"
+  to = "/dmca.html"
+  status = 200
+
+[[redirects]]
+  from = "/faq"
+  to = "/faq.html"
+  status = 200
+
+# 404 fallback
 [[redirects]]
   from = "/*"
   to = "/index.html"

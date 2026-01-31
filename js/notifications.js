@@ -35,14 +35,23 @@ class UnrulyNotifications {
         
         // Show prompt if permission not yet decided
         if (!('Notification' in window) || Notification.permission === 'default') {
-            // Check if already dismissed
+            // Check if already dismissed permanently
             const dismissed = localStorage.getItem('notification-prompt-dismissed');
-            if (!dismissed || Date.now() - parseInt(dismissed) > 24 * 60 * 60 * 1000) {
-                // Show after 2 seconds
-                setTimeout(() => this.showPermissionPrompt(), 2000);
+            if (dismissed === 'permanent') return;
+            
+            // Check temporary dismissal (24 hours)
+            const dismissedAt = localStorage.getItem('notification-prompt-dismissed-at');
+            if (dismissedAt && (Date.now() - parseInt(dismissedAt)) < 24 * 60 * 60 * 1000) {
+                return;
             }
+            
+            // Show after 2 seconds
+            setTimeout(() => this.showPermissionPrompt(), 2000);
         } else if (this.permissionGranted) {
+            localStorage.setItem('notificationPermissionState', 'granted');
             this.setupLocalNotifications();
+        } else if (Notification.permission === 'denied') {
+            localStorage.setItem('notificationPermissionState', 'denied');
         }
     }
     
@@ -191,6 +200,9 @@ class UnrulyNotifications {
             const permission = await Notification.requestPermission();
             this.permissionGranted = permission === 'granted';
             
+            // Store the permission state
+            localStorage.setItem('notificationPermissionState', permission);
+            
             if (this.permissionGranted) {
                 this.removePrompt();
                 this.setupLocalNotifications();
@@ -206,9 +218,15 @@ class UnrulyNotifications {
                 this.showToast('Notifications enabled! 🔔', 'success');
             } else if (permission === 'denied') {
                 this.removePrompt();
+                localStorage.setItem('notification-prompt-dismissed', 'permanent');
                 this.showToast('Notifications blocked. Enable in browser settings.', 'warning');
+            } else {
+                // Permission dismissed without decision
+                this.removePrompt();
+                localStorage.setItem('notification-prompt-dismissed-at', Date.now().toString());
             }
         } catch (error) {
+            console.error('Notification permission error:', error);
             this.removePrompt();
             this.showToast('Could not enable notifications', 'error');
         }
@@ -216,7 +234,8 @@ class UnrulyNotifications {
     
     // Dismiss the prompt
     dismissPrompt() {
-        localStorage.setItem('notification-prompt-dismissed', Date.now().toString());
+        // Store as temporary dismissal (will ask again after 24 hours)
+        localStorage.setItem('notification-prompt-dismissed-at', Date.now().toString());
         this.removePrompt();
     }
     

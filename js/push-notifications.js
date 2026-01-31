@@ -66,6 +66,26 @@ const UnrulyPush = {
      * Check if push notifications are supported
      */
     isSupported() {
+        // Check for basic notification support
+        if (!('Notification' in window)) {
+            console.log('Notifications not supported in this browser');
+            return false;
+        }
+
+        // iOS/Safari limitations - web push not supported on iOS < 16.4
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        
+        if (isIOS) {
+            // iOS 16.4+ supports web push only for installed PWAs
+            const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+            if (!isStandalone) {
+                console.log('iOS requires PWA installation for push notifications');
+                return false;
+            }
+        }
+
+        // Check for required APIs
         return 'serviceWorker' in navigator && 
                'PushManager' in window && 
                'Notification' in window;
@@ -109,8 +129,30 @@ const UnrulyPush = {
         // Only show for logged-in users who haven't subscribed or dismissed
         if (!this.isLoggedIn()) return;
         if (this.subscription) return;
-        if (localStorage.getItem('pushPromptDismissed')) return;
-        if (Notification.permission === 'denied') return;
+        
+        // Check if permanently dismissed
+        if (localStorage.getItem('pushPromptDismissed') === 'permanent') return;
+        
+        // Check if user already made a decision
+        const permissionState = localStorage.getItem('notificationPermissionState');
+        if (permissionState === 'granted' || permissionState === 'denied') return;
+        
+        // Check current browser permission
+        if (Notification.permission === 'denied') {
+            localStorage.setItem('notificationPermissionState', 'denied');
+            return;
+        }
+        if (Notification.permission === 'granted') {
+            localStorage.setItem('notificationPermissionState', 'granted');
+            return;
+        }
+
+        // Check temporary dismissal (24 hours)
+        const dismissedAt = localStorage.getItem('pushPromptDismissedAt');
+        if (dismissedAt) {
+            const hoursSinceDismissed = (Date.now() - parseInt(dismissedAt)) / (1000 * 60 * 60);
+            if (hoursSinceDismissed < 24) return;
+        }
 
         // Wait a bit before showing prompt (don't interrupt user immediately)
         setTimeout(() => {
@@ -260,7 +302,11 @@ const UnrulyPush = {
         const dontAsk = document.getElementById('push-dont-ask-checkbox');
         
         if (dontAsk && dontAsk.checked) {
-            localStorage.setItem('pushPromptDismissed', 'true');
+            // Permanently dismiss
+            localStorage.setItem('pushPromptDismissed', 'permanent');
+        } else {
+            // Temporarily dismiss (will show again after 24 hours)
+            localStorage.setItem('pushPromptDismissedAt', Date.now().toString());
         }
         
         if (prompt) {
@@ -274,11 +320,26 @@ const UnrulyPush = {
      */
     async requestPermission() {
         try {
+            // Check if notifications are supported first
+            if (!this.isSupported()) {
+                this.showToast('Push notifications are not supported on this device/browser', 'warning');
+                this.dismissPrompt();
+                localStorage.setItem('pushPromptDismissed', 'permanent');
+                return false;
+            }
+
             // Request permission
             const permission = await Notification.requestPermission();
             
+            // Store the permission state
+            localStorage.setItem('notificationPermissionState', permission);
+            
             if (permission !== 'granted') {
-                this.showToast('Notifications blocked. Enable them in browser settings.', 'error');
+                if (permission === 'denied') {
+                    this.showToast('Notifications blocked. Enable them in browser settings.', 'error');
+                } else {
+                    this.showToast('Notification permission not granted', 'warning');
+                }
                 this.dismissPrompt();
                 return false;
             }
@@ -289,13 +350,16 @@ const UnrulyPush = {
             if (subscribed) {
                 this.showToast('🔔 Notifications enabled! You\'ll be notified of new releases.', 'success');
                 localStorage.setItem('pushSubscribed', 'true');
+                localStorage.setItem('notificationPermissionState', 'granted');
+            } else {
+                this.showToast('Could not complete subscription. Please try again.', 'error');
             }
             
             this.dismissPrompt();
             return subscribed;
         } catch (error) {
             console.error('Permission request error:', error);
-            this.showToast('Failed to enable notifications', 'error');
+            this.showToast('Failed to enable notifications. Try again later.', 'error');
             this.dismissPrompt();
             return false;
         }

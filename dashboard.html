@@ -1025,6 +1025,16 @@
     <script src="js/config.js"></script>
     <script src="js/sanitize.js"></script>
     <script src="js/auth.js"></script>
+    <script>
+        // IMMEDIATE AUTH CHECK - Redirect before page renders
+        (function() {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            if (!token) {
+                window.location.replace('login.html?redirect=dashboard.html');
+                throw new Error('Unauthorized - redirecting to login');
+            }
+        })();
+    </script>
     <script src="js/main.js"></script>
     <script>
         const DASHBOARD_API_URL = API_CONFIG.BASE_URL + '/api';
@@ -1054,9 +1064,12 @@
             }
 
             if (!token) {
-                showDashboardError('You are not logged in. Please <a href="login.html" style="color:#1976d2;text-decoration:underline;">log in</a> to view your dashboard.');
+                window.location.replace('login.html?redirect=dashboard.html');
                 return;
             }
+
+            // Remove auth loading overlay
+            document.body.classList.add('loaded');
 
             // Show loading state
             document.body.classList.add('loading');

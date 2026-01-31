@@ -820,6 +820,14 @@
                     
                     <div class="action-item">
                         <div class="action-info">
+                            <h4>Active Sessions</h4>
+                            <p>Manage devices where you're currently logged in</p>
+                        </div>
+                        <button class="btn btn-secondary" onclick="showActiveSessions()">View Devices</button>
+                    </div>
+                    
+                    <div class="action-item">
+                        <div class="action-info">
                             <h4>Sign Out Everywhere</h4>
                             <p>Sign out of all devices except this one</p>
                         </div>
@@ -841,6 +849,16 @@
 
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
+    <script>
+        // Immediate auth check - redirect before page renders
+        (function() {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            if (!token) {
+                window.location.replace('login.html?redirect=profile.html');
+                return;
+            }
+        })();
+    </script>
     <script src="js/main.js"></script>
     <script>
         const API_URL = API_CONFIG.BASE_URL;
@@ -848,11 +866,15 @@
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', async () => {
-            // Check if logged in
-            if (!isLoggedIn()) {
-                window.location.href = 'login.html';
+            // Double-check authentication
+            const token = getAuthToken();
+            if (!token || !isLoggedIn()) {
+                window.location.replace('login.html?redirect=profile.html');
                 return;
             }
+            
+            // Remove loading overlay
+            document.body.classList.add('loaded');
             
             // Load user profile
             await loadUserProfile();
@@ -1158,8 +1180,87 @@
             }
         }
 
+        async function showActiveSessions() {
+            try {
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                if (!token) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                const apiUrl = (typeof API_CONFIG !== 'undefined' && API_CONFIG.BASE_URL)
+                    ? API_CONFIG.BASE_URL
+                    : 'https://luganda-translated-movies-production.up.railway.app';
+                
+                const response = await fetch(`${apiUrl}/api/auth/sessions`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const devices = data.data.devices || [];
+                    const lastLogin = data.data.lastLogin ? new Date(data.data.lastLogin).toLocaleString() : 'Never';
+                    
+                    let devicesHTML = devices.length > 0 
+                        ? devices.map((device, index) => `
+                            <div style="padding: 15px; background: var(--background-dark); border-radius: 8px; margin-bottom: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: start;">
+                                    <div>
+                                        <div style="font-weight: 600; margin-bottom: 4px;">${device.deviceName || 'Unknown Device'}</div>
+                                        <div style="font-size: 13px; color: var(--text-secondary);">${device.browser || 'Unknown Browser'} • ${device.os || 'Unknown OS'}</div>
+                                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">Last active: ${device.lastActive ? new Date(device.lastActive).toLocaleString() : 'Unknown'}</div>
+                                    </div>
+                                    <button onclick="removeDevice(${index})" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;">Remove</button>
+                                </div>
+                            </div>
+                        `).join('')
+                        : '<p style="text-align: center; color: var(--text-secondary);">No active devices found</p>';
+                    
+                    const modal = document.createElement('div');
+                    modal.innerHTML = `
+                        <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;" onclick="this.remove()">
+                            <div style="background: var(--background-light); border-radius: 16px; max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto; padding: 30px;" onclick="event.stopPropagation();">
+                                <h2 style="margin-bottom: 8px;">Active Devices & Sessions</h2>
+                                <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 14px;">Last login: ${lastLogin}</p>
+                                <div>${devicesHTML}</div>
+                                <button onclick="this.closest('div[style*=\'position: fixed\']').remove()" class="btn btn-secondary" style="width: 100%; margin-top: 15px;">Close</button>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(modal);
+                } else {
+                    showError('Failed to load active sessions');
+                }
+            } catch (error) {
+                console.error('Error loading sessions:', error);
+                showError('Error loading active sessions');
+            }
+        }
+        
+        function removeDevice(index) {
+            // Note: Backend implementation needed for individual device removal
+            showError('Device removal feature coming soon. Use "Sign Out All" to remove all devices.');
+        }
+        
         function signOutEverywhere() {
             if (confirm('Are you sure you want to sign out of all devices?')) {
+                // Call backend logout-all endpoint
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                if (token) {
+                    const apiUrl = (typeof API_CONFIG !== 'undefined' && API_CONFIG.BASE_URL)
+                        ? API_CONFIG.BASE_URL
+                        : 'https://luganda-translated-movies-production.up.railway.app';
+                    
+                    fetch(`${apiUrl}/api/auth/logout-all`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }).catch(err => console.error('Logout all error:', err));
+                }
+                
                 // Clear local auth and redirect
                 clearAuthData();
                 showSuccess('Signed out of all devices');

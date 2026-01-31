@@ -569,6 +569,19 @@
     <script src="js/config.js?v=20260124"></script>
 
     <script>
+        // AUTHENTICATION CHECK - Users must be logged in to watch series
+        (function() {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            if (!token) {
+                // Save current URL to return after login
+                const currentUrl = window.location.href;
+                localStorage.setItem('redirectAfterLogin', currentUrl);
+                // Redirect to login
+                window.location.replace('login.html?redirect=' + encodeURIComponent(currentUrl));
+                throw new Error('Authentication required');
+            }
+        })();
+        
         // API Configuration - always use production API in production
         const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
         const API_BASE_URL = isProduction 

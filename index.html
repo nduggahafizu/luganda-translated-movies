@@ -140,6 +140,120 @@
     <!-- Video.js for enhanced video playback -->
     <link href="https://vjs.zencdn.net/8.16.1/video-js.css" rel="stylesheet">
 
+    <style>
+        /* Skeleton Loader */
+        .skeleton {
+            background: linear-gradient(90deg, #2a2a3e 25%, #363650 50%, #2a2a3e 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: 8px;
+        }
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .skeleton-card {
+            height: 280px;
+            margin-bottom: 1rem;
+        }
+        .skeleton-title {
+            height: 20px;
+            width: 80%;
+            margin-top: 0.5rem;
+        }
+        .skeleton-meta {
+            height: 14px;
+            width: 60%;
+            margin-top: 0.5rem;
+        }
+        
+        /* Featured Badges */
+        .content-card {
+            position: relative;
+        }
+        .featured-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            z-index: 2;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .badge-new {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+        .badge-trending {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: #fff;
+        }
+        .badge-premium {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: #fff;
+        }
+        
+        /* Enhanced Hero Slider */
+        .hero-cta {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .btn-watch-now {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 14px 32px;
+            background: var(--primary-color, #7CFC00);
+            color: #000;
+            font-weight: 700;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(124, 252, 0, 0.3);
+        }
+        .btn-watch-now:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(124, 252, 0, 0.4);
+            color: #000;
+        }
+        .btn-more-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 14px 28px;
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            font-weight: 600;
+            font-size: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        .btn-more-info:hover {
+            background: rgba(255,255,255,0.25);
+            border-color: rgba(255,255,255,0.5);
+            color: #fff;
+        }
+        
+        /* Better spacing */
+        .app-section {
+            margin-bottom: 3rem;
+        }
+        .section-header {
+            margin-bottom: 1.5rem;
+        }
+    </style>
+
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
 
@@ -567,65 +681,20 @@
                                                 <li data-target="#slider" data-slide-to="2"></li>
                                             </ol>
                                             
+                            <!-- Hero slides will be dynamically populated -->
                             <div class="carousel-item active" id="heroSlide1">
-                                <a href="#" class="slide media media-slide" style="background-image: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.3)), url('https://image.tmdb.org/t/p/original/bOFaAXmWWXC3Rbv4u4uM9ZSzRXP.jpg');">
+                                <div class="slide media media-slide skeleton" style="min-height: 400px;">
                                     <div class="slide-caption">
-                                        <div class="d-flex align-items-center">
-                                            <div>
-                                                <div class="slide-header">
-                                                    <div class="imdb">VJ: Junior</div>
-                                                    <div>2021</div>
-                                                    <div class="category text-12">Luganda Movie</div>
-                                                </div>
-                                <div class="title">Fast & Furious 9</div>
-                                                <div class="description">
-                                    Dom and the crew must take on an international terrorist who turns out to be Dom's forsaken brother.
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <div class="skeleton" style="width: 60%; height: 200px;"></div>
                                     </div>
-                                </a>
+                                </div>
                             </div>
-                                            
-                                            <div class="carousel-item" id="heroSlide2">
-                                                <a href="#" class="slide media media-slide" style="background-image: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.3)), url('https://image.tmdb.org/t/p/original/uxzzxijgPIY7slzFvMotPv8wjKA.jpg');">
-                                                    <div class="slide-caption">
-                                                        <div class="d-flex align-items-center">
-                                                            <div>
-                                                                <div class="slide-header">
-                                                                    <div class="imdb">VJ: Emmy</div>
-                                                                    <div>2018</div>
-                                                                    <div class="category text-12">Luganda Movie</div>
-                                                                </div>
-                                                <div class="title">Black Panther</div>
-                                                                <div class="description">
-                                                    T'Challa returns home to the African nation of Wakanda to take his rightful place as king.
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                            </div>
-                                            
-                                            <div class="carousel-item" id="heroSlide3">
-                                                <a href="#" class="slide media media-slide" style="background-image: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.3)), url('https://image.tmdb.org/t/p/original/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg');">
-                                                    <div class="slide-caption">
-                                                        <div class="d-flex align-items-center">
-                                                            <div>
-                                                                <div class="slide-header">
-                                                                    <div class="imdb">VJ: Emmy</div>
-                                                                    <div>2022</div>
-                                                                    <div class="category text-12">Luganda Movie</div>
-                                                                </div>
-                                                <div class="title">Avatar: The Way of Water</div>
-                                                                <div class="description">
-                                                    Jake Sully and Ney'tiri have formed a family and are doing everything to stay together.
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                            </div>
+                            <div class="carousel-item" id="heroSlide2">
+                                <div class="slide media media-slide skeleton" style="min-height: 400px;"></div>
+                            </div>
+                            <div class="carousel-item" id="heroSlide3">
+                                <div class="slide media media-slide skeleton" style="min-height: 400px;"></div>
+                            </div>
                                         </div>
                                         
                                         <div class="carousel-control">
@@ -662,10 +731,31 @@
                                     </a>
                                 </div>
                                 <div class="card-grid" id="trendingMovies">
-                                    <!-- Trending movies will be loaded here -->
-                                    <div class="loading-state">
-                                        <div class="loading-spinner"></div>
-                                        <p class="loading-text">Loading trending movies...</p>
+                                    <!-- Skeleton loaders -->
+                                    <div class="content-card">
+                                        <div class="skeleton skeleton-card"></div>
+                                        <div class="skeleton skeleton-title"></div>
+                                        <div class="skeleton skeleton-meta"></div>
+                                    </div>
+                                    <div class="content-card">
+                                        <div class="skeleton skeleton-card"></div>
+                                        <div class="skeleton skeleton-title"></div>
+                                        <div class="skeleton skeleton-meta"></div>
+                                    </div>
+                                    <div class="content-card">
+                                        <div class="skeleton skeleton-card"></div>
+                                        <div class="skeleton skeleton-title"></div>
+                                        <div class="skeleton skeleton-meta"></div>
+                                    </div>
+                                    <div class="content-card">
+                                        <div class="skeleton skeleton-card"></div>
+                                        <div class="skeleton skeleton-title"></div>
+                                        <div class="skeleton skeleton-meta"></div>
+                                    </div>
+                                    <div class="content-card">
+                                        <div class="skeleton skeleton-card"></div>
+                                        <div class="skeleton skeleton-title"></div>
+                                        <div class="skeleton skeleton-meta"></div>
                                     </div>
                                 </div>
                             </div>
@@ -684,22 +774,6 @@
                                 </div>
                                 <div class="row row-cols-2 row-cols-md-5 list-scrollable" id="continueWatchingGrid">
                                     <!-- Continue watching items will be loaded here -->
-                                </div>
-                            </div>
-
-                            <!-- Ad Container - Between Sections -->
-                            <div class="ad-container" style="margin: 30px auto; max-width: 728px; text-align: center;">
-                                <ins class="adsbygoogle"
-                                     style="display:block"
-                                     data-ad-client="ca-pub-1904736753681797"
-                                     data-ad-slot="auto"
-                                     data-ad-format="horizontal"
-                                     data-full-width-responsive="true"></ins>
-                                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-                            </div>
-
-                            <!-- Latest Movies Section -->
-                            <div class="app-section movie-section">
                                 </div>
                             </div>
 
@@ -723,10 +797,31 @@
                                     </a>
                                 </div>
                                 <div class="card-grid" id="allMovies">
-                                    <!-- Movies will be loaded here dynamically -->
-                                    <div class="loading-state">
-                                        <div class="loading-spinner"></div>
-                                        <p class="loading-text">Loading movies...</p>
+                                    <!-- Skeleton loaders -->
+                                    <div class="content-card">
+                                        <div class="skeleton skeleton-card"></div>
+                                        <div class="skeleton skeleton-title"></div>
+                                        <div class="skeleton skeleton-meta"></div>
+                                    </div>
+                                    <div class="content-card">
+                                        <div class="skeleton skeleton-card"></div>
+                                        <div class="skeleton skeleton-title"></div>
+                                        <div class="skeleton skeleton-meta"></div>
+                                    </div>
+                                    <div class="content-card">
+                                        <div class="skeleton skeleton-card"></div>
+                                        <div class="skeleton skeleton-title"></div>
+                                        <div class="skeleton skeleton-meta"></div>
+                                    </div>
+                                    <div class="content-card">
+                                        <div class="skeleton skeleton-card"></div>
+                                        <div class="skeleton skeleton-title"></div>
+                                        <div class="skeleton skeleton-meta"></div>
+                                    </div>
+                                    <div class="content-card">
+                                        <div class="skeleton skeleton-card"></div>
+                                        <div class="skeleton skeleton-title"></div>
+                                        <div class="skeleton skeleton-meta"></div>
                                     </div>
                                 </div>
                             </div>
@@ -785,10 +880,31 @@
                                     </a>
                                 </div>
                                 <div class="card-grid" id="popularMovies">
-                                    <!-- Movies will be loaded dynamically -->
-                                    <div class="loading-state">
-                                        <div class="loading-spinner"></div>
-                                        <p class="loading-text">Loading popular movies...</p>
+                                    <!-- Skeleton loaders -->
+                                    <div class="content-card">
+                                        <div class="skeleton skeleton-card"></div>
+                                        <div class="skeleton skeleton-title"></div>
+                                        <div class="skeleton skeleton-meta"></div>
+                                    </div>
+                                    <div class="content-card">
+                                        <div class="skeleton skeleton-card"></div>
+                                        <div class="skeleton skeleton-title"></div>
+                                        <div class="skeleton skeleton-meta"></div>
+                                    </div>
+                                    <div class="content-card">
+                                        <div class="skeleton skeleton-card"></div>
+                                        <div class="skeleton skeleton-title"></div>
+                                        <div class="skeleton skeleton-meta"></div>
+                                    </div>
+                                    <div class="content-card">
+                                        <div class="skeleton skeleton-card"></div>
+                                        <div class="skeleton skeleton-title"></div>
+                                        <div class="skeleton skeleton-meta"></div>
+                                    </div>
+                                    <div class="content-card">
+                                        <div class="skeleton skeleton-card"></div>
+                                        <div class="skeleton skeleton-title"></div>
+                                        <div class="skeleton skeleton-meta"></div>
                                     </div>
                                 </div>
                             </div>
@@ -1095,59 +1211,74 @@
             // Load Continue Watching section
             loadContinueWatching();
             
+            // Show loading state
+            const loadingHTML = `
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <p style="color: #888; margin-top: 1rem;">Loading movies...</p>
+                </div>
+            `;
+            document.getElementById('allMovies').innerHTML = loadingHTML;
+            
             try {
-                // Try to fetch from backend API first
-                try {
-                    console.log('🎬 Loading movies from API...');
-                    console.log('API Config:', API_CONFIG);
+                // Fetch from API (will use cache if available)
+                const allMoviesResponse = await LugandaMoviesAPI.getLatest(20);
+                const allMovies = allMoviesResponse.data || allMoviesResponse.movies || [];
+                
+                // Render all movies (newest first from backend)
+                if (allMovies.length > 0) {
+                    renderMovies(allMovies, 'allMovies');
                     
-                    // Fetch ALL movies from backend (sorted by newest first - createdAt descending)
-                    const allMoviesResponse = await LugandaMoviesAPI.getLatest(20);
-                    console.log('API Response:', allMoviesResponse);
-                    const allMovies = allMoviesResponse.data || allMoviesResponse.movies || [];
-                    console.log('Movies loaded:', allMovies.length);
+                    // Update hero slider with first 3 movies
+                    updateHeroSlider(allMovies.slice(0, 3));
                     
-                    // Render all movies (newest first from backend)
-                    if (allMovies.length > 0) {
-                        renderMovies(allMovies, 'allMovies');
-                        
-                        // Update hero slider with first 3 movies
-                        updateHeroSlider(allMovies.slice(0, 3));
-                        
-                        // Also populate popular movies section (sorted by views)
-                        const popularMovies = [...allMovies].sort((a, b) => (b.views || 0) - (a.views || 0));
-                        renderMovies(popularMovies.slice(0, 5), 'popularMovies');
-                        
-                        // Load trending section (based on views + recent)
-                        loadTrendingMovies(allMovies);
-                        
-                        // Load trending sidebar
-                        loadTrendingSidebar(allMovies);
-                        
-                        // Load TV Series
-                        loadNewSeries();
-                    } else {
-                        // Show message if no movies
-                        document.getElementById('allMovies').innerHTML = `
-                            <div class="col-12 text-center py-5">
-                                <p style="color: #888;">No movies available yet. Check back soon!</p>
-                            </div>
-                        `;
-                    }
+                    // Also populate popular movies section (sorted by views)
+                    const popularMovies = [...allMovies].sort((a, b) => (b.views || 0) - (a.views || 0));
+                    renderMovies(popularMovies.slice(0, 5), 'popularMovies');
                     
-                } catch (apiError) {
-                    console.error('Backend API error:', apiError);
-                    console.log('API URL was:', API_CONFIG?.API_ENDPOINTS?.LUGANDA_MOVIES);
+                    // Load trending section (based on views + recent)
+                    loadTrendingMovies(allMovies);
+                    
+                    // Load trending sidebar
+                    loadTrendingSidebar(allMovies);
+                    
+                    // Load TV Series
+                    loadNewSeries();
+                } else {
+                    // Show message if no movies
                     document.getElementById('allMovies').innerHTML = `
                         <div class="col-12 text-center py-5">
-                            <p style="color: #888;">Unable to load movies. Please try again later.</p>
-                            <p style="color: #666; font-size: 12px;">Error: ${apiError.message}</p>
+                            <p style="color: #888;">No movies available yet. Check back soon!</p>
                         </div>
                     `;
                 }
                 
-            } catch (error) {
-                console.error('Error loading movies:', error);
+            } catch (apiError) {
+                // If API fails, check if we have ANY cached data
+                const fallbackCache = localStorage.getItem('movies_cache_/latest?limit=20');
+                if (fallbackCache) {
+                    try {
+                        const { data } = JSON.parse(fallbackCache);
+                        const allMovies = data.data || data.movies || [];
+                        if (allMovies.length > 0) {
+                            renderMovies(allMovies, 'allMovies');
+                            document.getElementById('allMovies').insertAdjacentHTML('beforebegin', 
+                                '<div class="alert alert-warning" style="margin: 1rem;">Showing cached content. Refresh to see latest.</div>'
+                            );
+                            return;
+                        }
+                    } catch (e) {}
+                }
+                
+                // No cache available - show error
+                document.getElementById('allMovies').innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <p style="color: #888;">Unable to load movies. Please check your connection.</p>
+                        <button onclick="location.reload()" class="btn btn-primary mt-3">Retry</button>
+                    </div>
+                `;
             }
         });
         
@@ -1276,9 +1407,6 @@
                     <a href="player.html?id=${movie._id}" class="content-card">
                         <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
                             <span class="trending-rank">${rank}</span>
-                            <div class="card-badges">
-                                <span class="badge-quality">${quality.toUpperCase()}</span>
-                            </div>
                             <div class="play-overlay">
                                 <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
                                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
@@ -1576,29 +1704,51 @@
                 const vjName = movie.lugandaTranslation?.translatedBy || movie.vjName || 'Unruly Movies';
                 const title = movie.title || movie.originalTitle || 'Unknown Movie';
                 const description = movie.overview || movie.description || 'Watch this amazing movie in Luganda translation.';
+                const movieId = movie._id || movie.id;
+                const rating = movie.rating?.userRating || movie.rating?.translationRating || 4.2;
                 
-                // Update the slide link and background
-                const slideLink = slide.querySelector('.slide');
-                if (slideLink) {
-                    slideLink.href = `player.html?id=${movie._id}`;
-                    slideLink.style.backgroundImage = `linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.3)), url('${backdrop}')`;
-                }
-                
-                // Update slide content
-                const vjElement = slide.querySelector('.imdb');
-                if (vjElement) {
-                    const vjBadge = formatVjBadge(vjName);
-                    vjElement.textContent = vjBadge ? vjBadge.replace(/^VJ\s+/, 'VJ: ') : '';
-                }
-                
-                const yearElement = slide.querySelector('.slide-header > div:nth-child(2)');
-                if (yearElement) yearElement.textContent = year;
-                
-                const titleElement = slide.querySelector('.title');
-                if (titleElement) titleElement.textContent = title;
-                
-                const descElement = slide.querySelector('.description');
-                if (descElement) descElement.textContent = description.substring(0, 200) + (description.length > 200 ? '...' : '');
+                // Create the full slide content with CTAs
+                slide.innerHTML = `
+                    <div class="slide media media-slide" style="background-image: linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.4)), url('${backdrop}');">
+                        <div class="slide-caption">
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <div class="slide-header">
+                                        <div class="imdb">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700" style="margin-right: 4px;">
+                                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                            </svg>
+                                            ${rating.toFixed(1)}
+                                        </div>
+                                        <div>${year}</div>
+                                        <div class="category text-12">Luganda Translation</div>
+                                    </div>
+                                    <div class="title">${title}</div>
+                                    <div class="description">${description.substring(0, 150)}${description.length > 150 ? '...' : ''}</div>
+                                    <div class="hero-cta">
+                                        <a href="player.html?id=${movieId}" class="btn-watch-now">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                            </svg>
+                                            Watch Now
+                                        </a>
+                                        <a href="movie.html?id=${movieId}" class="btn-more-info">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                            </svg>
+                                            More Info
+                                        </a>
+                                    </div>
+                                    <div style="margin-top: 1rem; color: #aaa; font-size: 14px;">
+                                        <strong>VJ:</strong> ${formatVjBadge(vjName) || vjName}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
             });
         }
         
@@ -1655,6 +1805,17 @@
                 const posterId = `${containerId}-poster-${index}`;
                 const tmdbId = movie.tmdbId || movie.metaData?.tmdbId || movie.externalIds?.tmdbId || null;
                 const movieTitle = movie.originalTitle || movie.lugandaTitle || 'Unknown Title';
+                
+                // Determine featured badge
+                let featuredBadge = '';
+                const movieAge = Math.floor((Date.now() - new Date(movie.createdAt || movie.releaseDate)) / (1000 * 60 * 60 * 24));
+                if (movieAge <= 7) {
+                    featuredBadge = '<span class=\"featured-badge badge-new\">New</span>';
+                } else if (movie.trending || (movie.views && movie.views > 1000)) {
+                    featuredBadge = '<span class=\"featured-badge badge-trending\">Trending</span>';
+                } else if (movie.requiredPlan === 'premium') {
+                    featuredBadge = '<span class=\"featured-badge badge-premium\">Premium</span>';
+                }
                 const year = movie.year || '';
                 const genres = movie.genres || [];
                 
@@ -1665,10 +1826,8 @@
                 
                 const movieCard = `
                     <a href="player.html?id=${movie._id}" class="content-card">
+                        ${featuredBadge}
                         <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
-                            <div class="card-badges">
-                                <span class="badge-quality">${quality.toUpperCase()}</span>
-                            </div>
                             <div class="play-overlay">
                                 <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
                                     <polygon points="5 3 19 12 5 21 5 3"></polygon>

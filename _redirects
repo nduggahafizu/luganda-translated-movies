@@ -16,9 +16,41 @@ http://unrulymovies.com/* https://unrulymovies.com/:splat 301!
 # API proxy
 /api/* https://luganda-translated-movies-production.up.railway.app/:splat 200
 
+# Clean URLs - serve HTML files without .html extension
+/movies           /movies.html           200
+/player           /player.html           200
+/series           /series.html           200
+/series-player    /series-player.html    200
+/series-detail    /series-detail.html    200
+/search           /search.html           200
+/login            /login.html            200
+/register         /register.html         200
+/dashboard        /dashboard.html        200
+/profile          /profile.html          200
+/subscribe        /subscribe.html        200
+/subscription     /subscription.html     200
+/uganda-tv        /uganda-tv.html        200
+/tv-stations      /tv-stations.html      200
+/vjs              /vjs.html              200
+/vj               /vj.html               200
+/genres           /genres.html           200
+/trending         /trending.html         200
+/about            /about.html            200
+/contact          /contact.html          200
+/terms            /terms.html            200
+/privacy          /privacy.html          200
+/privacy-policy   /privacy-policy.html   200
+/dmca             /dmca.html             200
+/faq              /faq.html              200
+/cookies          /cookies.html          200
+/test-api         /test-api.html         200
+/admin            /admin.html            200
+/admin-users      /admin-users.html      200
+/admin-movies     /admin-movies.html     200
+
 # Serve static files (don't redirect these to index.html)
 /.well-known/*  /.well-known/:splat  200
 
-# Redirect all requests to index.html for client-side routing
-/*    /index.html   200
+# 404 fallback - Redirect all other requests to index.html
+/*    /index.html   404
 

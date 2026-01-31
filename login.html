@@ -360,6 +360,15 @@
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
     <script>
+        // Check for redirect parameter in URL
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirectUrl = urlParams.get('redirect');
+            if (redirectUrl) {
+                localStorage.setItem('redirectAfterLogin', redirectUrl);
+            }
+        })();
+        
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const eyeIcon = document.getElementById('eyeIcon');

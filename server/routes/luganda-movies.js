@@ -3,6 +3,7 @@ const router = express.Router();
 const LugandaMovie = require('../models/LugandaMovie');
 const axios = require('axios');
 const { memCache, clearMemoryCache } = require('../middleware/cache');
+const { protect } = require('../middleware/auth');
 
 // Import notification service (optional - won't break if not available)
 let notifyNewMovie, notifyVjFollowers;
@@ -360,7 +361,8 @@ router.post('/search-series', async (req, res) => {
 });
 
 // GET /api/luganda-movies/series/:id - Get a series with all seasons/episodes
-router.get('/series/:id', async (req, res) => {
+// PROTECTED: Requires authentication to view series
+router.get('/series/:id', protect, async (req, res) => {
     setCorsHeaders(req, res);
     try {
         let series;
@@ -901,7 +903,8 @@ router.get('/search', async (req, res) => {
 });
 
 // GET /api/luganda-movies/:id - Get single movie by ID (MUST be last route with dynamic param)
-router.get('/:id', async (req, res) => {
+// PROTECTED: Requires authentication to view movie details
+router.get('/:id', protect, async (req, res) => {
     setCorsHeaders(req, res);
     
     try {

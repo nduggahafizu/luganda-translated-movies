@@ -7,17 +7,63 @@ const LugandaMoviesAPI = (function() {
 
     // API Base URL - Uses centralized config
     const API_BASE_URL = API_CONFIG.API_ENDPOINTS.LUGANDA_MOVIES;
+    
+    // Client-side cache configuration
+    const CACHE_PREFIX = 'movies_cache_';
+    const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-    // Helper function for API calls
+    // Get from cache
+    function getFromCache(key) {
+        try {
+            const cached = localStorage.getItem(CACHE_PREFIX + key);
+            if (!cached) return null;
+            
+            const { data, timestamp } = JSON.parse(cached);
+            const age = Date.now() - timestamp;
+            
+            if (age < CACHE_DURATION) {
+                return data;
+            }
+            
+            // Expired - remove it
+            localStorage.removeItem(CACHE_PREFIX + key);
+            return null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    // Save to cache
+    function saveToCache(key, data) {
+        try {
+            const cacheData = {
+                data,
+                timestamp: Date.now()
+            };
+            localStorage.setItem(CACHE_PREFIX + key, JSON.stringify(cacheData));
+        } catch (e) {
+            // Storage full or disabled - ignore
+        }
+    }
+
+    // Helper function for API calls with caching
     async function apiCall(endpoint, options = {}) {
+        const cacheKey = endpoint + JSON.stringify(options.body || '');
+        
+        // For GET requests, check cache first
+        if (!options.method || options.method === 'GET') {
+            const cached = getFromCache(cacheKey);
+            if (cached) {
+                return cached;
+            }
+        }
+        
         try {
             // Remove trailing slash from API_BASE_URL and leading slash from endpoint to avoid double slashes
             const base = API_BASE_URL.replace(/\/$/, '');
             const path = endpoint.replace(/^\//, '');
             const url = `${base}/${path}`;
             
-            // Don't add cache-busting - let server cache work
-            // Browser caching is controlled via Cache-Control headers
             const response = await fetch(url, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -31,10 +77,20 @@ const LugandaMoviesAPI = (function() {
             if (!response.ok) {
                 throw new Error(data.message || 'API request failed');
             }
+            
+            // Cache successful GET requests
+            if (!options.method || options.method === 'GET') {
+                saveToCache(cacheKey, data);
+            }
 
             return data;
         } catch (error) {
-            console.error('API Error:', error);
+            // If offline or error, try to return stale cache
+            const cached = localStorage.getItem(CACHE_PREFIX + cacheKey);
+            if (cached) {
+                const { data } = JSON.parse(cached);
+                return data; // Return stale data as fallback
+            }
             throw error;
         }
     }

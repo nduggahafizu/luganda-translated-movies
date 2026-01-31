@@ -853,6 +853,12 @@
                         <option value="premium">Premium</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="editUserActive" style="width: auto; margin-right: 8px;">
+                        Account Active (Uncheck to ban user)
+                    </label>
+                </div>
                 <div class="modal-actions">
                     <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
                     <button type="submit" class="btn-save">Save Changes</button>
@@ -1031,6 +1037,22 @@
                                     </svg>
                                     Edit
                                 </button>
+                                ${status === 'active' ? `
+                                <button class="action-btn delete" onclick="banUser('${user._id}', '${escapeHtml(user.fullName || user.email)}')" title="Ban User">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                                    </svg>
+                                    Ban
+                                </button>
+                                ` : `
+                                <button class="action-btn edit" onclick="unbanUser('${user._id}', '${escapeHtml(user.fullName || user.email)}')" title="Unban User">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    Unban
+                                </button>
+                                `}
                             </div>
                         </td>
                     </tr>
@@ -1086,6 +1108,7 @@
             document.getElementById('editUserEmail').value = user.email || '';
             document.getElementById('editUserRole').value = user.role || 'user';
             document.getElementById('editUserPlan').value = user.subscription?.plan || 'free';
+            document.getElementById('editUserActive').checked = user.isActive !== false;
             
             document.getElementById('editModal').classList.add('active');
         }
@@ -1101,6 +1124,7 @@
             const userId = document.getElementById('editUserId').value;
             const role = document.getElementById('editUserRole').value;
             const plan = document.getElementById('editUserPlan').value;
+            const isActive = document.getElementById('editUserActive').checked;
             
             try {
                 const response = await fetch(`${API_URL}/admin/users/${userId}`, {
@@ -1111,6 +1135,7 @@
                     },
                     body: JSON.stringify({
                         role,
+                        isActive,
                         subscription: { plan }
                     })
                 });
@@ -1179,6 +1204,111 @@
             document.body.appendChild(toast);
             
             setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Ban user function
+        async function banUser(userId, userName) {
+            if (!confirm(`Are you sure you want to ban ${userName}? This will prevent them from accessing the platform.`)) {
+                return;
+            }
+            
+            const token = localStorage.getItem('token');
+            
+            try {
+                const response = await fetch(`${API_URL}/admin/users/${userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        isActive: false
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    showToast(`${userName} has been banned`, 'success');
+                    loadUsers();
+                } else {
+                    showToast(data.message || 'Failed to ban user', 'error');
+                }
+            } catch (error) {
+                console.error('Error banning user:', error);
+                showToast('Failed to ban user', 'error');
+            }
+        }
+
+        // Unban user function
+        async function unbanUser(userId, userName) {
+            if (!confirm(`Are you sure you want to unban ${userName}? This will restore their access to the platform.`)) {
+                return;
+            }
+            
+            const token = localStorage.getItem('token');
+            
+            try {
+                const response = await fetch(`${API_URL}/admin/users/${userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        isActive: true
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    showToast(`${userName} has been unbanned`, 'success');
+                    loadUsers();
+                } else {
+                    showToast(data.message || 'Failed to unban user', 'error');
+                }
+            } catch (error) {
+                console.error('Error unbanning user:', error);
+                showToast('Failed to unban user', 'error');
+            }
+        }
+
+        // Upgrade to premium function
+        async function upgradeToPremium(userId, userName) {
+            if (!confirm(`Upgrade ${userName} to Premium? This will give them full access to all premium content.`)) {
+                return;
+            }
+            
+            const token = localStorage.getItem('token');
+            
+            try {
+                const response = await fetch(`${API_URL}/admin/users/${userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        subscription: {
+                            plan: 'premium',
+                            status: 'active'
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    showToast(`${userName} upgraded to Premium`, 'success');
+                    loadUsers();
+                } else {
+                    showToast(data.message || 'Failed to upgrade user', 'error');
+                }
+            } catch (error) {
+                console.error('Error upgrading user:', error);
+                showToast('Failed to upgrade user', 'error');
+            }
         }
 
         // Close modal on escape
