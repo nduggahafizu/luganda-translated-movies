@@ -22,6 +22,37 @@
     <link rel="preload" href="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js?v=2024" as="script">
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/hls.js@latest" as="script">
     
+    <!-- Suppress third-party console warnings -->
+    <script>
+        // Suppress known third-party warnings (YouTube API, AdSense) in production
+        (function() {
+            const originalWarn = console.warn;
+            const originalError = console.error;
+            
+            console.warn = function(...args) {
+                const msg = args.join(' ');
+                // Filter out third-party warnings we can't control
+                if (msg.includes('www-widgetapi.js') || 
+                    msg.includes('target origin provided') ||
+                    msg.includes('non-passive event listener') ||
+                    msg.includes('Violation')) {
+                    return;
+                }
+                originalWarn.apply(console, args);
+            };
+            
+            console.error = function(...args) {
+                const msg = args.join(' ');
+                // Filter YouTube API origin errors
+                if (msg.includes('www-widgetapi.js') || 
+                    msg.includes('target origin provided')) {
+                    return;
+                }
+                originalError.apply(console, args);
+            };
+        })();
+    </script>
+    
     <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMF82HVT9G"></script>
     <script>
@@ -2089,6 +2120,26 @@
                 pointer-events: auto !important;
                 transform: translateY(0) !important;
             }
+            
+            /* Non-fullscreen mobile controls - also auto-hide when playing */
+            .plyr--playing.plyr--hide-controls .plyr__controls {
+                opacity: 0 !important;
+                pointer-events: none !important;
+                transition: opacity 0.3s ease !important;
+            }
+            
+            /* Show controls on touch/tap */
+            .plyr--playing.plyr--touch-active .plyr__controls,
+            .plyr--paused .plyr__controls {
+                opacity: 1 !important;
+                pointer-events: auto !important;
+            }
+            
+            /* Hide big play button overlay when controls are hidden */
+            .plyr--playing.plyr--hide-controls .plyr__control--overlaid {
+                opacity: 0 !important;
+                pointer-events: none !important;
+            }
         }
         
         /* Safe Area for notched devices */
@@ -3034,23 +3085,24 @@
         function isDirectVideoUrl(url) {
             if (!url) return false;
             
+            // Clean URL for extension checking (remove query params and hash)
+            const cleanUrl = url.split('?')[0].split('#')[0].toLowerCase();
+            
             // Archive.org EMBED URLs should use iframe (better compatibility)
             if (url.includes('archive.org/embed/')) return false;
             
             // Archive.org direct downloads (only MP4/WebM for native playback)
             // Also check for CDN subdomain URLs (ia800101.us.archive.org, etc.)
-            if (url.includes('archive.org/download/') || url.match(/ia\d+\.us\.archive\.org/)) {
-                const urlLower = url.toLowerCase();
+            if (url.includes('archive.org/download/') || url.match(/ia\d+\.us\.archive\.org/) || url.includes('/items/')) {
                 // Only treat MP4 and WebM as direct (they work in all browsers)
-                if (urlLower.endsWith('.mp4') || urlLower.endsWith('.webm')) return true;
+                if (cleanUrl.endsWith('.mp4') || cleanUrl.endsWith('.webm')) return true;
                 // MKV should use embed player for better compatibility
-                if (urlLower.endsWith('.mkv')) return false;
+                if (cleanUrl.endsWith('.mkv')) return false;
             }
             
             // Direct video file extensions (browser-compatible only)
             const videoExtensions = ['.mp4', '.webm', '.m4v', '.m3u8'];
-            const urlLower = url.toLowerCase();
-            if (videoExtensions.some(ext => urlLower.includes(ext))) return true;
+            if (videoExtensions.some(ext => cleanUrl.endsWith(ext) || cleanUrl.includes(ext))) return true;
             
             // Google Drive direct links
             if (url.includes('drive.google.com') && url.includes('export=download')) return true;
@@ -3281,6 +3333,9 @@
             // Setup auto-rotate for mobile
             setupAutoRotate(player);
             
+            // Setup mobile touch controls handling
+            setupMobileTouchControls(player);
+            
             // Player ready - YouTube-style behavior
             player.on('ready', () => {
                 console.log('🚀 Plyr ready - YouTube style enabled');
@@ -3288,6 +3343,70 @@
             });
             
             return player;
+        }
+        
+        // Handle mobile touch to show/hide controls
+        function setupMobileTouchControls(playerInstance) {
+            if (!playerInstance || !playerInstance.elements || !playerInstance.elements.container) return;
+            
+            const container = playerInstance.elements.container;
+            let touchTimeout = null;
+            let controlsVisible = true;
+            
+            // Detect if touch device
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            if (!isTouchDevice) return;
+            
+            // Show controls temporarily on tap
+            function showControlsTemporarily() {
+                container.classList.add('plyr--touch-active');
+                container.classList.remove('plyr--hide-controls');
+                controlsVisible = true;
+                
+                // Clear any existing timeout
+                if (touchTimeout) {
+                    clearTimeout(touchTimeout);
+                }
+                
+                // Hide controls after 3 seconds if still playing
+                touchTimeout = setTimeout(() => {
+                    if (playerInstance.playing) {
+                        container.classList.remove('plyr--touch-active');
+                        container.classList.add('plyr--hide-controls');
+                        controlsVisible = false;
+                    }
+                }, 3000);
+            }
+            
+            // Toggle controls on tap (not on control buttons)
+            container.addEventListener('touchstart', (e) => {
+                // Don't toggle if tapping on controls
+                if (e.target.closest('.plyr__controls') || e.target.closest('.plyr__control')) {
+                    return;
+                }
+                
+                if (playerInstance.playing) {
+                    showControlsTemporarily();
+                }
+            }, { passive: true });
+            
+            // Show controls when paused
+            playerInstance.on('pause', () => {
+                if (touchTimeout) clearTimeout(touchTimeout);
+                container.classList.add('plyr--touch-active');
+                container.classList.remove('plyr--hide-controls');
+                controlsVisible = true;
+            });
+            
+            // Start hiding timer when playing
+            playerInstance.on('play', () => {
+                showControlsTemporarily();
+            });
+            
+            // Clear timeout on destroy
+            playerInstance.on('destroy', () => {
+                if (touchTimeout) clearTimeout(touchTimeout);
+            });
         }
 
         function requestElementFullscreen(el) {
@@ -3355,6 +3474,10 @@
                         
                         console.log('🎬 Video URL:', videoUrl);
                         console.log('🎬 Direct CDN URL:', directCdnUrl);
+                        console.log('🎬 Secure Stream Path:', secureStreamPath);
+                        console.log('🎬 Provider:', declaredProvider);
+                        console.log('🎬 Is Direct Video URL (directCdnUrl):', directCdnUrl ? isDirectVideoUrl(directCdnUrl) : 'N/A');
+                        console.log('🎬 Is Direct Video URL (videoUrl):', videoUrl ? isDirectVideoUrl(videoUrl) : 'N/A');
                         
                         // Check if video URL is valid
                         // Note: secureStreamPath and provider='archive' with archiveItemId are valid even without direct videoUrl
