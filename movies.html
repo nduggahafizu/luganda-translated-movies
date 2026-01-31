@@ -476,38 +476,26 @@
                 </div>`;
             
             try {
-                const queryParams = new URLSearchParams({
+                const queryParams = {
                     page: currentPage,
                     limit: 18,
                     ...params
-                });
+                };
                 
-                const response = await fetch(`${API_CONFIG.API_ENDPOINTS.MOVIES}/fetch?${queryParams}`);
-                const data = await response.json();
+                const data = await LugandaMoviesAPI.getAllMovies(queryParams);
                 
-                if (data.success) {
-                    // Transform API response to expected format
-                    movies = data.movies.map(m => ({
-                        _id: m.row_id,
-                        originalTitle: m.title,
-                        lugandaTitle: m.luganda_title,
-                        vjName: m.vj,
-                        year: m.year,
-                        genres: m.categories ? m.categories.split(', ') : [],
-                        rating: {
-                            translationRating: m.rating || 0,
-                            userRating: m.rating || 0
-                        },
-                        video: { quality: m.quality },
-                        poster: m.poster_url,
-                        views: m.views,
-                        tmdbId: null
-                    }));
-                    totalPages = data.pagination.pages;
+                if (data.success && data.data) {
+                    movies = data.data;
+                    totalPages = data.pages || 1;
                     renderMovies(movies);
-                    updatePagination(data.pagination);
+                    updatePagination({
+                        page: data.page || currentPage,
+                        pages: data.pages || 1,
+                        total: data.total || movies.length,
+                        hasMore: data.page < data.pages
+                    });
                 } else {
-                    throw new Error(data.error || 'Failed to load movies');
+                    throw new Error(data.message || 'Failed to load movies');
                 }
             } catch (error) {
                 console.error('Error loading movies:', error);

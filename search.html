@@ -923,33 +923,30 @@
             document.getElementById('initialState')?.remove();
             
             try {
-                // Build search URL - use /search endpoint for queries, or main endpoint for browsing
-                let apiUrl;
+                let data;
+                const filters = { page: currentPage, limit: 20 };
+                
+                if (genre) filters.genre = genre;
+                if (vj) filters.vjName = vj;
+                if (year) filters.year = year;
+                if (sort) filters.sort = sort;
+                
+                // Use cached API
                 if (query) {
-                    apiUrl = `${API_URL}/search?q=${encodeURIComponent(query)}&page=${currentPage}&limit=20`;
+                    data = await LugandaMoviesAPI.searchMovies(query, filters);
                 } else {
-                    apiUrl = `${API_URL}?page=${currentPage}&limit=20`;
+                    data = await LugandaMoviesAPI.getAllMovies(filters);
                 }
                 
-                if (genre) apiUrl += `&genre=${genre}`;
-                if (vj) apiUrl += `&vj=${vj}`;
-                if (year) apiUrl += `&year=${year}`;
-                if (sort) apiUrl += `&sort=${sort}`;
-                
-                console.log('Searching with URL:', apiUrl);
-                
-                const response = await fetch(apiUrl);
-                const data = await response.json();
-                
-                // Handle both response formats (data.data or data.data.movies)
-                const movies = data.data?.movies || data.data || [];
+                // Handle response
+                const movies = data.data || [];
                 
                 if (movies.length > 0) {
-                    totalResults = data.data?.pagination?.total || data.count || movies.length;
+                    totalResults = data.total || data.count || movies.length;
                     document.getElementById('resultsCount').innerHTML = `Showing <strong>${totalResults}</strong> results for "${query || 'All Movies'}"`;
                     
                     renderResults(movies);
-                    renderPagination(data.data?.pagination);
+                    renderPagination(data.pagination || { page: currentPage, pages: data.pages || 1 });
                 } else {
                     resultsGrid.innerHTML = `
                         <div class="no-results" style="grid-column: 1/-1;">
