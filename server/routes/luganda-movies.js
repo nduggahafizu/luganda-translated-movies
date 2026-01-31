@@ -903,8 +903,8 @@ router.get('/search', async (req, res) => {
 });
 
 // GET /api/luganda-movies/:id - Get single movie by ID (MUST be last route with dynamic param)
-// PROTECTED: Requires authentication to view movie details
-router.get('/:id', protect, async (req, res) => {
+// PUBLIC: Anyone can view movie details
+router.get('/:id', async (req, res) => {
     setCorsHeaders(req, res);
     
     try {
