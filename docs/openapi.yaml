@@ -1,0 +1,466 @@
+openapi: 3.0.3
+info:
+  title: Unruly Movies API
+  version: "1.0.0"
+  description: API spec for Unruly Movies mobile app clients.
+servers:
+  - url: https://luganda-translated-movies-production.up.railway.app
+    description: Production
+  - url: http://localhost:5000
+    description: Local development
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Error message
+    Movie:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        originalTitle:
+          type: string
+          example: "F9: The Fast Saga"
+        lugandaTitle:
+          type: string
+          example: "F9 - Luganda"
+        vjName:
+          type: string
+          example: "VJ Junior"
+        poster:
+          type: string
+          example: "https://image.tmdb.org/t/p/w500/poster.jpg"
+        backdrop:
+          type: string
+          example: "https://image.tmdb.org/t/p/original/backdrop.jpg"
+        genres:
+          type: array
+          items:
+            type: string
+        year:
+          type: integer
+          example: 2021
+        duration:
+          type: integer
+          example: 143
+        views:
+          type: integer
+          example: 1234
+        featured:
+          type: boolean
+          example: false
+        trending:
+          type: boolean
+          example: true
+        requiredPlan:
+          type: string
+          example: free
+        rating:
+          type: object
+          properties:
+            userRating:
+              type: number
+              example: 4.5
+            translationRating:
+              type: number
+              example: 4.7
+        video:
+          type: object
+          properties:
+            provider:
+              type: string
+              example: archive
+            quality:
+              type: string
+              example: HD
+            secureStreamPath:
+              type: string
+              example: /api/video/stream/luganda/507f1f77bcf86cd799439011
+            archiveItemId:
+              type: string
+              example: some-archive-item
+    MovieListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Movie"
+        count:
+          type: integer
+          example: 10
+    MovieDetailResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: "#/components/schemas/Movie"
+    AuthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIs..."
+        refreshToken:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIs..."
+        data:
+          type: object
+          properties:
+            user:
+              type: object
+    PlaybackTokenResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIs..."
+        expiresIn:
+          type: string
+          example: 10m
+paths:
+  /api/luganda-movies/latest:
+    get:
+      summary: Get latest movies
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          example: 20
+      responses:
+        "200":
+          description: Latest movies
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MovieListResponse"
+  /api/luganda-movies/trending:
+    get:
+      summary: Get trending movies
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          example: 10
+      responses:
+        "200":
+          description: Trending movies
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MovieListResponse"
+  /api/luganda-movies/featured:
+    get:
+      summary: Get featured movies
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          example: 10
+      responses:
+        "200":
+          description: Featured movies
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MovieListResponse"
+  /api/luganda-movies/new-releases:
+    get:
+      summary: Get new releases (last 30 days)
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          example: 20
+      responses:
+        "200":
+          description: New releases
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MovieListResponse"
+  /api/luganda-movies/genres:
+    get:
+      summary: Get genres
+      responses:
+        "200":
+          description: Genre list
+  /api/luganda-movies/genre/{genre}:
+    get:
+      summary: Get movies by genre
+      parameters:
+        - in: path
+          name: genre
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          example: 20
+      responses:
+        "200":
+          description: Movies by genre
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MovieListResponse"
+  /api/luganda-movies/vjs:
+    get:
+      summary: Get VJ list
+      responses:
+        "200":
+          description: VJ list
+  /api/luganda-movies/vj/{vjName}:
+    get:
+      summary: Get movies by VJ
+      parameters:
+        - in: path
+          name: vjName
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          example: 20
+      responses:
+        "200":
+          description: Movies by VJ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MovieListResponse"
+  /api/luganda-movies/search:
+    get:
+      summary: Search movies
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+        - in: query
+          name: genre
+          schema:
+            type: string
+        - in: query
+          name: vj
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MovieListResponse"
+  /api/luganda-movies/{id}:
+    get:
+      summary: Get movie detail
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Movie detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MovieDetailResponse"
+  /api/auth/register:
+    post:
+      summary: Register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Register response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+  /api/auth/login:
+    post:
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Login response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+  /api/auth/me:
+    get:
+      summary: Get current user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current user
+  /api/auth/refresh-token:
+    post:
+      summary: Refresh token
+      responses:
+        "200":
+          description: Refresh response
+  /api/auth/logout:
+    post:
+      summary: Logout
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Logout response
+  /api/auth/logout-all:
+    post:
+      summary: Logout all devices
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Logout-all response
+  /api/video/playback-token:
+    post:
+      summary: Create playback token
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                movieId:
+                  type: string
+      responses:
+        "200":
+          description: Playback token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlaybackTokenResponse"
+  /api/video/stream/luganda/{movieId}:
+    get:
+      summary: Stream movie (Archive sources)
+      parameters:
+        - in: path
+          name: movieId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: token
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Video stream
+  /api/video/extract:
+    post:
+      summary: Extract direct URL from host
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+      responses:
+        "200":
+          description: Extracted URL
+  /api/payments/airtel/initiate:
+    post:
+      summary: Airtel payment initiate
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Airtel initiate response
+  /api/payments/mtn/initiate:
+    post:
+      summary: MTN payment initiate
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: MTN initiate response
+  /api/payments/pesapal/initiate:
+    post:
+      summary: PesaPal payment initiate
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: PesaPal initiate response
+  /api/payments/stripe/confirm:
+    post:
+      summary: Stripe confirm
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Stripe confirm response
+  /api/payments/history:
+    get:
+      summary: Payment history
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Payment history

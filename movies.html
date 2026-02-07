@@ -486,13 +486,14 @@
                 
                 if (data.success && data.data) {
                     movies = data.data;
-                    totalPages = data.pages || 1;
+                    const pg = data.pagination || {};
+                    totalPages = pg.pages || 1;
                     renderMovies(movies);
                     updatePagination({
-                        page: data.page || currentPage,
-                        pages: data.pages || 1,
-                        total: data.total || movies.length,
-                        hasMore: data.page < data.pages
+                        page: pg.page || currentPage,
+                        pages: pg.pages || 1,
+                        total: pg.total || movies.length,
+                        hasMore: (pg.page || 1) < (pg.pages || 1)
                     });
                 } else {
                     throw new Error(data.message || 'Failed to load movies');
