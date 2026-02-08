@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Notification = require('../models/Notification');
+const ExpoPushToken = require('../models/ExpoPushToken');
 const { protect } = require('../middleware/auth');
 
 // Get user's notifications
@@ -211,4 +212,110 @@ router.post('/notify-movie/:movieId', protect, async (req, res) => {
     }
 });
 
-module.exports = router;
+// Register Expo push token (for mobile app)
+router.post('/register-token', protect, async (req, res) => {
+    try {
+        const { pushToken, platform } = req.body;
+
+        if (!pushToken) {
+            return res.status(400).json({ status: 'error', message: 'Push token is required' });
+        }
+
+        if (!platform || !['android', 'ios'].includes(platform)) {
+            return res.status(400).json({ status: 'error', message: 'Valid platform (android/ios) is required' });
+        }
+
+        // Check if token already exists
+        let existingToken = await ExpoPushToken.findOne({ pushToken });
+
+        if (existingToken) {
+            // Update existing token
+            existingToken.user = req.user._id;
+            existingToken.platform = platform;
+            existingToken.isActive = true;
+            existingToken.failedAttempts = 0;
+            existingToken.disabledAt = undefined;
+            existingToken.disabledReason = undefined;
+            existingToken.lastUsed = new Date();
+            await existingToken.save();
+
+            return res.json({
+                status: 'success',
+                message: 'Push token updated',
+                data: { tokenId: existingToken._id }
+            });
+        }
+
+        // Create new token
+        const newToken = await ExpoPushToken.create({
+            user: req.user._id,
+            pushToken,
+            platform
+        });
+
+        res.status(201).json({
+            status: 'success',
+            message: 'Push token registered',
+            data: { tokenId: newToken._id }
+        });
+    } catch (error) {
+        console.error('Register push token error:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to register push token' });
+    }
+});
+
+// Unregister Expo push token
+router.delete('/unregister-token', protect, async (req, res) => {
+    try {
+        const { pushToken } = req.body;
+
+        if (!pushToken) {
+            return res.status(400).json({ status: 'error', message: 'Push token is required' });
+        }
+
+        const result = await ExpoPushToken.findOneAndDelete({
+            pushToken,
+            user: req.user._id
+        });
+
+        if (!result) {
+            return res.status(404).json({ status: 'error', message: 'Token not found' });
+        }
+
+        res.json({
+            status: 'success',
+            message: 'Push token unregistered'
+        });
+    } catch (error) {
+        console.error('Unregister push token error:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to unregister token' });
+    }
+});
+
+// Admin: Send push notification to all mobile app users
+router.post('/push-all', protect, async (req, res) => {
+    try {
+        if (!req.user.role || req.user.role !== 'admin') {
+            return res.status(403).json({ status: 'error', message: 'Admin access required' });
+        }
+
+        const { title, body, data } = req.body;
+
+        if (!title || !body) {
+            return res.status(400).json({ status: 'error', message: 'Title and body are required' });
+        }
+
+        const { sendSystemAnnouncement } = require('../services/expoPushService');
+        const result = await sendSystemAnnouncement(title, body, data);
+
+        res.json({
+            status: 'success',
+            message: `Push notification sent to ${result.sent} devices`,
+            data: result
+        });
+    } catch (error) {
+        console.error('Push all error:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to send push notifications' });
+    }
+});
+

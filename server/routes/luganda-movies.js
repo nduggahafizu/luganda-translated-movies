@@ -17,6 +17,16 @@ try {
     notifyVjFollowers = async () => ({ success: false });
 }
 
+// Import Expo push service for mobile notifications
+let expoPushNotifyNewMovie;
+try {
+    const expoPushService = require('../services/expoPushService');
+    expoPushNotifyNewMovie = expoPushService.notifyNewMovie;
+} catch (err) {
+    console.warn('Expo push service not available:', err.message);
+    expoPushNotifyNewMovie = async () => ({ success: false });
+}
+
 // CORS middleware for all routes - Dynamic origin support
 const setCorsHeaders = (req, res) => {
     const origin = req.headers.origin;
@@ -198,6 +208,8 @@ router.post('/simple-add', async (req, res) => {
         try {
             await notifyNewMovie(newMovie);
             await notifyVjFollowers(newMovie, vjName);
+            // Send push notification to mobile app users
+            await expoPushNotifyNewMovie(newMovie);
         } catch (notifyError) {
             console.error('Notification error (non-blocking):', notifyError.message);
         }
@@ -291,6 +303,13 @@ router.post('/import-series', async (req, res) => {
         console.log('[IMPORT-SERIES] Saving to database...');
         const newSeries = await LugandaMovie.create(seriesData);
         console.log('[IMPORT-SERIES] Series saved:', newSeries._id);
+
+        // Send push notification to mobile app users
+        try {
+            await expoPushNotifyNewMovie(newSeries);
+        } catch (notifyError) {
+            console.error('Expo push notification error (non-blocking):', notifyError.message);
+        }
 
         res.status(201).json({ 
             success: true, 
@@ -564,6 +583,8 @@ router.post('/auto-add', async (req, res) => {
         try {
             await notifyNewMovie(newMovie);
             await notifyVjFollowers(newMovie, vjName);
+            // Send push notification to mobile app users
+            await expoPushNotifyNewMovie(newMovie);
         } catch (notifyError) {
             console.error('Notification error (non-blocking):', notifyError.message);
         }
@@ -624,6 +645,8 @@ router.post('/', async (req, res) => {
         try {
             await notifyNewMovie(newMovie);
             await notifyVjFollowers(newMovie, vjName);
+            // Send push notification to mobile app users
+            await expoPushNotifyNewMovie(newMovie);
         } catch (notifyError) {
             console.error('Notification error (non-blocking):', notifyError.message);
         }
