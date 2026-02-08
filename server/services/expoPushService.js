@@ -3,6 +3,7 @@
  * Handles sending push notifications to mobile app users via Expo's push service
  */
 
+const axios = require('axios');
 const ExpoPushToken = require('../models/ExpoPushToken');
 
 const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
@@ -43,17 +44,15 @@ async function sendExpoPushNotifications(tokens, notification) {
                 badge: notification.badge || 1,
             }));
 
-            const response = await fetch(EXPO_PUSH_URL, {
-                method: 'POST',
+            const response = await axios.post(EXPO_PUSH_URL, messages, {
                 headers: {
                     'Accept': 'application/json',
                     'Accept-Encoding': 'gzip, deflate',
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(messages),
             });
 
-            const result = await response.json();
+            const result = response.data;
 
             if (result.data) {
                 for (let i = 0; i < result.data.length; i++) {
