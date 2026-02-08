@@ -319,3 +319,4 @@ router.post('/push-all', protect, async (req, res) => {
     }
 });
 
+module.exports = router;
