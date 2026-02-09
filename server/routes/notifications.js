@@ -264,6 +264,50 @@ router.post('/register-token', protect, async (req, res) => {
     }
 });
 
+// Register Expo push token anonymously (no login required)
+// This allows collecting tokens from users who haven't logged in yet
+router.post('/register-anonymous', async (req, res) => {
+    try {
+        const { pushToken, platform } = req.body;
+
+        if (!pushToken) {
+            return res.status(400).json({ status: 'error', message: 'Push token is required' });
+        }
+
+        // Check if token already exists
+        let existingToken = await ExpoPushToken.findOne({ pushToken });
+
+        if (existingToken) {
+            // Update existing token
+            existingToken.platform = platform || existingToken.platform;
+            existingToken.isActive = true;
+            existingToken.failedAttempts = 0;
+            existingToken.lastUsed = new Date();
+            await existingToken.save();
+
+            return res.json({
+                status: 'success',
+                message: 'Push token updated'
+            });
+        }
+
+        // Create new token (without user association)
+        await ExpoPushToken.create({
+            pushToken,
+            platform: platform || 'android',
+            isActive: true
+        });
+
+        res.status(201).json({
+            status: 'success',
+            message: 'Push token registered'
+        });
+    } catch (error) {
+        console.error('Register anonymous push token error:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to register push token' });
+    }
+});
+
 // Unregister Expo push token
 router.delete('/unregister-token', protect, async (req, res) => {
     try {
