@@ -973,15 +973,17 @@
                 });
                 const statsData = await statsResponse.json();
                 
-                if (statsData.status === 'success') {
-                    document.getElementById('totalMovies').textContent = formatNumber(statsData.data.totals.movies);
-                    document.getElementById('totalUsers').textContent = formatNumber(statsData.data.totals.users);
-                    document.getElementById('monthlyViews').textContent = formatNumber(statsData.data.monthly.totalViews);
-                    document.getElementById('totalReviews').textContent = formatNumber(statsData.data.totals.reviews);
-                    document.getElementById('usersChange').textContent = `+${statsData.data.newUsers} this month`;
+                if (statsData.success || statsData.status === 'success') {
+                    const totals = statsData.data?.totals || statsData.data || {};
+                    const monthly = statsData.data?.monthly || {};
+                    document.getElementById('totalMovies').textContent = formatNumber(totals.movies || totals.totalMovies || 0);
+                    document.getElementById('totalUsers').textContent = formatNumber(totals.users || totals.totalUsers || 0);
+                    document.getElementById('monthlyViews').textContent = formatNumber(monthly.totalViews || totals.views || 0);
+                    document.getElementById('totalReviews').textContent = formatNumber(totals.reviews || totals.totalReviews || 0);
+                    document.getElementById('usersChange').textContent = `+${statsData.data?.newUsers || 0} this month`;
                     
                     // Render chart
-                    renderChart(statsData.data.dailyStats);
+                    if (statsData.data?.dailyStats) renderChart(statsData.data.dailyStats);
                 }
 
                 // Load recent movies

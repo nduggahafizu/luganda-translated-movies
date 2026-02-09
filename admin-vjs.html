@@ -593,7 +593,7 @@
                 const response = await fetch(`${API_URL}/vjs`);
                 const data = await response.json();
                 
-                if (data.status === 'success' || data.success) {
+                if ((data.success || data.status === 'success') || data.success) {
                     allVJs = data.data || [];
                     renderVJs(allVJs);
                     updateStats();
@@ -727,7 +727,7 @@
                 
                 const data = await response.json();
                 
-                if (data.status === 'success' || data.success) {
+                if ((data.success || data.status === 'success') || data.success) {
                     alert(isEdit ? 'VJ updated successfully!' : 'VJ added successfully!');
                     closeModal();
                     loadVJs();
@@ -755,7 +755,7 @@
                 
                 const data = await response.json();
                 
-                if (data.status === 'success' || data.success) {
+                if ((data.success || data.status === 'success') || data.success) {
                     alert('VJ deleted successfully!');
                     loadVJs();
                 } else {

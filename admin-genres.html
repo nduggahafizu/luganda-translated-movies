@@ -560,7 +560,7 @@
                 const response = await fetch(`${API_URL}/genres`);
                 const data = await response.json();
                 
-                if (data.status === 'success' && data.data && data.data.length > 0) {
+                if ((data.success || data.status === 'success') && data.data && data.data.length > 0) {
                     allGenres = data.data;
                 } else {
                     // Use default genres
@@ -694,7 +694,7 @@
                 
                 const data = await response.json();
                 
-                if (data.status === 'success' || data.success) {
+                if ((data.success || data.status === 'success') || data.success) {
                     alert(isEdit ? 'Genre updated!' : 'Genre added!');
                     closeModal();
                     loadGenres();

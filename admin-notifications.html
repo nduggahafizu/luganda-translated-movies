@@ -664,7 +664,7 @@
                 });
                 const usersData = await usersResponse.json();
                 
-                if (usersData.success || usersData.status === 'success') {
+                if (usersData.success || users(data.success || data.status === 'success')) {
                     document.getElementById('totalUsers').textContent = usersData.pagination?.total || usersData.total || 0;
                 }
                 
@@ -842,7 +842,7 @@
                 });
                 const data = await response.json();
                 
-                if (data.status === 'success') {
+                if ((data.success || data.status === 'success')) {
                     document.getElementById('emailTotal').textContent = data.data.total || 0;
                     document.getElementById('emailActive').textContent = data.data.active || 0;
                     document.getElementById('emailUnverified').textContent = data.data.unverified || 0;
@@ -941,7 +941,7 @@
                 
                 const data = await response.json();
                 
-                if (data.status === 'success') {
+                if ((data.success || data.status === 'success')) {
                     showToast(`✅ Email sent to ${data.data.sent} subscribers!`, 'success');
                     document.getElementById('emailMovieForm').reset();
                     loadEmailStats();
@@ -979,7 +979,7 @@
                 
                 const data = await response.json();
                 
-                if (data.status === 'success') {
+                if ((data.success || data.status === 'success')) {
                     showToast(`✅ Weekly digest sent to ${data.data.sent} subscribers!`, 'success');
                 } else {
                     showToast(data.message || 'Failed to send digest', 'error');

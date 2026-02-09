@@ -943,11 +943,11 @@
                 
                 const data = await response.json();
                 
-                if (data.status === 'success') {
+                if ((data.success || data.status === 'success')) {
                     allUsers = data.data;
-                    totalPages = data.pagination.pages;
+                    totalPages = data.pagination?.pages || 1;
                     renderUsers(data.data);
-                    updatePagination(data.pagination);
+                    updatePagination(data.pagination || { page: 1, pages: 1, total: data.data?.length || 0, limit: 20 });
                     updateStats();
                 } else {
                     showToast(data.message || 'Failed to load users', 'error');
@@ -970,13 +970,14 @@
                 
                 const data = await response.json();
                 
-                if (data.status === 'success') {
-                    document.getElementById('totalUsers').textContent = data.data.totals.users || 0;
-                    document.getElementById('premiumUsers').textContent = data.data.growth?.premiumUsers || 0;
-                    document.getElementById('newUsersToday').textContent = data.data.growth?.newUsersToday || 0;
+                if (data.success || data.status === 'success') {
+                    const totalUsers = data.data?.totals?.users || data.data?.totalUsers || 0;
+                    document.getElementById('totalUsers').textContent = totalUsers;
+                    document.getElementById('premiumUsers').textContent = data.data?.growth?.premiumUsers || data.data?.premiumUsers || 0;
+                    document.getElementById('newUsersToday').textContent = data.data?.growth?.newUsersToday || data.data?.newUsersToday || 0;
                     
                     // Calculate active users (this is an estimate)
-                    const activeUsers = Math.round((data.data.totals.users || 0) * 0.7);
+                    const activeUsers = Math.round(totalUsers * 0.7);
                     document.getElementById('activeUsers').textContent = activeUsers;
                 }
             } catch (error) {
@@ -1142,7 +1143,7 @@
                 
                 const data = await response.json();
                 
-                if (data.status === 'success') {
+                if ((data.success || data.status === 'success')) {
                     showToast('User updated successfully', 'success');
                     closeModal();
                     loadUsers();
@@ -1228,7 +1229,7 @@
                 
                 const data = await response.json();
                 
-                if (data.status === 'success') {
+                if ((data.success || data.status === 'success')) {
                     showToast(`${userName} has been banned`, 'success');
                     loadUsers();
                 } else {
@@ -1262,7 +1263,7 @@
                 
                 const data = await response.json();
                 
-                if (data.status === 'success') {
+                if ((data.success || data.status === 'success')) {
                     showToast(`${userName} has been unbanned`, 'success');
                     loadUsers();
                 } else {
@@ -1299,7 +1300,7 @@
                 
                 const data = await response.json();
                 
-                if (data.status === 'success') {
+                if ((data.success || data.status === 'success')) {
                     showToast(`${userName} upgraded to Premium`, 'success');
                     loadUsers();
                 } else {

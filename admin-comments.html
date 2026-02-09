@@ -573,7 +573,7 @@
                 });
                 const data = await response.json();
                 
-                if (data.status === 'success' && data.data && data.data.length > 0) {
+                if ((data.success || data.status === 'success') && data.data && data.data.length > 0) {
                     allComments = data.data;
                 } else {
                     allComments = [];

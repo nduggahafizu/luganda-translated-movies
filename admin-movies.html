@@ -1595,7 +1595,7 @@
             noMovies.style.display = 'none';
             
             try {
-                const response = await fetch(`${API_BASE}/luganda-movies?limit=100`, {
+                const response = await fetch(`${API_BASE}/luganda-movies?limit=500`, {
                     headers: getAuthHeaders()
                 });
                 const data = await response.json();
