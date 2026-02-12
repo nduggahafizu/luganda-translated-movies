@@ -757,7 +757,7 @@
                                 if (isDirectVideo) {
                                     // Use native video player for direct video files
                                     const videoSrc = isMkv 
-                                        ? \`\${API_BASE_URL}/api/video-proxy/remux?url=\${encodeURIComponent(embedUrl)}\`
+                                        ? \`\${API_BASE_URL}/api/video/remux?url=\${encodeURIComponent(embedUrl)}\`
                                         : embedUrl;
                                     return \`
                                         <div class="video-loading-overlay" id="video-loading">
