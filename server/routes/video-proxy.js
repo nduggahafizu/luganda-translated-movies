@@ -716,6 +716,84 @@ router.get('/proxy', async (req, res) => {
 });
 
 /**
+ * Simple video proxy - streams video directly without transcoding
+ * GET /api/video/stream-proxy?url=...
+ * This works for MKV and other formats by proxying the bytes through
+ */
+router.get('/stream-proxy', async (req, res) => {
+    setCorsHeaders(req, res);
+    
+    const { url } = req.query;
+    
+    if (!url) {
+        return res.status(400).json({ success: false, message: 'URL required' });
+    }
+
+    let decodedUrl = decodeURIComponent(url);
+    // Encode spaces for HTTP requests
+    const fetchUrl = decodedUrl.replace(/ /g, '%20');
+    console.log('🎬 Proxying video:', decodedUrl.substring(0, 100) + '...');
+
+    try {
+        const range = req.headers.range;
+        const headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': '*/*',
+            'Accept-Encoding': 'identity',
+        };
+        
+        if (range) {
+            headers['Range'] = range;
+        }
+
+        const response = await axios({
+            method: 'GET',
+            url: fetchUrl,
+            responseType: 'stream',
+            headers,
+            timeout: 60000,
+            maxRedirects: 5,
+            validateStatus: () => true
+        });
+
+        if (response.status >= 400) {
+            console.error('🎬 Upstream error:', response.status);
+            return res.status(response.status).json({ success: false, message: 'Video unavailable' });
+        }
+
+        // Determine content type - use video/mp4 even for MKV (browser will try to play)
+        const contentType = response.headers['content-type'] || 'video/mp4';
+        res.setHeader('Content-Type', contentType);
+        
+        if (response.headers['content-length']) {
+            res.setHeader('Content-Length', response.headers['content-length']);
+        }
+        if (response.headers['content-range']) {
+            res.setHeader('Content-Range', response.headers['content-range']);
+        }
+        
+        res.setHeader('Accept-Ranges', 'bytes');
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+        res.setHeader('Access-Control-Expose-Headers', 'Content-Length, Content-Range, Accept-Ranges');
+
+        res.status(response.status);
+        response.data.pipe(res);
+
+        // Handle client disconnect
+        req.on('close', () => {
+            console.log('🎬 Client disconnected from proxy');
+            response.data.destroy();
+        });
+
+    } catch (error) {
+        console.error('🎬 Stream proxy error:', error.message);
+        if (!res.headersSent) {
+            res.status(500).json({ success: false, message: 'Proxy error: ' + error.message });
+        }
+    }
+});
+
+/**
  * Remux MKV to MP4 on-the-fly for browser playback
  * GET /api/video-proxy/remux?url=...
  * This converts MKV container to MP4 without re-encoding (very fast)

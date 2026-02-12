@@ -356,7 +356,7 @@
             grid.innerHTML = seriesList.map(show => {
                 const seasonCount = show.seasons ? show.seasons.length : 0;
                 const rating = show.rating?.imdb || show.rating?.userRating || 0;
-                const poster = show.poster || show.thumbnail || 'assets/images/placeholder-movie.jpg';
+                const poster = show.poster || show.thumbnail || 'assets/images/placeholder.svg';
                 const genre = show.genres?.[0] || 'Drama';
                 const vjName = show.translator?.name || 'VJ';
                 const title = show.title || 'Unknown Title';

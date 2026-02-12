@@ -3974,14 +3974,14 @@
                 return;
             }
             
-            // 🎬 MKV SUPPORT: Use backend remux endpoint for MKV files
+            // 🎬 MKV SUPPORT: Use backend proxy endpoint for MKV files
             const urlLower = url.toLowerCase();
             if (urlLower.includes('.mkv')) {
-                console.log('🎬 MKV detected - using remux endpoint');
+                console.log('🎬 MKV detected - using stream proxy');
                 const apiUrl = typeof API_CONFIG !== 'undefined' 
                     ? API_CONFIG.BASE_URL 
                     : 'https://luganda-translated-movies-production.up.railway.app';
-                url = `${apiUrl}/api/video/remux?url=${encodeURIComponent(url)}`;
+                url = `${apiUrl}/api/video/stream-proxy?url=${encodeURIComponent(url)}`;
             }
             
             // Convert cloud video URLs to direct playable format

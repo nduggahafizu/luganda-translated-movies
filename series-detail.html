@@ -529,7 +529,7 @@
             const container = document.getElementById('seriesContent');
             const seasonCount = series.seasons?.length || 0;
             const rating = series.rating?.imdb || series.rating?.userRating || 0;
-            const poster = series.poster || series.thumbnail || 'assets/images/placeholder-movie.jpg';
+            const poster = series.poster || series.thumbnail || 'assets/images/placeholder.svg';
             const backdrop = series.backdrop || poster;
             const genres = series.genres || ['Drama'];
             const vjName = series.translator?.name || 'VJ';
@@ -626,7 +626,7 @@
             }
             
             return season.episodes.map((ep, i) => {
-                const thumbnail = ep.thumbnail || currentSeries.poster || 'assets/images/placeholder-movie.jpg';
+                const thumbnail = ep.thumbnail || currentSeries.poster || 'assets/images/placeholder.svg';
                 const duration = ep.duration ? formatDuration(ep.duration) : '45 min';
                 
                 return `
