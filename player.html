@@ -3564,6 +3564,13 @@
                     if ((data.status === 'success' || data.success === true) && data.data) {
                         const movie = data.data;
 
+                        // 🎬 SERIES DETECTION: If this is a series with seasons, redirect to series player
+                        if (movie.contentType === 'series' || (movie.seasons && movie.seasons.length > 0)) {
+                            console.log('📺 Series detected! Redirecting to series player...');
+                            window.location.replace(`series-player.html?id=${movieId}`);
+                            return;
+                        }
+
                         setCurrentMovieRequiredPlan(movie.requiredPlan || 'free', movie._id || movie.id || movieId);
                         
                         // Get embed URL from either location
@@ -3969,6 +3976,16 @@
                 return;
             }
             
+            // 🎬 MKV SUPPORT: Use backend remux endpoint for MKV files
+            const urlLower = url.toLowerCase();
+            if (urlLower.includes('.mkv')) {
+                console.log('🎬 MKV detected - using remux endpoint');
+                const apiUrl = typeof API_CONFIG !== 'undefined' 
+                    ? API_CONFIG.BASE_URL 
+                    : 'https://luganda-translated-movies-production.up.railway.app';
+                url = `${apiUrl}/api/video-proxy/remux?url=${encodeURIComponent(url)}`;
+            }
+            
             // Convert cloud video URLs to direct playable format
             const cloudVideo = convertCloudVideoUrl(url);
             let videoUrl = cloudVideo.url;
@@ -4144,10 +4161,10 @@
                     loadingOverlay.style.display = 'none';
                     
                     // Check if it's a format issue (MKV not supported in some browsers)
-                    const urlLower = videoUrl.toLowerCase();
-                    if (urlLower.includes('.mkv')) {
-                        // Show helpful message for MKV files
-                        showVideoError('MKV format may not be supported in this browser. Try using Chrome/Edge, or download the video to watch locally.', videoUrl);
+                    const errorUrlLower = videoUrl.toLowerCase();
+                    if (errorUrlLower.includes('.mkv') || errorUrlLower.includes('/remux')) {
+                        // Show helpful message for MKV/remux files
+                        showVideoError('MKV video failed to load. The server may be processing the video. Please try again in a moment, or download the video to watch locally.', videoUrl);
                     } else {
                         showVideoError('Error loading video. The file may be unavailable or your browser may not support this format.', videoUrl);
                     }

@@ -703,27 +703,57 @@
                 <div class="series-container">
                     <!-- Player Section -->
                     <section class="player-section">
-                        <div class="video-container">
-                            ${currentEp?.video?.embedUrl 
-                                ? `
-                                    <button class="embed-fullscreen-btn" type="button" aria-label="Fullscreen" onclick="requestVideoContainerFullscreen(event)">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M8 3H5a2 2 0 0 0-2 2v3" />
-                                            <path d="M16 3h3a2 2 0 0 1 2 2v3" />
-                                            <path d="M8 21H5a2 2 0 0 1-2-2v-3" />
-                                            <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+                        <div class="video-container" id="video-container">
+                            ${(() => {
+                                if (!currentEp?.video) {
+                                    return `<div class="no-video-message">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                         </svg>
-                                    </button>
-                                    <iframe src="${currentEp.video.embedUrl}" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" loading="lazy" allowfullscreen></iframe>
-                                `
-                                : `<div class="no-video-message">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                    </svg>
-                                    <h3>Select an Episode</h3>
-                                    <p>Choose an episode from the list below to start watching</p>
-                                </div>`
-                            }
+                                        <h3>Select an Episode</h3>
+                                        <p>Choose an episode from the list below to start watching</p>
+                                    </div>`;
+                                }
+                                
+                                const embedUrl = currentEp.video.embedUrl || currentEp.video.originalVideoPath || '';
+                                const isDirectVideo = embedUrl.match(/\.(mp4|mkv|webm|avi|mov)(\?|$)/i);
+                                const isMkv = embedUrl.toLowerCase().includes('.mkv');
+                                
+                                if (isDirectVideo) {
+                                    // Use native video player for direct video files
+                                    const videoSrc = isMkv 
+                                        ? \`\${API_BASE_URL}/api/video-proxy/remux?url=\${encodeURIComponent(embedUrl)}\`
+                                        : embedUrl;
+                                    return \`
+                                        <button class="embed-fullscreen-btn" type="button" aria-label="Fullscreen" onclick="requestVideoContainerFullscreen(event)">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+                                                <path d="M16 3h3a2 2 0 0 1 2 2v3" />
+                                                <path d="M8 21H5a2 2 0 0 1-2-2v-3" />
+                                                <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+                                            </svg>
+                                        </button>
+                                        <video id="series-video" controls autoplay playsinline 
+                                               style="position:absolute;top:0;left:0;width:100%;height:100%;background:#000;">
+                                            <source src="\${videoSrc}" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    \`;
+                                } else {
+                                    // Use iframe for embed URLs (Streamtape, etc.)
+                                    return \`
+                                        <button class="embed-fullscreen-btn" type="button" aria-label="Fullscreen" onclick="requestVideoContainerFullscreen(event)">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+                                                <path d="M16 3h3a2 2 0 0 1 2 2v3" />
+                                                <path d="M8 21H5a2 2 0 0 1-2-2v-3" />
+                                                <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+                                            </svg>
+                                        </button>
+                                        <iframe src="\${embedUrl}" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" loading="lazy" allowfullscreen></iframe>
+                                    \`;
+                                }
+                            })()}
                         </div>
                         ${currentEp ? `
                         <div class="now-playing-info">

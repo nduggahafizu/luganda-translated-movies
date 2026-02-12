@@ -6,6 +6,11 @@ const LugandaMovie = require('../models/LugandaMovie');
 const User = require('../models/User');
 const { protect, optionalAuth } = require('../middleware/auth');
 
+// FFmpeg for MKV remuxing
+const ffmpeg = require('fluent-ffmpeg');
+const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+ffmpeg.setFfmpegPath(ffmpegPath);
+
 const PLAYBACK_TOKEN_SECRET = process.env.PLAYBACK_TOKEN_SECRET || process.env.JWT_SECRET || 'unruly-movies-playback-token-secret';
 const PLAYBACK_TOKEN_EXPIRES_IN = process.env.PLAYBACK_TOKEN_EXPIRES_IN || '10m';
 
@@ -707,6 +712,129 @@ router.get('/proxy', async (req, res) => {
     } catch (error) {
         console.error('Video proxy error:', error.message);
         res.status(500).send('Proxy error');
+    }
+});
+
+/**
+ * Remux MKV to MP4 on-the-fly for browser playback
+ * GET /api/video-proxy/remux?url=...
+ * This converts MKV container to MP4 without re-encoding (very fast)
+ */
+router.get('/remux', async (req, res) => {
+    setCorsHeaders(req, res);
+    
+    const { url } = req.query;
+    
+    if (!url) {
+        return res.status(400).json({ success: false, message: 'URL required' });
+    }
+
+    const decodedUrl = decodeURIComponent(url);
+    console.log('🎬 Remuxing video:', decodedUrl.substring(0, 100) + '...');
+
+    try {
+        // Set response headers for streaming video
+        res.setHeader('Content-Type', 'video/mp4');
+        res.setHeader('Accept-Ranges', 'bytes');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Access-Control-Expose-Headers', 'Content-Length, Content-Range, Accept-Ranges');
+
+        // Create FFmpeg command to remux MKV -> MP4
+        // -c copy means no transcoding, just container change (very fast)
+        // -movflags frag_keyframe+empty_moov+faststart enables streaming without full download
+        const ffmpegProcess = ffmpeg(decodedUrl)
+            .inputOptions([
+                '-headers', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\r\nReferer: https://archive.org/\r\n'
+            ])
+            .outputOptions([
+                '-c:v', 'copy',           // Copy video codec (no transcoding)
+                '-c:a', 'aac',            // Convert audio to AAC for browser compatibility
+                '-b:a', '192k',           // Audio bitrate
+                '-movflags', 'frag_keyframe+empty_moov+faststart', // Enable streaming
+                '-f', 'mp4'               // Output format
+            ])
+            .on('start', (cmd) => {
+                console.log('🎬 FFmpeg started:', cmd.substring(0, 200));
+            })
+            .on('error', (err, stdout, stderr) => {
+                console.error('🎬 FFmpeg error:', err.message);
+                if (!res.headersSent) {
+                    res.status(500).json({ success: false, message: 'Remux failed: ' + err.message });
+                }
+            })
+            .on('end', () => {
+                console.log('🎬 FFmpeg finished');
+            });
+
+        // Pipe the output to response
+        ffmpegProcess.pipe(res, { end: true });
+
+        // Handle client disconnect
+        req.on('close', () => {
+            console.log('🎬 Client disconnected, killing FFmpeg');
+            ffmpegProcess.kill('SIGKILL');
+        });
+
+    } catch (error) {
+        console.error('Remux error:', error.message);
+        if (!res.headersSent) {
+            res.status(500).json({ success: false, message: 'Remux error: ' + error.message });
+        }
+    }
+});
+
+/**
+ * Get info about a video file (codecs, duration, etc.)
+ * GET /api/video-proxy/probe?url=...
+ */
+router.get('/probe', async (req, res) => {
+    setCorsHeaders(req, res);
+    
+    const { url } = req.query;
+    
+    if (!url) {
+        return res.status(400).json({ success: false, message: 'URL required' });
+    }
+
+    const decodedUrl = decodeURIComponent(url);
+
+    try {
+        ffmpeg.ffprobe(decodedUrl, (err, metadata) => {
+            if (err) {
+                console.error('Probe error:', err.message);
+                return res.status(500).json({ success: false, message: 'Probe failed: ' + err.message });
+            }
+
+            const videoStream = metadata.streams.find(s => s.codec_type === 'video');
+            const audioStream = metadata.streams.find(s => s.codec_type === 'audio');
+
+            res.json({
+                success: true,
+                data: {
+                    format: metadata.format.format_name,
+                    duration: metadata.format.duration,
+                    size: metadata.format.size,
+                    bitrate: metadata.format.bit_rate,
+                    video: videoStream ? {
+                        codec: videoStream.codec_name,
+                        width: videoStream.width,
+                        height: videoStream.height,
+                        fps: videoStream.r_frame_rate
+                    } : null,
+                    audio: audioStream ? {
+                        codec: audioStream.codec_name,
+                        channels: audioStream.channels,
+                        sampleRate: audioStream.sample_rate
+                    } : null,
+                    // Recommend remux if MKV or incompatible audio
+                    needsRemux: metadata.format.format_name?.includes('matroska') || 
+                               (audioStream && !['aac', 'mp3'].includes(audioStream.codec_name))
+                }
+            });
+        });
+    } catch (error) {
+        console.error('Probe error:', error.message);
+        res.status(500).json({ success: false, message: 'Probe error: ' + error.message });
     }
 });
 
