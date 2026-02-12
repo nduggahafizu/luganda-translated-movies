@@ -3187,17 +3187,15 @@
             // Archive.org EMBED URLs should use iframe (better compatibility)
             if (url.includes('archive.org/embed/')) return false;
             
-            // Archive.org direct downloads (only MP4/WebM for native playback)
+            // Archive.org direct downloads - now including MKV (remuxed via backend)
             // Also check for CDN subdomain URLs (ia800101.us.archive.org, etc.)
             if (url.includes('archive.org/download/') || url.match(/ia\d+\.us\.archive\.org/) || url.includes('/items/')) {
-                // Only treat MP4 and WebM as direct (they work in all browsers)
-                if (cleanUrl.endsWith('.mp4') || cleanUrl.endsWith('.webm')) return true;
-                // MKV should use embed player for better compatibility
-                if (cleanUrl.endsWith('.mkv')) return false;
+                // MP4, WebM, and MKV (MKV will be remuxed to MP4 via backend)
+                if (cleanUrl.endsWith('.mp4') || cleanUrl.endsWith('.webm') || cleanUrl.endsWith('.mkv')) return true;
             }
             
-            // Direct video file extensions (browser-compatible only)
-            const videoExtensions = ['.mp4', '.webm', '.m4v', '.m3u8'];
+            // Direct video file extensions (browser-compatible + MKV which gets remuxed)
+            const videoExtensions = ['.mp4', '.webm', '.m4v', '.m3u8', '.mkv'];
             if (videoExtensions.some(ext => cleanUrl.endsWith(ext) || cleanUrl.includes(ext))) return true;
             
             // Google Drive direct links

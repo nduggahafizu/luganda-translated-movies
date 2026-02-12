@@ -732,6 +732,9 @@ router.get('/remux', async (req, res) => {
     const decodedUrl = decodeURIComponent(url);
     console.log('🎬 Remuxing video:', decodedUrl.substring(0, 100) + '...');
 
+    let ffmpegProcess = null;
+    let isEnded = false;
+
     try {
         // Set response headers for streaming video
         res.setHeader('Content-Type', 'video/mp4');
@@ -742,9 +745,13 @@ router.get('/remux', async (req, res) => {
         // Create FFmpeg command to remux MKV -> MP4
         // -c copy means no transcoding, just container change (very fast)
         // -movflags frag_keyframe+empty_moov+faststart enables streaming without full download
-        const ffmpegProcess = ffmpeg(decodedUrl)
+        ffmpegProcess = ffmpeg(decodedUrl)
             .inputOptions([
-                '-headers', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\r\nReferer: https://archive.org/\r\n'
+                '-reconnect', '1',
+                '-reconnect_streamed', '1', 
+                '-reconnect_delay_max', '5',
+                '-timeout', '30000000',  // 30 second timeout in microseconds
+                '-user_agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
             ])
             .outputOptions([
                 '-c:v', 'copy',           // Copy video codec (no transcoding)
@@ -754,16 +761,26 @@ router.get('/remux', async (req, res) => {
                 '-f', 'mp4'               // Output format
             ])
             .on('start', (cmd) => {
-                console.log('🎬 FFmpeg started:', cmd.substring(0, 200));
+                console.log('🎬 FFmpeg started:', cmd.substring(0, 300));
+            })
+            .on('progress', (progress) => {
+                if (progress.timemark) {
+                    console.log('🎬 FFmpeg progress:', progress.timemark);
+                }
             })
             .on('error', (err, stdout, stderr) => {
                 console.error('🎬 FFmpeg error:', err.message);
+                console.error('🎬 FFmpeg stderr:', stderr ? stderr.substring(0, 500) : 'none');
+                isEnded = true;
                 if (!res.headersSent) {
                     res.status(500).json({ success: false, message: 'Remux failed: ' + err.message });
+                } else {
+                    res.end();
                 }
             })
             .on('end', () => {
-                console.log('🎬 FFmpeg finished');
+                console.log('🎬 FFmpeg finished successfully');
+                isEnded = true;
             });
 
         // Pipe the output to response
@@ -771,8 +788,12 @@ router.get('/remux', async (req, res) => {
 
         // Handle client disconnect
         req.on('close', () => {
-            console.log('🎬 Client disconnected, killing FFmpeg');
-            ffmpegProcess.kill('SIGKILL');
+            if (!isEnded) {
+                console.log('🎬 Client disconnected, killing FFmpeg');
+                if (ffmpegProcess) {
+                    ffmpegProcess.kill('SIGKILL');
+                }
+            }
         });
 
     } catch (error) {
