@@ -729,7 +729,10 @@ router.get('/remux', async (req, res) => {
         return res.status(400).json({ success: false, message: 'URL required' });
     }
 
-    const decodedUrl = decodeURIComponent(url);
+    // Decode the URL, then re-encode spaces for FFmpeg compatibility
+    let decodedUrl = decodeURIComponent(url);
+    // FFmpeg needs spaces encoded as %20, not literal spaces
+    const ffmpegUrl = decodedUrl.replace(/ /g, '%20');
     console.log('🎬 Remuxing video:', decodedUrl.substring(0, 100) + '...');
 
     let ffmpegProcess = null;
@@ -745,7 +748,7 @@ router.get('/remux', async (req, res) => {
         // Create FFmpeg command to remux MKV -> MP4
         // -c copy means no transcoding, just container change (very fast)
         // -movflags frag_keyframe+empty_moov+faststart enables streaming without full download
-        ffmpegProcess = ffmpeg(decodedUrl)
+        ffmpegProcess = ffmpeg(ffmpegUrl)
             .inputOptions([
                 '-reconnect', '1',
                 '-reconnect_streamed', '1', 
