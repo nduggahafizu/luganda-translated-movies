@@ -805,12 +805,12 @@ router.get('/trending', memCache(60), async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 10;
         
-        // Combined query for better performance
+        // Only return movies explicitly marked as trending by admin
         const movies = await LugandaMovie.find({ 
             status: 'published',
-            $or: [{ trending: true }, { views: { $gt: 0 } }]
+            trending: true
         })
-        .sort({ trending: -1, views: -1, 'rating.userRating': -1 })
+        .sort({ updatedAt: -1, views: -1 })
         .limit(limit)
         .select('-__v')
         .lean();
@@ -873,6 +873,45 @@ router.get('/for-you', memCache(60), async (req, res) => {
     } catch (error) {
         console.error('Error fetching for-you movies:', error);
         res.status(500).json({ success: false, message: 'Failed to fetch for-you movies' });
+    }
+});
+
+// GET /api/luganda-movies/series - Get all TV series (auto-synced by contentType)
+router.get('/series', memCache(60), async (req, res) => {
+    setCorsHeaders(req, res);
+    setCacheHeaders(res, 60);
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
+        const skip = (page - 1) * limit;
+        
+        const [series, total] = await Promise.all([
+            LugandaMovie.find({ 
+                status: 'published', 
+                contentType: 'series' 
+            })
+            .sort({ updatedAt: -1, createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .select('-__v')
+            .lean(),
+            LugandaMovie.countDocuments({ status: 'published', contentType: 'series' })
+        ]);
+        
+        res.json({ 
+            success: true, 
+            data: sanitizeMoviesForPublic(series), 
+            count: series.length,
+            pagination: {
+                page,
+                limit,
+                total,
+                pages: Math.ceil(total / limit)
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching series:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch series' });
     }
 });
 
