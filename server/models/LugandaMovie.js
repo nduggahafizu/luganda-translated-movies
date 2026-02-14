@@ -269,6 +269,16 @@ const lugandaMovieSchema = new mongoose.Schema({
         default: false
     },
     
+    todaysPicks: {
+        type: Boolean,
+        default: false
+    },
+    
+    forYou: {
+        type: Boolean,
+        default: false
+    },
+    
     // Statistics
     views: {
         type: Number,

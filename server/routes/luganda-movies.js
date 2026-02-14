@@ -840,6 +840,42 @@ router.get('/featured', memCache(60), async (req, res) => {
     }
 });
 
+// GET /api/luganda-movies/todays-picks - Get today's picks (CACHED for 60 seconds)
+router.get('/todays-picks', memCache(60), async (req, res) => {
+    setCorsHeaders(req, res);
+    setCacheHeaders(res, 60);
+    try {
+        const limit = parseInt(req.query.limit) || 10;
+        const movies = await LugandaMovie.find({ status: 'published', todaysPicks: true })
+            .sort({ updatedAt: -1 })
+            .limit(limit)
+            .select('-__v')
+            .lean();
+        res.json({ success: true, data: sanitizeMoviesForPublic(movies), count: movies.length });
+    } catch (error) {
+        console.error('Error fetching today\'s picks:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch today\'s picks' });
+    }
+});
+
+// GET /api/luganda-movies/for-you - Get "For You" recommendations (CACHED for 60 seconds)
+router.get('/for-you', memCache(60), async (req, res) => {
+    setCorsHeaders(req, res);
+    setCacheHeaders(res, 60);
+    try {
+        const limit = parseInt(req.query.limit) || 10;
+        const movies = await LugandaMovie.find({ status: 'published', forYou: true })
+            .sort({ views: -1, createdAt: -1 })
+            .limit(limit)
+            .select('-__v')
+            .lean();
+        res.json({ success: true, data: sanitizeMoviesForPublic(movies), count: movies.length });
+    } catch (error) {
+        console.error('Error fetching for-you movies:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch for-you movies' });
+    }
+});
+
 // GET /api/luganda-movies/genres - Get all unique genres
 router.get('/genres', async (req, res) => {
     setCorsHeaders(req, res);
@@ -1017,6 +1053,57 @@ router.get('/:id', async (req, res) => {
             success: false,
             message: 'Failed to fetch movie'
         });
+    }
+});
+
+// PATCH /api/luganda-movies/:id - Quick update (toggle trending, featured, todaysPicks, forYou)
+router.patch('/:id', async (req, res) => {
+    setCorsHeaders(req, res);
+    try {
+        const { id } = req.params;
+        
+        if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+            return res.status(400).json({ success: false, message: 'Invalid movie ID format' });
+        }
+        
+        const updateData = {};
+        const body = req.body;
+        
+        // Handle both naming conventions (isTrending/trending, isFeatured/featured)
+        if (body.trending !== undefined) updateData.trending = body.trending;
+        if (body.isTrending !== undefined) updateData.trending = body.isTrending;
+        if (body.featured !== undefined) updateData.featured = body.featured;
+        if (body.isFeatured !== undefined) updateData.featured = body.isFeatured;
+        if (body.todaysPicks !== undefined) updateData.todaysPicks = body.todaysPicks;
+        if (body.isTodaysPicks !== undefined) updateData.todaysPicks = body.isTodaysPicks;
+        if (body.forYou !== undefined) updateData.forYou = body.forYou;
+        if (body.isForYou !== undefined) updateData.forYou = body.isForYou;
+        
+        // Also allow updating status
+        if (body.status) updateData.status = body.status;
+        
+        if (Object.keys(updateData).length === 0) {
+            return res.status(400).json({ success: false, message: 'No valid fields to update' });
+        }
+        
+        const movie = await LugandaMovie.findByIdAndUpdate(
+            id,
+            { $set: updateData },
+            { new: true, runValidators: true }
+        );
+        
+        if (!movie) {
+            return res.status(404).json({ success: false, message: 'Movie not found' });
+        }
+        
+        res.json({
+            success: true,
+            message: 'Movie updated successfully',
+            data: movie
+        });
+    } catch (error) {
+        console.error('PATCH movie error:', error);
+        res.status(500).json({ success: false, message: error.message });
     }
 });
 
