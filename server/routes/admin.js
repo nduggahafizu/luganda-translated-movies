@@ -183,11 +183,17 @@ router.get('/users', [auth, adminOnly], async (req, res) => {
 // @access  Admin only
 router.put('/users/:id', [auth, adminOnly, validateAdminUserUpdate], async (req, res) => {
     try {
-        const { role, isActive, subscription } = req.body;
+        const { role, isActive, subscription, status, statusReason } = req.body;
         
         const updateData = {};
         if (role) updateData.role = role;
         if (typeof isActive === 'boolean') updateData.isActive = isActive;
+        if (status && ['active', 'restricted', 'banned'].includes(status)) {
+            updateData.status = status;
+            updateData.statusReason = statusReason || null;
+            updateData.statusUpdatedAt = new Date();
+            updateData.statusUpdatedBy = req.user._id;
+        }
         if (subscription) {
             if (subscription.plan) updateData['subscription.plan'] = subscription.plan;
             if (subscription.status) updateData['subscription.status'] = subscription.status;
@@ -213,6 +219,63 @@ router.put('/users/:id', [auth, adminOnly, validateAdminUserUpdate], async (req,
         });
     } catch (error) {
         console.error('Error updating user:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Server error'
+        });
+    }
+});
+
+// @route   PATCH /api/admin/users/:id/status
+// @desc    Update user status (ban/restrict/activate)
+// @access  Admin only
+router.patch('/users/:id/status', [auth, adminOnly], async (req, res) => {
+    try {
+        const { status, reason } = req.body;
+        
+        if (!status || !['active', 'restricted', 'banned'].includes(status)) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Invalid status. Must be: active, restricted, or banned'
+            });
+        }
+        
+        // Don't allow banning other admins
+        const targetUser = await User.findById(req.params.id);
+        if (!targetUser) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'User not found'
+            });
+        }
+        
+        if (targetUser.role === 'admin' && status !== 'active') {
+            return res.status(403).json({
+                status: 'error',
+                message: 'Cannot ban or restrict admin users'
+            });
+        }
+        
+        const user = await User.findByIdAndUpdate(
+            req.params.id,
+            {
+                $set: {
+                    status,
+                    statusReason: reason || null,
+                    statusUpdatedAt: new Date(),
+                    statusUpdatedBy: req.user._id
+                }
+            },
+            { new: true }
+        ).select('-password');
+        
+        res.json({
+            status: 'success',
+            message: `User ${status === 'active' ? 'activated' : status}`,
+            data: user
+        });
+    } catch (error) {
+        console.error('Error updating user status:', error);
         res.status(500).json({
             status: 'error',
             message: 'Server error'

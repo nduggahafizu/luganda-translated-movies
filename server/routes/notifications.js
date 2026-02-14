@@ -2,7 +2,138 @@ const express = require('express');
 const router = express.Router();
 const Notification = require('../models/Notification');
 const ExpoPushToken = require('../models/ExpoPushToken');
+const User = require('../models/User');
 const { protect } = require('../middleware/auth');
+const { adminOnly } = require('../middleware/adminAuth');
+
+// =============================================
+// PUSH TOKEN MANAGEMENT ENDPOINTS
+// =============================================
+
+// @route   GET /api/notifications/tokens
+// @desc    Get all push tokens (admin only)
+// @access  Admin only
+router.get('/tokens', [protect, adminOnly], async (req, res) => {
+    try {
+        const tokens = await ExpoPushToken.find({ isActive: true })
+            .populate('user', 'fullName email lastVisit status createdAt')
+            .sort({ updatedAt: -1 })
+            .lean();
+        
+        res.json({
+            status: 'success',
+            data: tokens,
+            count: tokens.length
+        });
+    } catch (error) {
+        console.error('Get tokens error:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to fetch tokens' });
+    }
+});
+
+// @route   GET /api/notifications/tokens/count
+// @desc    Get push token count (admin only)
+// @access  Admin only
+router.get('/tokens/count', [protect, adminOnly], async (req, res) => {
+    try {
+        const count = await ExpoPushToken.countDocuments({ isActive: true });
+        res.json({ status: 'success', count });
+    } catch (error) {
+        console.error('Get token count error:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to count tokens' });
+    }
+});
+
+// @route   POST /api/notifications/register-token
+// @desc    Register Expo push token (works with or without auth)
+// @access  Public or Private
+router.post('/register-token', async (req, res) => {
+    try {
+        const { pushToken, platform = 'android' } = req.body;
+
+        if (!pushToken) {
+            return res.status(400).json({ status: 'error', message: 'Push token is required' });
+        }
+
+        // Try to get user from auth header (optional)
+        let userId = null;
+        try {
+            const authHeader = req.headers.authorization;
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+                const token = authHeader.split(' ')[1];
+                const jwt = require('jsonwebtoken');
+                const JWT_SECRET = process.env.JWT_SECRET || 'unruly-movies-jwt-secret-key-2024';
+                const decoded = jwt.verify(token, JWT_SECRET);
+                userId = decoded.userId || decoded.id;
+            }
+        } catch (e) {
+            // No valid token, continue without user
+        }
+
+        // Check if token already exists
+        let existingToken = await ExpoPushToken.findOne({ pushToken });
+
+        if (existingToken) {
+            // Update existing token
+            existingToken.platform = platform;
+            existingToken.isActive = true;
+            existingToken.failedAttempts = 0;
+            existingToken.disabledAt = undefined;
+            existingToken.disabledReason = undefined;
+            existingToken.lastUsed = new Date();
+            if (userId) existingToken.user = userId;
+            await existingToken.save();
+
+            return res.json({
+                status: 'success',
+                message: 'Push token updated'
+            });
+        }
+
+        // Create new token
+        await ExpoPushToken.create({
+            user: userId,
+            pushToken,
+            platform,
+            isActive: true
+        });
+
+        res.status(201).json({
+            status: 'success',
+            message: 'Push token registered'
+        });
+    } catch (error) {
+        console.error('Register push token error:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to register push token' });
+    }
+});
+
+// @route   DELETE /api/notifications/unregister-token
+// @desc    Unregister Expo push token
+// @access  Public
+router.delete('/unregister-token', async (req, res) => {
+    try {
+        const { pushToken } = req.body;
+
+        if (!pushToken) {
+            return res.status(400).json({ status: 'error', message: 'Push token is required' });
+        }
+
+        await ExpoPushToken.findOneAndDelete({ pushToken });
+
+        res.json({
+            status: 'success',
+            message: 'Push token unregistered'
+        });
+    } catch (error) {
+        console.error('Unregister push token error:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to unregister token' });
+    }
+});
+
+// =============================================
+// USER NOTIFICATIONS ENDPOINTS
+// =============================================
 
 // Get user's notifications
 router.get('/', protect, async (req, res) => {

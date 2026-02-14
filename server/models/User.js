@@ -160,9 +160,32 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
+    lastVisit: {
+        type: Date,
+        default: null
+    },
     isActive: {
         type: Boolean,
         default: true
+    },
+    // Account status for admin control (active, restricted, banned)
+    status: {
+        type: String,
+        enum: ['active', 'restricted', 'banned'],
+        default: 'active'
+    },
+    statusReason: {
+        type: String,
+        default: null
+    },
+    statusUpdatedAt: {
+        type: Date,
+        default: null
+    },
+    statusUpdatedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: null
     },
     // Security features
     lastSecurityUpdate: {

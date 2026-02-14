@@ -59,6 +59,30 @@ exports.protect = async (req, res, next) => {
                 });
             }
 
+            // Check if user is banned
+            if (req.user.status === 'banned') {
+                return res.status(403).json({
+                    status: 'error',
+                    message: 'Your account has been banned. Please contact support.',
+                    code: 'ACCOUNT_BANNED',
+                    reason: req.user.statusReason || 'Violation of terms of service'
+                });
+            }
+
+            // Check if user is restricted
+            if (req.user.status === 'restricted') {
+                return res.status(403).json({
+                    status: 'error',
+                    message: 'Your account has been restricted. Please contact support to restore access.',
+                    code: 'ACCOUNT_RESTRICTED',
+                    reason: req.user.statusReason || 'Account under review'
+                });
+            }
+
+            // Update lastVisit
+            req.user.lastVisit = new Date();
+            await req.user.save({ validateBeforeSave: false });
+
             // Check if token was issued before last security update
             if (req.user.lastSecurityUpdate) {
                 const tokenIssuedAt = new Date(decoded.iat * 1000);

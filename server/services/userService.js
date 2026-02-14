@@ -79,6 +79,25 @@ async function loginUser({ email, password }) {
     if (!user.isActive) {
         return { error: 'Your account has been deactivated. Please contact support.' };
     }
+
+    // Check if user is banned
+    if (user.status === 'banned') {
+        return { 
+            error: 'Your account has been banned. Please contact support.',
+            code: 'ACCOUNT_BANNED',
+            reason: user.statusReason
+        };
+    }
+
+    // Check if user is restricted
+    if (user.status === 'restricted') {
+        return { 
+            error: 'Your account has been restricted. Please contact support to restore access.',
+            code: 'ACCOUNT_RESTRICTED',
+            reason: user.statusReason
+        };
+    }
+
     if (!user.password) {
         return { error: 'Invalid email or password' };
     }
@@ -87,6 +106,7 @@ async function loginUser({ email, password }) {
         return { error: 'Invalid email or password' };
     }
     user.lastLogin = Date.now();
+    user.lastVisit = Date.now();
     await user.save();
     const token = generateToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
@@ -97,7 +117,10 @@ async function loginUser({ email, password }) {
             email: user.email,
             role: user.role,
             subscription: user.subscription,
-            isEmailVerified: user.isEmailVerified
+            isEmailVerified: user.isEmailVerified,
+            status: user.status || 'active',
+            lastVisit: user.lastVisit,
+            lastLogin: user.lastLogin
         },
         token,
         refreshToken
