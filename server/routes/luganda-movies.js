@@ -162,7 +162,8 @@ router.post('/simple-add', async (req, res) => {
             embedUrl,
             featured,
             trending,
-            tmdbId
+            tmdbId,
+            trailer
         } = req.body;
 
         // Validate required fields
@@ -196,7 +197,8 @@ router.post('/simple-add', async (req, res) => {
             featured: featured || false,
             trending: trending || false,
             status: 'published',
-            metaData: tmdbId ? { tmdbId: parseInt(tmdbId) } : {}
+            metaData: tmdbId ? { tmdbId: parseInt(tmdbId) } : {},
+            trailer: trailer || null
         };
 
         const newMovie = await LugandaMovie.create(movieData);
@@ -1176,7 +1178,8 @@ router.put('/:id', async (req, res) => {
             featured,
             trending,
             status,
-            requiredPlan
+            requiredPlan,
+            trailer
         } = req.body;
 
         // Build update object with only provided fields
@@ -1197,6 +1200,7 @@ router.put('/:id', async (req, res) => {
         if (trending !== undefined) updateData.trending = trending;
         if (status) updateData.status = status;
         if (requiredPlan) updateData.requiredPlan = requiredPlan;
+        if (trailer !== undefined) updateData.trailer = trailer;
         
         // Handle video/embed URL update
         if (embedUrl) {
