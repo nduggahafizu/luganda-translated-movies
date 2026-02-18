@@ -126,7 +126,9 @@ async function notifyNewMovie(movie) {
             data: {
                 type: 'new_movie',
                 movieId: movie._id.toString(),
-                url: `/movie/${movie._id}`
+                url: `/movie/${movie._id}`,
+                poster: movie.poster || movie.posterUrl || null,
+                title: movie.lugandaTitle || movie.title
             },
             channelId: 'new-movies'
         };
@@ -162,7 +164,9 @@ async function notifyNewEpisode(series, episode) {
                 seriesId: series._id.toString(),
                 season: episode.season,
                 episode: episode.episode,
-                url: `/movie/${series._id}`
+                url: `/movie/${series._id}`,
+                poster: series.poster || series.posterUrl || null,
+                title: series.lugandaTitle || series.title
             },
             channelId: 'new-movies'
         };
