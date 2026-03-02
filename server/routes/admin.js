@@ -470,6 +470,543 @@ router.delete('/movies/:id', [auth, adminOnly], async (req, res) => {
     }
 });
 
+// ============ SERIES MANAGEMENT ============
+
+// @route   GET /api/admin/series
+// @desc    Get all series for admin
+// @access  Admin only
+router.get('/series', [auth, adminOnly], async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
+        const skip = (page - 1) * limit;
+        
+        const filter = { contentType: 'series' };
+        
+        if (req.query.status) {
+            filter.status = req.query.status;
+        }
+        
+        if (req.query.vj) {
+            filter.vjName = req.query.vj;
+        }
+        
+        if (req.query.search) {
+            filter.$or = [
+                { originalTitle: { $regex: req.query.search, $options: 'i' } },
+                { lugandaTitle: { $regex: req.query.search, $options: 'i' } }
+            ];
+        }
+        
+        const [series, total] = await Promise.all([
+            LugandaMovie.find(filter)
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit),
+            LugandaMovie.countDocuments(filter)
+        ]);
+        
+        res.json({
+            status: 'success',
+            data: series,
+            pagination: {
+                page,
+                limit,
+                total,
+                pages: Math.ceil(total / limit)
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching series:', error);
+        res.status(500).json({ status: 'error', message: 'Server error' });
+    }
+});
+
+// @route   POST /api/admin/series
+// @desc    Add new series
+// @access  Admin only
+router.post('/series', [auth, adminOnly], async (req, res) => {
+    try {
+        const seriesData = {
+            ...req.body,
+            contentType: 'series'
+        };
+        
+        const series = new LugandaMovie(seriesData);
+        await series.save();
+        
+        res.status(201).json({
+            status: 'success',
+            message: 'Series added successfully',
+            data: series
+        });
+    } catch (error) {
+        console.error('Error adding series:', error);
+        res.status(500).json({ status: 'error', message: error.message || 'Server error' });
+    }
+});
+
+// @route   PUT /api/admin/series/:id
+// @desc    Update series
+// @access  Admin only
+router.put('/series/:id', [auth, adminOnly], async (req, res) => {
+    try {
+        const series = await LugandaMovie.findByIdAndUpdate(
+            req.params.id,
+            { $set: req.body },
+            { new: true }
+        );
+        
+        if (!series) {
+            return res.status(404).json({ status: 'error', message: 'Series not found' });
+        }
+        
+        res.json({
+            status: 'success',
+            message: 'Series updated successfully',
+            data: series
+        });
+    } catch (error) {
+        console.error('Error updating series:', error);
+        res.status(500).json({ status: 'error', message: 'Server error' });
+    }
+});
+
+// @route   DELETE /api/admin/series/:id
+// @desc    Delete series
+// @access  Admin only
+router.delete('/series/:id', [auth, adminOnly], async (req, res) => {
+    try {
+        const series = await LugandaMovie.findByIdAndDelete(req.params.id);
+        
+        if (!series) {
+            return res.status(404).json({ status: 'error', message: 'Series not found' });
+        }
+        
+        // Clean up related data
+        await Promise.all([
+            Review.deleteMany({ movie: req.params.id }),
+            Comment.deleteMany({ movie: req.params.id }),
+            ViewStats.deleteMany({ movie: req.params.id })
+        ]);
+        
+        res.json({
+            status: 'success',
+            message: 'Series deleted successfully'
+        });
+    } catch (error) {
+        console.error('Error deleting series:', error);
+        res.status(500).json({ status: 'error', message: 'Server error' });
+    }
+});
+
+// @route   POST /api/admin/series/:id/season
+// @desc    Add season to series
+// @access  Admin only
+router.post('/series/:id/season', [auth, adminOnly], async (req, res) => {
+    try {
+        const { seasonNumber, name, overview, posterPath, episodes } = req.body;
+        
+        const series = await LugandaMovie.findById(req.params.id);
+        if (!series) {
+            return res.status(404).json({ status: 'error', message: 'Series not found' });
+        }
+        
+        // Check if season already exists
+        const existingSeason = series.seasons?.find(s => s.seasonNumber === seasonNumber);
+        if (existingSeason) {
+            return res.status(400).json({ status: 'error', message: 'Season already exists' });
+        }
+        
+        // Add season
+        if (!series.seasons) series.seasons = [];
+        series.seasons.push({
+            seasonNumber,
+            name: name || `Season ${seasonNumber}`,
+            overview,
+            posterPath,
+            episodes: episodes || []
+        });
+        
+        series.totalSeasons = series.seasons.length;
+        await series.save();
+        
+        res.json({
+            status: 'success',
+            message: 'Season added successfully',
+            data: series
+        });
+    } catch (error) {
+        console.error('Error adding season:', error);
+        res.status(500).json({ status: 'error', message: error.message || 'Server error' });
+    }
+});
+
+// @route   POST /api/admin/series/:id/season/:seasonNumber/episode
+// @desc    Add episode to season
+// @access  Admin only
+router.post('/series/:id/season/:seasonNumber/episode', [auth, adminOnly], async (req, res) => {
+    try {
+        const { episodeNumber, title, description, video, thumbnail, duration } = req.body;
+        const seasonNum = parseInt(req.params.seasonNumber);
+        
+        const series = await LugandaMovie.findById(req.params.id);
+        if (!series) {
+            return res.status(404).json({ status: 'error', message: 'Series not found' });
+        }
+        
+        const seasonIndex = series.seasons?.findIndex(s => s.seasonNumber === seasonNum);
+        if (seasonIndex === -1) {
+            return res.status(404).json({ status: 'error', message: 'Season not found' });
+        }
+        
+        // Add episode
+        if (!series.seasons[seasonIndex].episodes) {
+            series.seasons[seasonIndex].episodes = [];
+        }
+        
+        series.seasons[seasonIndex].episodes.push({
+            episodeNumber,
+            title: title || `Episode ${episodeNumber}`,
+            description,
+            video,
+            thumbnail,
+            duration
+        });
+        
+        // Update total episodes count
+        series.totalEpisodes = series.seasons.reduce((total, s) => total + (s.episodes?.length || 0), 0);
+        await series.save();
+        
+        res.json({
+            status: 'success',
+            message: 'Episode added successfully',
+            data: series
+        });
+    } catch (error) {
+        console.error('Error adding episode:', error);
+        res.status(500).json({ status: 'error', message: error.message || 'Server error' });
+    }
+});
+
+// @route   PUT /api/admin/series/:id/season/:seasonNumber/episode/:episodeNumber
+// @desc    Update episode
+// @access  Admin only
+router.put('/series/:id/season/:seasonNumber/episode/:episodeNumber', [auth, adminOnly], async (req, res) => {
+    try {
+        const seasonNum = parseInt(req.params.seasonNumber);
+        const episodeNum = parseInt(req.params.episodeNumber);
+        
+        const series = await LugandaMovie.findById(req.params.id);
+        if (!series) {
+            return res.status(404).json({ status: 'error', message: 'Series not found' });
+        }
+        
+        const seasonIndex = series.seasons?.findIndex(s => s.seasonNumber === seasonNum);
+        if (seasonIndex === -1) {
+            return res.status(404).json({ status: 'error', message: 'Season not found' });
+        }
+        
+        const episodeIndex = series.seasons[seasonIndex].episodes?.findIndex(e => e.episodeNumber === episodeNum);
+        if (episodeIndex === -1) {
+            return res.status(404).json({ status: 'error', message: 'Episode not found' });
+        }
+        
+        // Update episode fields
+        Object.assign(series.seasons[seasonIndex].episodes[episodeIndex], req.body);
+        await series.save();
+        
+        res.json({
+            status: 'success',
+            message: 'Episode updated successfully',
+            data: series
+        });
+    } catch (error) {
+        console.error('Error updating episode:', error);
+        res.status(500).json({ status: 'error', message: error.message || 'Server error' });
+    }
+});
+
+// @route   DELETE /api/admin/series/:id/season/:seasonNumber/episode/:episodeNumber
+// @desc    Delete episode
+// @access  Admin only
+router.delete('/series/:id/season/:seasonNumber/episode/:episodeNumber', [auth, adminOnly], async (req, res) => {
+    try {
+        const seasonNum = parseInt(req.params.seasonNumber);
+        const episodeNum = parseInt(req.params.episodeNumber);
+        
+        const series = await LugandaMovie.findById(req.params.id);
+        if (!series) {
+            return res.status(404).json({ status: 'error', message: 'Series not found' });
+        }
+        
+        const seasonIndex = series.seasons?.findIndex(s => s.seasonNumber === seasonNum);
+        if (seasonIndex === -1) {
+            return res.status(404).json({ status: 'error', message: 'Season not found' });
+        }
+        
+        series.seasons[seasonIndex].episodes = series.seasons[seasonIndex].episodes.filter(
+            e => e.episodeNumber !== episodeNum
+        );
+        
+        series.totalEpisodes = series.seasons.reduce((total, s) => total + (s.episodes?.length || 0), 0);
+        await series.save();
+        
+        res.json({
+            status: 'success',
+            message: 'Episode deleted successfully',
+            data: series
+        });
+    } catch (error) {
+        console.error('Error deleting episode:', error);
+        res.status(500).json({ status: 'error', message: error.message || 'Server error' });
+    }
+});
+
+// ============ BULK OPERATIONS ============
+
+// @route   POST /api/admin/bulk/delete-movies
+// @desc    Bulk delete movies
+// @access  Admin only
+router.post('/bulk/delete-movies', [auth, adminOnly], async (req, res) => {
+    try {
+        const { ids } = req.body;
+        
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ status: 'error', message: 'Movie IDs array required' });
+        }
+        
+        const result = await LugandaMovie.deleteMany({ _id: { $in: ids } });
+        
+        // Clean up related data
+        await Promise.all([
+            Review.deleteMany({ movie: { $in: ids } }),
+            Comment.deleteMany({ movie: { $in: ids } }),
+            ViewStats.deleteMany({ movie: { $in: ids } })
+        ]);
+        
+        res.json({
+            status: 'success',
+            message: `${result.deletedCount} movies deleted`,
+            deletedCount: result.deletedCount
+        });
+    } catch (error) {
+        console.error('Bulk delete error:', error);
+        res.status(500).json({ status: 'error', message: 'Server error' });
+    }
+});
+
+// @route   POST /api/admin/bulk/update-status
+// @desc    Bulk update movie status
+// @access  Admin only
+router.post('/bulk/update-status', [auth, adminOnly], async (req, res) => {
+    try {
+        const { ids, status } = req.body;
+        
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ status: 'error', message: 'Movie IDs array required' });
+        }
+        
+        if (!['published', 'draft', 'archived'].includes(status)) {
+            return res.status(400).json({ status: 'error', message: 'Invalid status' });
+        }
+        
+        const result = await LugandaMovie.updateMany(
+            { _id: { $in: ids } },
+            { $set: { status } }
+        );
+        
+        res.json({
+            status: 'success',
+            message: `${result.modifiedCount} movies updated`,
+            modifiedCount: result.modifiedCount
+        });
+    } catch (error) {
+        console.error('Bulk update error:', error);
+        res.status(500).json({ status: 'error', message: 'Server error' });
+    }
+});
+
+// @route   POST /api/admin/bulk/feature
+// @desc    Bulk feature/unfeature movies
+// @access  Admin only
+router.post('/bulk/feature', [auth, adminOnly], async (req, res) => {
+    try {
+        const { ids, featured } = req.body;
+        
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ status: 'error', message: 'Movie IDs array required' });
+        }
+        
+        const result = await LugandaMovie.updateMany(
+            { _id: { $in: ids } },
+            { $set: { featured: !!featured } }
+        );
+        
+        res.json({
+            status: 'success',
+            message: `${result.modifiedCount} movies ${featured ? 'featured' : 'unfeatured'}`,
+            modifiedCount: result.modifiedCount
+        });
+    } catch (error) {
+        console.error('Bulk feature error:', error);
+        res.status(500).json({ status: 'error', message: 'Server error' });
+    }
+});
+
+// ============ SUBSCRIPTION MANAGEMENT ============
+
+// @route   PUT /api/admin/users/:id/subscription
+// @desc    Update user subscription
+// @access  Admin only
+router.put('/users/:id/subscription', [auth, adminOnly], async (req, res) => {
+    try {
+        const { plan, status, expiresAt, extensionDays } = req.body;
+        
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({ status: 'error', message: 'User not found' });
+        }
+        
+        // Update subscription
+        if (plan) user.subscription.plan = plan;
+        if (status) user.subscription.status = status;
+        
+        if (expiresAt) {
+            user.subscription.expiresAt = new Date(expiresAt);
+        } else if (extensionDays) {
+            // Extend from current expiry or from now
+            const baseDate = user.subscription.expiresAt && user.subscription.expiresAt > new Date()
+                ? user.subscription.expiresAt
+                : new Date();
+            user.subscription.expiresAt = new Date(baseDate.getTime() + extensionDays * 24 * 60 * 60 * 1000);
+        }
+        
+        await user.save();
+        
+        res.json({
+            status: 'success',
+            message: 'Subscription updated',
+            data: user.subscription
+        });
+    } catch (error) {
+        console.error('Subscription update error:', error);
+        res.status(500).json({ status: 'error', message: 'Server error' });
+    }
+});
+
+// @route   GET /api/admin/subscriptions
+// @desc    Get subscription statistics
+// @access  Admin only
+router.get('/subscriptions', [auth, adminOnly], async (req, res) => {
+    try {
+        const stats = await User.aggregate([
+            {
+                $group: {
+                    _id: {
+                        plan: '$subscription.plan',
+                        status: '$subscription.status'
+                    },
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+        
+        const expiringSoon = await User.countDocuments({
+            'subscription.status': 'active',
+            'subscription.expiresAt': {
+                $gte: new Date(),
+                $lte: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+            }
+        });
+        
+        const recentUpgrades = await User.find({
+            'subscription.plan': { $in: ['basic', 'premium', 'vip'] },
+            'subscription.startedAt': { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
+        }).countDocuments();
+        
+        res.json({
+            status: 'success',
+            data: {
+                breakdown: stats,
+                expiringIn7Days: expiringSoon,
+                newSubscribersThisMonth: recentUpgrades
+            }
+        });
+    } catch (error) {
+        console.error('Subscription stats error:', error);
+        res.status(500).json({ status: 'error', message: 'Server error' });
+    }
+});
+
+// ============ SYSTEM HEALTH ============
+
+// @route   GET /api/admin/system/health
+// @desc    Get system health status
+// @access  Admin only
+router.get('/system/health', [auth, adminOnly], async (req, res) => {
+    try {
+        const mongoose = require('mongoose');
+        
+        const health = {
+            server: 'healthy',
+            database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+            timestamp: new Date(),
+            uptime: process.uptime(),
+            memory: process.memoryUsage(),
+            nodeVersion: process.version
+        };
+        
+        res.json({
+            status: 'success',
+            data: health
+        });
+    } catch (error) {
+        console.error('Health check error:', error);
+        res.status(500).json({ status: 'error', message: 'Server error' });
+    }
+});
+
+// @route   GET /api/admin/system/stats
+// @desc    Get system statistics
+// @access  Admin only
+router.get('/system/stats', [auth, adminOnly], async (req, res) => {
+    try {
+        const [
+            totalMovies,
+            totalSeries,
+            totalUsers,
+            totalViews,
+            storageUsed
+        ] = await Promise.all([
+            LugandaMovie.countDocuments({ contentType: { $ne: 'series' } }),
+            LugandaMovie.countDocuments({ contentType: 'series' }),
+            User.countDocuments(),
+            ViewStats.countDocuments(),
+            LugandaMovie.aggregate([
+                { $group: { _id: null, count: { $sum: 1 } } }
+            ])
+        ]);
+        
+        res.json({
+            status: 'success',
+            data: {
+                content: {
+                    movies: totalMovies,
+                    series: totalSeries,
+                    total: totalMovies + totalSeries
+                },
+                users: totalUsers,
+                totalViews,
+                lastUpdated: new Date()
+            }
+        });
+    } catch (error) {
+        console.error('System stats error:', error);
+        res.status(500).json({ status: 'error', message: 'Server error' });
+    }
+});
+
 // @route   GET /api/admin/analytics
 // @desc    Get detailed analytics
 // @access  Admin only

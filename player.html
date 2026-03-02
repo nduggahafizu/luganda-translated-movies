@@ -2251,6 +2251,9 @@
             }
         }
     </style>
+    
+    <!-- Premium Netflix-style Player (loaded last to override inline styles) -->
+    <link rel="stylesheet" href="css/premium-player.css?v=20260302">
 </head>
 
 <body>
@@ -2291,15 +2294,10 @@
                 <source src="" type="video/mp4">
             </video>
             
-            <!-- Display Ad Fallback (if no video ad available) -->
+            <!-- Display Ad Fallback - NO ADSENSE (violates policy on pages without content) -->
             <div class="preroll-display-ad" id="prerollDisplayAd" style="display: none;">
                 <div class="ad-content">
-                    <div class="ad-message">Advertisement</div>
-                    <ins class="adsbygoogle"
-                         style="display:block"
-                         data-ad-client="ca-pub-1904736753681797"
-                         data-ad-slot="auto"
-                         data-ad-format="rectangle"></ins>
+                    <div class="ad-message">Preparing your video...</div>
                     <div class="preroll-countdown" id="displayAdCountdown">Video starts in 5 seconds...</div>
                 </div>
             </div>

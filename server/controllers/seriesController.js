@@ -46,11 +46,15 @@ exports.getAllSeries = async (req, res) => {
         const limit = parseInt(req.query.limit) || 20;
         const skip = (page - 1) * limit;
         
-        // Build filter object - always filter for series content type
+        // Build filter object - filter for series content type
         const filter = { 
-            contentType: 'series',
-            status: 'published' // Only show published series
+            contentType: 'series'
         };
+        
+        // Only filter by status if explicitly requested (allow all series by default)
+        if (req.query.published === 'true') {
+            filter.status = 'published';
+        }
         
         if (req.query.genre) {
             filter.genres = { $in: [new RegExp(req.query.genre, 'i')] };
@@ -116,10 +120,19 @@ exports.getSeriesById = async (req, res) => {
         const { id } = req.params;
         
         let series;
+        // First try to find by ID with contentType series
         if (id.match(/^[0-9a-fA-F]{24}$/)) {
             series = await LugandaMovie.findOne({ _id: id, contentType: 'series' });
+            // Fallback: try finding by ID without contentType filter
+            if (!series) {
+                series = await LugandaMovie.findOne({ _id: id });
+            }
         } else {
             series = await LugandaMovie.findOne({ slug: id, contentType: 'series' });
+            // Fallback: try finding by slug without contentType filter
+            if (!series) {
+                series = await LugandaMovie.findOne({ slug: id });
+            }
         }
         
         if (!series) {

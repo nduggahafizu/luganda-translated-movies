@@ -7,26 +7,27 @@ class SeriesAPI {
     constructor() {
         // Production API URL (always use this in production)
         this.productionUrl = 'https://luganda-translated-movies-production.up.railway.app';
+        this.localUrl = 'http://localhost:5000';
         this.cache = new Map();
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
     }
 
     get baseUrl() {
-        // Check if we're in production (not localhost)
-        const isProduction = window.location.hostname !== 'localhost' && 
-                            window.location.hostname !== '127.0.0.1';
+        const hostname = window.location.hostname;
+        const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
         
-        if (isProduction) {
-            // Always use production API in production environment
-            return this.productionUrl;
+        // Local development - always use localhost:5000
+        if (isLocalhost) {
+            console.log('[SeriesAPI] Using local API:', this.localUrl);
+            return this.localUrl;
         }
         
-        // For local development, try API_CONFIG first
+        // Production - check API_CONFIG first, then fallback
         if (window.API_CONFIG && window.API_CONFIG.BASE_URL) {
             return window.API_CONFIG.BASE_URL;
         }
         
-        // Default fallback
+        // Default fallback for production
         return this.productionUrl;
     }
 

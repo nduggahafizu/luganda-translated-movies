@@ -757,12 +757,12 @@
                                 if (isDirectVideo) {
                                     // Use native video player for direct video files
                                     const videoSrc = isMkv 
-                                        ? \`\${API_BASE_URL}/api/video/stream-proxy?url=\${encodeURIComponent(embedUrl)}\`
+                                        ? `${API_BASE_URL}/api/video/stream-proxy?url=${encodeURIComponent(embedUrl)}`
                                         : embedUrl;
-                                    return \`
+                                    return `
                                         <div class="video-loading-overlay" id="video-loading">
                                             <div class="spinner"></div>
-                                            <p>\${isMkv ? 'Processing MKV video...' : 'Loading video...'}</p>
+                                            <p>${isMkv ? 'Processing MKV video...' : 'Loading video...'}</p>
                                         </div>
                                         <button class="embed-fullscreen-btn" type="button" aria-label="Fullscreen" onclick="requestVideoContainerFullscreen(event)">
                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -775,14 +775,14 @@
                                         <video id="series-video" controls autoplay playsinline 
                                                style="position:absolute;top:0;left:0;width:100%;height:100%;background:#000;"
                                                oncanplay="hideVideoLoading()"
-                                               onerror="handleVideoError(this, '\${embedUrl}')">
-                                            <source src="\${videoSrc}" type="video/mp4">
+                                               onerror="handleVideoError(this, '${embedUrl}')">
+                                            <source src="${videoSrc}" type="video/mp4">
                                             Your browser does not support the video tag.
                                         </video>
-                                    \`;
+                                    `;
                                 } else {
                                     // Use iframe for embed URLs (Streamtape, etc.)
-                                    return \`
+                                    return `
                                         <button class="embed-fullscreen-btn" type="button" aria-label="Fullscreen" onclick="requestVideoContainerFullscreen(event)">
                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M8 3H5a2 2 0 0 0-2 2v3" />
@@ -791,8 +791,8 @@
                                                 <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
                                             </svg>
                                         </button>
-                                        <iframe src="\${embedUrl}" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" loading="lazy" allowfullscreen></iframe>
-                                    \`;
+                                        <iframe src="${embedUrl}" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" loading="lazy" allowfullscreen></iframe>
+                                    `;
                                 }
                             })()}
                         </div>
