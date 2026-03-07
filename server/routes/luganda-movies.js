@@ -1097,6 +1097,42 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+// POST /api/luganda-movies/:id/like - Like/unlike a movie
+router.post('/:id/like', async (req, res) => {
+    setCorsHeaders(req, res);
+    try {
+        const { id } = req.params;
+        
+        if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+            return res.status(400).json({ success: false, message: 'Invalid movie ID format' });
+        }
+        
+        const movie = await LugandaMovie.findById(id);
+        if (!movie) {
+            return res.status(404).json({ success: false, message: 'Movie not found' });
+        }
+        
+        // Increment likes count
+        movie.likes = (movie.likes || 0) + 1;
+        await movie.save();
+        
+        // Clear cache
+        clearMemoryCache();
+        
+        res.json({
+            success: true,
+            message: 'Movie liked',
+            data: { likes: movie.likes }
+        });
+    } catch (error) {
+        console.error('Error liking movie:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to like movie'
+        });
+    }
+});
+
 // PATCH /api/luganda-movies/:id - Quick update (toggle trending, featured, todaysPicks, forYou)
 router.patch('/:id', async (req, res) => {
     setCorsHeaders(req, res);

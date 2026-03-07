@@ -633,6 +633,11 @@
             background: rgba(255,255,255,0.2);
         }
         
+        .action-btn.active {
+            background: var(--accent);
+            color: #000;
+        }
+        
         /* ========== RELATED MOVIES ========== */
         .section-title {
             font-size: 20px;
@@ -974,6 +979,7 @@
             // Custom event handlers
             player.on('play', () => {
                 hideLoading();
+                hideError();
             });
             
             player.on('waiting', () => {
@@ -988,6 +994,7 @@
             // Auto-hide header during playback
             player.on('playing', () => {
                 startHeaderHideTimer();
+                hideError();
             });
             
             player.on('pause', () => {
@@ -1063,16 +1070,19 @@
                 return;
             }
             
+            // Clear any previous error state
+            hideError();
+            
             console.log('🎬 Loading video:', url);
             
             // Determine video type
             let type = 'video/mp4';
             const urlLower = url.toLowerCase();
             
-            // Handle MKV - use remux endpoint
+            // Handle MKV - use stream-proxy endpoint (remux crashes on server)
             if (urlLower.includes('.mkv')) {
-                console.log('🎬 MKV detected - using remux');
-                url = `${API_BASE}/api/video/remux?url=${encodeURIComponent(url)}`;
+                console.log('🎬 MKV detected - using stream proxy');
+                url = `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(url)}`;
                 type = 'video/mp4';
             }
             // Handle HLS
@@ -1093,6 +1103,7 @@
             // Attempt to play
             player.ready(() => {
                 hideLoading();
+                hideError();
                 player.play().catch(e => {
                     console.log('Autoplay blocked:', e);
                     hideLoading();
@@ -1335,6 +1346,10 @@
             errorOverlay.classList.add('active');
         }
         
+        function hideError() {
+            errorOverlay.classList.remove('active');
+        }
+        
         function handleVideoError() {
             const error = player.error();
             let message = 'Video playback error. Please try again.';
@@ -1424,7 +1439,39 @@
         }
         
         // ========== WATCHLIST BUTTON ==========
-        document.getElementById('watchlistBtn').addEventListener('click', async () => {
+        let isInWatchlist = false;
+        const watchlistBtn = document.getElementById('watchlistBtn');
+        
+        // Check watchlist status on load
+        async function checkWatchlistStatus() {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            if (!token || !movieId) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/playlist/watchlist/check/${movieId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (data.status === 'success' && data.data.inWatchlist) {
+                    isInWatchlist = true;
+                    updateWatchlistButton();
+                }
+            } catch (e) {
+                console.log('Could not check watchlist status');
+            }
+        }
+        
+        function updateWatchlistButton() {
+            if (isInWatchlist) {
+                watchlistBtn.innerHTML = '<i class="fas fa-check"></i><span>In Watchlist</span>';
+                watchlistBtn.classList.add('active');
+            } else {
+                watchlistBtn.innerHTML = '<i class="fas fa-plus"></i><span>Add to Watchlist</span>';
+                watchlistBtn.classList.remove('active');
+            }
+        }
+        
+        watchlistBtn.addEventListener('click', async () => {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
             if (!token) {
                 showNotification('Please login to add to watchlist');
@@ -1446,12 +1493,17 @@
                 
                 const data = await response.json();
                 if (data.success) {
+                    isInWatchlist = data.added;
+                    updateWatchlistButton();
                     showNotification(data.added ? 'Added to watchlist!' : 'Removed from watchlist');
                 }
             } catch (e) {
                 showNotification('Could not update watchlist');
             }
         });
+        
+        // Check watchlist status
+        checkWatchlistStatus();
         
         // ========== LIKE BUTTON ==========
         document.getElementById('likeBtn').addEventListener('click', async () => {

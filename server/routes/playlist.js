@@ -163,6 +163,65 @@ router.delete('/watchlist/:movieId', protect, async (req, res) => {
 });
 
 /**
+ * @route   POST /api/playlist/watchlist/toggle
+ * @desc    Toggle movie in watchlist (add if not present, remove if present)
+ * @access  Private
+ */
+router.post('/watchlist/toggle', protect, async (req, res) => {
+    try {
+        const { contentId, contentType } = req.body;
+        const userId = req.user._id;
+
+        if (!contentId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Content ID is required'
+            });
+        }
+
+        const user = await User.findById(userId);
+        const existingIndex = user.watchlist.findIndex(
+            item => item.contentId && item.contentId.toString() === contentId
+        );
+
+        let added = false;
+
+        if (existingIndex >= 0) {
+            // Remove from watchlist
+            await User.findByIdAndUpdate(userId, {
+                $pull: { watchlist: { contentId: contentId } }
+            });
+            added = false;
+        } else {
+            // Add to watchlist
+            await User.findByIdAndUpdate(userId, {
+                $push: {
+                    watchlist: {
+                        contentType: contentType || 'movie',
+                        contentId: contentId,
+                        addedAt: new Date()
+                    }
+                }
+            });
+            added = true;
+        }
+
+        res.json({
+            success: true,
+            added: added,
+            message: added ? 'Added to watchlist' : 'Removed from watchlist'
+        });
+
+    } catch (error) {
+        console.error('Error toggling watchlist:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to toggle watchlist'
+        });
+    }
+});
+
+/**
  * @route   GET /api/playlist/watchlist/check/:movieId
  * @desc    Check if movie is in watchlist
  * @access  Private
