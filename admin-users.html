@@ -859,6 +859,12 @@
                         Account Active (Uncheck to ban user)
                     </label>
                 </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="editUserCanDownload" style="width: auto; margin-right: 8px;">
+                        Allow Downloads (User can download enabled movies)
+                    </label>
+                </div>
                 <div class="modal-actions">
                     <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
                     <button type="submit" class="btn-save">Save Changes</button>
@@ -1110,6 +1116,7 @@
             document.getElementById('editUserRole').value = user.role || 'user';
             document.getElementById('editUserPlan').value = user.subscription?.plan || 'free';
             document.getElementById('editUserActive').checked = user.isActive !== false;
+            document.getElementById('editUserCanDownload').checked = user.canDownload === true;
             
             document.getElementById('editModal').classList.add('active');
         }
@@ -1126,6 +1133,7 @@
             const role = document.getElementById('editUserRole').value;
             const plan = document.getElementById('editUserPlan').value;
             const isActive = document.getElementById('editUserActive').checked;
+            const canDownload = document.getElementById('editUserCanDownload').checked;
             
             try {
                 const response = await fetch(`${API_URL}/admin/users/${userId}`, {
@@ -1137,6 +1145,7 @@
                     body: JSON.stringify({
                         role,
                         isActive,
+                        canDownload,
                         subscription: { plan }
                     })
                 });

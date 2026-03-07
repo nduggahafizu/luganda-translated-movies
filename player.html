@@ -1084,6 +1084,13 @@
             border-radius: 12px;
             background: rgba(255,255,255,0.06);
             border: 1px solid rgba(255,255,255,0.12);
+            /* Fix mobile GPU rendering glitch */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            isolation: isolate;
+            overflow: hidden;
         }
 
         .playback-preferences .prefs-title {
@@ -1106,6 +1113,9 @@
             align-items: center;
             justify-content: space-between;
             gap: 12px;
+            /* Fix mobile rendering */
+            position: relative;
+            z-index: 1;
         }
 
         .pref-text {
@@ -1123,6 +1133,10 @@
         .pref-text .pref-hint {
             font-size: 12px;
             color: rgba(255,255,255,0.65);
+            /* Fix mobile text rendering glitch */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
         }
 
         .toggle {
@@ -1132,6 +1146,11 @@
             width: 44px;
             height: 26px;
             flex: 0 0 auto;
+            /* Fix mobile GPU rendering glitch */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
         }
 
         .toggle input {
@@ -1155,10 +1174,13 @@
             left: 3px;
             width: 20px;
             height: 20px;
-            transform: translateY(-50%);
+            transform: translateY(-50%) translateZ(0);
+            -webkit-transform: translateY(-50%) translateZ(0);
             border-radius: 50%;
             background: rgba(255,255,255,0.92);
-            transition: all 0.2s ease;
+            transition: left 0.2s ease, background 0.2s ease;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
         }
 
         .toggle input:checked + .track {
@@ -1169,6 +1191,8 @@
         .toggle input:checked + .track .thumb {
             left: 21px;
             background: #d9ffb8;
+            transform: translateY(-50%) translateZ(0);
+            -webkit-transform: translateY(-50%) translateZ(0);
         }
         
         /* Action Buttons */
@@ -1863,14 +1887,27 @@
         /* Loading State - Munowatch Style */
         .loading-overlay {
             position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 100%);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 100%;
+            background: #1a1a2e;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 10;
-            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+        
+        /* Ensure loading overlay covers player wrapper on mobile */
+        @media (max-width: 767px) {
+            .loading-overlay {
+                min-height: 200px;
+            }
         }
         
         .spinner {
@@ -2059,6 +2096,11 @@
             
             .player-wrapper {
                 padding-top: 55px;
+                min-height: calc(56.25vw + 55px); /* 16:9 ratio + header padding */
+            }
+            
+            .loading-overlay {
+                min-height: calc(56.25vw);
             }
             
             .plyr {
@@ -3434,6 +3476,8 @@
             player.on('ready', () => {
                 console.log('🚀 Plyr ready - YouTube style enabled');
                 // Controls will auto-hide during playback (handled by Plyr + CSS)
+                // Apply saved video fit/fill preference
+                applyVideoFitMode();
             });
             
             return player;
@@ -3546,6 +3590,43 @@
                 requestElementFullscreen(container);
             });
         })();
+
+        // Video Fit/Fill Toggle (press 'Z' to toggle in fullscreen)
+        let videoFitMode = localStorage.getItem('unruly_video_fit') === 'true';
+        
+        function toggleVideoFitMode() {
+            videoFitMode = !videoFitMode;
+            localStorage.setItem('unruly_video_fit', videoFitMode ? 'true' : 'false');
+            
+            const plyrElement = document.querySelector('.plyr');
+            if (plyrElement) {
+                if (videoFitMode) {
+                    plyrElement.classList.add('video-fit');
+                    showNotification('Video: Fit mode (letterbox)', 'info');
+                } else {
+                    plyrElement.classList.remove('video-fit');
+                    showNotification('Video: Fill mode (full screen)', 'info');
+                }
+            }
+        }
+        
+        // Apply saved fit mode preference
+        function applyVideoFitMode() {
+            const plyrElement = document.querySelector('.plyr');
+            if (plyrElement && videoFitMode) {
+                plyrElement.classList.add('video-fit');
+            }
+        }
+        
+        // Add keyboard shortcut for fit/fill toggle (Z key like VLC)
+        document.addEventListener('keydown', (e) => {
+            // Only respond if not typing in an input/textarea
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            
+            if (e.key === 'z' || e.key === 'Z') {
+                toggleVideoFitMode();
+            }
+        });
 
 
         // Load movie data
@@ -3850,7 +3931,7 @@
         }
 
         // Update movie information on page
-        function updateMovieInfo(movie) {
+        async function updateMovieInfo(movie) {
             document.getElementById('movieTitle').textContent = movie.originalTitle || movie.title;
             document.getElementById('movieDescription').textContent = movie.plot || movie.description || 'No description available.';
             
@@ -3958,35 +4039,57 @@
                 loadEpisodes(movie);
             }
             
-            // Setup download button based on allowDownload setting
+            // Setup download button based on allowDownload setting AND user permission
             const downloadBtn = document.getElementById('downloadBtn');
             if (downloadBtn && !isNonMoviePlayback) {
+                // Check if movie allows download
                 if (movie.allowDownload && movie.video?.embedUrl) {
-                    downloadBtn.style.display = 'flex';
-                    downloadBtn.onclick = () => {
-                        const videoUrl = movie.video.embedUrl;
-                        const fileName = `${movie.title || movie.originalTitle || 'movie'}.mp4`;
-                        
-                        // For direct video URLs, initiate download
-                        if (videoUrl.includes('.mp4') || videoUrl.includes('.mkv') || videoUrl.includes('.webm')) {
-                            const link = document.createElement('a');
-                            link.href = videoUrl;
-                            link.download = fileName;
-                            link.target = '_blank';
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                            showNotification('Download started!', 'success');
-                        } else if (videoUrl.includes('streamtape.') || videoUrl.includes('doodstream.') || videoUrl.includes('filemoon.')) {
-                            // For embed URLs, open in new tab with instructions
-                            window.open(videoUrl, '_blank');
-                            showNotification('Opening video source - use browser download option', 'info');
-                        } else {
-                            // Fallback: open video URL
-                            window.open(videoUrl, '_blank');
-                            showNotification('Opening video source', 'info');
+                    // Check if user has download permission
+                    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                    if (token) {
+                        try {
+                            const apiUrl = typeof API_CONFIG !== 'undefined' ? API_CONFIG.BASE_URL : 'https://luganda-translated-movies-production.up.railway.app';
+                            const userResp = await fetch(`${apiUrl}/api/auth/me`, {
+                                headers: { 'Authorization': `Bearer ${token}` }
+                            });
+                            const userData = await userResp.json();
+                            
+                            if (userData.success && userData.data?.canDownload) {
+                                downloadBtn.style.display = 'flex';
+                                downloadBtn.onclick = () => {
+                                    const videoUrl = movie.video.embedUrl;
+                                    const fileName = `${movie.title || movie.originalTitle || 'movie'}.mp4`;
+                                    
+                                    // For direct video URLs, initiate download
+                                    if (videoUrl.includes('.mp4') || videoUrl.includes('.mkv') || videoUrl.includes('.webm')) {
+                                        const link = document.createElement('a');
+                                        link.href = videoUrl;
+                                        link.download = fileName;
+                                        link.target = '_blank';
+                                        document.body.appendChild(link);
+                                        link.click();
+                                        document.body.removeChild(link);
+                                        showNotification('Download started!', 'success');
+                                    } else if (videoUrl.includes('streamtape.') || videoUrl.includes('doodstream.') || videoUrl.includes('filemoon.')) {
+                                        // For embed URLs, open in new tab with instructions
+                                        window.open(videoUrl, '_blank');
+                                        showNotification('Opening video source - use browser download option', 'info');
+                                    } else {
+                                        // Fallback: open video URL
+                                        window.open(videoUrl, '_blank');
+                                        showNotification('Opening video source', 'info');
+                                    }
+                                };
+                            } else {
+                                downloadBtn.style.display = 'none';
+                            }
+                        } catch (err) {
+                            console.log('Could not verify download permission:', err);
+                            downloadBtn.style.display = 'none';
                         }
-                    };
+                    } else {
+                        downloadBtn.style.display = 'none';
+                    }
                 } else {
                     downloadBtn.style.display = 'none';
                 }
@@ -4008,14 +4111,16 @@
                 return;
             }
             
-            // 🎬 MKV SUPPORT: Use backend proxy endpoint for MKV files
+            // 🎬 MKV SUPPORT: Use backend remux endpoint for MKV files
+            // Remux converts MKV to MP4 container on-the-fly for better browser compatibility
             const urlLower = url.toLowerCase();
             if (urlLower.includes('.mkv')) {
-                console.log('🎬 MKV detected - using stream proxy');
+                console.log('🎬 MKV detected - using remux for browser compatibility');
                 const apiUrl = typeof API_CONFIG !== 'undefined' 
                     ? API_CONFIG.BASE_URL 
                     : 'https://luganda-translated-movies-production.up.railway.app';
-                url = `${apiUrl}/api/video/stream-proxy?url=${encodeURIComponent(url)}`;
+                // Use remux endpoint which converts MKV->MP4 on-the-fly
+                url = `${apiUrl}/api/video/remux?url=${encodeURIComponent(url)}`;
             }
             
             // Convert cloud video URLs to direct playable format
@@ -4181,6 +4286,19 @@
                         console.log('⚠️ Trying fallback URL:', cloudVideo.fallbackUrl);
                         attemptLoad(cloudVideo.fallbackUrl);
                         return;
+                    }
+                    
+                    // If remux failed, try stream-proxy as fallback for MKV
+                    const currentUrl = video.src || videoUrl;
+                    if (currentUrl.includes('/remux?') && loadAttempts < maxAttempts) {
+                        const apiUrl = typeof API_CONFIG !== 'undefined' ? API_CONFIG.BASE_URL : 'https://luganda-translated-movies-production.up.railway.app';
+                        const originalUrl = new URLSearchParams(currentUrl.split('?')[1]).get('url');
+                        if (originalUrl) {
+                            console.log('⚠️ Remux failed, trying stream-proxy fallback...');
+                            const proxyUrl = `${apiUrl}/api/video/stream-proxy?url=${encodeURIComponent(originalUrl)}`;
+                            attemptLoad(proxyUrl);
+                            return;
+                        }
                     }
                     
                     // Retry with same URL (network issues)

@@ -56,6 +56,10 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'admin'],
         default: 'user'
     },
+    canDownload: {
+        type: Boolean,
+        default: false
+    },
     subscription: {
         plan: {
             type: String,

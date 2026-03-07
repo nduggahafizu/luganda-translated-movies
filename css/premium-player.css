@@ -394,6 +394,33 @@
     font-size: 26px !important;
 }
 
+/* Fill screen in fullscreen - no letterboxing */
+.plyr--fullscreen-active video,
+.plyr:fullscreen video,
+.plyr--fullscreen-active .plyr__video-wrapper,
+.plyr:fullscreen .plyr__video-wrapper {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+/* Optional: Fit mode (with letterboxing) - toggle with .video-fit class */
+.plyr.video-fit video,
+.plyr.video-fit .plyr__video-wrapper,
+.plyr--fullscreen-active.video-fit video,
+.plyr:fullscreen.video-fit video {
+    object-fit: contain !important;
+}
+
+/* Full window coverage in fullscreen */
+.plyr--fullscreen-active,
+.plyr:fullscreen {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+}
+
 /* ========================================
    MOBILE TOUCH OPTIMIZATION
    ======================================== */
