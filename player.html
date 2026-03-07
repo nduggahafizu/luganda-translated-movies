@@ -1019,18 +1019,38 @@
             });
             
             // Auto-rotate to landscape on fullscreen (mobile)
-            player.on('fullscreenchange', () => {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            player.on('fullscreenchange', async () => {
                 const isFullscreen = player.isFullscreen();
                 
-                if (screen.orientation && screen.orientation.lock) {
-                    if (isFullscreen) {
-                        // Lock to landscape when entering fullscreen
-                        screen.orientation.lock('landscape').catch(() => {
-                            // Silently fail if not supported
-                        });
-                    } else {
-                        // Unlock orientation when exiting fullscreen
-                        screen.orientation.unlock();
+                if (isMobile) {
+                    try {
+                        if (isFullscreen) {
+                            // Lock to landscape when entering fullscreen
+                            if (screen.orientation && screen.orientation.lock) {
+                                await screen.orientation.lock('landscape-primary');
+                            } else if (screen.lockOrientation) {
+                                screen.lockOrientation('landscape');
+                            } else if (screen.mozLockOrientation) {
+                                screen.mozLockOrientation('landscape');
+                            } else if (screen.msLockOrientation) {
+                                screen.msLockOrientation('landscape');
+                            }
+                        } else {
+                            // Unlock orientation when exiting fullscreen
+                            if (screen.orientation && screen.orientation.unlock) {
+                                screen.orientation.unlock();
+                            } else if (screen.unlockOrientation) {
+                                screen.unlockOrientation();
+                            } else if (screen.mozUnlockOrientation) {
+                                screen.mozUnlockOrientation();
+                            } else if (screen.msUnlockOrientation) {
+                                screen.msUnlockOrientation();
+                            }
+                        }
+                    } catch (e) {
+                        console.log('Orientation lock not supported:', e.message);
                     }
                 }
             });
