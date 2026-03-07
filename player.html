@@ -225,20 +225,25 @@
         }
         
         .video-js .vjs-progress-holder {
-            height: 4px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 2px;
+            height: 5px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
             margin: 0;
             transition: height 0.15s ease;
         }
         
         .video-js .vjs-progress-control:hover .vjs-progress-holder {
-            height: 6px;
+            height: 8px;
         }
         
         .video-js .vjs-play-progress {
             background: var(--accent);
             border-radius: 2px;
+            transition: width 0.1s linear;
+        }
+        
+        .video-js .vjs-slider-horizontal .vjs-play-progress {
+            height: 100%;
         }
         
         .video-js .vjs-play-progress:before {
@@ -251,11 +256,13 @@
             height: 14px;
             background: var(--accent);
             border-radius: 50%;
-            opacity: 0;
-            transition: opacity 0.15s ease;
+            opacity: 1;
+            box-shadow: 0 0 8px rgba(229, 9, 20, 0.6);
+            transition: transform 0.15s ease, opacity 0.15s ease;
         }
         
         .video-js .vjs-progress-control:hover .vjs-play-progress:before {
+            transform: translateY(-50%) scale(1.2);
             opacity: 1;
         }
         
@@ -731,6 +738,16 @@
                 width: calc(100% - 20px);
             }
             
+            .video-js .vjs-progress-holder {
+                height: 6px;
+            }
+            
+            .video-js .vjs-play-progress:before {
+                width: 16px;
+                height: 16px;
+                right: -8px;
+            }
+            
             .video-js .vjs-control {
                 width: 36px;
                 height: 36px;
@@ -999,6 +1016,23 @@
             
             player.on('pause', () => {
                 showHeader();
+            });
+            
+            // Auto-rotate to landscape on fullscreen (mobile)
+            player.on('fullscreenchange', () => {
+                const isFullscreen = player.isFullscreen();
+                
+                if (screen.orientation && screen.orientation.lock) {
+                    if (isFullscreen) {
+                        // Lock to landscape when entering fullscreen
+                        screen.orientation.lock('landscape').catch(() => {
+                            // Silently fail if not supported
+                        });
+                    } else {
+                        // Unlock orientation when exiting fullscreen
+                        screen.orientation.unlock();
+                    }
+                }
             });
             
             // Fit/Fill toggle with Z key
