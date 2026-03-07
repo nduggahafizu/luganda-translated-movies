@@ -33,16 +33,25 @@ async function sendExpoPushNotifications(tokens, notification) {
 
     for (const batch of batches) {
         try {
-            const messages = batch.map(token => ({
-                to: token.pushToken || token,
-                sound: 'default',
-                title: notification.title || 'UNRULY MOVIES',
-                body: notification.body || '',
-                data: notification.data || {},
-                channelId: notification.channelId || 'new-movies',
-                priority: 'high',
-                badge: notification.badge || 1,
-            }));
+            const messages = batch.map(token => {
+                const msg = {
+                    to: token.pushToken || token,
+                    sound: 'default',
+                    title: notification.title || 'UNRULY MOVIES',
+                    body: notification.body || '',
+                    data: notification.data || {},
+                    channelId: notification.channelId || 'new-movies',
+                    priority: 'high',
+                    badge: notification.badge || 1,
+                };
+                
+                // Add image for rich notifications (shows poster in notification on Android)
+                if (notification.image) {
+                    msg.richContent = { image: notification.image };
+                }
+                
+                return msg;
+            });
 
             const response = await axios.post(EXPO_PUSH_URL, messages, {
                 headers: {
@@ -123,6 +132,7 @@ async function notifyNewMovie(movie) {
         const notification = {
             title: '🎬 New Movie Added!',
             body: `${movie.lugandaTitle || movie.title}${movie.vjName ? ` - Translated by VJ ${movie.vjName}` : ''}`,
+            image: movie.poster || movie.posterUrl || null, // For rich notification display
             data: {
                 type: 'new_movie',
                 movieId: movie._id.toString(),
@@ -159,6 +169,7 @@ async function notifyNewEpisode(series, episode) {
         const notification = {
             title: '📺 New Episode!',
             body: `${series.lugandaTitle || series.title} - S${episode.season}E${episode.episode}`,
+            image: series.poster || series.posterUrl || null, // For rich notification display
             data: {
                 type: 'new_episode',
                 seriesId: series._id.toString(),

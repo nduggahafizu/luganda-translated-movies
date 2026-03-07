@@ -45,8 +45,10 @@ class UnrulyNotifications {
                 return;
             }
             
-            // Show after 2 seconds
-            setTimeout(() => this.showPermissionPrompt(), 2000);
+            // DO NOT auto-prompt - this triggers Chrome's spam detection
+            // Only show prompt after user interaction (clicks bell icon, watches video, etc.)
+            // The prompt can be manually triggered via: window.unrulyNotifications.showPermissionPrompt()
+            console.log('Notification permission: default - waiting for user interaction to prompt');
         } else if (this.permissionGranted) {
             localStorage.setItem('notificationPermissionState', 'granted');
             this.setupLocalNotifications();

@@ -1020,8 +1020,10 @@
             align-items: center;
             gap: 12px;
             padding: 12px 15px;
+            background: #1a2e1a; /* Solid fallback for mobile */
             background: rgba(124, 252, 0, 0.1);
-            border: 1px solid rgba(124, 252, 0, 0.3);
+            border: 1px solid #3d6b3d; /* Solid fallback */
+            border-color: rgba(124, 252, 0, 0.3);
             border-radius: 12px;
             margin-bottom: 15px;
         }
@@ -1030,7 +1032,7 @@
             width: 45px;
             height: 45px;
             border-radius: 50%;
-            border: 2px solid var(--primary-color);
+            border: 2px solid #7CFC00; /* Explicit color */
             object-fit: cover;
         }
         
@@ -1040,12 +1042,12 @@
         
         .vj-label {
             font-size: 12px;
-            color: var(--text-secondary);
+            color: #888888; /* Explicit color */
         }
         
         .vj-name {
             font-weight: 600;
-            color: var(--primary-color);
+            color: #7CFC00; /* Explicit color instead of var() */
         }
         
         .movie-description {
@@ -3954,6 +3956,40 @@
             // Show episodes section for series
             if (movie.type === 'series' || isSeries) {
                 loadEpisodes(movie);
+            }
+            
+            // Setup download button based on allowDownload setting
+            const downloadBtn = document.getElementById('downloadBtn');
+            if (downloadBtn && !isNonMoviePlayback) {
+                if (movie.allowDownload && movie.video?.embedUrl) {
+                    downloadBtn.style.display = 'flex';
+                    downloadBtn.onclick = () => {
+                        const videoUrl = movie.video.embedUrl;
+                        const fileName = `${movie.title || movie.originalTitle || 'movie'}.mp4`;
+                        
+                        // For direct video URLs, initiate download
+                        if (videoUrl.includes('.mp4') || videoUrl.includes('.mkv') || videoUrl.includes('.webm')) {
+                            const link = document.createElement('a');
+                            link.href = videoUrl;
+                            link.download = fileName;
+                            link.target = '_blank';
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            showNotification('Download started!', 'success');
+                        } else if (videoUrl.includes('streamtape.') || videoUrl.includes('doodstream.') || videoUrl.includes('filemoon.')) {
+                            // For embed URLs, open in new tab with instructions
+                            window.open(videoUrl, '_blank');
+                            showNotification('Opening video source - use browser download option', 'info');
+                        } else {
+                            // Fallback: open video URL
+                            window.open(videoUrl, '_blank');
+                            showNotification('Opening video source', 'info');
+                        }
+                    };
+                } else {
+                    downloadBtn.style.display = 'none';
+                }
             }
         }
 

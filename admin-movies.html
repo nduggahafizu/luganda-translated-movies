@@ -958,6 +958,10 @@
                                         <input type="checkbox" id="movie-trending">
                                         Mark as Trending
                                     </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="movie-allow-download">
+                                        Allow Download
+                                    </label>
                                 </div>
                             </div>
                         </div>
@@ -1139,6 +1143,10 @@
                             <label class="checkbox-label">
                                 <input type="checkbox" id="edit-trending">
                                 Mark as Trending
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="edit-allow-download">
+                                Allow Download
                             </label>
                         </div>
                     </div>
@@ -1814,6 +1822,7 @@
                     : undefined,
                 featured: document.getElementById('movie-featured').checked,
                 trending: document.getElementById('movie-trending').checked,
+                allowDownload: document.getElementById('movie-allow-download').checked,
                 embedUrl: document.getElementById('movie-embed-url').value,
                 tmdbId: document.getElementById('movie-tmdb-id').value || undefined
             };
@@ -1897,6 +1906,7 @@
             document.getElementById('edit-genres').value = (movie.genres || []).join(', ');
             document.getElementById('edit-featured').checked = movie.featured || false;
             document.getElementById('edit-trending').checked = movie.trending || false;
+            document.getElementById('edit-allow-download').checked = movie.allowDownload || false;
             
             // Show the modal
             document.getElementById('edit-modal').classList.add('show');
@@ -1929,7 +1939,8 @@
                     ? document.getElementById('edit-genres').value.split(',').map(g => g.trim().toLowerCase())
                     : undefined,
                 featured: document.getElementById('edit-featured').checked,
-                trending: document.getElementById('edit-trending').checked
+                trending: document.getElementById('edit-trending').checked,
+                allowDownload: document.getElementById('edit-allow-download').checked
             };
             
             // Clean undefined fields

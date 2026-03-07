@@ -279,6 +279,11 @@ const lugandaMovieSchema = new mongoose.Schema({
         default: false
     },
     
+    allowDownload: {
+        type: Boolean,
+        default: false
+    },
+    
     // Statistics
     views: {
         type: Number,
