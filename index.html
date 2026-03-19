@@ -327,12 +327,41 @@
             color: rgba(255,255,255,0.84);
             line-height: 1.8;
         }
+
+        .mobile-app-cta {
+            display: none;
+        }
         @media (max-width: 768px) {
             .trust-section {
                 padding: 20px;
             }
             .trust-section h2 {
                 font-size: 26px;
+            }
+
+            .mobile-app-cta {
+                position: fixed;
+                left: 14px;
+                right: 14px;
+                bottom: 14px;
+                z-index: 9999;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                padding: 14px 16px;
+                border-radius: 999px;
+                font-weight: 700;
+                text-decoration: none;
+                color: #000;
+                background: var(--primary-color);
+                box-shadow: 0 12px 28px rgba(124, 252, 0, 0.35);
+                border: 1px solid rgba(0, 0, 0, 0.08);
+            }
+
+            .mobile-app-cta svg {
+                width: 18px;
+                height: 18px;
             }
         }
     </style>
@@ -367,6 +396,15 @@
 
 <body>
     <a class="skip-link" href="#maincontent">Skip to content</a>
+
+    <a href="https://downloadunruly.netlify.app" class="mobile-app-cta" target="_blank" aria-label="Get Unruly Movies App">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        Get App
+    </a>
 
     <div class="container">
         <div class="app">
@@ -816,53 +854,6 @@
                                 </div>
                             </div>
 
-                            <div class="app-section trust-section">
-                                <h2>Why Unruly Movies is different</h2>
-                                <p>
-                                    Unruly Movies is not just a list of videos. We focus on Luganda-translated entertainment with proper VJ crediting,
-                                    clear movie details, category organization, and a local audience experience built for viewers in Uganda and the wider
-                                    East African community. Every title is published with editorial context such as translator name, release information,
-                                    viewing category, and platform navigation that helps users discover content quickly.
-                                </p>
-
-                                <div class="trust-grid">
-                                    <div class="trust-card">
-                                        <h3>Original local focus</h3>
-                                        <p>
-                                            The platform is built specifically for fans of Luganda-translated movies, series, and Ugandan TV channels.
-                                            Our pages are written for this audience instead of being generic entertainment placeholders.
-                                        </p>
-                                    </div>
-                                    <div class="trust-card">
-                                        <h3>Named VJ crediting</h3>
-                                        <p>
-                                            We highlight translators and VJs so viewers can follow the voices and translation styles they trust.
-                                            That makes the catalog more useful than a basic embed directory.
-                                        </p>
-                                    </div>
-                                    <div class="trust-card">
-                                        <h3>Clear ownership and support</h3>
-                                        <p>
-                                            Unruly Movies is maintained by Nduga Hafizu with public contact, privacy, terms, and DMCA pages so visitors,
-                                            reviewers, and advertisers can verify who operates the site.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div class="founder-note">
-                                    <strong>Founder note:</strong> I built Unruly Movies to make Luganda-translated entertainment easier to discover,
-                                    more respectful to VJ identity, and better organized for mobile users. The goal is to combine streaming, series,
-                                    and Ugandan TV access in one place while keeping the experience simple, fast, and community-focused.
-                                </div>
-
-                                <div class="trust-links">
-                                    <a class="trust-link" href="about.html">About the platform</a>
-                                    <a class="trust-link" href="contact.html">Contact the founder</a>
-                                    <a class="trust-link" href="privacy-policy.html">Privacy policy</a>
-                                    <a class="trust-link" href="dmca.html">DMCA policy</a>
-                                </div>
-                            </div>
-
                             <!-- Trending Now Section - Immediately after slider -->
                             <div class="app-section movie-section" style="margin-top: 25px;">
                                 <div class="section-header">
@@ -1056,6 +1047,53 @@
                                         <div class="skeleton skeleton-title"></div>
                                         <div class="skeleton skeleton-meta"></div>
                                     </div>
+                                </div>
+                            </div>
+
+                            <div class="app-section trust-section">
+                                <h2>Why Unruly Movies is different</h2>
+                                <p>
+                                    Unruly Movies is not just a list of videos. We focus on Luganda-translated entertainment with proper VJ crediting,
+                                    clear movie details, category organization, and a local audience experience built for viewers in Uganda and the wider
+                                    East African community. Every title is published with editorial context such as translator name, release information,
+                                    viewing category, and platform navigation that helps users discover content quickly.
+                                </p>
+
+                                <div class="trust-grid">
+                                    <div class="trust-card">
+                                        <h3>Original local focus</h3>
+                                        <p>
+                                            The platform is built specifically for fans of Luganda-translated movies, series, and Ugandan TV channels.
+                                            Our pages are written for this audience instead of being generic entertainment placeholders.
+                                        </p>
+                                    </div>
+                                    <div class="trust-card">
+                                        <h3>Named VJ crediting</h3>
+                                        <p>
+                                            We highlight translators and VJs so viewers can follow the voices and translation styles they trust.
+                                            That makes the catalog more useful than a basic embed directory.
+                                        </p>
+                                    </div>
+                                    <div class="trust-card">
+                                        <h3>Clear ownership and support</h3>
+                                        <p>
+                                            Unruly Movies is maintained by Nduga Hafizu with public contact, privacy, terms, and DMCA pages so visitors,
+                                            reviewers, and advertisers can verify who operates the site.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="founder-note">
+                                    <strong>Founder note:</strong> I built Unruly Movies to make Luganda-translated entertainment easier to discover,
+                                    more respectful to VJ identity, and better organized for mobile users. The goal is to combine streaming, series,
+                                    and Ugandan TV access in one place while keeping the experience simple, fast, and community-focused.
+                                </div>
+
+                                <div class="trust-links">
+                                    <a class="trust-link" href="about.html">About the platform</a>
+                                    <a class="trust-link" href="contact.html">Contact the founder</a>
+                                    <a class="trust-link" href="privacy-policy.html">Privacy policy</a>
+                                    <a class="trust-link" href="dmca.html">DMCA policy</a>
                                 </div>
                             </div>
                         </div>

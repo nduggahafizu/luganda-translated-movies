@@ -665,6 +665,7 @@
         let currentEpisode = (Number.isFinite(requestedEpisode) && requestedEpisode > 0)
             ? { season: currentSeason, episode: requestedEpisode }
             : null;
+        let seriesFullscreenRotation = false;
 
         function requestVideoContainerFullscreen(event) {
             if (event) event.preventDefault();
@@ -674,8 +675,52 @@
             if (req) req.call(container);
         }
 
+        function isMobileSeriesViewport() {
+            return window.matchMedia('(max-width: 920px)').matches;
+        }
+
+        async function lockSeriesLandscape() {
+            if (!isMobileSeriesViewport()) return;
+
+            try {
+                if (screen.orientation?.lock) {
+                    await screen.orientation.lock('landscape');
+                    seriesFullscreenRotation = true;
+                } else if (screen.lockOrientation) {
+                    screen.lockOrientation('landscape');
+                    seriesFullscreenRotation = true;
+                }
+            } catch (error) {
+                seriesFullscreenRotation = false;
+                console.log('Series orientation lock skipped:', error.message);
+            }
+        }
+
+        function unlockSeriesLandscape() {
+            if (!seriesFullscreenRotation) return;
+
+            try {
+                if (screen.orientation?.unlock) {
+                    screen.orientation.unlock();
+                } else if (screen.unlockOrientation) {
+                    screen.unlockOrientation();
+                }
+            } catch (error) {
+                console.log('Series orientation unlock skipped:', error.message);
+            }
+
+            seriesFullscreenRotation = false;
+        }
+
         document.addEventListener('fullscreenchange', () => {
-            document.body.classList.toggle('fullscreen-active', Boolean(document.fullscreenElement));
+            const isFullscreen = Boolean(document.fullscreenElement);
+            document.body.classList.toggle('fullscreen-active', isFullscreen);
+
+            if (isFullscreen) {
+                lockSeriesLandscape();
+            } else {
+                unlockSeriesLandscape();
+            }
         });
         
         // Initialize

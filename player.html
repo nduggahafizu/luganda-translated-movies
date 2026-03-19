@@ -171,10 +171,14 @@
         /* Control Bar - Netflix Style */
         .video-js .vjs-control-bar {
             background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 50%, transparent 100%);
-            height: 80px;
-            padding: 0 20px 10px;
+            min-height: 92px;
+            height: auto;
+            padding: 10px 20px 12px;
             display: flex;
-            align-items: flex-end;
+            flex-wrap: wrap;
+            align-items: center;
+            align-content: flex-end;
+            gap: 8px;
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -206,7 +210,7 @@
         .video-js .vjs-current-time {
             order: 3;
             display: flex;
-            padding: 0 10px;
+            padding: 0 6px;
         }
         
         .video-js .vjs-time-divider {
@@ -219,18 +223,17 @@
         .video-js .vjs-duration {
             order: 5;
             display: flex;
-            padding: 0 10px;
+            padding: 0 6px;
         }
         
         .video-js .vjs-progress-control {
-            order: 6;
-            flex: 1;
+            order: 0;
+            flex: 1 0 100%;
             height: 40px;
-            position: absolute;
-            bottom: 50px;
-            left: 20px;
-            right: 20px;
-            width: calc(100% - 40px);
+            position: relative;
+            inset: auto;
+            width: 100%;
+            margin-bottom: 4px;
         }
         
         .video-js .vjs-progress-holder {
@@ -658,6 +661,11 @@
             background: var(--accent);
             color: #000;
         }
+
+        .action-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
         
         /* ========== RELATED MOVIES ========== */
         .section-title {
@@ -748,15 +756,15 @@
             }
             
             .video-js .vjs-control-bar {
-                height: 60px;
-                padding: 0 10px 8px;
+                min-height: 74px;
+                padding: 8px 10px 10px;
+                gap: 4px;
             }
             
             .video-js .vjs-progress-control {
-                bottom: 40px;
-                left: 10px;
-                right: 10px;
-                width: calc(100% - 20px);
+                width: 100%;
+                height: 28px;
+                margin-bottom: 0;
             }
             
             .video-js .vjs-progress-holder {
@@ -780,6 +788,12 @@
             }
             
             .video-js .vjs-playback-rate {
+                display: none;
+            }
+
+            .video-js .vjs-volume-panel,
+            .video-js .vjs-picture-in-picture-control,
+            .video-js .vjs-duration {
                 display: none;
             }
             
@@ -987,6 +1001,7 @@
         // Video.js Player Instance
         let player = null;
         let currentMovie = null;
+        let fullscreenRotateApplied = false;
         
         // ========== INITIALIZE VIDEO.JS ==========
         function initPlayer() {
@@ -1044,6 +1059,14 @@
             player.on('fullscreenchange', async () => {
                 const isFullscreen = player.isFullscreen();
                 document.body.classList.toggle('fullscreen-active', isFullscreen);
+
+                if (isFullscreen) {
+                    await lockMobileOrientation();
+                } else {
+                    unlockMobileOrientation();
+                }
+
+                syncPlayerLayout();
             });
             
             // Fit/Fill toggle with Z key
@@ -1056,6 +1079,72 @@
             });
             
             return player;
+        }
+
+        function isMobileViewport() {
+            return window.matchMedia('(max-width: 920px)').matches;
+        }
+
+        function isTouchDevice() {
+            return window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        }
+
+        async function lockMobileOrientation() {
+            if (!isMobileViewport() || !isTouchDevice()) return;
+
+            try {
+                if (screen.orientation?.lock) {
+                    await screen.orientation.lock('landscape');
+                    fullscreenRotateApplied = true;
+                } else if (screen.lockOrientation) {
+                    screen.lockOrientation('landscape');
+                    fullscreenRotateApplied = true;
+                } else if (screen.mozLockOrientation) {
+                    screen.mozLockOrientation('landscape');
+                    fullscreenRotateApplied = true;
+                } else if (screen.msLockOrientation) {
+                    screen.msLockOrientation('landscape');
+                    fullscreenRotateApplied = true;
+                }
+            } catch (error) {
+                fullscreenRotateApplied = false;
+                console.log('Orientation lock skipped:', error.message);
+            }
+        }
+
+        function unlockMobileOrientation() {
+            if (!fullscreenRotateApplied) return;
+
+            try {
+                if (screen.orientation?.unlock) {
+                    screen.orientation.unlock();
+                } else if (screen.unlockOrientation) {
+                    screen.unlockOrientation();
+                } else if (screen.mozUnlockOrientation) {
+                    screen.mozUnlockOrientation();
+                } else if (screen.msUnlockOrientation) {
+                    screen.msUnlockOrientation();
+                }
+            } catch (error) {
+                console.log('Orientation unlock skipped:', error.message);
+            }
+
+            fullscreenRotateApplied = false;
+        }
+
+        function syncPlayerLayout() {
+            if (!player) return;
+
+            const applyResize = () => {
+                try {
+                    player.trigger('componentresize');
+                } catch (error) {
+                    console.log('Player resize skipped:', error.message);
+                }
+            };
+
+            requestAnimationFrame(applyResize);
+            setTimeout(applyResize, 250);
         }
         
         // ========== VIDEO FIT/FILL TOGGLE ==========
@@ -1129,6 +1218,9 @@
                 startHeaderHideTimer();
             }
         });
+
+        window.addEventListener('resize', syncPlayerLayout);
+        window.addEventListener('orientationchange', syncPlayerLayout);
         
         // ========== LOAD VIDEO SOURCE ==========
         function loadVideo(url) {
@@ -1507,7 +1599,22 @@
         
         // ========== WATCHLIST BUTTON ==========
         let isInWatchlist = false;
+        let isLiked = false;
         const watchlistBtn = document.getElementById('watchlistBtn');
+        const likeBtn = document.getElementById('likeBtn');
+
+        function getWatchlistButtonContent(active) {
+            return active
+                ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path><polyline points="9 11 12 14 16 10"></polyline></svg><span>In Watchlist</span>`
+                : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg><span>Add to Watchlist</span>`;
+        }
+
+        function updateLikeButton() {
+            likeBtn.classList.toggle('active', isLiked);
+            likeBtn.innerHTML = isLiked
+                ? `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg><span>Liked</span>`
+                : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg><span>Like</span>`;
+        }
         
         // Check watchlist status on load
         async function checkWatchlistStatus() {
@@ -1529,13 +1636,8 @@
         }
         
         function updateWatchlistButton() {
-            if (isInWatchlist) {
-                watchlistBtn.innerHTML = '<i class="fas fa-check"></i><span>In Watchlist</span>';
-                watchlistBtn.classList.add('active');
-            } else {
-                watchlistBtn.innerHTML = '<i class="fas fa-plus"></i><span>Add to Watchlist</span>';
-                watchlistBtn.classList.remove('active');
-            }
+            watchlistBtn.innerHTML = getWatchlistButtonContent(isInWatchlist);
+            watchlistBtn.classList.toggle('active', isInWatchlist);
         }
         
         watchlistBtn.addEventListener('click', async () => {
@@ -1579,6 +1681,8 @@
                 showNotification('Please login to like');
                 return;
             }
+
+            likeBtn.disabled = true;
             
             try {
                 const response = await fetch(`${API_BASE}/api/luganda-movies/${movieId}/like`, {
@@ -1590,17 +1694,22 @@
                 
                 const data = await response.json();
                 if (data.success) {
+                    isLiked = true;
+                    updateLikeButton();
                     showNotification('Liked!');
-                    document.getElementById('likeBtn').querySelector('svg').setAttribute('fill', 'currentColor');
                 }
             } catch (e) {
                 showNotification('Could not like movie');
+            } finally {
+                likeBtn.disabled = false;
             }
         });
         
         // ========== INITIALIZE ==========
         document.addEventListener('DOMContentLoaded', () => {
             initPlayer();
+            updateWatchlistButton();
+            updateLikeButton();
             loadMovieData();
         });
         
