@@ -252,6 +252,88 @@
         .section-header {
             margin-bottom: 1.5rem;
         }
+
+        .trust-section {
+            background: linear-gradient(135deg, rgba(124, 252, 0, 0.08), rgba(0, 217, 255, 0.05));
+            border: 1px solid rgba(124, 252, 0, 0.18);
+            border-radius: 18px;
+            padding: 28px;
+        }
+        .trust-section h2 {
+            color: #fff;
+            font-size: 32px;
+            margin-bottom: 14px;
+        }
+        .trust-section > p {
+            color: rgba(255,255,255,0.82);
+            line-height: 1.8;
+            max-width: 950px;
+            margin-bottom: 24px;
+        }
+        .trust-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+        .trust-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 20px;
+        }
+        .trust-card h3 {
+            color: var(--primary-color);
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .trust-card p {
+            color: rgba(255,255,255,0.78);
+            font-size: 14px;
+            line-height: 1.7;
+            margin: 0;
+        }
+        .trust-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .trust-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 16px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 600;
+            color: #fff;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.2s ease;
+        }
+        .trust-link:hover {
+            color: #000;
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        .founder-note {
+            margin-top: 18px;
+            padding: 18px 20px;
+            border-left: 4px solid var(--primary-color);
+            background: rgba(0,0,0,0.22);
+            border-radius: 10px;
+            color: rgba(255,255,255,0.84);
+            line-height: 1.8;
+        }
+        @media (max-width: 768px) {
+            .trust-section {
+                padding: 20px;
+            }
+            .trust-section h2 {
+                font-size: 26px;
+            }
+        }
     </style>
 
     <!-- Google AdSense -->
@@ -733,6 +815,53 @@
                                 </div>
                             </div>
 
+                            <div class="app-section trust-section">
+                                <h2>Why Unruly Movies is different</h2>
+                                <p>
+                                    Unruly Movies is not just a list of videos. We focus on Luganda-translated entertainment with proper VJ crediting,
+                                    clear movie details, category organization, and a local audience experience built for viewers in Uganda and the wider
+                                    East African community. Every title is published with editorial context such as translator name, release information,
+                                    viewing category, and platform navigation that helps users discover content quickly.
+                                </p>
+
+                                <div class="trust-grid">
+                                    <div class="trust-card">
+                                        <h3>Original local focus</h3>
+                                        <p>
+                                            The platform is built specifically for fans of Luganda-translated movies, series, and Ugandan TV channels.
+                                            Our pages are written for this audience instead of being generic entertainment placeholders.
+                                        </p>
+                                    </div>
+                                    <div class="trust-card">
+                                        <h3>Named VJ crediting</h3>
+                                        <p>
+                                            We highlight translators and VJs so viewers can follow the voices and translation styles they trust.
+                                            That makes the catalog more useful than a basic embed directory.
+                                        </p>
+                                    </div>
+                                    <div class="trust-card">
+                                        <h3>Clear ownership and support</h3>
+                                        <p>
+                                            Unruly Movies is maintained by Nduga Hafizu with public contact, privacy, terms, and DMCA pages so visitors,
+                                            reviewers, and advertisers can verify who operates the site.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="founder-note">
+                                    <strong>Founder note:</strong> I built Unruly Movies to make Luganda-translated entertainment easier to discover,
+                                    more respectful to VJ identity, and better organized for mobile users. The goal is to combine streaming, series,
+                                    and Ugandan TV access in one place while keeping the experience simple, fast, and community-focused.
+                                </div>
+
+                                <div class="trust-links">
+                                    <a class="trust-link" href="about.html">About the platform</a>
+                                    <a class="trust-link" href="contact.html">Contact the founder</a>
+                                    <a class="trust-link" href="privacy-policy.html">Privacy policy</a>
+                                    <a class="trust-link" href="dmca.html">DMCA policy</a>
+                                </div>
+                            </div>
+
                             <!-- Trending Now Section - Immediately after slider -->
                             <div class="app-section movie-section" style="margin-top: 25px;">
                                 <div class="section-header">
@@ -981,7 +1110,7 @@
                     </div>
                 </div>
                 <div class="footer-bottom">
-                    <p>Copyright © unruly movies watch 2026</p>
+                    <p>Copyright © 2026 Unruly Movies. Founded and managed by Nduga Hafizu.</p>
                 </div>
             </footer>
         </div>
