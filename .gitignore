@@ -37,6 +37,10 @@ build/
 *.tmp
 *.temp
 
+# App distribution files
+downloads/*.apk
+*.apk
+
 # Security-sensitive documentation (contains API keys)
 NETLIFY_API_KEY_UPDATE.md
 SECURITY_FIX_COMPLETE.md
