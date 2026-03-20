@@ -1232,6 +1232,13 @@
             // Clear any previous error state
             hideError();
             
+            // Fix mixed content - convert http to https for known CDNs
+            if (url.startsWith('http://')) {
+                const httpsUrl = url.replace('http://', 'https://');
+                console.log('🔒 Converting to HTTPS:', httpsUrl);
+                url = httpsUrl;
+            }
+            
             console.log('🎬 Loading video:', url);
             
             // Determine video type
@@ -1324,7 +1331,10 @@
             return extensions.some(ext => urlLower.includes(ext)) ||
                    url.includes('archive.org') ||
                    url.includes('cloudflare') ||
-                   url.includes('r2.dev');
+                   url.includes('r2.dev') ||
+                   url.includes('b-cdn.net') ||
+                   url.includes('bunnycdn') ||
+                   url.includes('pearlpix.xyz');
         }
         
         // ========== LOAD EMBED VIDEO ==========
