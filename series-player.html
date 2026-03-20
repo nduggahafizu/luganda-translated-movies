@@ -653,15 +653,19 @@
 
         async function requireLoggedInMember() {
             const token = getAuthToken();
+            console.log('[Auth] Token exists:', !!token);
+            
             if (!token) {
                 redirectToLogin();
                 return false;
             }
 
             try {
+                console.log('[Auth] Verifying token with API...');
                 const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
+                console.log('[Auth] Response status:', response.status);
 
                 if (response.status === 401 || response.status === 403) {
                     localStorage.removeItem('token');
@@ -671,20 +675,26 @@
                 }
 
                 if (!response.ok) {
-                    showError('Could not verify login right now. Please refresh and try again.');
-                    return false;
+                    console.warn('[Auth] Server error during auth check, allowing playback');
+                    return true;
                 }
 
                 const data = await response.json();
+                console.log('[Auth] Response data success:', data.success);
+                
                 if (!data.success) {
-                    showError('Could not verify login right now. Please refresh and try again.');
+                    localStorage.removeItem('token');
+                    sessionStorage.removeItem('token');
+                    redirectToLogin();
                     return false;
                 }
 
+                console.log('[Auth] User verified successfully');
                 return true;
             } catch (error) {
-                showError('Network issue while checking login. Please refresh and try again.');
-                return false;
+                console.error('[Auth] Network error:', error.message);
+                console.warn('[Auth] Network issue, but token exists - allowing playback');
+                return true;
             }
         }
         

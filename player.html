@@ -1014,40 +1014,55 @@
 
         async function requireLoggedInMember() {
             const token = getAuthToken();
+            console.log('[Auth] Token exists:', !!token);
+            
             if (!token) {
                 showError('Please login or sign up to watch videos. Redirecting...');
-                setTimeout(redirectToLogin, 700);
+                redirectToLogin();
                 return false;
             }
 
             try {
+                console.log('[Auth] Verifying token with API...');
                 const response = await fetch(`${API_BASE}/api/auth/me`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
+                console.log('[Auth] Response status:', response.status);
 
                 if (response.status === 401 || response.status === 403) {
                     localStorage.removeItem('token');
                     sessionStorage.removeItem('token');
                     showError('Your session expired. Please login again. Redirecting...');
-                    setTimeout(redirectToLogin, 700);
+                    redirectToLogin();
                     return false;
                 }
 
                 if (!response.ok) {
-                    showError('Could not verify your login right now. Please try again.');
-                    return false;
+                    console.error('[Auth] Non-OK response:', response.status);
+                    // Don't block playback for server errors, just log and continue
+                    console.warn('[Auth] Server error during auth check, allowing playback');
+                    return true;
                 }
 
                 const data = await response.json();
+                console.log('[Auth] Response data success:', data.success);
+                
                 if (!data.success) {
-                    showError('Could not verify your login right now. Please try again.');
+                    // Server returned success: false - likely an auth issue
+                    localStorage.removeItem('token');
+                    sessionStorage.removeItem('token');
+                    showError('Please login again to continue. Redirecting...');
+                    redirectToLogin();
                     return false;
                 }
 
+                console.log('[Auth] User verified successfully');
                 return true;
             } catch (error) {
-                showError('Network issue while checking login. Please retry.');
-                return false;
+                console.error('[Auth] Network error:', error.message);
+                // Network error - don't block if token exists, let video try to load
+                console.warn('[Auth] Network issue, but token exists - allowing playback');
+                return true;
             }
         }
         
