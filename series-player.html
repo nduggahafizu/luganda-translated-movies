@@ -663,20 +663,27 @@
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
+                if (response.status === 401 || response.status === 403) {
+                    localStorage.removeItem('token');
+                    sessionStorage.removeItem('token');
+                    redirectToLogin();
+                    return false;
+                }
+
                 if (!response.ok) {
-                    throw new Error('Invalid session');
+                    showError('Could not verify login right now. Please refresh and try again.');
+                    return false;
                 }
 
                 const data = await response.json();
                 if (!data.success) {
-                    throw new Error('Invalid session');
+                    showError('Could not verify login right now. Please refresh and try again.');
+                    return false;
                 }
 
                 return true;
             } catch (error) {
-                localStorage.removeItem('token');
-                sessionStorage.removeItem('token');
-                redirectToLogin();
+                showError('Network issue while checking login. Please refresh and try again.');
                 return false;
             }
         }
