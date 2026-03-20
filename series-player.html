@@ -635,24 +635,51 @@
     <script src="js/config.js?v=20260124"></script>
 
     <script>
-        // AUTHENTICATION CHECK - Users must be logged in to watch series
-        (function() {
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            if (!token) {
-                // Save current URL to return after login
-                const currentUrl = window.location.href;
-                localStorage.setItem('redirectAfterLogin', currentUrl);
-                // Redirect to login
-                window.location.replace('login.html?redirect=' + encodeURIComponent(currentUrl));
-                throw new Error('Authentication required');
-            }
-        })();
-        
         // API Configuration - always use production API in production
         const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
         const API_BASE_URL = isProduction 
             ? 'https://luganda-translated-movies-production.up.railway.app'
             : ((window.API_CONFIG && window.API_CONFIG.BASE_URL) || 'http://localhost:5000');
+
+        function getAuthToken() {
+            return localStorage.getItem('token') || sessionStorage.getItem('token');
+        }
+
+        function redirectToLogin() {
+            const currentUrl = window.location.href;
+            localStorage.setItem('redirectAfterLogin', currentUrl);
+            window.location.replace('login.html?redirect=' + encodeURIComponent(currentUrl));
+        }
+
+        async function requireLoggedInMember() {
+            const token = getAuthToken();
+            if (!token) {
+                redirectToLogin();
+                return false;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Invalid session');
+                }
+
+                const data = await response.json();
+                if (!data.success) {
+                    throw new Error('Invalid session');
+                }
+
+                return true;
+            } catch (error) {
+                localStorage.removeItem('token');
+                sessionStorage.removeItem('token');
+                redirectToLogin();
+                return false;
+            }
+        }
         
         // Get series ID from URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -724,7 +751,10 @@
         });
         
         // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            const isAuthorized = await requireLoggedInMember();
+            if (!isAuthorized) return;
+
             if (!seriesId) {
                 showError('No series ID provided');
                 return;

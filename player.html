@@ -1001,6 +1001,48 @@
         let player = null;
         let currentMovie = null;
         let fullscreenRotateApplied = false;
+
+        function getAuthToken() {
+            return localStorage.getItem('token') || sessionStorage.getItem('token');
+        }
+
+        function redirectToLogin() {
+            const currentUrl = window.location.href;
+            localStorage.setItem('redirectAfterLogin', currentUrl);
+            window.location.replace(`login.html?redirect=${encodeURIComponent(currentUrl)}`);
+        }
+
+        async function requireLoggedInMember() {
+            const token = getAuthToken();
+            if (!token) {
+                showError('Please login or sign up to watch videos. Redirecting...');
+                setTimeout(redirectToLogin, 700);
+                return false;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Invalid session');
+                }
+
+                const data = await response.json();
+                if (!data.success) {
+                    throw new Error('Invalid user session');
+                }
+
+                return true;
+            } catch (error) {
+                localStorage.removeItem('token');
+                sessionStorage.removeItem('token');
+                showError('Your session expired. Please login again. Redirecting...');
+                setTimeout(redirectToLogin, 700);
+                return false;
+            }
+        }
         
         // ========== INITIALIZE VIDEO.JS ==========
         function initPlayer() {
@@ -1780,7 +1822,10 @@
         });
         
         // ========== INITIALIZE ==========
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            const isAuthorized = await requireLoggedInMember();
+            if (!isAuthorized) return;
+
             initPlayer();
             updateWatchlistButton();
             updateLikeButton();
