@@ -1301,13 +1301,21 @@
                     updateMovieInfo(currentMovie);
                     
                     // Get video URL
-                    const videoUrl = currentMovie.video?.embedUrl || currentMovie.embedUrl || currentMovie.video?.url;
+                    const rawVideoUrl = currentMovie.video?.embedUrl || currentMovie.embedUrl || currentMovie.video?.url;
+                    const videoUrl = typeof rawVideoUrl === 'string' ? rawVideoUrl.trim() : rawVideoUrl;
+                    const provider = (currentMovie.video?.provider || '').toLowerCase();
+                    const format = (currentMovie.video?.format || '').toLowerCase();
                     
-                    if (videoUrl && isDirectVideo(videoUrl)) {
+                    if (videoUrl && (isDirectVideo(videoUrl) || format === 'mp4' || format === 'm3u8' || format === 'webm')) {
                         loadVideo(videoUrl);
-                    } else if (videoUrl) {
+                    } else if (videoUrl && provider !== 'streamtape') {
+                        // For unknown/non-streamtape embed providers, try extractor first.
                         // Try to extract direct URL for embed URLs
                         await loadEmbedVideo(videoUrl);
+                    } else if (videoUrl) {
+                        // Streamtape-tagged URLs are frequently saved as direct CDN links in this project.
+                        // If not matched by extension checks, still attempt direct playback before extractor.
+                        loadVideo(videoUrl);
                     } else {
                         showError('Video not available for this movie');
                     }
@@ -1327,14 +1335,17 @@
         // ========== CHECK IF DIRECT VIDEO URL ==========
         function isDirectVideo(url) {
             const extensions = ['.mp4', '.webm', '.mkv', '.m3u8', '.m4v'];
-            const urlLower = url.toLowerCase();
+             const normalizedUrl = typeof url === 'string' ? url.trim() : '';
+             const urlLower = normalizedUrl.toLowerCase();
             return extensions.some(ext => urlLower.includes(ext)) ||
-                   url.includes('archive.org') ||
-                   url.includes('cloudflare') ||
-                   url.includes('r2.dev') ||
-                   url.includes('b-cdn.net') ||
-                   url.includes('bunnycdn') ||
-                   url.includes('pearlpix.xyz');
+                 urlLower.includes('archive.org') ||
+                 urlLower.includes('cloudflare') ||
+                 urlLower.includes('r2.dev') ||
+                 urlLower.includes('b-cdn.net') ||
+                 urlLower.includes('bunnycdn') ||
+                 urlLower.includes('pearlpix.xyz') ||
+                 urlLower.includes('munotech.b-cdn.net') ||
+                 urlLower.includes('jimmy.pearlpix.xyz');
         }
         
         // ========== LOAD EMBED VIDEO ==========
