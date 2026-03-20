@@ -890,7 +890,7 @@
     <section class="player-section">
         <div class="player-wrapper" id="playerWrapper">
             <!-- Video.js Player -->
-            <video id="videoPlayer" class="video-js vjs-big-play-centered" playsinline crossorigin="anonymous">
+            <video id="videoPlayer" class="video-js vjs-big-play-centered" playsinline>
             </video>
             
             <!-- Loading Overlay -->
@@ -1238,6 +1238,14 @@
                 url = httpsUrl;
             }
             
+            // Decode URL-encoded characters (like %20 for spaces)
+            try {
+                url = decodeURIComponent(url);
+                console.log('🔓 Decoded URL:', url);
+            } catch (e) {
+                console.warn('URL decode failed:', e);
+            }
+            
             console.log('🎬 Loading video:', url);
             
             // Determine video type
@@ -1260,7 +1268,18 @@
             }
             
             // Set source
+            console.log('🎬 Setting player source:', { src: url, type: type });
             player.src({ src: url, type: type });
+            
+            // Verify source was set
+            setTimeout(() => {
+                const currentSrc = player.currentSrc();
+                console.log('🎬 Player current source:', currentSrc);
+                if (!currentSrc || currentSrc === '') {
+                    console.error('❌ Player source not set correctly');
+                    showError('Failed to load video source');
+                }
+            }, 100);
             
             // Apply fit mode preference
             applyVideoFit();
