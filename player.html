@@ -1269,9 +1269,15 @@
             
             // Set source
             console.log('🎬 Setting player source:', { src: url, type: type });
+            player.pause();
+            player.currentTime(0);
             player.src({ src: url, type: type });
-            
-            // Verify source was set
+            player.load();
+
+            // Apply fit mode preference
+            applyVideoFit();
+
+            // Verify source selection
             setTimeout(() => {
                 const currentSrc = player.currentSrc();
                 console.log('🎬 Player current source:', currentSrc);
@@ -1280,10 +1286,25 @@
                     showError('Failed to load video source');
                 }
             }, 100);
-            
-            // Apply fit mode preference
-            applyVideoFit();
-            
+
+            // Turn on additional error tracking
+            player.one('error', () => {
+                const err = player.error();
+                console.error('⚠️ Player error event:', err);
+
+                if (err && err.code === 4) {
+                    // Retry once with the same URL before fallback
+                    console.warn('⚠️ Retrying playback for CODE:4');
+                    player.src({ src: url, type: type });
+                    player.load();
+                    player.play().catch(playErr => {
+                        console.error('Retry play failed:', playErr);
+                        showError('Video not supported in browser; opening in new tab...');
+                        window.open(url, '_blank');
+                    });
+                }
+            });
+
             // Attempt to play
             player.ready(() => {
                 hideLoading();
