@@ -1030,7 +1030,24 @@
                 }
             });
             
+            // Enforce normal playback speed on load
+            player.ready(() => {
+                try {
+                    player.playbackRate(1.0);
+                    console.log('⚙️ Playback rate enforced:', player.playbackRate());
+                } catch (e) {
+                    console.warn('⚠️ Could not enforce playbackRate:', e);
+                }
+            });
+
             // Custom event handlers
+            player.on('ratechange', () => {
+                if (player.playbackRate() !== 1.0) {
+                    console.warn('⚠️ Playback rate changed to', player.playbackRate(), '- resetting to 1.0');
+                    player.playbackRate(1.0);
+                }
+            });
+
             player.on('play', () => {
                 hideLoading();
                 hideError();
