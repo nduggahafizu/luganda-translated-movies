@@ -1245,7 +1245,16 @@
             } catch (e) {
                 console.warn('URL decode failed:', e);
             }
-            
+
+            // Use server proxy for known restrictive providers (b-cdn, pearlpix etc.)
+            const normalizedUrl = typeof url === 'string' ? url.trim() : url;
+            const normalizedLower = typeof normalizedUrl === 'string' ? normalizedUrl.toLowerCase() : '';
+            if (normalizedLower.includes('b-cdn.net') || normalizedLower.includes('pearlpix.xyz') || normalizedLower.includes('jimmy.pearlpix.xyz') || normalizedLower.includes('nkuba.b-cdn.net')) {
+                const proxied = `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(normalizedUrl)}`;
+                console.log('🛡️ Using stream proxy for DRM/CORS-prone host:', proxied);
+                url = proxied;
+            }
+
             console.log('🎬 Loading video:', url);
             
             // Determine video type
@@ -1299,36 +1308,9 @@
                     player.load();
                     player.play().catch(playErr => {
                         console.error('Retry play failed:', playErr);
-                        showError('Video not supported in browser; opening in new tab...');
-                        window.open(url, '_blank');
-                    });
-                }
-            });
-
-            // Attempt to play
-            player.ready(() => {
-                hideLoading();
-                hideError();
-                player.play().catch(e => {
-                    console.log('Autoplay blocked:', e);
-                    hideLoading();
-                });
-            });
-        }
-        
-        // ========== LOAD MOVIE DATA ==========
-        async function loadMovieData() {
-            if (!movieId) {
-                showError('No movie ID provided');
-                return;
-            }
-            
-            try {
-                const response = await fetch(`${API_BASE}/api/luganda-movies/${movieId}`);
-                const data = await response.json();
-                
-                if ((data.status === 'success' || data.success) && data.data) {
-                    currentMovie = data.data;
+                        const fallbackUrl = `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(normalizedUrl)}`;
+                        showError('Video not supported in browser; opening proxy in new tab...');
+                        window.open(fallbackUrl, '_blank');
                     
                     // Redirect series to series player
                     if (currentMovie.contentType === 'series' || (currentMovie.seasons && currentMovie.seasons.length > 0)) {
