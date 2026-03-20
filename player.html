@@ -1003,7 +1003,20 @@
         let fullscreenRotateApplied = false;
 
         function getAuthToken() {
-            return localStorage.getItem('token') || sessionStorage.getItem('token');
+            return (
+                localStorage.getItem('token') ||
+                localStorage.getItem('authToken') ||
+                sessionStorage.getItem('token') ||
+                sessionStorage.getItem('authToken')
+            );
+        }
+
+        function normalizeBearerToken(token) {
+            if (typeof token !== 'string') return '';
+            const trimmed = token.trim();
+            return trimmed.toLowerCase().startsWith('bearer ')
+                ? trimmed.slice(7).trim()
+                : trimmed;
         }
 
         function redirectToLogin() {
@@ -1013,7 +1026,7 @@
         }
 
         async function requireLoggedInMember() {
-            const token = getAuthToken();
+            const token = normalizeBearerToken(getAuthToken());
             console.log('[Auth] Token exists:', !!token);
             
             if (!token) {
@@ -1031,7 +1044,9 @@
 
                 if (response.status === 401 || response.status === 403) {
                     localStorage.removeItem('token');
+                    localStorage.removeItem('authToken');
                     sessionStorage.removeItem('token');
+                    sessionStorage.removeItem('authToken');
                     showError('Your session expired. Please login again. Redirecting...');
                     redirectToLogin();
                     return false;
@@ -1045,12 +1060,20 @@
                 }
 
                 const data = await response.json();
-                console.log('[Auth] Response data success:', data.success);
+                const isValidAuth = !!(
+                    data?.success === true ||
+                    data?.status === 'success' ||
+                    data?.user ||
+                    data?.data
+                );
+                console.log('[Auth] Response valid:', isValidAuth);
                 
-                if (!data.success) {
+                if (!isValidAuth) {
                     // Server returned success: false - likely an auth issue
                     localStorage.removeItem('token');
+                    localStorage.removeItem('authToken');
                     sessionStorage.removeItem('token');
+                    sessionStorage.removeItem('authToken');
                     showError('Please login again to continue. Redirecting...');
                     redirectToLogin();
                     return false;
