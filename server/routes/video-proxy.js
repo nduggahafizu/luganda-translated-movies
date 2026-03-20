@@ -742,6 +742,19 @@ router.get('/stream-proxy', async (req, res) => {
             'Accept-Encoding': 'identity',
         };
         
+        // Add appropriate Referer for restricted CDNs
+        const urlLower = fetchUrl.toLowerCase();
+        if (urlLower.includes('nkuba.b-cdn.net') || urlLower.includes('b-cdn.net')) {
+            headers['Referer'] = 'https://nkuba.b-cdn.net/';
+            headers['Origin'] = 'https://nkuba.b-cdn.net';
+        } else if (urlLower.includes('munotech.b-cdn.net')) {
+            headers['Referer'] = 'https://munotech.b-cdn.net/';
+            headers['Origin'] = 'https://munotech.b-cdn.net';
+        } else if (urlLower.includes('pearlpix.xyz') || urlLower.includes('jimmy.pearlpix.xyz')) {
+            headers['Referer'] = 'https://pearlpix.net/';
+            headers['Origin'] = 'https://pearlpix.net';
+        }
+        
         if (range) {
             headers['Range'] = range;
         }
@@ -757,8 +770,8 @@ router.get('/stream-proxy', async (req, res) => {
         });
 
         if (response.status >= 400) {
-            console.error('🎬 Upstream error:', response.status);
-            return res.status(response.status).json({ success: false, message: 'Video unavailable' });
+            console.error('🎬 Upstream error:', response.status, 'for URL:', fetchUrl.substring(0, 100));
+            return res.status(response.status).json({ success: false, message: 'Video unavailable', status: response.status });
         }
 
         // Determine content type - use video/mp4 even for MKV (browser will try to play)

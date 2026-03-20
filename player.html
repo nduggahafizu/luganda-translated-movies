@@ -1262,16 +1262,7 @@
             } catch (e) {
                 console.warn('URL decode failed:', e);
             }
-
-            // Use server proxy for known restrictive providers (b-cdn, pearlpix etc.)
-            const normalizedUrl = typeof url === 'string' ? url.trim() : url;
-            const normalizedLower = typeof normalizedUrl === 'string' ? normalizedUrl.toLowerCase() : '';
-            if (normalizedLower.includes('b-cdn.net') || normalizedLower.includes('pearlpix.xyz') || normalizedLower.includes('jimmy.pearlpix.xyz') || normalizedLower.includes('nkuba.b-cdn.net')) {
-                const proxied = `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(normalizedUrl)}`;
-                console.log('🛡️ Using stream proxy for DRM/CORS-prone host:', proxied);
-                url = proxied;
-            }
-
+            
             console.log('🎬 Loading video:', url);
             
             // Determine video type
@@ -1319,41 +1310,83 @@
                 console.error('⚠️ Player error event:', err);
 
                 if (err && err.code === 4) {
-                    // Retry once with the same URL before fallback
-                    console.warn('⚠️ Retrying playback for CODE:4');
-                    player.src({ src: url, type: type });
+                    // Retry with stream proxy for CODE:4
+                    console.warn('⚠️ Retrying playback for CODE:4 with stream proxy');
+                    const proxyUrl = `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(url)}`;
+                    
+                    player.src({ src: proxyUrl, type: type });
                     player.load();
                     player.play().catch(playErr => {
-                        console.error('Retry play failed:', playErr);
-                        const fallbackUrl = `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(normalizedUrl)}`;
-                        showError('Video not supported in browser; opening proxy in new tab...');
-                        window.open(fallbackUrl, '_blank');
-                    
-                    // Redirect series to series player
-                    if (currentMovie.contentType === 'series' || (currentMovie.seasons && currentMovie.seasons.length > 0)) {
-                        window.location.replace(`series-player.html?id=${movieId}`);
-                        return;
-                    }
-                    
-                    // Update UI
-                    updateMovieInfo(currentMovie);
-                    
-                    // Get video URL
-                    const rawVideoUrl = currentMovie.video?.embedUrl || currentMovie.embedUrl || currentMovie.video?.url;
-                    const videoUrl = typeof rawVideoUrl === 'string' ? rawVideoUrl.trim() : rawVideoUrl;
-                    const provider = (currentMovie.video?.provider || '').toLowerCase();
-                    const format = (currentMovie.video?.format || '').toLowerCase();
-                    
-                    if (videoUrl && (isDirectVideo(videoUrl) || format === 'mp4' || format === 'm3u8' || format === 'webm')) {
-                        loadVideo(videoUrl);
-                    } else if (videoUrl && provider !== 'streamtape') {
-                        // For unknown/non-streamtape embed providers, try extractor first.
-                        // Try to extract direct URL for embed URLs
-                        await loadEmbedVideo(videoUrl);
-                    } else if (videoUrl) {
-                        // Streamtape-tagged URLs are frequently saved as direct CDN links in this project.
-                        // If not matched by extension checks, still attempt direct playback before extractor.
-                        loadVideo(videoUrl);
+                        console.error('Proxy play failed:', playErr);
+                        showError('Video not supported. Try refreshing the page.');
+                    });
+                }
+            });
+            
+        } else {
+            showError('Movie not found');
+        }
+    } catch (error) {
+        console.error('Error loading movie:', error);
+        showError('Failed to load movie');
+    }
+}
+
+// ========== CHECK IF DIRECT VIDEO URL ==========
+function isDirectVideo(url) {
+    const extensions = ['.mp4', '.webm', '.mkv', '.m3u8', '.m4v'];
+     const normalizedUrl = typeof url === 'string' ? url.trim() : '';
+     const urlLower = normalizedUrl.toLowerCase();
+    return extensions.some(ext => urlLower.includes(ext)) ||
+                 urlLower.includes('archive.org') ||
+                 urlLower.includes('cloudflare') ||
+                 urlLower.includes('r2.dev') ||
+                 urlLower.includes('b-cdn.net') ||
+                 urlLower.includes('bunnycdn') ||
+                 urlLower.includes('pearlpix.xyz') ||
+                 urlLower.includes('munotech.b-cdn.net') ||
+                 urlLower.includes('jimmy.pearlpix.xyz');
+}
+
+// ========== LOAD MOVIE DATA ==========
+async function loadMovieData() {
+    if (!movieId) {
+        showError('No movie ID provided');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE}/api/luganda-movies/${movieId}`);
+        const data = await response.json();
+        
+        if ((data.status === 'success' || data.success) && data.data) {
+            currentMovie = data.data;
+            
+            // Redirect series to series player
+            if (currentMovie.contentType === 'series' || (currentMovie.seasons && currentMovie.seasons.length > 0)) {
+                window.location.replace(`series-player.html?id=${movieId}`);
+                return;
+            }
+            
+            // Update UI
+            updateMovieInfo(currentMovie);
+            
+            // Get video URL
+            const rawVideoUrl = currentMovie.video?.embedUrl || currentMovie.embedUrl || currentMovie.video?.url;
+            const videoUrl = typeof rawVideoUrl === 'string' ? rawVideoUrl.trim() : rawVideoUrl;
+            const provider = (currentMovie.video?.provider || '').toLowerCase();
+            const format = (currentMovie.video?.format || '').toLowerCase();
+            
+            if (videoUrl && (isDirectVideo(videoUrl) || format === 'mp4' || format === 'm3u8' || format === 'webm')) {
+                loadVideo(videoUrl);
+            } else if (videoUrl && provider !== 'streamtape') {
+                // For unknown/non-streamtape embed providers, try extractor first.
+                // Try to extract direct URL for embed URLs
+                await loadEmbedVideo(videoUrl);
+            } else if (videoUrl) {
+                // Streamtape-tagged URLs are frequently saved as direct CDN links in this project.
+                // If not matched by extension checks, still attempt direct playback before extractor.
+                loadVideo(videoUrl);
                     } else {
                         showError('Video not available for this movie');
                     }
