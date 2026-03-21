@@ -1356,17 +1356,28 @@
             let type = 'video/mp4';
             const urlLower = url.toLowerCase();
             
-            // Handle MKV - use stream-proxy endpoint (remux crashes on server)
-            if (urlLower.includes('.mkv')) {
-                console.log('🎬 MKV detected - using stream proxy');
+            // Check if URL needs proxying (CDNs with CORS/referer restrictions)
+            const needsProxy = urlLower.includes('b-cdn.net') || 
+                               urlLower.includes('pearlpix.xyz') ||
+                               urlLower.includes('.mkv');
+            
+            if (needsProxy) {
+                console.log('🎬 CDN detected - using stream proxy');
                 url = `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(url)}`;
-                type = 'video/mp4';
+                // Set type based on original extension
+                if (urlLower.includes('.mkv')) {
+                    type = 'video/mp4';
+                } else if (urlLower.includes('.webm')) {
+                    type = 'video/webm';
+                } else if (urlLower.includes('.m3u8')) {
+                    type = 'application/x-mpegURL';
+                }
             }
-            // Handle HLS
+            // Handle HLS (non-proxied)
             else if (urlLower.includes('.m3u8')) {
                 type = 'application/x-mpegURL';
             }
-            // Handle WebM
+            // Handle WebM (non-proxied)
             else if (urlLower.includes('.webm')) {
                 type = 'video/webm';
             }

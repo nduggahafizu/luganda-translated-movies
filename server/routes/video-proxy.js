@@ -744,12 +744,16 @@ router.get('/stream-proxy', async (req, res) => {
         
         // Add appropriate Referer for restricted CDNs
         const urlLower = fetchUrl.toLowerCase();
-        if (urlLower.includes('nkuba.b-cdn.net') || urlLower.includes('b-cdn.net')) {
-            headers['Referer'] = 'https://nkuba.b-cdn.net/';
-            headers['Origin'] = 'https://nkuba.b-cdn.net';
-        } else if (urlLower.includes('munotech.b-cdn.net')) {
-            headers['Referer'] = 'https://munotech.b-cdn.net/';
-            headers['Origin'] = 'https://munotech.b-cdn.net';
+        if (urlLower.includes('b-cdn.net')) {
+            // Extract the actual subdomain for proper referer
+            const match = fetchUrl.match(/https?:\/\/([^\/]+\.b-cdn\.net)/i);
+            if (match) {
+                headers['Referer'] = `https://${match[1]}/`;
+                headers['Origin'] = `https://${match[1]}`;
+            } else {
+                headers['Referer'] = 'https://b-cdn.net/';
+                headers['Origin'] = 'https://b-cdn.net';
+            }
         } else if (urlLower.includes('pearlpix.xyz') || urlLower.includes('jimmy.pearlpix.xyz')) {
             headers['Referer'] = 'https://pearlpix.net/';
             headers['Origin'] = 'https://pearlpix.net';
