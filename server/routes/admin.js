@@ -1666,4 +1666,41 @@ router.put('/settings/pricing', [auth, adminOnly], async (req, res) => {
     }
 });
 
+// @route   PATCH /api/admin/users/:id/download-permission
+// @desc    Toggle user's download permission
+// @access  Admin only
+router.patch('/users/:id/download-permission', [auth, adminOnly], async (req, res) => {
+    try {
+        const { canDownload } = req.body;
+        
+        const user = await User.findByIdAndUpdate(
+            req.params.id,
+            { canDownload: canDownload === true },
+            { new: true }
+        ).select('fullName email canDownload');
+        
+        if (!user) {
+            return res.status(404).json({ 
+                status: 'error',
+                message: 'User not found' 
+            });
+        }
+        
+        res.json({
+            status: 'success',
+            message: 'Download permission updated',
+            data: {
+                _id: user._id,
+                canDownload: user.canDownload
+            }
+        });
+    } catch (error) {
+        console.error('Error updating download permission:', error);
+        res.status(500).json({ 
+            status: 'error',
+            message: 'Server error' 
+        });
+    }
+});
+
 module.exports = router;
