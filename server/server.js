@@ -266,6 +266,12 @@ app.use('/api/push', pushRoutes); // Web Push notifications
 // Token refresh endpoint
 app.post('/api/auth/refresh', refreshTokenHandler);
 
+// Serve app-ads.txt for AdMob verification
+app.get('/app-ads.txt', (req, res) => {
+  res.type('text/plain');
+  res.send('google.com, pub-1904736753681797, DIRECT, f08c47fec0942fa0');
+});
+
 /**
  * @swagger
  * /api/health:
