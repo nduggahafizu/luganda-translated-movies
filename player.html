@@ -1167,6 +1167,14 @@
         const pathMatch = window.location.pathname.match(/\/watch\/([^/?#]+)/);
         const movieId = pathMatch ? decodeURIComponent(pathMatch[1]) : urlParams.get('id');
         
+        // Debug logging for URL parsing
+        console.log('🔗 [Player] URL Debug:', {
+            pathname: window.location.pathname,
+            search: window.location.search,
+            pathMatch: pathMatch,
+            movieId: movieId
+        });
+        
         // DOM Elements
         const videoElement = document.getElementById('videoPlayer');
         const loadingOverlay = document.getElementById('loadingOverlay');
