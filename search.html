@@ -898,7 +898,7 @@
         }
 
         function selectSuggestion(movieId, title) {
-            window.location.href = `/watch/${movieId}`;
+            window.location.href = `player.html?id=${movieId}`;
         }
 
         async function performSearch(event) {
@@ -988,7 +988,7 @@
                 return `
                 <div class="movie-card">
                     <div class="movie-poster">
-                        <a href="/watch/${movieId}">
+                        <a href="player.html?id=${movieId}">
                             <img src="${posterUrl}" alt="${title}" loading="lazy" onerror="this.src='https://placehold.co/300x450/1a1a2e/7CFC00?text=Movie'">
                         </a>
                         <div class="movie-badge">${quality}</div>
@@ -1001,7 +1001,7 @@
                             </div>
                         ` : ''}
                         <div class="movie-overlay">
-                            <button class="play-btn" onclick="window.location.href='/watch/${movieId}'">
+                            <button class="play-btn" onclick="window.location.href='player.html?id=${movieId}'">
                                 <svg viewBox="0 0 24 24" fill="currentColor">
                                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                 </svg>

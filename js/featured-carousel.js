@@ -68,7 +68,7 @@ const FeaturedCarousel = {
                             <span>Translated by <strong>${formatVjBadge(this.slides[0]?.vjName) || ''}</strong></span>
                         </div>
                         <div class="carousel-actions">
-                            <a href="/watch/${this.slides[0]?.id}" class="btn-play">
+                            <a href="player.html?id=${this.slides[0]?.id}" class="btn-play">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                 </svg>
@@ -141,7 +141,7 @@ const FeaturedCarousel = {
         content.querySelector('.carousel-description').textContent = movie.description || '';
         content.querySelector('.vj-avatar').src = movie.vjAvatar || 'assets/images/default-avatar.svg';
         content.querySelector('.carousel-vj strong').textContent = formatVjBadge(movie.vjName) || '';
-        content.querySelector('.btn-play').href = `/watch/${movie.id}`;
+        content.querySelector('.btn-play').href = `player.html?id=${movie.id}`;
         content.querySelector('.btn-add-list').dataset.movieId = movie.id;
         content.querySelector('.btn-info').dataset.movieId = movie.id;
     },

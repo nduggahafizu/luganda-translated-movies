@@ -291,7 +291,7 @@ class UnrulyNotifications {
                             body: `${movieTitle} is now available to watch`,
                             icon: movie.poster || '/assets/images/logo.png',
                             image: movie.poster,
-                            url: `/watch/${movie._id}`,
+                            url: `/player.html?id=${movie._id}`,
                             tag: `movie-${movie._id}`
                         });
                     }
@@ -446,7 +446,7 @@ class UnrulyNotifications {
             body: `${movie.title} - Watch now in Luganda!`,
             icon: movie.poster || '/assets/images/logo.png',
             image: movie.backdrop || movie.poster,
-            url: `/watch/${movie._id}`,
+            url: `/player.html?id=${movie._id}`,
             tag: `movie-${movie._id}`,
             requireInteraction: true
         });

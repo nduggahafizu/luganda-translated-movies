@@ -401,7 +401,7 @@
                 const vjName = movie.vjName || 'Unknown';
                 
                 return `
-                    <a href="/watch/${movie._id}" class="movie-card">
+                    <a href="player.html?id=${movie._id}" class="movie-card">
                         <div class="movie-poster" style="background-image: url('${poster}')">
                             <span class="movie-quality">${quality}</span>
                             <span class="movie-rating">★ ${rating.toFixed(1)}</span>

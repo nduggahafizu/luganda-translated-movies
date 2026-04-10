@@ -684,7 +684,7 @@
                 posterData.push({ posterId, posterUrl: movie.poster || null, fallbackPoster });
                 
                 const movieCard = `
-                    <a href="/watch/${movie._id}" class="content-card" data-movie-id="${movie._id}">
+                    <a href="player.html?id=${movie._id}" class="content-card" data-movie-id="${movie._id}">
                         <div class="card-poster" id="${posterId}" data-fallback-poster="${fallbackPoster}">
                             <div class="card-badges">
                                 <span class="card-badge badge-quality">${quality.toUpperCase()}</span>

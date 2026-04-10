@@ -1583,7 +1583,7 @@
                 html += `
                     <div class="col">
                         <div class="list-movie position-relative continue-watching-item">
-                            <a href="/watch/${movieId}" class="list-media">
+                            <a href="player.html?id=${movieId}" class="list-media">
                                 <div class="list-media-attr">
                                     <div class="quality">${percentage}%</div>
                                 </div>
@@ -1600,7 +1600,7 @@
                                 <div class="media media-cover" style="background-image: url('${posterUrl}');"></div>
                             </a>
                             <div class="list-caption">
-                                <a href="/watch/${movieId}" class="list-title">${data.title || 'Unknown'}</a>
+                                <a href="player.html?id=${movieId}" class="list-title">${data.title || 'Unknown'}</a>
                                 <span class="list-category" style="color: var(--primary-color);">Resume watching</span>
                             </div>
                             <button class="remove-from-history" onclick="removeFromWatchHistory('${movieId}')" title="Remove">
@@ -1677,7 +1677,7 @@
                 }
                 
                 const movieCard = `
-                    <a href="/watch/${movie._id}" class="content-card" data-movie-id="${movie._id}">
+                    <a href="player.html?id=${movie._id}" class="content-card" data-movie-id="${movie._id}">
                         <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
                             <span class="trending-rank">${rank}</span>
                             <div class="card-badges">
@@ -1944,7 +1944,7 @@
                 const viewsText = views >= 1000 ? `${(views / 1000).toFixed(1)}K views` : `${views} views`;
                 html += `
                     <li>
-                        <a href="/watch/${movie._id}" class="nav-content">
+                        <a href="player.html?id=${movie._id}" class="nav-content">
                             <div>${movie.originalTitle || movie.title}</div>
                             <div class="view">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1996,13 +1996,13 @@
                                     <div class="title">${title}</div>
                                     <div class="description">${description.substring(0, 150)}${description.length > 150 ? '...' : ''}</div>
                                     <div class="hero-cta">
-                                        <a href="/watch/${movieId}" class="btn-watch-now">
+                                        <a href="player.html?id=${movieId}" class="btn-watch-now">
                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                                                 <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                             </svg>
                                             Watch Now
                                         </a>
-                                        <a href="/watch/${movieId}" class="btn-more-info">
+                                        <a href="player.html?id=${movieId}" class="btn-more-info">
                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                 <circle cx="12" cy="12" r="10"></circle>
                                                 <line x1="12" y1="16" x2="12" y2="12"></line>
@@ -2095,7 +2095,7 @@
                 }
                 
                 const movieCard = `
-                    <a href="/watch/${movie._id}" class="content-card" data-movie-id="${movie._id}">
+                    <a href="player.html?id=${movie._id}" class="content-card" data-movie-id="${movie._id}">
                         ${featuredBadge}
                         <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
                             <div class="card-badges">

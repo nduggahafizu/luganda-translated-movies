@@ -435,7 +435,7 @@
                         const views = movie.views || 0;
                         
                         return `
-                            <a href="/watch/${movie._id}" class="trending-card" data-movie-id="${movie._id}">
+                            <a href="player.html?id=${movie._id}" class="trending-card" data-movie-id="${movie._id}">
                                 <div class="trending-rank ${rankClass}">${rank}</div>
                                 <img src="${poster}" alt="${title}" loading="lazy" onerror="this.src='assets/images/placeholder.svg'">
                                 <div class="trending-card-info">

@@ -1162,18 +1162,10 @@
             ? API_CONFIG.BASE_URL 
             : 'https://luganda-translated-movies-production.up.railway.app';
         
-        // URL Parameters - supports both /watch/ID and ?id=ID
+        // URL Parameters - primary format is player.html?id=ID, with legacy /watch/ID support
         const urlParams = new URLSearchParams(window.location.search);
         const pathMatch = window.location.pathname.match(/\/watch\/([^/?#]+)/);
-        const movieId = pathMatch ? decodeURIComponent(pathMatch[1]) : urlParams.get('id');
-        
-        // Debug logging for URL parsing
-        console.log('🔗 [Player] URL Debug:', {
-            pathname: window.location.pathname,
-            search: window.location.search,
-            pathMatch: pathMatch,
-            movieId: movieId
-        });
+        const movieId = urlParams.get('id') || (pathMatch ? decodeURIComponent(pathMatch[1]) : null);
         
         // DOM Elements
         const videoElement = document.getElementById('videoPlayer');
@@ -1852,7 +1844,7 @@
                 const safeTitle = title.replace(/'/g, "\\'");
                 
                 return `
-                    <a href="/watch/${movie._id}" class="related-card">
+                    <a href="player.html?id=${movie._id}" class="related-card">
                         <div class="related-poster-wrapper">
                             <img src="${poster}" alt="${title}" class="related-poster" loading="lazy" onerror="this.src='assets/images/placeholder-poster.jpg'">
                             <div class="related-badges">

@@ -1309,7 +1309,7 @@
             return `
                 <div class="movie-card">
                     <div class="movie-poster">
-                        <a href="/watch/${movieId}">
+                        <a href="player.html?id=${movieId}">
                             <img src="${posterUrl}" alt="${movieTitle}" loading="lazy" onerror="this.src='assets/images/placeholder.svg'">
                         </a>
                         ${type === 'history' && progress > 0 ? `
