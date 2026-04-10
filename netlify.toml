@@ -23,7 +23,7 @@
 
 [[redirects]]
   from = "/watch/:id"
-  to = "/player.html"
+  to = "/player.html?id=:id"
   status = 200
 
 [[redirects]]
