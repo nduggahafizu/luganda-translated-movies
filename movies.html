@@ -56,7 +56,6 @@
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/card-grid.css">
     <link rel="stylesheet" href="css/trailer-player.css">
-    <link rel="stylesheet" href="css/professional-cards.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     
     <!-- Google AdSense -->
@@ -552,7 +551,6 @@
                 
                 if (data.success && data.data) {
                     movies = data.data;
-                    window.allMoviesCache = movies; // Store globally for similar movies
                     const pg = data.pagination || {};
                     totalPages = pg.pages || 1;
                     renderMovies(movies);
@@ -686,43 +684,16 @@
                 posterData.push({ posterId, posterUrl: movie.poster || null, fallbackPoster });
                 
                 const movieCard = `
-                    <a href="/watch/${movie._id}" class="content-card" data-movie-id="${movie._id}" data-tmdb-id="${movie.tmdbId || ''}">
+                    <a href="/watch/${movie._id}" class="content-card" data-movie-id="${movie._id}">
                         <div class="card-poster" id="${posterId}" data-fallback-poster="${fallbackPoster}">
                             <div class="card-badges">
                                 <span class="card-badge badge-quality">${quality.toUpperCase()}</span>
                                 ${vjBadge ? `<span class="card-badge badge-vj">${vjBadge}</span>` : ''}
                             </div>
-                            <div class="card-hover-actions">
-                                <div class="hover-buttons">
-                                    <button class="hover-btn btn-play-main" title="Watch Now">
-                                        <svg viewBox="0 0 24 24" fill="currentColor">
-                                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                        </svg>
-                                    </button>
-                                    <button class="hover-btn btn-trailer" onclick="event.preventDefault(); event.stopPropagation(); playMovieTrailer('${movie.tmdbId || ''}', '${title.replace(/'/g, "\\'")}');" title="Watch Trailer">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
-                                            <line x1="7" y1="2" x2="7" y2="22"></line>
-                                            <line x1="17" y1="2" x2="17" y2="22"></line>
-                                            <line x1="2" y1="12" x2="22" y2="12"></line>
-                                        </svg>
-                                    </button>
-                                    <button class="hover-btn btn-add" onclick="event.preventDefault(); event.stopPropagation(); addToWatchlist('${movie._id}');" title="Add to Watchlist">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div class="hover-info">
-                                    <span class="hover-info-item quality">${quality}</span>
-                                    <span class="hover-info-item rating">
-                                        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                                        ${rating.toFixed(1)}
-                                    </span>
-                                    ${movie.year ? `<span class="hover-info-item">${movie.year}</span>` : ''}
-                                    ${movie.genres && movie.genres.length > 0 ? `<span class="hover-info-item">${movie.genres[0]}</span>` : ''}
-                                </div>
+                            <div class="play-overlay">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
                             </div>
                         </div>
                         <div class="card-info">
@@ -863,36 +834,6 @@
                 toast.style.animation = 'toastOut 0.3s ease forwards';
                 setTimeout(() => toast.remove(), 300);
             }, 2500);
-        }
-        
-        // Get similar movies based on genre for "You May Also Like"
-        function getSimilarMovies(movieId, genres, limit = 4) {
-            const allMovies = window.allMoviesCache || [];
-            if (!allMovies.length || !genres || !genres.length) return [];
-            
-            return allMovies
-                .filter(m => m._id !== movieId && m.genres && m.genres.some(g => genres.includes(g)))
-                .slice(0, limit);
-        }
-        
-        // Generate "You May Also Like" HTML
-        function generateAlsoLikeHTML(movieId, genres) {
-            const similar = getSimilarMovies(movieId, genres, 4);
-            if (!similar.length) return '';
-            
-            const items = similar.map(m => {
-                const poster = m.poster || 'assets/images/placeholder.svg';
-                return `<div class="card-also-like-item">
-                    <img src="${poster}" alt="${m.originalTitle || ''}" loading="lazy" onerror="this.src='assets/images/placeholder.svg'">
-                </div>`;
-            }).join('');
-            
-            return `
-                <div class="card-also-like">
-                    <div class="card-also-like-title">You May Also Like</div>
-                    <div class="card-also-like-items">${items}</div>
-                </div>
-            `;
         }
     </script>
     

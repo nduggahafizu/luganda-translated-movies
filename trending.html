@@ -435,23 +435,9 @@
                         const views = movie.views || 0;
                         
                         return `
-                            <a href="/watch/${movie._id}" class="trending-card" data-movie-id="${movie._id}" data-tmdb-id="${movie.tmdbId || ''}">
+                            <a href="/watch/${movie._id}" class="trending-card" data-movie-id="${movie._id}">
                                 <div class="trending-rank ${rankClass}">${rank}</div>
                                 <img src="${poster}" alt="${title}" loading="lazy" onerror="this.src='assets/images/placeholder.svg'">
-                                <div class="trending-card-overlay">
-                                    <div class="trending-card-buttons">
-                                        <button class="trend-btn btn-play" title="Watch Now">
-                                            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                                        </button>
-                                        <button class="trend-btn btn-trailer" onclick="event.preventDefault(); event.stopPropagation(); playMovieTrailer('${movie.tmdbId || ''}', '${title.replace(/'/g, "\\'")}');" title="Trailer">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <rect x="2" y="2" width="20" height="20" rx="2"></rect>
-                                                <line x1="7" y1="2" x2="7" y2="22"></line>
-                                                <line x1="17" y1="2" x2="17" y2="22"></line>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
                                 <div class="trending-card-info">
                                     <div class="trending-card-title">${title}</div>
                                     <div class="trending-card-meta">

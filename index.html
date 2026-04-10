@@ -132,7 +132,6 @@
     <link rel="stylesheet" href="css/card-grid.css">
     <link rel="stylesheet" href="css/trailer-player.css">
     <link rel="stylesheet" href="css/professional-enhancements.css">
-    <link rel="stylesheet" href="css/professional-cards.css">
     <link rel="stylesheet" href="css/adsense-styles.css">
     <link rel="stylesheet" href="css/modern-ui.css">
     <link rel="stylesheet" href="css/payment-modal.css">
@@ -1291,39 +1290,6 @@
                 setTimeout(() => toast.remove(), 300);
             }, 2500);
         }
-        
-        // Get similar movies based on genre for "You May Also Like"
-        function getSimilarMovies(movieId, genres, limit = 4) {
-            const allMovies = window.allMoviesCache || [];
-            if (!allMovies.length || !genres || !genres.length) return [];
-            
-            // Find movies with matching genres, excluding current movie
-            const similar = allMovies
-                .filter(m => m._id !== movieId && m.genres && m.genres.some(g => genres.includes(g)))
-                .slice(0, limit);
-            
-            return similar;
-        }
-        
-        // Generate "You May Also Like" HTML for a movie
-        function generateAlsoLikeHTML(movieId, genres) {
-            const similar = getSimilarMovies(movieId, genres, 4);
-            if (!similar.length) return '';
-            
-            const items = similar.map(m => {
-                const poster = m.poster || 'assets/images/placeholder.svg';
-                return `<div class="card-also-like-item">
-                    <img src="${poster}" alt="${m.originalTitle || ''}" loading="lazy" onerror="this.src='assets/images/placeholder.svg'">
-                </div>`;
-            }).join('');
-            
-            return `
-                <div class="card-also-like">
-                    <div class="card-also-like-title">You May Also Like</div>
-                    <div class="card-also-like-items">${items}</div>
-                </div>
-            `;
-        }
     </script>
     
     <style>
@@ -1534,9 +1500,6 @@
                 const allMoviesResponse = await LugandaMoviesAPI.getLatest(20);
                 const allMovies = allMoviesResponse.data || allMoviesResponse.movies || [];
                 
-                // Store globally for "You May Also Like" functionality
-                window.allMoviesCache = allMovies;
-                
                 // Render all movies (newest first from backend)
                 if (allMovies.length > 0) {
                     renderMovies(allMovies, 'allMovies');
@@ -1714,45 +1677,16 @@
                 }
                 
                 const movieCard = `
-                    <a href="/watch/${movie._id}" class="content-card" data-movie-id="${movie._id}" data-tmdb-id="${movie.tmdbId || ''}">
+                    <a href="/watch/${movie._id}" class="content-card" data-movie-id="${movie._id}">
                         <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
                             <span class="trending-rank">${rank}</span>
-                            <div class="card-hover-actions">
-                                <div class="hover-buttons">
-                                    <button class="hover-btn btn-play-main" title="Watch Now">
-                                        <svg viewBox="0 0 24 24" fill="currentColor">
-                                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                        </svg>
-                                    </button>
-                                    <button class="hover-btn btn-trailer" onclick="event.preventDefault(); event.stopPropagation(); playMovieTrailer('${movie.tmdbId || ''}', '${movieTitle.replace(/'/g, "\\'")}');" title="Watch Trailer">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
-                                            <line x1="7" y1="2" x2="7" y2="22"></line>
-                                            <line x1="17" y1="2" x2="17" y2="22"></line>
-                                            <line x1="2" y1="12" x2="22" y2="12"></line>
-                                            <line x1="2" y1="7" x2="7" y2="7"></line>
-                                            <line x1="2" y1="17" x2="7" y2="17"></line>
-                                            <line x1="17" y1="17" x2="22" y2="17"></line>
-                                            <line x1="17" y1="7" x2="22" y2="7"></line>
-                                        </svg>
-                                    </button>
-                                    <button class="hover-btn btn-add" onclick="event.preventDefault(); event.stopPropagation(); addToWatchlist('${movie._id}');" title="Add to Watchlist">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div class="hover-info">
-                                    <span class="hover-info-item quality">${quality}</span>
-                                    <span class="hover-info-item rating">
-                                        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                                        ${rating.toFixed(1)}
-                                    </span>
-                                    ${year ? `<span class="hover-info-item">${year}</span>` : ''}
-                                    ${genres.length > 0 ? `<span class="hover-info-item">${genres[0]}</span>` : ''}
-                                </div>
-                                ${generateAlsoLikeHTML(movie._id, genres)}
+                            <div class="card-badges">
+                                <span class="card-badge badge-quality">${quality}</span>
+                            </div>
+                            <div class="play-overlay">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
                             </div>
                         </div>
                         <div class="card-info">
@@ -2161,44 +2095,16 @@
                 }
                 
                 const movieCard = `
-                    <a href="/watch/${movie._id}" class="content-card" data-movie-id="${movie._id}" data-tmdb-id="${tmdbId || ''}">
+                    <a href="/watch/${movie._id}" class="content-card" data-movie-id="${movie._id}">
                         ${featuredBadge}
                         <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
-                            <div class="card-hover-actions">
-                                <div class="hover-buttons">
-                                    <button class="hover-btn btn-play-main" title="Watch Now">
-                                        <svg viewBox="0 0 24 24" fill="currentColor">
-                                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                        </svg>
-                                    </button>
-                                    <button class="hover-btn btn-trailer" onclick="event.preventDefault(); event.stopPropagation(); playMovieTrailer('${tmdbId || ''}', '${movieTitle.replace(/'/g, "\\'")}');" title="Watch Trailer">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
-                                            <line x1="7" y1="2" x2="7" y2="22"></line>
-                                            <line x1="17" y1="2" x2="17" y2="22"></line>
-                                            <line x1="2" y1="12" x2="22" y2="12"></line>
-                                            <line x1="2" y1="7" x2="7" y2="7"></line>
-                                            <line x1="2" y1="17" x2="7" y2="17"></line>
-                                            <line x1="17" y1="17" x2="22" y2="17"></line>
-                                            <line x1="17" y1="7" x2="22" y2="7"></line>
-                                        </svg>
-                                    </button>
-                                    <button class="hover-btn btn-add" onclick="event.preventDefault(); event.stopPropagation(); addToWatchlist('${movie._id}');" title="Add to Watchlist">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div class="hover-info">
-                                    <span class="hover-info-item quality">${quality}</span>
-                                    <span class="hover-info-item rating">
-                                        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                                        ${rating.toFixed(1)}
-                                    </span>
-                                    ${year ? `<span class="hover-info-item">${year}</span>` : ''}
-                                    ${genres.length > 0 ? `<span class="hover-info-item">${genres[0]}</span>` : ''}
-                                </div>
+                            <div class="card-badges">
+                                <span class="card-badge badge-quality">${quality}</span>
+                            </div>
+                            <div class="play-overlay">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
                             </div>
                         </div>
                         <div class="card-info">
