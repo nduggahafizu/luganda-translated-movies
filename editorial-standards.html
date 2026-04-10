@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Editorial Standards - Unruly Movies</title>
+    <meta name="description" content="Read how Unruly Movies curates Luganda-translated movies, credits VJs, reviews metadata, and maintains a useful catalog for viewers.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://unrulymovies.com/editorial-standards">
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Unruly Movies Editorial Standards",
+        "url": "https://unrulymovies.com/editorial-standards.html",
+        "description": "Editorial standards and catalog curation notes for Unruly Movies.",
+        "publisher": {
+            "@type": "Organization",
+            "name": "Unruly Movies",
+            "founder": {
+                "@type": "Person",
+                "name": "Nduga Hafizu"
+            }
+        }
+    }
+    </script>
+    <style>
+        .guide-shell {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+
+        .guide-hero {
+            padding: 56px 28px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, rgba(124, 252, 0, 0.12), rgba(0, 217, 255, 0.06));
+            border: 1px solid rgba(124, 252, 0, 0.18);
+            margin-bottom: 36px;
+            text-align: center;
+        }
+
+        .guide-hero h1 {
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            margin-bottom: 16px;
+            color: var(--primary-color);
+        }
+
+        .guide-hero p {
+            max-width: 760px;
+            margin: 0 auto;
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.8;
+        }
+
+        .guide-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+            margin: 24px 0 36px;
+        }
+
+        .guide-card,
+        .guide-section {
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+        }
+
+        .guide-card {
+            padding: 22px;
+        }
+
+        .guide-card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .guide-card p,
+        .guide-section p,
+        .guide-section li {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .guide-section {
+            padding: 30px;
+            margin-bottom: 22px;
+        }
+
+        .guide-section h2 {
+            font-size: 1.55rem;
+            margin-bottom: 14px;
+            color: var(--text-primary);
+        }
+
+        .guide-section h3 {
+            margin: 20px 0 10px;
+            color: var(--primary-color);
+            font-size: 1rem;
+        }
+
+        .guide-section ul {
+            margin: 12px 0 0 20px;
+        }
+
+        .guide-note {
+            padding: 18px 20px;
+            border-left: 4px solid var(--primary-color);
+            background: rgba(124, 252, 0, 0.08);
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .guide-actions {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+
+        .guide-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 22px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .guide-btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: #000;
+        }
+
+        .guide-btn-secondary {
+            border: 1px solid rgba(124, 252, 0, 0.35);
+            color: var(--primary-color);
+            background: rgba(124, 252, 0, 0.06);
+        }
+
+        .guide-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="app">
+            <div class="app-header">
+                <div class="navbar navbar-expand-lg">
+                    <div class="app-navbar">
+                        <a href="index.html" class="navbar-brand">
+                            <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
+                        </a>
+                    </div>
+                    <ul class="navbar-nav navbar-user ml-auto align-items-center text-nowrap">
+                        <li class="nav-item"><a class="nav-link" href="movies.html">Movies</a></li>
+                        <li class="nav-item"><a class="nav-link" href="vjs.html">VJ Translators</a></li>
+                        <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+                        <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <main class="guide-shell">
+                <section class="guide-hero">
+                    <h1>Editorial Standards</h1>
+                    <p>
+                        Unruly Movies is designed to be more than a simple collection of embeds. This page explains how the catalog is organized,
+                        how VJ credits are presented, which details are checked before a title is published, and how viewers can report mistakes,
+                        broken links, or rights concerns.
+                    </p>
+                </section>
+
+                <section class="guide-grid" aria-label="Editorial summary">
+                    <article class="guide-card">
+                        <h2>Catalog first</h2>
+                        <p>Each page is expected to help viewers understand what they are opening, who translated it, and where it fits in the catalog.</p>
+                    </article>
+                    <article class="guide-card">
+                        <h2>Visible VJ credit</h2>
+                        <p>Translator names are treated as core metadata so visitors can follow a trusted VJ style instead of browsing blind.</p>
+                    </article>
+                    <article class="guide-card">
+                        <h2>User reports matter</h2>
+                        <p>Broken streams, wrong metadata, and copyright complaints are reviewed through the public contact and DMCA channels.</p>
+                    </article>
+                </section>
+
+                <section class="guide-section">
+                    <h2>What a useful title page should contain</h2>
+                    <p>
+                        Every movie or series entry should include enough context for a viewer to make a clear decision before pressing play.
+                        That means avoiding empty pages and prioritizing details that are genuinely useful for Luganda-speaking audiences.
+                    </p>
+                    <ul>
+                        <li>Original title or commonly recognized title</li>
+                        <li>Luganda title when a local naming version is used</li>
+                        <li>Named VJ or translator credit where available</li>
+                        <li>Genre, year, and playback quality labels</li>
+                        <li>Short synopsis or contextual summary</li>
+                        <li>Related navigation to more VJ, genre, or series pages</li>
+                    </ul>
+                </section>
+
+                <section class="guide-section">
+                    <h2>How curation works on the site</h2>
+                    <h3>1. Selection</h3>
+                    <p>
+                        The catalog focuses on Luganda-translated entertainment, not a broad generic movie index. Pages are written for viewers who care about
+                        VJ identity, translation style, and fast discovery on mobile devices.
+                    </p>
+                    <h3>2. Metadata review</h3>
+                    <p>
+                        Before a title is treated as publish-ready, the goal is to confirm the naming, artwork, VJ credit, and category tags so the page can be
+                        browsed through search, genre, and translator pathways.
+                    </p>
+                    <h3>3. Ongoing cleanup</h3>
+                    <p>
+                        Utility pages, tests, internal tools, and duplicate redirects are kept out of search where possible so the public site stays focused on
+                        content that provides real value to viewers and advertisers.
+                    </p>
+                </section>
+
+                <section class="guide-section">
+                    <h2>How Unruly Movies tries to stay useful</h2>
+                    <ul>
+                        <li>Use descriptive headings instead of thin placeholder text.</li>
+                        <li>Link visitors to support, legal, and policy pages from major sections.</li>
+                        <li>Keep navigation simple so people can move between home, catalog, genres, VJs, and help pages without confusion.</li>
+                        <li>Prefer direct explanations over exaggerated marketing claims.</li>
+                        <li>Surface feedback channels for corrections, requests, and rights concerns.</li>
+                    </ul>
+                    <div class="guide-note">
+                        If a page does not help a visitor understand the title, the translator, or the viewing options, it should be improved or removed from search visibility.
+                    </div>
+                </section>
+
+                <section class="guide-section">
+                    <h2>Reporting corrections or rights issues</h2>
+                    <p>
+                        Viewers can use the contact form for support, title corrections, broken streams, and feature requests. Rights holders can use the DMCA policy page
+                        and the published contact address for takedown notices or follow-up questions.
+                    </p>
+                    <div class="guide-actions">
+                        <a class="guide-btn guide-btn-primary" href="contact.html">Contact support</a>
+                        <a class="guide-btn guide-btn-secondary" href="dmca.html">Read DMCA policy</a>
+                        <a class="guide-btn guide-btn-secondary" href="movies.html">Browse the catalog</a>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#66BB6A">
     <meta name="robots" content="index, follow">
     <meta name="author" content="Nduga Hafizu">
-    <link rel="canonical" href="https://unrulymovies.com/movies.html">
+    <link rel="canonical" href="https://unrulymovies.com/movies">
     <meta name="google-adsense-account" content="ca-pub-1904736753681797">
     <meta name="google-site-verification" content="ZETgIS2RUYfcmNN7z0_OCZ7CjNP4LbfPI-F1MD7uiyY">
     
@@ -56,10 +56,54 @@
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/card-grid.css">
     <link rel="stylesheet" href="css/trailer-player.css">
+    <link rel="stylesheet" href="css/professional-cards.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
+    <style>
+        .editorial-panel {
+            margin: 0 0 28px;
+            padding: 22px 24px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(124, 252, 0, 0.08), rgba(0, 217, 255, 0.05));
+            border: 1px solid rgba(124, 252, 0, 0.18);
+        }
+
+        .editorial-panel h2 {
+            margin: 0 0 12px;
+            font-size: 1.35rem;
+            color: var(--text-primary);
+        }
+
+        .editorial-panel p {
+            margin: 0 0 12px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .editorial-points {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .editorial-point {
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: rgba(0, 0, 0, 0.18);
+            border: 1px solid rgba(124, 252, 0, 0.1);
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .editorial-point strong {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--primary-color);
+        }
+    </style>
 </head>
 
 <body>
@@ -222,7 +266,29 @@
                                     </svg>
                                     Browse Luganda Movies
                                 </h1>
-                                <p class="page-hero-subtitle">Watch your favorite movies with Luganda VJ translations</p>
+                                <p class="page-hero-subtitle">Browse films by VJ credit, genre, release year, and streaming quality.</p>
+                            </div>
+
+                            <div class="editorial-panel">
+                                <h2>What makes this catalog useful</h2>
+                                <p>
+                                    Unruly Movies aims to be more than a bare list of playable links. The catalog is organized so visitors can compare titles,
+                                    track translator identity, and move through genre and quality filters before deciding what to watch.
+                                </p>
+                                <div class="editorial-points">
+                                    <div class="editorial-point">
+                                        <strong>Named VJ credits</strong>
+                                        Discover titles by translator style instead of browsing anonymous entries.
+                                    </div>
+                                    <div class="editorial-point">
+                                        <strong>Useful filters</strong>
+                                        Narrow the catalog by genre, year, quality, and popularity for faster discovery.
+                                    </div>
+                                    <div class="editorial-point">
+                                        <strong>Public standards</strong>
+                                        Read the <a href="editorial-standards.html">editorial standards</a> page for how public-facing pages are reviewed.
+                                    </div>
+                                </div>
                             </div>
                             
                             <!-- Filters -->
@@ -377,13 +443,13 @@
                             </a>
                             <p class="footer-tagline">Uganda's premier platform for Luganda VJ translated movies.</p>
                             <div class="footer-social">
-                                <a href="#" aria-label="Facebook" class="social-link">
+                                <a href="mailto:nduggahafizu@gmail.com" aria-label="Email support" class="social-link">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                                 </a>
-                                <a href="#" aria-label="Twitter" class="social-link">
+                                <a href="https://wa.me/256743311809" aria-label="WhatsApp support" class="social-link">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                                 </a>
-                                <a href="#" aria-label="YouTube" class="social-link">
+                                <a href="faq.html" aria-label="Read the FAQ" class="social-link">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                                 </a>
                             </div>
@@ -401,7 +467,7 @@
                             <h4>Legal</h4>
                             <ul>
                                 <li><a href="terms.html">Terms of Service</a></li>
-                                <li><a href="privacy.html">Privacy Policy</a></li>
+                                <li><a href="privacy-policy.html">Privacy Policy</a></li>
                                 <li><a href="dmca.html">DMCA Policy</a></li>
                             </ul>
                         </div>
@@ -409,13 +475,14 @@
                             <h4>Company</h4>
                             <ul>
                                 <li><a href="about.html">About Us</a></li>
+                                <li><a href="editorial-standards.html">Editorial Standards</a></li>
                                 <li><a href="contact.html">Contact</a></li>
                             </ul>
                         </div>
                     </div>
                 </div>
                 <div class="footer-bottom">
-                    <p>Copyright © unruly movies watch 2026</p>
+                    <p>Copyright © 2026 Unruly Movies</p>
                 </div>
             </footer>
         </div>
@@ -485,6 +552,7 @@
                 
                 if (data.success && data.data) {
                     movies = data.data;
+                    window.allMoviesCache = movies; // Store globally for similar movies
                     const pg = data.pagination || {};
                     totalPages = pg.pages || 1;
                     renderMovies(movies);
@@ -618,23 +686,42 @@
                 posterData.push({ posterId, posterUrl: movie.poster || null, fallbackPoster });
                 
                 const movieCard = `
-                    <a href="player.html?id=${movie._id}" class="content-card">
+                    <a href="/watch/${movie._id}" class="content-card" data-movie-id="${movie._id}" data-tmdb-id="${movie.tmdbId || ''}">
                         <div class="card-poster" id="${posterId}" data-fallback-poster="${fallbackPoster}">
                             <div class="card-badges">
                                 <span class="card-badge badge-quality">${quality.toUpperCase()}</span>
                                 ${vjBadge ? `<span class="card-badge badge-vj">${vjBadge}</span>` : ''}
                             </div>
-                            <div class="card-rating">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                </svg>
-                                ${rating.toFixed(1)}
-                            </div>
-                            <div class="play-overlay">
-                                <div class="play-button">
-                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                    </svg>
+                            <div class="card-hover-actions">
+                                <div class="hover-buttons">
+                                    <button class="hover-btn btn-play-main" title="Watch Now">
+                                        <svg viewBox="0 0 24 24" fill="currentColor">
+                                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                        </svg>
+                                    </button>
+                                    <button class="hover-btn btn-trailer" onclick="event.preventDefault(); event.stopPropagation(); playMovieTrailer('${movie.tmdbId || ''}', '${title.replace(/'/g, "\\'")}');" title="Watch Trailer">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                                            <line x1="7" y1="2" x2="7" y2="22"></line>
+                                            <line x1="17" y1="2" x2="17" y2="22"></line>
+                                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                    <button class="hover-btn btn-add" onclick="event.preventDefault(); event.stopPropagation(); addToWatchlist('${movie._id}');" title="Add to Watchlist">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="hover-info">
+                                    <span class="hover-info-item quality">${quality}</span>
+                                    <span class="hover-info-item rating">
+                                        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                        ${rating.toFixed(1)}
+                                    </span>
+                                    ${movie.year ? `<span class="hover-info-item">${movie.year}</span>` : ''}
+                                    ${movie.genres && movie.genres.length > 0 ? `<span class="hover-info-item">${movie.genres[0]}</span>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -689,6 +776,136 @@
             }
         });
     </script>
+    
+    <!-- Trailer Player -->
+    <script src="js/trailer-player.js"></script>
+    <script>
+        // Initialize trailer player
+        let trailerPlayer;
+        document.addEventListener('DOMContentLoaded', () => {
+            trailerPlayer = new TrailerPlayer();
+        });
+        
+        // Play movie trailer using TMDB ID
+        async function playMovieTrailer(tmdbId, movieTitle) {
+            if (!tmdbId) {
+                showToast('Trailer not available for this movie', 'info');
+                return;
+            }
+            if (!trailerPlayer) {
+                console.error('Trailer player not initialized');
+                return;
+            }
+            try {
+                await trailerPlayer.playTrailer(tmdbId, movieTitle);
+            } catch (error) {
+                console.error('Error playing trailer:', error);
+                showToast('Trailer not available', 'error');
+            }
+        }
+        
+        // Add movie to user's watchlist
+        async function addToWatchlist(movieId) {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/playlist/watchlist`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ contentId: movieId, contentType: 'movie' })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    showToast('Added to Watchlist!', 'success');
+                } else {
+                    showToast(data.message || 'Already in watchlist', 'info');
+                }
+            } catch (error) {
+                console.error('Error adding to watchlist:', error);
+                showToast('Could not add to watchlist', 'error');
+            }
+        }
+        
+        // Toast notification
+        function showToast(message, type = 'info') {
+            const existing = document.querySelector('.toast-notification');
+            if (existing) existing.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 14px 24px;
+                background: ${type === 'success' ? '#7CFC00' : type === 'error' ? '#ff4444' : '#333'};
+                color: ${type === 'success' ? '#000' : '#fff'};
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 14px;
+                z-index: 10000;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+                animation: toastIn 0.3s ease;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'toastOut 0.3s ease forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+        
+        // Get similar movies based on genre for "You May Also Like"
+        function getSimilarMovies(movieId, genres, limit = 4) {
+            const allMovies = window.allMoviesCache || [];
+            if (!allMovies.length || !genres || !genres.length) return [];
+            
+            return allMovies
+                .filter(m => m._id !== movieId && m.genres && m.genres.some(g => genres.includes(g)))
+                .slice(0, limit);
+        }
+        
+        // Generate "You May Also Like" HTML
+        function generateAlsoLikeHTML(movieId, genres) {
+            const similar = getSimilarMovies(movieId, genres, 4);
+            if (!similar.length) return '';
+            
+            const items = similar.map(m => {
+                const poster = m.poster || 'assets/images/placeholder.svg';
+                return `<div class="card-also-like-item">
+                    <img src="${poster}" alt="${m.originalTitle || ''}" loading="lazy" onerror="this.src='assets/images/placeholder.svg'">
+                </div>`;
+            }).join('');
+            
+            return `
+                <div class="card-also-like">
+                    <div class="card-also-like-title">You May Also Like</div>
+                    <div class="card-also-like-items">${items}</div>
+                </div>
+            `;
+        }
+    </script>
+    
+    <style>
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        @keyframes toastOut {
+            from { opacity: 1; transform: translateX(-50%) translateY(0); }
+            to { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        }
+    </style>
     
     <!-- Live Chat Widget -->
     <script src="js/chat-widget.js"></script>

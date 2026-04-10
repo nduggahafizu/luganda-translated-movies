@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="Your personal dashboard - manage watchlist, history, and preferences">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#7CFC00">
     <meta name="google-adsense-account" content="ca-pub-1904736753681797">
     
@@ -1308,7 +1309,7 @@
             return `
                 <div class="movie-card">
                     <div class="movie-poster">
-                        <a href="player.html?id=${movieId}">
+                        <a href="/watch/${movieId}">
                             <img src="${posterUrl}" alt="${movieTitle}" loading="lazy" onerror="this.src='assets/images/placeholder.svg'">
                         </a>
                         ${type === 'history' && progress > 0 ? `

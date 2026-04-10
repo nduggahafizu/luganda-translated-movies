@@ -22,6 +22,11 @@
   status = 200
 
 [[redirects]]
+  from = "/watch/:id"
+  to = "/player.html"
+  status = 200
+
+[[redirects]]
   from = "/series"
   to = "/series.html"
   status = 200

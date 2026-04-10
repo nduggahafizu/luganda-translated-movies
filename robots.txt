@@ -2,40 +2,118 @@
 # https://unrulymovies.com
 # Developed by Nduga Hafizu - A legitimate Ugandan Luganda Translation Platform
 
+# Default rules for all crawlers
 User-agent: *
 Allow: /
 
-# Allow all major search engines
+# Explicitly allow main content pages
+Allow: /
+Allow: /movies
+Allow: /trending
+Allow: /series
+Allow: /genres
+Allow: /vjs
+Allow: /uganda-tv
+Allow: /about
+Allow: /contact
+Allow: /faq
+Allow: /editorial-standards
+Allow: /subscription
+Allow: /terms
+Allow: /privacy-policy
+Allow: /dmca
+Allow: /cookies
+
+# Allow CSS, JS and assets for proper rendering
+Allow: /css/
+Allow: /js/
+Allow: /assets/
+
+# === Google ===
 User-agent: Googlebot
 Allow: /
 
-User-agent: Bingbot
-Allow: /
+User-agent: Googlebot-Image
+Allow: /assets/images/
 
-User-agent: DuckDuckBot
-Allow: /
-
-# Allow Google AdSense crawler
 User-agent: Mediapartners-Google
 Allow: /
 
 User-agent: AdsBot-Google
 Allow: /
 
-# Disallow admin and private areas
-Disallow: /admin.html
-Disallow: /admin-movies.html
-Disallow: /dashboard.html
-Disallow: /server/
-Disallow: /*.bat$
+User-agent: AdsBot-Google-Mobile
+Allow: /
 
-# Allow CSS and JS for proper rendering
-Allow: /css/
-Allow: /js/
-Allow: /assets/
+# === Bing ===
+User-agent: Bingbot
+Allow: /
+
+User-agent: msnbot
+Allow: /
+
+User-agent: BingPreview
+Allow: /
+
+# === Other Search Engines ===
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: facebot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+# === Disallow private/utility pages ===
+Disallow: /admin
+Disallow: /admin-*
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /player
+Disallow: /movie
+Disallow: /series-player
+Disallow: /series-detail
+Disallow: /search
+Disallow: /local-admin-upload
+Disallow: /test-*
+Disallow: /login
+Disallow: /register
+Disallow: /subscribe
+Disallow: /tv-stations
+Disallow: /vj
+Disallow: /privacy
+Disallow: /payment-success
+Disallow: /payment-failed
+Disallow: /offline
+Disallow: /error
+Disallow: /404
+Disallow: /amp
+Disallow: /munowatch
+Disallow: /assets/images/og-image-generator
+Disallow: /assets/images/logo-generator
+Disallow: /server/
+Disallow: /native-app/
+Disallow: /redis/
+Disallow: /scripts/
 
 # Sitemap location
 Sitemap: https://unrulymovies.com/sitemap.xml
 
-# Crawl delay for politeness
+# IndexNow key for instant Bing/Yandex indexing
+# Key file: https://unrulymovies.com/unrulymovies2026.txt
+
+# Crawl delay for politeness (optional)
 Crawl-delay: 1

@@ -4,11 +4,20 @@
     <title>Trending Movies - VJ Translated Films | Unruly Movies</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Watch trending Luganda translated movies. The most popular VJ translated films on Unruly Movies.">
+    <meta name="description" content="Watch trending Luganda translated movies. The most popular VJ translated films on Unruly Movies - Uganda's premier streaming platform.">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#66BB6A">
+    <meta name="theme-color" content="#7CFC00">
     <meta name="author" content="Nduga Hafizu">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://unrulymovies.com/trending">
     <meta name="google-adsense-account" content="ca-pub-1904736753681797">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Trending Movies - Unruly Movies">
+    <meta property="og:description" content="Watch trending Luganda translated movies featuring popular VJ translations.">
+    <meta property="og:url" content="https://unrulymovies.com/trending.html">
+    <meta property="og:site_name" content="Unruly Movies">
     
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
     <link rel="shortcut icon" type="image/png" href="/assets/images/favicon.png">
@@ -136,6 +145,81 @@
             align-items: center;
             gap: 4px;
             color: var(--primary-color);
+        }
+        
+        /* Trending Card Hover Overlay */
+        .trending-card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.8) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        
+        .trending-card:hover .trending-card-overlay {
+            opacity: 1;
+        }
+        
+        .trending-card-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .trend-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.8);
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(4px);
+        }
+        
+        .trend-btn:hover {
+            transform: scale(1.15);
+            border-color: #fff;
+        }
+        
+        .trend-btn.btn-play {
+            background: #fff;
+            border: none;
+            color: #000;
+        }
+        
+        .trend-btn.btn-play:hover {
+            background: #7CFC00;
+        }
+        
+        .trend-btn.btn-trailer {
+            background: rgba(124,252,0,0.15);
+            border-color: #7CFC00;
+            color: #7CFC00;
+        }
+        
+        .trend-btn.btn-trailer:hover {
+            background: #7CFC00;
+            color: #000;
+        }
+        
+        .trend-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .trend-btn.btn-play svg {
+            margin-left: 2px;
         }
         
         .loading-spinner {
@@ -351,9 +435,23 @@
                         const views = movie.views || 0;
                         
                         return `
-                            <a href="player.html?id=${movie._id}" class="trending-card">
+                            <a href="/watch/${movie._id}" class="trending-card" data-movie-id="${movie._id}" data-tmdb-id="${movie.tmdbId || ''}">
                                 <div class="trending-rank ${rankClass}">${rank}</div>
                                 <img src="${poster}" alt="${title}" loading="lazy" onerror="this.src='assets/images/placeholder.svg'">
+                                <div class="trending-card-overlay">
+                                    <div class="trending-card-buttons">
+                                        <button class="trend-btn btn-play" title="Watch Now">
+                                            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                        </button>
+                                        <button class="trend-btn btn-trailer" onclick="event.preventDefault(); event.stopPropagation(); playMovieTrailer('${movie.tmdbId || ''}', '${title.replace(/'/g, "\\'")}');" title="Trailer">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <rect x="2" y="2" width="20" height="20" rx="2"></rect>
+                                                <line x1="7" y1="2" x2="7" y2="22"></line>
+                                                <line x1="17" y1="2" x2="17" y2="22"></line>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
                                 <div class="trending-card-info">
                                     <div class="trending-card-title">${title}</div>
                                     <div class="trending-card-meta">
@@ -402,6 +500,62 @@
         
         // Initialize
         loadTrendingMovies();
+    </script>
+    
+    <!-- Trailer Player -->
+    <link rel="stylesheet" href="css/trailer-player.css">
+    <script src="js/trailer-player.js"></script>
+    <script>
+        // Initialize trailer player
+        let trailerPlayer;
+        document.addEventListener('DOMContentLoaded', () => {
+            trailerPlayer = new TrailerPlayer();
+        });
+        
+        // Play movie trailer using TMDB ID
+        async function playMovieTrailer(tmdbId, movieTitle) {
+            if (!tmdbId) {
+                showToast('Trailer not available for this movie', 'info');
+                return;
+            }
+            if (!trailerPlayer) {
+                console.error('Trailer player not initialized');
+                return;
+            }
+            try {
+                await trailerPlayer.playTrailer(tmdbId, movieTitle);
+            } catch (error) {
+                console.error('Error playing trailer:', error);
+                showToast('Trailer not available', 'error');
+            }
+        }
+        
+        // Toast notification
+        function showToast(message, type = 'info') {
+            const existing = document.querySelector('.toast-notification');
+            if (existing) existing.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 14px 24px;
+                background: ${type === 'success' ? '#7CFC00' : type === 'error' ? '#ff4444' : '#333'};
+                color: ${type === 'success' ? '#000' : '#fff'};
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 14px;
+                z-index: 10000;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), 2500);
+        }
     </script>
 </body>
 </html>
