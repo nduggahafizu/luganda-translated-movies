@@ -103,13 +103,13 @@ class UnrulyNotifications {
             width: '70px',
             height: '70px',
             margin: '0 auto 20px',
-            background: 'rgba(124, 252, 0, 0.15)',
+            background: 'rgba(74, 222, 128, 0.15)',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
         });
-        iconDiv.innerHTML = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#7CFC00" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>';
+        iconDiv.innerHTML = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>';
         
         // Title
         const title = document.createElement('h3');
@@ -144,7 +144,7 @@ class UnrulyNotifications {
         // Allow button
         const allowBtn = document.createElement('button');
         Object.assign(allowBtn.style, {
-            background: 'linear-gradient(135deg, #7CFC00 0%, #00D9FF 100%)',
+            background: 'linear-gradient(135deg, #4ade80 0%, #00D9FF 100%)',
             color: '#000000',
             border: 'none',
             padding: '16px 24px',

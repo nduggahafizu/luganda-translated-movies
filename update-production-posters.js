@@ -89,7 +89,7 @@ async function searchTMDB(title, year) {
 }
 
 function generatePlaceholder(title, year) {
-    const colors = ['7CFC00', 'FF6B6B', '4ECDC4', 'FFE66D', 'A855F7', 'EC4899', '06B6D4', 'F97316'];
+    const colors = ['4ade80', 'FF6B6B', '4ECDC4', 'FFE66D', 'A855F7', 'EC4899', '06B6D4', 'F97316'];
     const colorIndex = (title || '').length % colors.length;
     const color = colors[colorIndex];
     const displayTitle = (title || 'Movie').substring(0, 15);

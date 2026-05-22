@@ -393,11 +393,11 @@ const WatchlistManager = {
                 }
                 
                 .watchlist-notification.success {
-                    border-color: var(--primary-color, #7CFC00);
+                    border-color: var(--primary-color, #4ade80);
                 }
                 
                 .watchlist-notification.success svg {
-                    color: var(--primary-color, #7CFC00);
+                    color: var(--primary-color, #4ade80);
                 }
                 
                 .notification-content {

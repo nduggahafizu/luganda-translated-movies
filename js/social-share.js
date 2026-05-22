@@ -322,8 +322,8 @@ const SocialShare = {
             }
             
             .share-platform-btn:hover {
-                background: rgba(124, 252, 0, 0.1);
-                border-color: var(--primary-color, #7CFC00);
+                background: rgba(74, 222, 128, 0.1);
+                border-color: var(--primary-color, #4ade80);
             }
             
             .share-platform-btn svg {
@@ -351,7 +351,7 @@ const SocialShare = {
                 align-items: center;
                 gap: 8px;
                 padding: 12px 20px;
-                background: var(--primary-color, #7CFC00);
+                background: var(--primary-color, #4ade80);
                 border: none;
                 border-radius: 10px;
                 color: #000;
@@ -387,8 +387,8 @@ const SocialShare = {
             }
             
             .share-native-btn:hover {
-                border-color: var(--primary-color, #7CFC00);
-                color: var(--primary-color, #7CFC00);
+                border-color: var(--primary-color, #4ade80);
+                color: var(--primary-color, #4ade80);
             }
             
             .share-native-btn svg {

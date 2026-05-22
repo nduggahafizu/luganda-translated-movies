@@ -3,9 +3,9 @@
 <head>
     <title>Movie Genres - Browse by Category | Unruly Movies</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="description" content="Browse Luganda translated movies by genre - Action, Comedy, Drama, Horror, Romance, Thriller, Sci-Fi and more. Find your favorite movie category with VJ translations.">
-    <meta name="theme-color" content="#7CFC00">
+    <meta name="theme-color" content="#4ade80">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://unrulymovies.com/genres">
     
@@ -63,15 +63,15 @@
             padding: 30px 20px;
             text-align: center;
             transition: transform 0.3s, box-shadow 0.3s;
-            border: 1px solid rgba(124, 252, 0, 0.1);
+            border: 1px solid rgba(74, 222, 128, 0.1);
             cursor: pointer;
             text-decoration: none;
             display: block;
         }
         .genre-card:hover {
             transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(124, 252, 0, 0.2);
-            border-color: rgba(124, 252, 0, 0.4);
+            box-shadow: 0 20px 40px rgba(74, 222, 128, 0.2);
+            border-color: rgba(74, 222, 128, 0.4);
         }
         .genre-icon {
             font-size: 3rem;
@@ -85,7 +85,7 @@
             text-transform: capitalize;
         }
         .genre-count {
-            color: #7CFC00;
+            color: #4ade80;
             font-size: 0.9rem;
         }
         .page-header {
@@ -95,7 +95,7 @@
         .page-header h1 {
             font-size: 2.5rem;
             margin-bottom: 12px;
-            background: linear-gradient(135deg, #7CFC00, #00d4aa);
+            background: linear-gradient(135deg, #4ade80, #00d4aa);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -125,15 +125,15 @@
         .back-btn {
             padding: 10px 24px;
             background: transparent;
-            border: 2px solid #7CFC00;
-            color: #7CFC00;
+            border: 2px solid #4ade80;
+            color: #4ade80;
             border-radius: 25px;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s;
         }
         .back-btn:hover {
-            background: #7CFC00;
+            background: #4ade80;
             color: #1a1a2e;
         }
         .movies-grid {
@@ -166,7 +166,7 @@
             position: absolute;
             top: 10px;
             left: 10px;
-            background: #7CFC00;
+            background: #4ade80;
             color: #1a1a2e;
             padding: 4px 10px;
             border-radius: 6px;
@@ -178,7 +178,7 @@
             top: 10px;
             right: 10px;
             background: rgba(0,0,0,0.7);
-            color: #7CFC00;
+            color: #4ade80;
             padding: 4px 10px;
             border-radius: 6px;
             font-size: 0.85rem;
@@ -197,7 +197,7 @@
             text-overflow: ellipsis;
         }
         .movie-vj {
-            color: #7CFC00;
+            color: #4ade80;
             font-size: 0.8rem;
         }
         .loading-spinner {
@@ -395,7 +395,7 @@
             const moviesGrid = document.getElementById('genreMoviesGrid');
             
             moviesGrid.innerHTML = movies.map(movie => {
-                const poster = movie.poster || `https://placehold.co/300x450/1a1a2e/7CFC00?text=${encodeURIComponent(movie.originalTitle || 'Movie')}`;
+                const poster = movie.poster || `https://placehold.co/300x450/16161f/4ade80?text=${encodeURIComponent(movie.originalTitle || 'Movie')}`;
                 const quality = movie.video?.quality?.toUpperCase() || 'HD';
                 const rating = movie.rating?.userRating || movie.rating?.imdb || 0;
                 const vjName = movie.vjName || 'Unknown';

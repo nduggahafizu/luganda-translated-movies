@@ -86,31 +86,37 @@ html, body {
 .menu.d-md-none {
     display: block !important;
 }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
+
 /* ===================================
    Unruly Movies - Main Stylesheet
-   Primary Color: Soft Green (#66BB6A)
+   Primary Color: Soft Green (#4ade80)
    =================================== */
 
 :root {
-    --primary-color: #7CFC00;
-    --primary-dark: #66CC00;
-    --primary-light: #98FF4A;
-    --secondary-color: #00D9FF;
-    --accent-gold: #FFD700;
-    --accent-purple: #9D4EDD;
-    --accent-pink: #FF6B9D;
-    --background-dark: #0a0a0f;
-    --background-light: #12121a;
-    --background-card: #1a1a25;
-    --text-primary: #ffffff;
-    --text-secondary: #a0a0a0;
-    --border-color: #2a2a35;
-    --hover-bg: #252530;
-    --gradient-primary: linear-gradient(135deg, #7CFC00 0%, #00D9FF 100%);
-    --gradient-gold: linear-gradient(135deg, #FFD700 0%, #FF6B9D 100%);
-    --gradient-purple: linear-gradient(135deg, #9D4EDD 0%, #00D9FF 100%);
-    --glow-primary: 0 0 20px rgba(124, 252, 0, 0.3);
-    --glow-secondary: 0 0 20px rgba(0, 217, 255, 0.3);
+    --primary-color: #4ade80;
+    --primary-dark: #22c55e;
+    --primary-light: #86efac;
+    --primary-glow: rgba(74, 222, 128, 0.35);
+    --secondary-color: #38bdf8;
+    --accent-gold: #fbbf24;
+    --accent-purple: #a78bfa;
+    --accent-pink: #f472b6;
+    --background-dark: #09090f;
+    --background-light: #111118;
+    --background-card: #16161f;
+    --text-primary: #f1f1f5;
+    --text-secondary: #8b8b99;
+    --border-color: #24243a;
+    --hover-bg: #1e1e2c;
+    --gradient-primary: linear-gradient(135deg, #4ade80 0%, #38bdf8 100%);
+    --gradient-gold: linear-gradient(135deg, #fbbf24 0%, #f472b6 100%);
+    --gradient-purple: linear-gradient(135deg, #a78bfa 0%, #38bdf8 100%);
+    --glow-primary: 0 0 24px rgba(74, 222, 128, 0.3);
+    --glow-secondary: 0 0 24px rgba(56, 189, 248, 0.3);
+    --radius-card: 14px;
+    --radius-btn: 10px;
+    --transition-base: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Accessibility - Screen reader only */
@@ -192,7 +198,7 @@ img {
 .app-header {
     background: linear-gradient(180deg, rgba(10, 10, 10, 0.98) 0%, rgba(10, 10, 10, 0.95) 100%);
     -webkit-backdrop-filter: blur(15px);
-    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter:backdrop-filter: blur(15px);
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -493,7 +499,7 @@ img {
     bottom: 0;
     background: rgba(0, 0, 0, 0.7);
     -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter:backdrop-filter: blur(4px);
     z-index: 1999;
     opacity: 0;
     visibility: hidden;
@@ -672,8 +678,58 @@ img {
 }
 
 .app-section {
-    margin-bottom: 60px;
+    margin-bottom: 48px;
     position: relative;
+}
+
+/* ===================================
+   Section Headers (used across pages)
+   =================================== */
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(74, 222, 128, 0.12);
+}
+
+.section-header h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    letter-spacing: -0.2px;
+}
+
+.section-header h2 svg {
+    flex-shrink: 0;
+}
+
+/* View All link inside section-header */
+.section-header .view-all,
+.view-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: var(--transition-base);
+    opacity: 0.85;
+}
+
+.section-header .view-all:hover,
+.view-all:hover {
+    opacity: 1;
+    color: var(--primary-light);
+    transform: translateX(3px);
 }
 
 .app-heading {
@@ -761,38 +817,92 @@ img {
 .slide {
     display: block;
     position: relative;
-    height: 580px;
-    background-size: cover;
-    background-position: center top;
-    border-radius: 24px;
+    height: clamp(480px, 60vh, 680px);
+    background: #111118;
+    border-radius: 20px;
     overflow: hidden;
 }
 
-/* Multi-layer gradient for cinematic effect */
-.slide::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: 
-        linear-gradient(to right, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.3) 60%, transparent 100%),
-        linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 40%),
-        linear-gradient(135deg, rgba(124, 252, 0, 0.05) 0%, transparent 50%);
-    border-radius: 24px;
-    z-index: 1;
+/* Poster-only slide — full image, no text overlay */
+.poster-slide {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
 }
 
-/* Animated subtle glow effect */
-.slide::after {
-    content: '';
+.slide-poster-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 15%;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.carousel-item.active .slide-poster-img {
+    transform: scale(1.0);
+}
+
+.poster-slide:hover .slide-poster-img {
+    transform: scale(1.04);
+}
+
+/* Thin footer bar — title + play icon */
+.slide-poster-footer {
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle at 20% 80%, rgba(124, 252, 0, 0.08) 0%, transparent 40%);
-    animation: heroGlow 8s ease-in-out infinite alternate;
-    z-index: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 40px 28px 22px;
+    background: linear-gradient(to top, rgba(5,5,12,0.88) 0%, transparent 100%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
     pointer-events: none;
+}
+
+.slide-poster-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 56px);
+}
+
+.slide-poster-play {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #030b05;
+    box-shadow: 0 4px 16px rgba(74, 222, 128, 0.4);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.poster-slide:hover .slide-poster-play {
+    transform: scale(1.12);
+    box-shadow: 0 6px 24px rgba(74, 222, 128, 0.55);
+}
+
+/* (poster-only slide — no overlay needed) */
+.slide::before {
+    display: none;
+}
+
+/* Animated subtle glow — kept for carousel wrapper */
+.slide::after {
+    display: none;
 }
 
 @keyframes heroGlow {
@@ -824,13 +934,13 @@ img {
 }
 
 .slide-header .imdb {
-    background: linear-gradient(135deg, #7CFC00 0%, #32CD32 100%);
+    background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
     color: #000;
     padding: 8px 16px;
     border-radius: 10px;
     font-weight: 800;
     font-size: 14px;
-    box-shadow: 0 4px 20px rgba(124, 252, 0, 0.4);
+    box-shadow: 0 4px 20px rgba(74, 222, 128, 0.4);
     display: flex;
     align-items: center;
     gap: 6px;
@@ -843,20 +953,20 @@ img {
     border-radius: 10px;
     font-size: 13px;
     font-weight: 600;
-    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter:backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     letter-spacing: 0.3px;
 }
 
 .slide .title {
-    font-size: 52px;
+    font-size: clamp(32px, 5vw, 58px);
     font-weight: 900;
-    margin-bottom: 20px;
-    line-height: 1.1;
-    text-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
-    letter-spacing: -0.5px;
-    max-width: 700px;
-    background: linear-gradient(180deg, #ffffff 0%, #e0e0e0 100%);
+    margin-bottom: 16px;
+    line-height: 1.08;
+    text-shadow: 0 4px 24px rgba(0, 0, 0, 0.8);
+    letter-spacing: -0.75px;
+    max-width: 680px;
+    background: linear-gradient(160deg, #ffffff 0%, #d4d4d8 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -883,22 +993,24 @@ img {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    padding: 16px 36px;
-    background: linear-gradient(135deg, #7CFC00 0%, #32CD32 100%);
-    color: #000;
+    padding: 15px 34px;
+    background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+    color: #030b05;
     font-weight: 800;
-    font-size: 16px;
-    border-radius: 14px;
+    font-size: 15px;
+    border-radius: var(--radius-btn, 10px);
     text-decoration: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 8px 30px rgba(124, 252, 0, 0.35);
-    letter-spacing: 0.3px;
+    transition: var(--transition-base);
+    box-shadow: 0 6px 24px rgba(74, 222, 128, 0.3);
+    letter-spacing: 0.2px;
+    border: none;
 }
 
 .btn-watch-now:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 12px 40px rgba(124, 252, 0, 0.5);
-    background: linear-gradient(135deg, #8FFF20 0%, #40E040 100%);
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 10px 36px rgba(74, 222, 128, 0.45);
+    background: linear-gradient(135deg, #6ee7a0 0%, #34d975 100%);
+    color: #030b05;
 }
 
 .btn-watch-now:active {
@@ -917,7 +1029,7 @@ img {
     border-radius: 14px;
     text-decoration: none;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter:backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
@@ -944,7 +1056,7 @@ img {
 .control-next {
     pointer-events: all;
     background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter:backdrop-filter: blur(10px);
     border-radius: 50%;
     width: 56px;
     height: 56px;
@@ -959,11 +1071,11 @@ img {
 
 .control-prev:hover,
 .control-next:hover {
-    background: linear-gradient(135deg, #7CFC00 0%, #32CD32 100%);
+    background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
     color: #000;
     transform: scale(1.15);
-    border-color: #7CFC00;
-    box-shadow: 0 8px 30px rgba(124, 252, 0, 0.4);
+    border-color: #4ade80;
+    box-shadow: 0 8px 30px rgba(74, 222, 128, 0.4);
 }
 
 /* Carousel Indicators - Modern Pill Style */
@@ -979,7 +1091,7 @@ img {
     padding: 12px 20px;
     z-index: 10;
     background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter:backdrop-filter: blur(10px);
     border-radius: 30px;
 }
 
@@ -997,9 +1109,9 @@ img {
 }
 
 .carousel-indicators li.active {
-    background: linear-gradient(90deg, #7CFC00 0%, #32CD32 100%);
+    background: linear-gradient(90deg, #4ade80 0%, #22c55e 100%);
     width: 56px;
-    box-shadow: 0 0 15px rgba(124, 252, 0, 0.5);
+    box-shadow: 0 0 15px rgba(74, 222, 128, 0.5);
 }
 
 /* ===================================
@@ -1086,8 +1198,8 @@ img {
 
 .list-movie:hover {
     transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 12px 40px rgba(124, 252, 0, 0.25), var(--glow-primary);
-    border-color: rgba(124, 252, 0, 0.3);
+    box-shadow: 0 12px 40px rgba(74, 222, 128, 0.25), var(--glow-primary);
+    border-color: rgba(74, 222, 128, 0.3);
 }
 
 .list-media {
@@ -1132,7 +1244,7 @@ img {
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    box-shadow: 0 2px 8px rgba(124, 252, 0, 0.4);
+    box-shadow: 0 2px 8px rgba(74, 222, 128, 0.4);
 }
 
 /* TMDB Rating Badge */
@@ -1146,7 +1258,7 @@ img {
     background: rgba(0, 0, 0, 0.7);
     border-radius: 8px;
     -webkit-backdrop-filter: blur(5px);
-    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter:backdrop-filter: blur(5px);
 }
 
 .imdb span {
@@ -1392,7 +1504,7 @@ img {
 
 .app-footer {
     background: linear-gradient(180deg, var(--background-light) 0%, #050508 100%);
-    border-top: 1px solid rgba(124, 252, 0, 0.15);
+    border-top: 1px solid rgba(74, 222, 128, 0.15);
     padding: 50px 20px 30px;
     margin-top: 50px;
     position: relative;
@@ -1599,7 +1711,7 @@ img {
 
 .scroll-up:hover {
     transform: translateY(-5px);
-    box-shadow: 0 5px 20px rgba(124, 252, 0, 0.4);
+    box-shadow: 0 5px 20px rgba(74, 222, 128, 0.4);
 }
 
 .scroll-up svg {
@@ -1737,7 +1849,7 @@ img.lazy:not(.loaded) {
     transform: translate(-50%, -50%);
     width: 40px;
     height: 40px;
-    border: 3px solid rgba(124, 252, 0, 0.3);
+    border: 3px solid rgba(74, 222, 128, 0.3);
     border-top-color: var(--primary-color);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
@@ -1834,7 +1946,7 @@ progress.movie-progress::-moz-progress-bar {
 }
 
 .video-js .vjs-big-play-button {
-    background-color: rgba(124, 252, 0, 0.9);
+    background-color: rgba(74, 222, 128, 0.9);
     border: none;
     border-radius: 50%;
     width: 80px;
@@ -1990,7 +2102,7 @@ progress.movie-progress::-moz-progress-bar {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: linear-gradient(135deg, rgba(124, 252, 0, 0.2), rgba(124, 252, 0, 0.1));
+    background: linear-gradient(135deg, rgba(74, 222, 128, 0.2), rgba(74, 222, 128, 0.1));
     border: 1px solid var(--primary-color);
     color: var(--primary-color);
     padding: 8px 16px;
@@ -2059,7 +2171,7 @@ progress.movie-progress::-moz-progress-bar {
 
 .btn-play-featured:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 30px rgba(124, 252, 0, 0.4);
+    box-shadow: 0 10px 30px rgba(74, 222, 128, 0.4);
     color: #000;
 }
 
@@ -2232,8 +2344,8 @@ progress.movie-progress::-moz-progress-bar {
 
 /* Footer About Section - What is Unruly */
 .footer-about {
-    background: rgba(124, 252, 0, 0.05);
-    border: 1px solid rgba(124, 252, 0, 0.15);
+    background: rgba(74, 222, 128, 0.05);
+    border: 1px solid rgba(74, 222, 128, 0.15);
     border-radius: 12px;
     padding: 30px;
     margin-bottom: 50px;
@@ -2823,7 +2935,7 @@ a:focus-visible {
 }
 
 .notification-item.unread {
-    background: rgba(124, 252, 0, 0.05);
+    background: rgba(74, 222, 128, 0.05);
     border-left: 3px solid var(--primary-color);
 }
 
@@ -2878,7 +2990,7 @@ a:focus-visible {
     display: inline-block;
     margin-top: 8px;
     padding: 6px 14px;
-    background: linear-gradient(135deg, var(--primary-color), #66CC00);
+    background: linear-gradient(135deg, var(--primary-color), #16a34a);
     color: #000;
     font-size: 12px;
     font-weight: 600;
@@ -2889,7 +3001,7 @@ a:focus-visible {
 
 .notification-action-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(124, 252, 0, 0.4);
+    box-shadow: 0 3px 10px rgba(74, 222, 128, 0.4);
     color: #000;
 }
 
@@ -2908,7 +3020,7 @@ a:focus-visible {
     display: block;
     text-align: center;
     padding: 14px;
-    background: rgba(124, 252, 0, 0.1);
+    background: rgba(74, 222, 128, 0.1);
     color: var(--primary-color);
     font-weight: 500;
     font-size: 14px;
@@ -2917,7 +3029,7 @@ a:focus-visible {
 }
 
 .view-all-notifications:hover {
-    background: rgba(124, 252, 0, 0.15);
+    background: rgba(74, 222, 128, 0.15);
     color: var(--primary-color);
 }
 
@@ -2948,18 +3060,18 @@ a:focus-visible {
 
 /* Glowing borders */
 .glow-border {
-    border: 1px solid rgba(124, 252, 0, 0.3);
-    box-shadow: 0 0 15px rgba(124, 252, 0, 0.1);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    box-shadow: 0 0 15px rgba(74, 222, 128, 0.1);
 }
 
 .glow-border:hover {
-    border-color: rgba(124, 252, 0, 0.6);
+    border-color: rgba(74, 222, 128, 0.6);
     box-shadow: var(--glow-primary);
 }
 
 /* Animated gradient background */
 .animated-gradient {
-    background: linear-gradient(-45deg, #7CFC00, #00D9FF, #9D4EDD, #FFD700);
+    background: linear-gradient(-45deg, #4ade80, #00D9FF, #9D4EDD, #FFD700);
     background-size: 400% 400%;
     animation: gradientShift 15s ease infinite;
 }
@@ -3067,7 +3179,7 @@ a:focus-visible {
 /* Glass morphism effect */
 .glass {
     background: rgba(26, 26, 37, 0.7);
-    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter:backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -3126,7 +3238,7 @@ a:focus-visible {
     bottom: 0;
     background: rgba(0, 0, 0, 0.85);
     -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter:backdrop-filter: blur(10px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3162,7 +3274,7 @@ a:focus-visible {
     width: 80px;
     height: 80px;
     margin: 0 auto 20px;
-    background: rgba(124, 252, 0, 0.1);
+    background: rgba(74, 222, 128, 0.1);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -3217,7 +3329,7 @@ a:focus-visible {
 
 .notif-btn-allow:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(124, 252, 0, 0.3);
+    box-shadow: 0 8px 25px rgba(74, 222, 128, 0.3);
 }
 
 .notif-btn-later {
@@ -3331,25 +3443,11 @@ a:focus-visible {
    =================================== */
 @media (max-width: 992px) {
     .slide {
-        height: 480px;
+        height: 420px;
     }
     
-    .slide .title {
-        font-size: 40px;
-    }
-    
-    .slide-caption {
-        padding: 80px 40px 50px;
-    }
-    
-    .btn-watch-now {
-        padding: 14px 28px;
-        font-size: 15px;
-    }
-    
-    .btn-more-info {
-        padding: 14px 24px;
-        font-size: 15px;
+    .slide-poster-title {
+        font-size: 16px;
     }
 }
 
@@ -3377,9 +3475,28 @@ a:focus-visible {
     }
     
     .app-section {
-        margin-bottom: 25px;
-        padding: 0 8px;
+        margin-bottom: 24px;
+        padding: 0 4px;
     }
+
+    .section-header {
+        margin-bottom: 14px;
+        padding-bottom: 12px;
+    }
+
+    .section-header h2 {
+        font-size: 1rem;
+        gap: 8px;
+    }
+
+    .section-header h2 svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .section-header .view-all,
+    .view-all {
+        font-size: 12px;
     
     /* Movie Grid Full Width Fix */
     .row {
@@ -3403,63 +3520,22 @@ a:focus-visible {
     }
     
     .slide {
-        height: 340px;
+        height: 280px;
         border-radius: 16px;
     }
     
-    .slide::before {
-        background: 
-            linear-gradient(to right, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.3) 100%),
-            linear-gradient(to top, rgba(0,0,0,0.95) 0%, transparent 50%);
+    .slide-poster-footer {
+        padding: 30px 16px 16px;
     }
-    
-    .slide::after {
-        display: none;
-    }
-    
-    .slide-caption {
-        padding: 30px 24px 28px;
-    }
-    
-    .slide .title {
-        font-size: 26px;
-        line-height: 1.2;
-        margin-bottom: 12px;
-        max-width: 100%;
-    }
-    
-    .slide .description {
+
+    .slide-poster-title {
         font-size: 14px;
-        -webkit-line-clamp: 2;
-        line-clamp: 2;
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        max-width: 100%;
     }
-    
-    .slide-header {
-        gap: 8px;
-        margin-bottom: 14px;
+
+    .slide-poster-play {
+        width: 34px;
+        height: 34px;
     }
-    
-    .slide-header .imdb {
-        padding: 6px 12px;
-        font-size: 12px;
-    }
-    
-    .category {
-        padding: 6px 12px;
-        font-size: 11px;
-    }
-    
-    .hero-cta {
-        gap: 12px;
-        margin-top: 20px;
-    }
-    
-    .btn-watch-now {
-        padding: 12px 24px;
         font-size: 14px;
         border-radius: 12px;
     }
@@ -3608,7 +3684,7 @@ a:focus-visible {
 }
 
 .data-transparency-title {
-    color: #7CFC00;
+    color: #4ade80;
     font-size: 2rem;
     margin-bottom: 15px;
 }
@@ -3628,8 +3704,8 @@ a:focus-visible {
 }
 
 .data-card {
-    background: rgba(124, 252, 0, 0.05);
-    border: 1px solid rgba(124, 252, 0, 0.2);
+    background: rgba(74, 222, 128, 0.05);
+    border: 1px solid rgba(74, 222, 128, 0.2);
     border-radius: 12px;
     padding: 25px;
 }
@@ -3659,5 +3735,116 @@ a:focus-visible {
 }
 
 .text-highlight {
-    color: #7CFC00;
+    color: #4ade80;
+}
+
+/* ===================================
+   Mobile Polish & UX — Global
+   =================================== */
+
+/* Make hero skeleton responsive height */
+.media-slide.skeleton {
+    min-height: clamp(220px, 45vw, 400px) !important;
+}
+
+@media (min-width: 576px) {
+    .media-slide.skeleton {
+        min-height: clamp(300px, 40vw, 520px) !important;
+    }
+}
+
+/* Bottom app CTA padding so content doesn't get hidden behind it on mobile */
+@media (max-width: 768px) {
+    .app-container {
+        padding-bottom: 80px;
+    }
+
+    /* Slightly bigger tap targets */
+    .nav-link,
+    .btn-watch-now,
+    .btn-more-info,
+    .view-all,
+    .section-header .view-all {
+        min-height: 44px;
+    }
+
+    /* section-header layout */
+    .section-header {
+        gap: 10px;
+        flex-wrap: nowrap;
+    }
+
+    .section-header h2 {
+        font-size: 1rem;
+        gap: 8px;
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Section spacing */
+    .app-section {
+        margin-bottom: 32px;
+    }
+
+    /* Trust section mobile */
+    .trust-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    /* App section inner padding */
+    .app-content {
+        padding: 8px 0 0;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Poster-only hero on small screens */
+    .slide {
+        height: 240px;
+        border-radius: 12px;
+    }
+
+    .slide-poster-footer {
+        padding: 28px 14px 14px;
+    }
+
+    .slide-poster-title {
+        font-size: 13px;
+    }
+
+    .slide-poster-play {
+        width: 32px;
+        height: 32px;
+    }
+
+    .slide-poster-play svg {
+        width: 13px;
+        height: 13px;
+    }
+
+    .carousel {
+        border-radius: 12px;
+    }
+
+    .app-slider {
+        margin-bottom: 20px;
+    }
+
+    .section-header {
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+    }
+}
+
+/* Safe-area bottom padding for notched phones */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+    @media (max-width: 768px) {
+        .app-container {
+            padding-bottom: calc(80px + env(safe-area-inset-bottom));
+        }
+    }
 }

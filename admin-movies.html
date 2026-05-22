@@ -4,7 +4,7 @@
     <title>Manage Movies - Admin | Unruly Movies</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow">
     
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
@@ -68,7 +68,7 @@
         }
         
         .admin-nav a:hover, .admin-nav a.active {
-            background: rgba(124, 252, 0, 0.1);
+            background: rgba(74, 222, 128, 0.1);
             color: var(--primary-color);
         }
         
@@ -182,7 +182,7 @@
         .form-group textarea:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(124, 252, 0, 0.1);
+            box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.1);
         }
         
         .form-group textarea {
@@ -231,7 +231,7 @@
         }
         
         .btn-secondary:hover {
-            background: rgba(124, 252, 0, 0.1);
+            background: rgba(74, 222, 128, 0.1);
         }
         
         /* TMDB Preview */
@@ -261,7 +261,7 @@
         .tmdb-info p { color: var(--text-secondary); margin-bottom: 10px; font-size: 14px; }
         .tmdb-info .genres { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
         .tmdb-info .genres span {
-            background: rgba(124, 252, 0, 0.1);
+            background: rgba(74, 222, 128, 0.1);
             color: var(--primary-color);
             padding: 4px 10px;
             border-radius: 5px;
@@ -291,7 +291,7 @@
         }
         
         .movies-table tr:hover td {
-            background: rgba(124, 252, 0, 0.02);
+            background: rgba(74, 222, 128, 0.02);
         }
         
         .movie-row-poster {
@@ -310,7 +310,7 @@
             align-items: center;
             gap: 5px;
             padding: 4px 10px;
-            background: rgba(124, 252, 0, 0.1);
+            background: rgba(74, 222, 128, 0.1);
             border-radius: 15px;
             font-size: 12px;
             color: var(--primary-color);
@@ -840,7 +840,7 @@
                             </div>
                             
                             <!-- Archive.org Helper -->
-                            <div class="form-group full-width" style="background: rgba(124, 252, 0, 0.05); padding: 15px; border-radius: 10px; border: 1px dashed var(--primary-color);">
+                            <div class="form-group full-width" style="background: rgba(74, 222, 128, 0.05); padding: 15px; border-radius: 10px; border: 1px dashed var(--primary-color);">
                                 <label style="color: var(--primary-color);">🎬 Archive.org Direct Link Generator (FAST, No CORS!)</label>
                                 <div style="margin-top: 10px;">
                                     <input type="text" id="archive-item-id" placeholder="Item ID or full URL (e.g., my-movie-2024 or https://archive.org/details/my-movie-2024)" style="width: 100%;">
@@ -1385,7 +1385,7 @@
             
             // Show loading status
             statusDiv.style.display = 'block';
-            statusDiv.style.background = 'rgba(124, 252, 0, 0.1)';
+            statusDiv.style.background = 'rgba(74, 222, 128, 0.1)';
             statusDiv.innerHTML = '<span style="color: var(--primary-color);">⏳ Fetching direct link from Archive.org...</span>';
             
             try {
@@ -1438,7 +1438,7 @@
                 document.getElementById('movie-embed-url').value = directUrl;
                 
                 // Show success with details
-                statusDiv.style.background = 'rgba(124, 252, 0, 0.15)';
+                statusDiv.style.background = 'rgba(74, 222, 128, 0.15)';
                 statusDiv.innerHTML = `
                     <span style="color: var(--primary-color);">✅ Direct MP4 Link Ready!</span><br>
                     <small style="color: var(--text-secondary);">

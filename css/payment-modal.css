@@ -215,7 +215,7 @@
 }
 
 .duration-tag.save {
-    background: #7CFC00;
+    background: #4ade80;
 }
 
 /* Provider Selection */
@@ -257,8 +257,8 @@
 }
 
 .provider-btn.active {
-    background: rgba(124, 252, 0, 0.08);
-    border-color: #7CFC00;
+    background: rgba(74, 222, 128, 0.08);
+    border-color: #4ade80;
 }
 
 .provider-icon {
@@ -304,8 +304,8 @@
 }
 
 .phone-input-wrapper:focus-within {
-    border-color: #7CFC00;
-    background: rgba(124, 252, 0, 0.05);
+    border-color: #4ade80;
+    background: rgba(74, 222, 128, 0.05);
 }
 
 .country-code {
@@ -362,7 +362,7 @@
 }
 
 .total-amount {
-    color: #7CFC00;
+    color: #4ade80;
     font-size: 18px;
 }
 
@@ -421,8 +421,8 @@
 }
 
 .status-icon.success {
-    background: rgba(124, 252, 0, 0.1);
-    border: 2px solid rgba(124, 252, 0, 0.3);
+    background: rgba(74, 222, 128, 0.1);
+    border: 2px solid rgba(74, 222, 128, 0.3);
 }
 
 .status-icon.failed {

@@ -40,10 +40,10 @@ const templates = {
                 <style>
                     body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
                     .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                    .header { background: linear-gradient(135deg, #7CFC00, #228B22); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                    .header { background: linear-gradient(135deg, #4ade80, #16a34a); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
                     .header h1 { color: #000; margin: 0; }
                     .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-                    .button { display: inline-block; padding: 12px 30px; background: #7CFC00; color: #000; text-decoration: none; border-radius: 5px; font-weight: bold; }
+                    .button { display: inline-block; padding: 12px 30px; background: #4ade80; color: #000; text-decoration: none; border-radius: 5px; font-weight: bold; }
                     .footer { text-align: center; margin-top: 30px; color: #888; font-size: 12px; }
                 </style>
             </head>
@@ -86,10 +86,10 @@ const templates = {
                 <style>
                     body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
                     .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                    .header { background: linear-gradient(135deg, #7CFC00, #228B22); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                    .header { background: linear-gradient(135deg, #4ade80, #16a34a); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
                     .header h1 { color: #000; margin: 0; }
                     .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-                    .button { display: inline-block; padding: 12px 30px; background: #7CFC00; color: #000; text-decoration: none; border-radius: 5px; font-weight: bold; }
+                    .button { display: inline-block; padding: 12px 30px; background: #4ade80; color: #000; text-decoration: none; border-radius: 5px; font-weight: bold; }
                     .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px 15px; margin: 20px 0; }
                     .footer { text-align: center; margin-top: 30px; color: #888; font-size: 12px; }
                 </style>
@@ -129,10 +129,10 @@ const templates = {
                 <style>
                     body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
                     .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                    .header { background: linear-gradient(135deg, #7CFC00, #228B22); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                    .header { background: linear-gradient(135deg, #4ade80, #16a34a); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
                     .header h1 { color: #000; margin: 0; }
                     .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-                    .button { display: inline-block; padding: 12px 30px; background: #7CFC00; color: #000; text-decoration: none; border-radius: 5px; font-weight: bold; }
+                    .button { display: inline-block; padding: 12px 30px; background: #4ade80; color: #000; text-decoration: none; border-radius: 5px; font-weight: bold; }
                     .footer { text-align: center; margin-top: 30px; color: #888; font-size: 12px; }
                 </style>
             </head>
@@ -171,7 +171,7 @@ const templates = {
                     .header { background: linear-gradient(135deg, #FFD700, #FFA500); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
                     .header h1 { color: #000; margin: 0; }
                     .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-                    .button { display: inline-block; padding: 12px 30px; background: #7CFC00; color: #000; text-decoration: none; border-radius: 5px; font-weight: bold; }
+                    .button { display: inline-block; padding: 12px 30px; background: #4ade80; color: #000; text-decoration: none; border-radius: 5px; font-weight: bold; }
                     .plan-badge { display: inline-block; background: #FFD700; color: #000; padding: 5px 15px; border-radius: 20px; font-weight: bold; }
                     .footer { text-align: center; margin-top: 30px; color: #888; font-size: 12px; }
                 </style>
@@ -223,13 +223,13 @@ const templates = {
                 <style>
                     body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
                     .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                    .header { background: linear-gradient(135deg, #7CFC00, #228B22); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                    .header { background: linear-gradient(135deg, #4ade80, #16a34a); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
                     .header h1 { color: #000; margin: 0; }
                     .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
                     .movie-card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
                     .movie-poster { width: 100%; height: 300px; object-fit: cover; }
                     .movie-info { padding: 20px; }
-                    .button { display: inline-block; padding: 12px 30px; background: #7CFC00; color: #000; text-decoration: none; border-radius: 5px; font-weight: bold; }
+                    .button { display: inline-block; padding: 12px 30px; background: #4ade80; color: #000; text-decoration: none; border-radius: 5px; font-weight: bold; }
                     .footer { text-align: center; margin-top: 30px; color: #888; font-size: 12px; }
                 </style>
             </head>

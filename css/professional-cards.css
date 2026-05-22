@@ -26,7 +26,7 @@
     min-width: 100%;
     background: #181818;
     border-radius: var(--card-radius);
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.8), 0 0 40px rgba(124, 252, 0, 0.15);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.8), 0 0 40px rgba(74, 222, 128, 0.15);
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -125,7 +125,7 @@
 }
 
 .preview-btn.btn-play:hover {
-    background: #7CFC00;
+    background: #4ade80;
     transform: scale(1.1);
 }
 
@@ -145,7 +145,7 @@
     transform: translateX(-50%);
     font-size: 8px;
     font-weight: 700;
-    color: #7CFC00;
+    color: #4ade80;
     white-space: nowrap;
     opacity: 0;
     transition: opacity 0.2s ease;
@@ -156,8 +156,8 @@
 }
 
 .preview-btn.active {
-    border-color: #7CFC00;
-    color: #7CFC00;
+    border-color: #4ade80;
+    color: #4ade80;
 }
 
 .preview-btn svg {
@@ -209,7 +209,7 @@
 
 .preview-quality {
     padding: 2px 6px;
-    background: linear-gradient(135deg, #7CFC00, #46d369);
+    background: linear-gradient(135deg, #4ade80, #46d369);
     color: #000;
     font-size: 10px;
     font-weight: 800;
@@ -254,12 +254,12 @@
     height: 24px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #7CFC00;
+    border: 2px solid #4ade80;
 }
 
 .preview-vj-name {
     font-size: 12px;
-    color: #7CFC00;
+    color: #4ade80;
     font-weight: 600;
 }
 
@@ -321,17 +321,17 @@
 }
 
 .hover-btn.btn-play-main:hover {
-    background: #7CFC00;
+    background: #4ade80;
 }
 
 .hover-btn.btn-trailer {
-    background: rgba(124, 252, 0, 0.15);
-    border-color: #7CFC00;
-    color: #7CFC00;
+    background: rgba(74, 222, 128, 0.15);
+    border-color: #4ade80;
+    color: #4ade80;
 }
 
 .hover-btn.btn-trailer:hover {
-    background: #7CFC00;
+    background: #4ade80;
     color: #000;
 }
 
@@ -363,7 +363,7 @@
 
 .hover-info-item.quality {
     padding: 2px 6px;
-    background: #7CFC00;
+    background: #4ade80;
     color: #000;
     font-weight: 700;
     border-radius: 3px;
@@ -416,7 +416,7 @@
     width: 32px;
     height: 32px;
     border: 3px solid rgba(255, 255, 255, 0.2);
-    border-top-color: #7CFC00;
+    border-top-color: #4ade80;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
@@ -630,7 +630,7 @@
 
 .expanded-quality {
     padding: 2px 6px;
-    background: #7CFC00;
+    background: #4ade80;
     color: #000;
     font-size: 11px;
     font-weight: 700;
@@ -730,7 +730,7 @@
     background: #181818;
     padding: 10px;
     border-radius: 0 0 var(--card-radius) var(--card-radius);
-    border-top: 1px solid rgba(124, 252, 0, 0.2);
+    border-top: 1px solid rgba(74, 222, 128, 0.2);
     opacity: 0;
     transform: translateY(100%);
     transition: all 0.3s ease;
@@ -745,7 +745,7 @@
 .card-also-like-title {
     font-size: 10px;
     font-weight: 600;
-    color: #7CFC00;
+    color: #4ade80;
     margin-bottom: 6px;
     text-transform: uppercase;
     letter-spacing: 0.5px;

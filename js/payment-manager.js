@@ -399,7 +399,7 @@ class PaymentManager {
         statusDiv.innerHTML = `
             <div class="status-success animate-bounce-in">
                 <div class="status-icon success">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#7CFC00" stroke-width="2">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
                         <path d="M20 6L9 17l-5-5"/>
                     </svg>
                 </div>
@@ -520,7 +520,7 @@ class PaymentManager {
      * Simple confetti effect
      */
     showConfetti() {
-        const colors = ['#7CFC00', '#00D9FF', '#FFD700', '#FF6B9D', '#9D4EDD'];
+        const colors = ['#4ade80', '#00D9FF', '#FFD700', '#FF6B9D', '#9D4EDD'];
         
         for (let i = 0; i < 50; i++) {
             const confetti = document.createElement('div');

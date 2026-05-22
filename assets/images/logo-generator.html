@@ -26,14 +26,14 @@
         }
         
         canvas {
-            border: 2px solid #7CFC00;
+            border: 2px solid #4ade80;
             border-radius: 10px;
             margin: 20px 0;
             background: white;
         }
         
         button {
-            background: linear-gradient(135deg, #7CFC00, #5CB300);
+            background: linear-gradient(135deg, #4ade80, #5CB300);
             color: #000;
             border: none;
             padding: 15px 30px;
@@ -47,11 +47,11 @@
         
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(124, 252, 0, 0.4);
+            box-shadow: 0 5px 20px rgba(74, 222, 128, 0.4);
         }
         
         h1 {
-            color: #7CFC00;
+            color: #4ade80;
             margin-bottom: 10px;
         }
         
@@ -84,13 +84,13 @@
         
         // Add gradient background
         const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
-        gradient.addColorStop(0, 'rgba(124, 252, 0, 0.1)');
+        gradient.addColorStop(0, 'rgba(74, 222, 128, 0.1)');
         gradient.addColorStop(1, 'rgba(0, 217, 255, 0.1)');
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         // Draw play button icon
-        ctx.fillStyle = '#7CFC00';
+        ctx.fillStyle = '#4ade80';
         ctx.beginPath();
         ctx.arc(100, 100, 50, 0, Math.PI * 2);
         ctx.fill();
@@ -108,7 +108,7 @@
         ctx.font = 'bold 60px Arial';
         ctx.fillText('UNRULY', 180, 90);
         
-        ctx.fillStyle = '#7CFC00';
+        ctx.fillStyle = '#4ade80';
         ctx.font = 'bold 40px Arial';
         ctx.fillText('MOVIES', 180, 135);
         
@@ -133,7 +133,7 @@
             fCtx.fillRect(0, 0, 64, 64);
             
             // Play button
-            fCtx.fillStyle = '#7CFC00';
+            fCtx.fillStyle = '#4ade80';
             fCtx.beginPath();
             fCtx.arc(32, 32, 28, 0, Math.PI * 2);
             fCtx.fill();

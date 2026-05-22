@@ -4,7 +4,7 @@
     <title>Genres - Admin | Unruly Movies</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow">
     
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
@@ -57,7 +57,7 @@
             transition: all 0.3s ease;
         }
         .admin-nav a:hover, .admin-nav a.active {
-            background: rgba(124, 252, 0, 0.1);
+            background: rgba(74, 222, 128, 0.1);
             color: var(--primary-color);
         }
         .admin-nav svg { width: 20px; height: 20px; }
@@ -494,9 +494,9 @@
                 
                 <div class="form-group">
                     <label class="form-label">Color</label>
-                    <input type="hidden" id="genreColor" value="#7CFC00">
+                    <input type="hidden" id="genreColor" value="#4ade80">
                     <div class="color-picker">
-                        <button type="button" class="color-btn selected" style="background: #7CFC00" onclick="selectColor('#7CFC00')"></button>
+                        <button type="button" class="color-btn selected" style="background: #4ade80" onclick="selectColor('#4ade80')"></button>
                         <button type="button" class="color-btn" style="background: #00d9ff" onclick="selectColor('#00d9ff')"></button>
                         <button type="button" class="color-btn" style="background: #ff9f43" onclick="selectColor('#ff9f43')"></button>
                         <button type="button" class="color-btn" style="background: #a855f7" onclick="selectColor('#a855f7')"></button>
@@ -530,7 +530,7 @@
             { name: 'Sci-Fi', slug: 'sci-fi', icon: '🚀', color: '#00d9ff', movieCount: 0 },
             { name: 'Fantasy', slug: 'fantasy', icon: '🔮', color: '#8b5cf6', movieCount: 0 },
             { name: 'Documentary', slug: 'documentary', icon: '📖', color: '#22c55e', movieCount: 0 },
-            { name: 'Family', slug: 'family', icon: '👨‍👩‍👧', color: '#7CFC00', movieCount: 0 },
+            { name: 'Family', slug: 'family', icon: '👨‍👩‍👧', color: '#4ade80', movieCount: 0 },
             { name: 'Adventure', slug: 'adventure', icon: '🌍', color: '#14b8a6', movieCount: 0 },
             { name: 'Crime', slug: 'crime', icon: '🔫', color: '#64748b', movieCount: 0 }
         ];
@@ -582,7 +582,7 @@
             
             grid.innerHTML = allGenres.map(genre => `
                 <div class="genre-card">
-                    <div class="genre-icon" style="background: ${genre.color || '#7CFC00'}20; color: ${genre.color || '#7CFC00'}">
+                    <div class="genre-icon" style="background: ${genre.color || '#4ade80'}20; color: ${genre.color || '#4ade80'}">
                         ${genre.icon || '🎬'}
                     </div>
                     <div class="genre-info">
@@ -622,7 +622,7 @@
             document.getElementById('submitBtnText').textContent = 'Add Genre';
             document.getElementById('genreForm').reset();
             document.getElementById('genreId').value = '';
-            document.getElementById('genreColor').value = '#7CFC00';
+            document.getElementById('genreColor').value = '#4ade80';
             resetColorPicker();
             document.getElementById('genreModal').classList.add('active');
         }
@@ -637,8 +637,8 @@
             document.getElementById('genreName').value = genre.name;
             document.getElementById('genreSlug').value = genre.slug;
             document.getElementById('genreIcon').value = genre.icon || '';
-            document.getElementById('genreColor').value = genre.color || '#7CFC00';
-            selectColor(genre.color || '#7CFC00');
+            document.getElementById('genreColor').value = genre.color || '#4ade80';
+            selectColor(genre.color || '#4ade80');
             
             document.getElementById('genreModal').classList.add('active');
         }
@@ -662,7 +662,7 @@
         
         function resetColorPicker() {
             document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('selected'));
-            document.querySelector('.color-btn[style*="#7CFC00"]').classList.add('selected');
+            document.querySelector('.color-btn[style*="#4ade80"]').classList.add('selected');
         }
         
         async function saveGenre(e) {

@@ -41,20 +41,20 @@
     transform: translateY(-5px);
     box-shadow: 
         0 20px 40px rgba(0, 0, 0, 0.4),
-        0 0 30px rgba(124, 252, 0, 0.15),
+        0 0 30px rgba(74, 222, 128, 0.15),
         inset 0 1px 0 rgba(255, 255, 255, 0.15);
-    border-color: rgba(124, 252, 0, 0.3);
+    border-color: rgba(74, 222, 128, 0.3);
 }
 
 .glass-button {
     background: linear-gradient(
         135deg,
-        rgba(124, 252, 0, 0.2) 0%,
+        rgba(74, 222, 128, 0.2) 0%,
         rgba(0, 217, 255, 0.2) 100%
     );
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(124, 252, 0, 0.3);
+    border: 1px solid rgba(74, 222, 128, 0.3);
     border-radius: 12px;
     padding: 12px 24px;
     color: #fff;
@@ -66,11 +66,11 @@
 .glass-button:hover {
     background: linear-gradient(
         135deg,
-        rgba(124, 252, 0, 0.4) 0%,
+        rgba(74, 222, 128, 0.4) 0%,
         rgba(0, 217, 255, 0.4) 100%
     );
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(124, 252, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(74, 222, 128, 0.3);
 }
 
 /* ============ MODERN ANIMATIONS ============ */
@@ -138,10 +138,10 @@
 /* Glow Pulse */
 @keyframes glowPulse {
     0%, 100% {
-        box-shadow: 0 0 20px rgba(124, 252, 0, 0.3);
+        box-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
     }
     50% {
-        box-shadow: 0 0 40px rgba(124, 252, 0, 0.5);
+        box-shadow: 0 0 40px rgba(74, 222, 128, 0.5);
     }
 }
 
@@ -313,7 +313,7 @@
 }
 
 .hover-glow:hover {
-    box-shadow: 0 0 30px rgba(124, 252, 0, 0.4);
+    box-shadow: 0 0 30px rgba(74, 222, 128, 0.4);
 }
 
 .hover-scale {
@@ -331,7 +331,7 @@
 /* ============ GRADIENT TEXT ============ */
 
 .gradient-text {
-    background: linear-gradient(135deg, #7CFC00 0%, #00D9FF 100%);
+    background: linear-gradient(135deg, #4ade80 0%, #00D9FF 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -368,7 +368,7 @@
     bottom: -2px;
     background: linear-gradient(
         45deg,
-        #7CFC00, #00D9FF, #9D4EDD, #FFD700, #7CFC00
+        #4ade80, #00D9FF, #9D4EDD, #FFD700, #4ade80
     );
     background-size: 400% 400%;
     animation: rotateGradient 3s ease infinite;
@@ -414,10 +414,10 @@
 
 .neon-green {
     text-shadow: 
-        0 0 5px #7CFC00,
-        0 0 10px #7CFC00,
-        0 0 20px #7CFC00,
-        0 0 40px #7CFC00;
+        0 0 5px #4ade80,
+        0 0 10px #4ade80,
+        0 0 20px #4ade80,
+        0 0 40px #4ade80;
 }
 
 .neon-blue {
@@ -430,10 +430,10 @@
 
 .neon-box-green {
     box-shadow: 
-        0 0 5px #7CFC00,
-        0 0 10px #7CFC00,
-        0 0 20px rgba(124, 252, 0, 0.5),
-        inset 0 0 10px rgba(124, 252, 0, 0.2);
+        0 0 5px #4ade80,
+        0 0 10px #4ade80,
+        0 0 20px rgba(74, 222, 128, 0.5),
+        inset 0 0 10px rgba(74, 222, 128, 0.2);
 }
 
 .neon-box-blue {
@@ -470,7 +470,7 @@
     background: linear-gradient(
         90deg,
         transparent,
-        rgba(124, 252, 0, 0.5),
+        rgba(74, 222, 128, 0.5),
         transparent
     );
     opacity: 0;
@@ -483,10 +483,10 @@
 
 .modern-card:hover {
     transform: translateY(-5px);
-    border-color: rgba(124, 252, 0, 0.2);
+    border-color: rgba(74, 222, 128, 0.2);
     box-shadow: 
         0 20px 40px rgba(0, 0, 0, 0.4),
-        0 0 0 1px rgba(124, 252, 0, 0.1);
+        0 0 0 1px rgba(74, 222, 128, 0.1);
 }
 
 /* ============ PREMIUM BADGE ============ */
@@ -556,7 +556,7 @@
 
 .progress-bar-modern .progress {
     height: 100%;
-    background: linear-gradient(90deg, #7CFC00 0%, #00D9FF 100%);
+    background: linear-gradient(90deg, #4ade80 0%, #00D9FF 100%);
     border-radius: 3px;
     transition: width 0.5s ease;
     position: relative;
@@ -593,9 +593,9 @@
 
 .modern-input:focus {
     outline: none;
-    border-color: #7CFC00;
-    background: rgba(124, 252, 0, 0.05);
-    box-shadow: 0 0 0 3px rgba(124, 252, 0, 0.1);
+    border-color: #4ade80;
+    background: rgba(74, 222, 128, 0.05);
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.1);
 }
 
 .modern-input::placeholder {
@@ -621,28 +621,28 @@
 }
 
 .btn-modern-primary {
-    background: linear-gradient(135deg, #7CFC00 0%, #66CC00 100%);
+    background: linear-gradient(135deg, #4ade80 0%, #16a34a 100%);
     color: #000;
 }
 
 .btn-modern-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(124, 252, 0, 0.4);
+    box-shadow: 0 10px 30px rgba(74, 222, 128, 0.4);
 }
 
 .btn-modern-secondary {
     background: transparent;
-    border: 2px solid #7CFC00;
-    color: #7CFC00;
+    border: 2px solid #4ade80;
+    color: #4ade80;
 }
 
 .btn-modern-secondary:hover {
-    background: rgba(124, 252, 0, 0.1);
+    background: rgba(74, 222, 128, 0.1);
     transform: translateY(-2px);
 }
 
 .btn-modern-gradient {
-    background: linear-gradient(135deg, #7CFC00 0%, #00D9FF 50%, #9D4EDD 100%);
+    background: linear-gradient(135deg, #4ade80 0%, #00D9FF 50%, #9D4EDD 100%);
     background-size: 200% 200%;
     color: #000;
     animation: rotateGradient 3s ease infinite;
@@ -650,7 +650,7 @@
 
 .btn-modern-gradient:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(124, 252, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(74, 222, 128, 0.3);
 }
 
 /* ============ MODAL STYLES ============ */
@@ -704,8 +704,8 @@
 .spinner-modern {
     width: 40px;
     height: 40px;
-    border: 3px solid rgba(124, 252, 0, 0.2);
-    border-top-color: #7CFC00;
+    border: 3px solid rgba(74, 222, 128, 0.2);
+    border-top-color: #4ade80;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
@@ -772,7 +772,7 @@
 }
 
 .toast-modern.success {
-    border-left: 4px solid #7CFC00;
+    border-left: 4px solid #4ade80;
 }
 
 .toast-modern.error {

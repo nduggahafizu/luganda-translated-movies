@@ -4,7 +4,7 @@
     <title>VJ Translators - Admin | Unruly Movies</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow">
     
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
@@ -61,7 +61,7 @@
             transition: all 0.3s ease;
         }
         .admin-nav a:hover, .admin-nav a.active {
-            background: rgba(124, 252, 0, 0.1);
+            background: rgba(74, 222, 128, 0.1);
             color: var(--primary-color);
         }
         .admin-nav svg { width: 20px; height: 20px; }
@@ -217,7 +217,7 @@
         .vj-badge {
             display: inline-block;
             padding: 4px 10px;
-            background: rgba(124, 252, 0, 0.1);
+            background: rgba(74, 222, 128, 0.1);
             color: var(--primary-color);
             border-radius: 20px;
             font-size: 12px;
@@ -519,7 +519,7 @@
                 <input type="hidden" id="vjId">
                 
                 <div class="avatar-upload">
-                    <img src="https://placehold.co/100x100/1a1a2e/7CFC00?text=VJ" class="avatar-preview" id="avatarPreview">
+                    <img src="https://placehold.co/100x100/16161f/4ade80?text=VJ" class="avatar-preview" id="avatarPreview">
                     <input type="text" class="form-control" id="vjImage" placeholder="Image URL" onchange="previewAvatar()">
                 </div>
                 
@@ -618,8 +618,8 @@
             
             grid.innerHTML = vjs.map(vj => `
                 <div class="vj-card">
-                    <img src="${vj.image || vj.profileImage || 'https://placehold.co/80x80/1a1a2e/7CFC00?text=' + (vj.name ? vj.name.charAt(0) : 'VJ')}" 
-                         alt="${vj.name}" class="vj-avatar" onerror="this.src='https://placehold.co/80x80/1a1a2e/7CFC00?text=VJ'">
+                    <img src="${vj.image || vj.profileImage || 'https://placehold.co/80x80/16161f/4ade80?text=' + (vj.name ? vj.name.charAt(0) : 'VJ')}" 
+                         alt="${vj.name}" class="vj-avatar" onerror="this.src='https://placehold.co/80x80/16161f/4ade80?text=VJ'">
                     <h3 class="vj-name">${vj.name}</h3>
                     <span class="vj-badge ${vj.movieCount > 50 ? 'popular' : vj.isNew ? 'new' : ''}">${vj.movieCount > 50 ? 'Popular' : 'Active'}</span>
                     <div class="vj-stats">
@@ -663,7 +663,7 @@
             document.getElementById('submitBtnText').textContent = 'Add VJ';
             document.getElementById('vjForm').reset();
             document.getElementById('vjId').value = '';
-            document.getElementById('avatarPreview').src = 'https://placehold.co/100x100/1a1a2e/7CFC00?text=VJ';
+            document.getElementById('avatarPreview').src = 'https://placehold.co/100x100/16161f/4ade80?text=VJ';
             document.getElementById('vjModal').classList.add('active');
         }
         
@@ -681,7 +681,7 @@
             document.getElementById('vjSpecialties').value = (vj.specialties || []).join(', ');
             document.getElementById('vjYoutube').value = vj.youtube || '';
             document.getElementById('vjStatus').value = vj.status || 'active';
-            document.getElementById('avatarPreview').src = vj.image || vj.profileImage || 'https://placehold.co/100x100/1a1a2e/7CFC00?text=VJ';
+            document.getElementById('avatarPreview').src = vj.image || vj.profileImage || 'https://placehold.co/100x100/16161f/4ade80?text=VJ';
             
             document.getElementById('vjModal').classList.add('active');
         }
@@ -692,7 +692,7 @@
         
         function previewAvatar() {
             const url = document.getElementById('vjImage').value;
-            document.getElementById('avatarPreview').src = url || 'https://placehold.co/100x100/1a1a2e/7CFC00?text=VJ';
+            document.getElementById('avatarPreview').src = url || 'https://placehold.co/100x100/16161f/4ade80?text=VJ';
         }
         
         async function saveVJ(e) {

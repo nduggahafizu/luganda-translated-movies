@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="Search for Luganda translated movies, VJ translators, and genres">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="robots" content="noindex, follow">
-    <meta name="theme-color" content="#7CFC00">
+    <meta name="theme-color" content="#4ade80">
     <meta name="google-adsense-account" content="ca-pub-1904736753681797">
     
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
@@ -55,7 +55,7 @@
         .search-input:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(124, 252, 0, 0.1);
+            box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.1);
         }
         
         .search-icon {
@@ -137,7 +137,7 @@
             align-items: center;
             gap: 8px;
             padding: 8px 15px;
-            background: rgba(124, 252, 0, 0.1);
+            background: rgba(74, 222, 128, 0.1);
             border: 1px solid var(--primary-color);
             border-radius: 20px;
             font-size: 13px;
@@ -870,13 +870,13 @@
                     suggestions.innerHTML = movies.map(movie => {
                         const movieId = Sanitize.attr(movie._id);
                         const movieTitle = Sanitize.text(movie.originalTitle || movie.title || 'Unknown');
-                        const moviePoster = Sanitize.url(movie.poster) || 'https://placehold.co/50x75/1a1a2e/7CFC00?text=Movie';
+                        const moviePoster = Sanitize.url(movie.poster) || 'https://placehold.co/50x75/16161f/4ade80?text=Movie';
                         const movieYear = Sanitize.text(movie.year || '');
                         const movieVj = movie.vjName ? '• VJ ' + Sanitize.text(movie.vjName) : '';
                         
                         return `
                             <div class="suggestion-item" onclick="selectSuggestion('${movieId}', '${movieTitle.replace(/'/g, "\\'")}')">
-                                <img src="${moviePoster}" alt="${movieTitle}" class="suggestion-poster" onerror="this.src='https://placehold.co/50x75/1a1a2e/7CFC00?text=Movie'">
+                                <img src="${moviePoster}" alt="${movieTitle}" class="suggestion-poster" onerror="this.src='https://placehold.co/50x75/16161f/4ade80?text=Movie'">
                                 <div class="suggestion-info">
                                     <div class="suggestion-title">${movieTitle}</div>
                                     <div class="suggestion-meta">${movieYear} ${movieVj}</div>
@@ -977,7 +977,7 @@
             resultsGrid.innerHTML = movies.map(movie => {
                 const title = Sanitize.text(movie.originalTitle || movie.title || 'Unknown Movie');
                 const movieId = Sanitize.attr(movie._id);
-                const posterUrl = Sanitize.url(movie.poster) || `https://placehold.co/300x450/1a1a2e/7CFC00?text=${encodeURIComponent(title.substring(0,15))}`;
+                const posterUrl = Sanitize.url(movie.poster) || `https://placehold.co/300x450/16161f/4ade80?text=${encodeURIComponent(title.substring(0,15))}`;
                 const rating = movie.rating?.userRating || movie.rating?.imdb || null;
                 const vjName = Sanitize.text(movie.vjName || movie.vj || '');
                 const description = Sanitize.text(movie.overview || movie.description || '');
@@ -989,7 +989,7 @@
                 <div class="movie-card">
                     <div class="movie-poster">
                         <a href="player.html?id=${movieId}">
-                            <img src="${posterUrl}" alt="${title}" loading="lazy" onerror="this.src='https://placehold.co/300x450/1a1a2e/7CFC00?text=Movie'">
+                            <img src="${posterUrl}" alt="${title}" loading="lazy" onerror="this.src='https://placehold.co/300x450/16161f/4ade80?text=Movie'">
                         </a>
                         <div class="movie-badge">${quality}</div>
                         ${rating ? `

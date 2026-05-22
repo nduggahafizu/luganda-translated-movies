@@ -132,10 +132,10 @@
                 width: 60px;
                 height: 60px;
                 border-radius: 50%;
-                background: linear-gradient(135deg, #7CFC00, #00d4aa);
+                background: linear-gradient(135deg, #4ade80, #00d4aa);
                 border: none;
                 cursor: pointer;
-                box-shadow: 0 4px 20px rgba(124, 252, 0, 0.4);
+                box-shadow: 0 4px 20px rgba(74, 222, 128, 0.4);
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -145,7 +145,7 @@
             
             .chat-toggle-btn:hover {
                 transform: scale(1.1);
-                box-shadow: 0 6px 25px rgba(124, 252, 0, 0.6);
+                box-shadow: 0 6px 25px rgba(74, 222, 128, 0.6);
             }
             
             .chat-toggle-btn svg {
@@ -224,7 +224,7 @@
             }
             
             .chat-header {
-                background: linear-gradient(135deg, #7CFC00, #00d4aa);
+                background: linear-gradient(135deg, #4ade80, #00d4aa);
                 padding: 20px;
                 display: flex;
                 justify-content: space-between;
@@ -321,7 +321,7 @@
                 width: 36px;
                 height: 36px;
                 border-radius: 50%;
-                background: #7CFC00;
+                background: #4ade80;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -385,7 +385,7 @@
             
             .chat-option-btn:hover {
                 background: #222;
-                border-color: #7CFC00;
+                border-color: #4ade80;
                 transform: translateX(5px);
             }
             
@@ -400,7 +400,7 @@
             }
             
             .email-btn svg {
-                color: #7CFC00;
+                color: #4ade80;
             }
             
             .form-btn svg {

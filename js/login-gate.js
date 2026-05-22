@@ -315,8 +315,8 @@
                     letter-spacing: 0.06em;
                     padding: 6px 10px;
                     border-radius: 999px;
-                    background: rgba(124, 252, 0, 0.18);
-                    border: 1px solid rgba(124, 252, 0, 0.32);
+                    background: rgba(74, 222, 128, 0.18);
+                    border: 1px solid rgba(74, 222, 128, 0.32);
                     color: #d9ffb8;
                 }
                 .smart-gate-message {
@@ -344,7 +344,7 @@
                     min-width: 120px;
                 }
                 .smart-gate-btn.primary {
-                    background: var(--primary-color, #7CFC00);
+                    background: var(--primary-color, #4ade80);
                     color: #000;
                     border: none;
                 }

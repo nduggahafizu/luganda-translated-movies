@@ -332,7 +332,7 @@ function updateAuthUI() {
             navbarUser.innerHTML = `
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown">
-                        <div class="avatar avatar-sm" style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7CFC00,#00D9FF);display:flex;align-items:center;justify-content:center;font-weight:bold;color:#000;">${(user.fullName || user.name || 'U').charAt(0).toUpperCase()}</div>
+                        <div class="avatar avatar-sm" style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#4ade80,#00D9FF);display:flex;align-items:center;justify-content:center;font-weight:bold;color:#000;">${(user.fullName || user.name || 'U').charAt(0).toUpperCase()}</div>
                         <span class="d-none d-md-inline ml-2">${(user.fullName || user.name || 'User').split(' ')[0]}</span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" style="background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);">
@@ -377,7 +377,7 @@ function showNotification(message, type = 'info') {
         position: fixed;
         top: 80px;
         right: 20px;
-        background: ${type === 'success' ? '#7CFC00' : type === 'error' ? '#ff4444' : '#00D9FF'};
+        background: ${type === 'success' ? '#4ade80' : type === 'error' ? '#ff4444' : '#00D9FF'};
         color: ${type === 'success' || type === 'error' ? '#000' : '#fff'};
         padding: 15px 20px;
         border-radius: 10px;

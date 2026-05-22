@@ -215,7 +215,7 @@ const UnrulyPush = {
                 width: 90%;
                 text-align: center;
                 box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-                border: 1px solid rgba(124, 252, 0, 0.2);
+                border: 1px solid rgba(74, 222, 128, 0.2);
             }
             .push-prompt-icon {
                 font-size: 60px;
@@ -223,7 +223,7 @@ const UnrulyPush = {
                 animation: bounce 1s ease infinite;
             }
             .push-prompt-modal h3 {
-                color: #7CFC00;
+                color: #4ade80;
                 font-size: 24px;
                 margin-bottom: 10px;
             }
@@ -239,7 +239,7 @@ const UnrulyPush = {
                 gap: 10px;
             }
             .push-btn-enable {
-                background: linear-gradient(135deg, #7CFC00 0%, #00D9FF 100%);
+                background: linear-gradient(135deg, #4ade80 0%, #00D9FF 100%);
                 color: #000;
                 border: none;
                 padding: 14px 30px;
@@ -251,7 +251,7 @@ const UnrulyPush = {
             }
             .push-btn-enable:hover {
                 transform: scale(1.05);
-                box-shadow: 0 5px 20px rgba(124, 252, 0, 0.4);
+                box-shadow: 0 5px 20px rgba(74, 222, 128, 0.4);
             }
             .push-btn-later {
                 background: transparent;
@@ -278,7 +278,7 @@ const UnrulyPush = {
                 cursor: pointer;
             }
             .push-dont-ask input {
-                accent-color: #7CFC00;
+                accent-color: #4ade80;
             }
             @keyframes fadeIn {
                 from { opacity: 0; }
@@ -560,7 +560,7 @@ const UnrulyPush = {
             font-weight: 600;
             z-index: 100001;
             animation: slideUp 0.3s ease;
-            background: ${type === 'success' ? '#7CFC00' : type === 'error' ? '#ff4444' : '#00D9FF'};
+            background: ${type === 'success' ? '#4ade80' : type === 'error' ? '#ff4444' : '#00D9FF'};
             color: ${type === 'error' ? '#fff' : '#000'};
             box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         `;
