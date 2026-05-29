@@ -86,14 +86,10 @@ Disallow: /player
 Disallow: /movie
 Disallow: /series-player
 Disallow: /series-detail
-Disallow: /search
 Disallow: /local-admin-upload
 Disallow: /test-*
 Disallow: /login
 Disallow: /register
-Disallow: /subscribe
-Disallow: /tv-stations
-Disallow: /vj
 Disallow: /privacy
 Disallow: /payment-success
 Disallow: /payment-failed
