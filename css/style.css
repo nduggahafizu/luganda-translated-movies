@@ -198,7 +198,7 @@ img {
 .app-header {
     background: linear-gradient(180deg, rgba(10, 10, 10, 0.98) 0%, rgba(10, 10, 10, 0.95) 100%);
     -webkit-backdrop-filter: blur(15px);
-    -webkit-backdrop-filter:backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -499,7 +499,7 @@ img {
     bottom: 0;
     background: rgba(0, 0, 0, 0.7);
     -webkit-backdrop-filter: blur(4px);
-    -webkit-backdrop-filter:backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
     z-index: 1999;
     opacity: 0;
     visibility: hidden;
@@ -953,7 +953,8 @@ img {
     border-radius: 10px;
     font-size: 13px;
     font-weight: 600;
-    -webkit-backdrop-filter:backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     letter-spacing: 0.3px;
 }
@@ -1029,7 +1030,8 @@ img {
     border-radius: 14px;
     text-decoration: none;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    -webkit-backdrop-filter:backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
@@ -1056,7 +1058,8 @@ img {
 .control-next {
     pointer-events: all;
     background: rgba(0, 0, 0, 0.6);
-    -webkit-backdrop-filter:backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     border-radius: 50%;
     width: 56px;
     height: 56px;
@@ -1091,7 +1094,8 @@ img {
     padding: 12px 20px;
     z-index: 10;
     background: rgba(0, 0, 0, 0.4);
-    -webkit-backdrop-filter:backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     border-radius: 30px;
 }
 
@@ -1258,7 +1262,7 @@ img {
     background: rgba(0, 0, 0, 0.7);
     border-radius: 8px;
     -webkit-backdrop-filter: blur(5px);
-    -webkit-backdrop-filter:backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
 }
 
 .imdb span {
@@ -3179,8 +3183,8 @@ a:focus-visible {
 /* Glass morphism effect */
 .glass {
     background: rgba(26, 26, 37, 0.7);
-    -webkit-backdrop-filter:backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -3238,7 +3242,7 @@ a:focus-visible {
     bottom: 0;
     background: rgba(0, 0, 0, 0.85);
     -webkit-backdrop-filter: blur(10px);
-    -webkit-backdrop-filter:backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3497,7 +3501,8 @@ a:focus-visible {
     .section-header .view-all,
     .view-all {
         font-size: 12px;
-    
+    }
+
     /* Movie Grid Full Width Fix */
     .row {
         margin: 0 -4px;
@@ -3536,6 +3541,9 @@ a:focus-visible {
         width: 34px;
         height: 34px;
     }
+
+    .btn-watch-now {
+        padding: 12px 22px;
         font-size: 14px;
         border-radius: 12px;
     }
