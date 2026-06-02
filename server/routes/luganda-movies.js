@@ -1133,6 +1133,35 @@ router.post('/:id/like', async (req, res) => {
     }
 });
 
+// POST /api/luganda-movies/:id/view - Increment view count from the player
+router.post('/:id/view', async (req, res) => {
+    setCorsHeaders(req, res);
+    try {
+        const { id } = req.params;
+
+        if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+            return res.status(400).json({ success: false, message: 'Invalid movie ID format' });
+        }
+
+        const movie = await LugandaMovie.findById(id);
+        if (!movie) {
+            return res.status(404).json({ success: false, message: 'Movie not found' });
+        }
+
+        movie.views = (movie.views || 0) + 1;
+        await movie.save();
+
+        res.json({
+            success: true,
+            message: 'View counted',
+            data: { views: movie.views }
+        });
+    } catch (error) {
+        console.error('Error counting view:', error);
+        res.status(500).json({ success: false, message: 'Failed to count view' });
+    }
+});
+
 // PATCH /api/luganda-movies/:id - Quick update (toggle trending, featured, todaysPicks, forYou)
 router.patch('/:id', async (req, res) => {
     setCorsHeaders(req, res);
