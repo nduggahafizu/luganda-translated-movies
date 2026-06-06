@@ -230,7 +230,8 @@ class TrailerPlayer {
 }
 
 // Initialize trailer player immediately (scripts load after DOM)
-let trailerPlayer = new TrailerPlayer();
+// Use var so it lands on window and doesn't conflict with inline script declarations
+var trailerPlayer = new TrailerPlayer();
 
 /**
  * Helper function to add trailer button to movie cards

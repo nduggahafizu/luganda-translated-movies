@@ -2130,14 +2130,9 @@
     
     <!-- Trailer Player -->
     <link rel="stylesheet" href="css/trailer-player.css">
+    <script src="js/tmdb-api.js"></script>
     <script src="js/trailer-player.js"></script>
     <script>
-        // Initialize trailer player
-        let trailerPlayer;
-        document.addEventListener('DOMContentLoaded', () => {
-            trailerPlayer = new TrailerPlayer();
-        });
-        
         // Play movie trailer using TMDB ID
         async function playMovieTrailer(tmdbId, movieTitle) {
             if (!tmdbId) {
