@@ -1540,14 +1540,16 @@
             const urlLower = url.toLowerCase();
             
             // Check if URL needs proxying (CDNs with CORS/referer restrictions)
-            const needsProxy = urlLower.includes('b-cdn.net') || 
+            const needsProxy = urlLower.includes('b-cdn.net') ||
                                urlLower.includes('pearlpix.xyz') ||
                                urlLower.includes('.mkv');
-            
+
+            // Save raw URL BEFORE proxying so the error-retry handler never double-proxies
+            const rawUrl = url;
+
             if (needsProxy) {
                 console.log('🎬 CDN detected - using stream proxy');
-                url = `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(url)}`;
-                // Set type based on original extension
+                url = `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(rawUrl)}`;
                 if (urlLower.includes('.mkv')) {
                     type = 'video/mp4';
                 } else if (urlLower.includes('.webm')) {
@@ -1555,16 +1557,12 @@
                 } else if (urlLower.includes('.m3u8')) {
                     type = 'application/x-mpegURL';
                 }
-            }
-            // Handle HLS (non-proxied)
-            else if (urlLower.includes('.m3u8')) {
+            } else if (urlLower.includes('.m3u8')) {
                 type = 'application/x-mpegURL';
-            }
-            // Handle WebM (non-proxied)
-            else if (urlLower.includes('.webm')) {
+            } else if (urlLower.includes('.webm')) {
                 type = 'video/webm';
             }
-            
+
             // Set source
             console.log('🎬 Setting player source:', { src: url, type: type });
             player.pause();
@@ -1591,10 +1589,10 @@
                 console.error('⚠️ Player error event:', err);
 
                 if (err && err.code === 4) {
-                    // Retry with stream proxy for CODE:4
+                    // Retry with stream proxy for CODE:4 — use rawUrl to avoid double-proxying
                     console.warn('⚠️ Retrying playback for CODE:4 with stream proxy');
-                    const proxyUrl = `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(url)}`;
-                    
+                    const proxyUrl = `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(rawUrl)}`;
+
                     player.src({ src: proxyUrl, type: type });
                     player.load();
                     player.play().catch(playErr => {

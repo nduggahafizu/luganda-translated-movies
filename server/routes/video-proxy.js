@@ -33,14 +33,15 @@ const setCorsHeaders = (req, res) => {
         'http://localhost:8000'
     ];
     
-    if (origin && (allowedOrigins.includes(origin) || origin.includes('netlify.app') || origin.includes('unrulymovies.com'))) {
+    if (origin && (allowedOrigins.includes(origin) || origin.includes('netlify.app') || origin.includes('unrulymovies.com') || origin.includes('pearlpix.net'))) {
         res.setHeader('Access-Control-Allow-Origin', origin);
-    } else if (!origin) {
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+    } else {
+        // Allow all origins for video streaming — credentials cannot be used with wildcard
         res.setHeader('Access-Control-Allow-Origin', '*');
     }
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Range');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
 };
 
 // Handle OPTIONS preflight
@@ -730,6 +731,18 @@ router.get('/stream-proxy', async (req, res) => {
     }
 
     let decodedUrl = decodeURIComponent(url);
+
+    // Guard: prevent double-proxy (URL is itself a stream-proxy URL)
+    if (decodedUrl.includes('/api/video/stream-proxy') || decodedUrl.includes('/stream-proxy?url=')) {
+        const innerMatch = decodedUrl.match(/[?&]url=(.+)$/);
+        if (innerMatch) {
+            decodedUrl = decodeURIComponent(innerMatch[1]);
+            console.warn('🎬 Double-proxy detected, unwrapping to:', decodedUrl.substring(0, 100));
+        } else {
+            return res.status(400).json({ success: false, message: 'Invalid proxy URL' });
+        }
+    }
+
     // Encode spaces for HTTP requests
     const fetchUrl = decodedUrl.replace(/ /g, '%20');
     console.log('🎬 Proxying video:', decodedUrl.substring(0, 100) + '...');
