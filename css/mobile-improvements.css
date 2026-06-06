@@ -77,11 +77,33 @@ html, body {
 /* ===== CARD GRID ===== */
 .card-grid {
     display: grid !important;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--card-gap-xs);
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
     margin: 0 0 32px 0;
     padding: 0;
     width: 100%;
+}
+
+/* Compact card info for 4-col mobile */
+.card-info {
+    padding: 4px 5px 6px;
+}
+.card-title {
+    font-size: 10px;
+}
+.card-meta {
+    font-size: 9px;
+    gap: 2px;
+}
+.card-badge {
+    font-size: 8px;
+    padding: 1px 4px;
+}
+.card-rating {
+    padding: 2px 5px;
+    font-size: 9px;
+    bottom: 4px;
+    right: 4px;
 }
 
 /* Remove Bootstrap gutters */
@@ -108,30 +130,30 @@ html, body {
 
 /* ===== BREAKPOINTS ===== */
 
-/* Small phones (< 400px) — very tight */
+/* Small phones (< 400px) — very tight, 4 columns */
 @media (max-width: 399px) {
     :root {
         --page-pad-md: 8px;
     }
     .card-grid {
-        gap: 6px;
+        gap: 3px;
     }
     .slide {
         height: clamp(180px, 52vw, 260px) !important;
     }
 }
 
-/* Phones (400px – 575px) */
+/* Phones (400px – 575px) — 4 columns */
 @media (min-width: 400px) and (max-width: 575px) {
     :root {
         --page-pad-md: 12px;
     }
     .card-grid {
-        gap: var(--card-gap-xs);
+        gap: 5px;
     }
 }
 
-/* Small tablets / large phones (576px – 767px) — 3 columns */
+/* Small tablets / large phones (576px – 767px) — 5 columns, restore card sizing */
 @media (min-width: 576px) {
     :root {
         --page-pad-md: 16px;
@@ -139,36 +161,51 @@ html, body {
     .card-grid,
     .row-cols-2,
     .row-cols-md-5 {
-        grid-template-columns: repeat(3, 1fr) !important;
-        gap: var(--card-gap-sm) !important;
+        grid-template-columns: repeat(5, 1fr) !important;
+        gap: 8px !important;
     }
+    .card-info { padding: 6px 8px 8px; }
+    .card-title { font-size: 12px; }
+    .card-meta  { font-size: 10px; gap: 4px; }
+    .card-badge { font-size: 9px; padding: 2px 6px; }
+    .card-rating { padding: 3px 6px; font-size: 10px; bottom: 6px; right: 6px; }
 }
 
-/* Tablets (768px – 991px) — 4 columns */
+/* Tablets (768px – 991px) — 5 columns */
 @media (min-width: 768px) {
     :root {
         --page-pad-md: 20px;
     }
     .card-grid,
     .row-cols-md-5 {
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: var(--card-gap-md) !important;
+        grid-template-columns: repeat(5, 1fr) !important;
+        gap: 12px !important;
     }
+    .card-info { padding: 8px 10px 10px; }
+    .card-title { font-size: 13px; }
+    .card-meta  { font-size: 11px; }
+    .card-badge { font-size: 9px; padding: 2px 6px; }
+    .card-rating { padding: 4px 7px; font-size: 11px; bottom: 8px; right: 8px; }
     .slide {
         height: clamp(300px, 42vw, 520px) !important;
     }
 }
 
-/* Desktop (992px – 1199px) — 5 columns */
+/* Desktop (992px – 1199px) — 6 columns */
 @media (min-width: 992px) {
     :root {
         --page-pad-md: 28px;
     }
     .card-grid,
     .row-cols-md-5 {
-        grid-template-columns: repeat(5, 1fr) !important;
+        grid-template-columns: repeat(6, 1fr) !important;
         gap: var(--card-gap-lg) !important;
     }
+    .card-info { padding: 10px 12px 12px; }
+    .card-title { font-size: 14px; }
+    .card-meta  { font-size: 12px; }
+    .card-badge { font-size: 10px; padding: 4px 10px; }
+    .card-rating { padding: 4px 8px; font-size: 11px; bottom: 10px; right: 10px; }
     .slide {
         height: clamp(380px, 36vw, 600px) !important;
     }
@@ -181,26 +218,26 @@ html, body {
     }
 }
 
-/* Large desktop (1200px+) — 6 columns */
+/* Large desktop (1200px+) — 7 columns */
 @media (min-width: 1200px) {
     :root {
         --page-pad-md: 36px;
     }
     .card-grid,
     .row-cols-md-5 {
-        grid-template-columns: repeat(6, 1fr) !important;
+        grid-template-columns: repeat(7, 1fr) !important;
         gap: 20px !important;
     }
 }
 
-/* Ultra-wide (1600px+) — 7 columns */
+/* Ultra-wide (1600px+) — 8 columns */
 @media (min-width: 1600px) {
     :root {
         --page-pad-md: 48px;
     }
     .card-grid,
     .row-cols-md-5 {
-        grid-template-columns: repeat(7, 1fr) !important;
+        grid-template-columns: repeat(8, 1fr) !important;
     }
 }
 
@@ -355,6 +392,14 @@ html, body {
         width: 42px;
         height: 42px;
     }
+}
+
+/* ===== RATING BADGE — dark bg with gold star (not full yellow card) ===== */
+.card-rating {
+    background: rgba(0, 0, 0, 0.82) !important;
+    color: #FFD700 !important;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
 }
 
 /* ===== PREVENT HORIZONTAL OVERFLOW ===== */
