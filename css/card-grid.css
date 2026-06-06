@@ -324,8 +324,8 @@
     position: absolute;
     bottom: 10px;
     right: 10px;
-    background: linear-gradient(135deg, #FFD700, #FFA500);
-    color: #000;
+    background: rgba(0, 0, 0, 0.80);
+    color: #FFD700;
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 11px;
@@ -334,6 +334,8 @@
     align-items: center;
     gap: 4px;
     z-index: 5;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
 }
 
 .card-rating svg {
@@ -368,11 +370,13 @@
     right: 10px;
     bottom: 10px;
     top: auto;
-    background: linear-gradient(135deg, #FFD700, #FFA500);
-    color: #000;
+    background: rgba(0, 0, 0, 0.80);
+    color: #FFD700;
     display: flex;
     align-items: center;
     gap: 4px;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
 }
 
 .card-badge.rating svg {
@@ -626,8 +630,8 @@
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1200px) {
     .card-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 16px;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 14px;
     }
 }
 
@@ -637,22 +641,23 @@
         border-radius: 16px;
         margin-bottom: 25px;
     }
-    
+
     .page-hero h1 {
         font-size: 24px;
     }
-    
+
     .page-hero p {
         font-size: 14px;
     }
-    
+
     .section-title {
         font-size: 20px;
     }
-    
+
+    /* Tablet: 4 columns minimum */
     .card-grid {
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-        gap: 12px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
     }
     
     .content-card {
@@ -711,26 +716,26 @@
 
 @media (max-width: 480px) {
     .card-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4px;
         margin: 0;
         padding: 0;
     }
-    
+
     .movie-section {
         padding: 0 !important;
         margin: 0 !important;
     }
-    
+
     .section-header {
         padding: 0 8px;
         margin-bottom: 12px;
     }
-    
+
     .card-title {
-        font-size: 11px;
+        font-size: 10px;
     }
-    
+
     .card-meta {
         font-size: 9px;
     }

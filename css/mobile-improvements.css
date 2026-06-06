@@ -394,14 +394,6 @@ html, body {
     }
 }
 
-/* ===== RATING BADGE — dark bg with gold star (not full yellow card) ===== */
-.card-rating {
-    background: rgba(0, 0, 0, 0.82) !important;
-    color: #FFD700 !important;
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
-}
-
 /* ===== PREVENT HORIZONTAL OVERFLOW ===== */
 * {
     box-sizing: border-box;
