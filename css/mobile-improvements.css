@@ -77,8 +77,8 @@ html, body {
 /* ===== CARD GRID ===== */
 .card-grid {
     display: grid !important;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 4px;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 4px !important;
     margin: 0 0 32px 0;
     padding: 0;
     width: 100%;
