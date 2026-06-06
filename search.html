@@ -861,7 +861,9 @@
                         const movieTitle = Sanitize.text(movie.originalTitle || movie.title || 'Unknown');
                         const moviePoster = Sanitize.url(movie.poster) || 'https://placehold.co/50x75/16161f/4ade80?text=Movie';
                         const movieYear = Sanitize.text(movie.year || '');
-                        const movieVj = movie.vjName ? '• VJ ' + Sanitize.text(movie.vjName) : '';
+                        const _rawVj = Sanitize.text(movie.vjName || '');
+                        const _vjSuffix = _rawVj.replace(/^vj\s*/i, '').trim();
+                        const movieVj = _vjSuffix ? '• VJ ' + _vjSuffix : (_rawVj ? '• ' + _rawVj : '');
                         
                         return `
                             <div class="suggestion-item" onclick="selectSuggestion('${movieId}', '${movieTitle.replace(/'/g, "\\'")}')">
@@ -968,7 +970,8 @@
                 const movieId = Sanitize.attr(movie._id);
                 const posterUrl = Sanitize.url(movie.poster) || `https://placehold.co/300x450/16161f/4ade80?text=${encodeURIComponent(title.substring(0,15))}`;
                 const rating = movie.rating?.userRating || movie.rating?.imdb || null;
-                const vjName = Sanitize.text(movie.vjName || movie.vj || '');
+                const _vjRaw = Sanitize.text(movie.vjName || movie.vj || '');
+                const vjName = _vjRaw.replace(/^vj\s*/i, '').trim();
                 const description = Sanitize.text(movie.overview || movie.description || '');
                 const quality = Sanitize.text(movie.video?.quality?.toUpperCase() || 'HD');
                 const year = Sanitize.text(movie.year || '');

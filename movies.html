@@ -624,8 +624,8 @@
         function formatVjBadge(vjName) {
             const name = (vjName || '').toString().trim();
             if (!name || name.toLowerCase() === 'unknown') return '';
-            if (/^vj\b/i.test(name)) return name.replace(/^vj\b/i, 'Vj').trim();
-            return `Vj ${name}`;
+            const suffix = name.replace(/^vj\s*/i, '').trim();
+            return suffix ? `VJ ${suffix}` : name.toUpperCase();
         }
 
         function renderMovies(moviesToRender) {

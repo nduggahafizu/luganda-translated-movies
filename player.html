@@ -1758,8 +1758,8 @@
             
             // VJ Info
             if (movie.vjName) {
-                const vjDisplay = movie.vjName.replace(/^vj[\s]*/i, '').trim();
-                document.getElementById('vjName').textContent = `VJ ${vjDisplay}`;
+                const vjSuffix = movie.vjName.replace(/^vj\s*/i, '').trim();
+                document.getElementById('vjName').textContent = vjSuffix ? `VJ ${vjSuffix}` : movie.vjName.trim();
             }
             if (movie.vjAvatar) {
                 document.getElementById('vjAvatar').src = movie.vjAvatar;
