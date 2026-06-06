@@ -53,16 +53,16 @@ router.get('/dashboard', [auth, adminOnly], async (req, res) => {
         
         // Get view stats for the month
         const viewStats = await ViewStats.aggregate([
-            { $match: { viewedAt: { $gte: thisMonth } } },
-            { $group: { _id: null, total: { $sum: 1 } } }
+            { $match: { date: { $gte: thisMonth } } },
+            { $group: { _id: null, total: { $sum: '$views' } } }
         ]);
-        
+
         const totalViewsThisMonth = viewStats[0]?.total || 0;
-        
+
         // Get last month views for comparison
         const lastMonthViews = await ViewStats.aggregate([
-            { $match: { viewedAt: { $gte: lastMonth, $lt: thisMonth } } },
-            { $group: { _id: null, total: { $sum: 1 } } }
+            { $match: { date: { $gte: lastMonth, $lt: thisMonth } } },
+            { $group: { _id: null, total: { $sum: '$views' } } }
         ]);
         
         const viewsGrowth = lastMonthViews[0]?.total 
@@ -1018,11 +1018,11 @@ router.get('/analytics', [auth, adminOnly], async (req, res) => {
         
         // Views by day
         const viewsByDay = await ViewStats.aggregate([
-            { $match: { viewedAt: { $gte: startDate } } },
+            { $match: { date: { $gte: startDate } } },
             {
                 $group: {
-                    _id: { $dateToString: { format: '%Y-%m-%d', date: '$viewedAt' } },
-                    views: { $sum: 1 }
+                    _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
+                    views: { $sum: '$views' }
                 }
             },
             { $sort: { _id: 1 } }
@@ -1042,11 +1042,11 @@ router.get('/analytics', [auth, adminOnly], async (req, res) => {
         
         // Top movies
         const topMovies = await ViewStats.aggregate([
-            { $match: { viewedAt: { $gte: startDate } } },
+            { $match: { date: { $gte: startDate } } },
             {
                 $group: {
                     _id: '$movie',
-                    views: { $sum: 1 }
+                    views: { $sum: '$views' }
                 }
             },
             { $sort: { views: -1 } },

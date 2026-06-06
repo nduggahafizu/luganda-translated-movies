@@ -1126,6 +1126,12 @@
             <button class="show-more-btn" id="showMoreBtn">Show more</button>
             
             <div class="action-buttons">
+                <button class="action-btn secondary" id="trailerBtn" style="display:none;" onclick="playMovieTrailer(this.dataset.tmdbId, this.dataset.title)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    Watch Trailer
+                </button>
                 <button class="action-btn primary" id="watchlistBtn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
@@ -1622,13 +1628,16 @@
                 
                 if ((data.status === 'success' || data.success) && data.data) {
                     currentMovie = data.data;
-                    
+
                     // Redirect series to series player
                     if (currentMovie.contentType === 'series' || (currentMovie.seasons && currentMovie.seasons.length > 0)) {
                         window.location.replace(`series-player.html?id=${movieId}`);
                         return;
                     }
-                    
+
+                    // Track view for analytics
+                    fetch(`${API_BASE}/api/luganda-movies/${movieId}/view`, { method: 'POST' }).catch(() => {});
+
                     // Update UI
                     updateMovieInfo(currentMovie);
                     
@@ -1757,6 +1766,15 @@
                 document.getElementById('vjAvatar').src = movie.vjAvatar;
             }
             
+            // Trailer button
+            const tmdbId = movie.tmdbId || movie.metaData?.tmdbId || movie.externalIds?.tmdbId;
+            const trailerBtn = document.getElementById('trailerBtn');
+            if (tmdbId && trailerBtn) {
+                trailerBtn.dataset.tmdbId = tmdbId;
+                trailerBtn.dataset.title = movie.originalTitle || movie.title || '';
+                trailerBtn.style.display = '';
+            }
+
             // Check download permission
             checkDownloadPermission(movie);
         }
@@ -1821,7 +1839,7 @@
                 const response = await fetch(url);
                 const data = await response.json();
                 
-                if (data.status === 'success' && data.data) {
+                if ((data.success || data.status === 'success') && data.data) {
                     const movies = data.data.filter(m => m._id !== currentMovie._id).slice(0, 6);
                     renderRelatedMovies(movies);
                 }

@@ -513,14 +513,6 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="subscription.html" aria-label="Subscribe" style="color: var(--primary-color);">
-                                <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                </svg>
-                                <span class="d-none d-lg-inline">Subscribe</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" href="contact.html" aria-label="Contact Us">
                                 <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
@@ -753,16 +745,6 @@
                     <!-- Account Section -->
                     <ul class="nav">
                         <li class="nav-header">Account</li>
-                        <li>
-                            <a href="subscribe.html">
-                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-                                    <path d="M2 17l10 5 10-5"></path>
-                                    <path d="M2 12l10 5 10-5"></path>
-                                </svg>
-                                Subscribe
-                            </a>
-                        </li>
                         <li>
                             <a href="dashboard.html">
                                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1015,11 +997,11 @@
                             <!-- Ad Container - Mid Page -->
                             <div class="ad-container" style="margin: 30px auto; max-width: 728px; text-align: center;">
                                 <ins class="adsbygoogle"
-                                     style="display:block"
+                                     style="display:block; text-align:center;"
+                                     data-ad-layout="in-article"
+                                     data-ad-format="fluid"
                                      data-ad-client="ca-pub-1904736753681797"
-                                     data-ad-slot="auto"
-                                     data-ad-format="rectangle"
-                                     data-full-width-responsive="true"></ins>
+                                     data-ad-slot="1617272951"></ins>
                                 <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
                             </div>
 
@@ -1156,6 +1138,7 @@
                             <ul>
                                 <li><a href="terms.html">Terms of Service</a></li>
                                 <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                                <li><a href="cookies.html">Cookie Policy</a></li>
                                 <li><a href="dmca.html">DMCA Policy</a></li>
                             </ul>
                         </div>
@@ -2061,8 +2044,6 @@
                     featuredBadge = '<span class=\"featured-badge badge-new\">New</span>';
                 } else if (movie.trending || (movie.views && movie.views > 1000)) {
                     featuredBadge = '<span class=\"featured-badge badge-trending\">Trending</span>';
-                } else if (movie.requiredPlan === 'premium') {
-                    featuredBadge = '<span class=\"featured-badge badge-premium\">Premium</span>';
                 }
                 const year = movie.year || '';
                 const genres = movie.genres || [];

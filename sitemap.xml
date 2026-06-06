@@ -78,14 +78,6 @@
     <priority>0.75</priority>
   </url>
   
-  <!-- Subscription -->
-  <url>
-    <loc>https://unrulymovies.com/subscription</loc>
-    <lastmod>2026-04-10</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
   <!-- Legal Pages -->
   <url>
     <loc>https://unrulymovies.com/terms</loc>

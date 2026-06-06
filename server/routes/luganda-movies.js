@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const LugandaMovie = require('../models/LugandaMovie');
+const ViewStats = require('../models/ViewStats');
+const crypto = require('crypto');
 const axios = require('axios');
 const { memCache, clearMemoryCache } = require('../middleware/cache');
 const { protect } = require('../middleware/auth');
@@ -1150,6 +1152,11 @@ router.post('/:id/view', async (req, res) => {
 
         movie.views = (movie.views || 0) + 1;
         await movie.save();
+
+        // Write to ViewStats for analytics
+        const viewerData = req.ip + (req.headers['user-agent'] || '');
+        const viewerId = crypto.createHash('sha256').update(viewerData).digest('hex').substring(0, 16);
+        await ViewStats.recordView(id, viewerId, 0, false);
 
         res.json({
             success: true,

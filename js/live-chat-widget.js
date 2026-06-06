@@ -143,11 +143,7 @@ class LiveChatWidget {
                             </details>
                             <details class="faq-item">
                                 <summary>How do I download movies?</summary>
-                                <p>Downloads are available for premium subscribers only. Look for the download button on the movie page after subscribing.</p>
-                            </details>
-                            <details class="faq-item">
-                                <summary>How do I cancel my subscription?</summary>
-                                <p>Go to your account settings, click on "Subscription", and then select "Cancel Subscription". Your access continues until the end of the billing period.</p>
+                                <p>Currently all content is available for free streaming. Downloads may not be available on all devices — try streaming directly on the movie page.</p>
                             </details>
                             <details class="faq-item">
                                 <summary>Can I request a specific movie?</summary>
