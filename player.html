@@ -1758,7 +1758,8 @@
             
             // VJ Info
             if (movie.vjName) {
-                document.getElementById('vjName').textContent = `VJ ${movie.vjName}`;
+                const vjDisplay = movie.vjName.replace(/^vj[\s]*/i, '').trim();
+                document.getElementById('vjName').textContent = `VJ ${vjDisplay}`;
             }
             if (movie.vjAvatar) {
                 document.getElementById('vjAvatar').src = movie.vjAvatar;
@@ -1851,7 +1852,7 @@
             grid.innerHTML = movies.map(movie => {
                 const title = movie.originalTitle || movie.title || 'Unknown';
                 const year = movie.year || movie.releaseYear || '';
-                const vj = movie.vjName || '';
+                const vj = (movie.vjName || '').replace(/^vj[\s]*/i, '').trim();
                 const quality = movie.video?.quality || 'HD';
                 const rating = movie.rating?.translationRating || movie.rating?.userRating || 4.0;
                 const genre = movie.genres?.[0] || '';
