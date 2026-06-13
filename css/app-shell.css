@@ -1,0 +1,200 @@
+/* ============================================
+   App Shell — floating bottom navigation, hero
+   enhancements, VJ badge pills, drawer polish.
+   Pearlpix-inspired layout, Unruly green/black theme.
+============================================ */
+
+/* ---------- Floating Bottom Nav ---------- */
+.app-bottom-nav {
+    position: fixed;
+    left: 50%;
+    bottom: 14px;
+    transform: translateX(-50%);
+    z-index: 1500;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    width: calc(100% - 24px);
+    max-width: 600px;
+    padding: 10px 18px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    background: rgba(20, 20, 28, 0.7);
+    border: 1px solid rgba(74, 222, 128, 0.15);
+    border-radius: 20px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: var(--glow-primary, 0 0 24px rgba(74, 222, 128, 0.3)), 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.app-bottom-nav .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 500;
+    transition: var(--transition-base, all 0.25s cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.app-bottom-nav .nav-item svg {
+    width: 22px;
+    height: 22px;
+    transition: var(--transition-base, all 0.25s cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.app-bottom-nav .nav-item:hover {
+    color: var(--text-primary, #f1f1f5);
+}
+
+.app-bottom-nav .nav-item.active {
+    color: var(--primary-color, #4ade80);
+}
+
+.app-bottom-nav .nav-item.active svg {
+    filter: drop-shadow(0 0 8px var(--primary-color, #4ade80));
+}
+
+/* Pages without the existing .app-container (which already reserves
+   bottom space on mobile) need clearance added so the floating nav
+   doesn't cover content. */
+@media (max-width: 768px) {
+    body.has-app-bottom-nav:not(:has(.app-container)) {
+        padding-bottom: calc(70px + env(safe-area-inset-bottom));
+    }
+}
+
+@media (min-width: 769px) {
+    .app-bottom-nav {
+        display: none;
+    }
+}
+
+/* ---------- Hero Content Overlay ---------- */
+.hero-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 60px 28px 24px;
+    background: linear-gradient(to top, rgba(5, 5, 12, 0.92) 0%, rgba(5, 5, 12, 0.55) 55%, transparent 100%);
+    z-index: 2;
+}
+
+.hero-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 8px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ---------- Hero Meta & Action Buttons ---------- */
+.hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.hero-meta span {
+    font-size: 13px;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+    font-weight: 500;
+}
+
+.hero-meta .vj-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary-color, #4ade80);
+    background: linear-gradient(135deg, rgba(74, 222, 128, 0.16), rgba(0, 217, 255, 0.08));
+    border: 1px solid rgba(74, 222, 128, 0.25);
+    border-radius: 999px;
+}
+
+.hero-btns {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+@media (max-width: 576px) {
+    .hero-content {
+        padding: 40px 16px 16px;
+    }
+
+    .hero-title {
+        font-size: 16px;
+        margin-bottom: 6px;
+    }
+
+    .hero-meta {
+        margin-bottom: 6px;
+    }
+
+    .hero-meta span {
+        font-size: 11px;
+    }
+
+    .hero-btns .btn-watch-now,
+    .hero-btns .btn-more-info {
+        padding: 8px 14px;
+        font-size: 12px;
+        gap: 4px;
+    }
+
+    .hero-btns .btn-watch-now svg,
+    .hero-btns .btn-more-info svg {
+        width: 13px;
+        height: 13px;
+    }
+}
+
+/* ---------- VJ Badge Pill (on card posters) ---------- */
+/* Top-right corner — keeps clear of .trending-rank and .card-badges,
+   which both occupy the top-left of the poster. */
+.vj-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 3;
+    padding: 3px 9px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--primary-color, #4ade80);
+    background: linear-gradient(135deg, rgba(74, 222, 128, 0.18), rgba(0, 217, 255, 0.08));
+    border: 1px solid rgba(74, 222, 128, 0.25);
+    border-radius: 999px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* ---------- Drawer Polish ---------- */
+.app-aside .drawer-logo {
+    padding: 4px 4px 18px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid rgba(74, 222, 128, 0.12);
+}
+
+.app-aside .drawer-logo-text {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(to right, #ffffff, var(--primary-color, #4ade80));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}

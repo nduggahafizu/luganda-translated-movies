@@ -149,6 +149,7 @@
     <link rel="stylesheet" href="css/adsense-styles.css">
     <link rel="stylesheet" href="css/modern-ui.css">
     <link rel="stylesheet" href="css/content-guide.css">
+    <link rel="stylesheet" href="css/app-shell.css">
     <link rel="stylesheet" href="css/payment-modal.css">
     
     <!-- Preload fonts -->
@@ -346,41 +347,12 @@
             line-height: 1.8;
         }
 
-        .mobile-app-cta {
-            display: none;
-        }
         @media (max-width: 768px) {
             .trust-section {
                 padding: 20px;
             }
             .trust-section h2 {
                 font-size: 26px;
-            }
-
-            .mobile-app-cta {
-                position: fixed;
-                left: 14px;
-                right: 14px;
-                bottom: 14px;
-                z-index: 9999;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                gap: 8px;
-                padding: 14px 16px;
-                border-radius: 999px;
-                font-weight: 700;
-                text-decoration: none;
-                color: #000;
-                background: var(--primary-color);
-                box-shadow: 0 12px 28px rgba(74, 222, 128, 0.35);
-                border: 1px solid rgba(0, 0, 0, 0.08);
-                cursor: pointer;
-            }
-
-            .mobile-app-cta svg {
-                width: 18px;
-                height: 18px;
             }
         }
 
@@ -482,15 +454,6 @@
 
 <body>
     <a class="skip-link" href="#maincontent">Skip to content</a>
-
-    <button id="mobileAppBtn" class="mobile-app-cta" aria-label="Get Unruly Movies App" style="border:none;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-        </svg>
-        Get App
-    </button>
 
     <!-- iOS Add to Home Screen banner -->
     <div id="iosInstallBanner">
@@ -697,7 +660,11 @@
                             <line x1="6" y1="6" x2="18" y2="18"></line>
                         </svg>
                     </button>
-                    
+
+                    <div class="drawer-logo">
+                        <span class="drawer-logo-text">Unruly Movies</span>
+                    </div>
+
                     <!-- Main Navigation -->
                     <ul class="nav">
                         <li class="nav-header">Menu</li>
@@ -753,8 +720,8 @@
                     <!-- Discovery Section -->
                     <ul class="nav">
                         <li class="nav-header">Discovery</li>
-                        <li>
-                            <a href="https://downloadunruly.netlify.app" target="_blank" style="background: rgba(124,252,0,0.15); color: #7cfc00; border-radius: 8px;">
+                        <li id="getAppItem">
+                            <a id="getAppLink" href="https://downloadunruly.netlify.app" target="_blank" style="background: rgba(124,252,0,0.15); color: #7cfc00; border-radius: 8px;">
                                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                     <polyline points="7 10 12 15 17 10"></polyline>
@@ -1790,6 +1757,7 @@
                             <span class="trending-rank">${rank}</span>
                             <div class="card-badges">
                                 <span class="card-badge badge-quality">${quality}</span>
+                                ${vjBadge ? `<span class="card-badge badge-vj">${vjBadge}</span>` : ''}
                             </div>
                             <div class="play-overlay">
                                 <svg viewBox="0 0 24 24" fill="currentColor">
@@ -2071,26 +2039,41 @@
         // Update hero slider with actual movies from database
         function updateHeroSlider(movies) {
             if (!movies || movies.length === 0) return;
-            
+
             movies.forEach((movie, index) => {
                 const slideId = `heroSlide${index + 1}`;
                 const slide = document.getElementById(slideId);
                 if (!slide) return;
-                
+
                 const poster = movie.backdrop || movie.poster || '';
                 const title = movie.title || movie.originalTitle || 'Movie';
                 const movieId = movie._id || movie.id;
-                
+                const year = movie.year || movie.releaseYear || '';
+                const genre = (movie.genres && movie.genres[0]) || '';
+                const vjBadge = formatVjBadge(movie.vjName);
+
                 slide.innerHTML = `
-                    <a href="player.html?id=${movieId}" class="slide poster-slide" aria-label="Watch ${title}">
+                    <div class="slide poster-slide">
                         <img src="${poster}" alt="${title}" class="slide-poster-img" loading="${index === 0 ? 'eager' : 'lazy'}" onerror="this.src='https://placehold.co/1280x720/16161f/4ade80?text=${encodeURIComponent(title.substring(0,20))}'">
-                        <div class="slide-poster-footer">
-                            <span class="slide-poster-title">${title}</span>
-                            <span class="slide-poster-play">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                            </span>
+                        <div class="hero-content">
+                            <h2 class="hero-title">${title}</h2>
+                            <div class="hero-meta">
+                                ${year ? `<span>${year}</span>` : ''}
+                                ${genre ? `<span>${genre}</span>` : ''}
+                                ${vjBadge ? `<span class="vj-badge-pill">${vjBadge}</span>` : ''}
+                            </div>
+                            <div class="hero-btns">
+                                <a href="player.html?id=${movieId}" class="btn-watch-now">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                    Play Now
+                                </a>
+                                <a href="player.html?id=${movieId}" class="btn-more-info">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                    More Info
+                                </a>
+                            </div>
                         </div>
-                    </a>
+                    </div>
                 `;
             });
         }
@@ -2171,6 +2154,7 @@
                         <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
                             <div class="card-badges">
                                 <span class="card-badge badge-quality">${quality}</span>
+                                ${vjBadge ? `<span class="card-badge badge-vj">${vjBadge}</span>` : ''}
                             </div>
                             <div class="play-overlay">
                                 <svg viewBox="0 0 24 24" fill="currentColor">
@@ -2272,6 +2256,7 @@
                                     </svg>
                                     SERIES
                                 </span>
+                                ${vjBadge ? `<span class="card-badge badge-vj">${vjBadge}</span>` : ''}
                             </div>
                             <div class="play-overlay">
                                 <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
@@ -2360,60 +2345,53 @@
     (function () {
         const ua = navigator.userAgent || '';
         const isIOS = /iphone|ipad|ipod/i.test(ua);
-        const isAndroid = /android/i.test(ua);
         const isInStandaloneMode = window.navigator.standalone === true
             || window.matchMedia('(display-mode: standalone)').matches;
 
-        const btn = document.getElementById('mobileAppBtn');
+        const link = document.getElementById('getAppLink');
+        const item = document.getElementById('getAppItem');
         const iosBanner = document.getElementById('iosInstallBanner');
 
-        if (!btn) return;
+        if (!link) return;
 
         if (isInStandaloneMode) {
-            // Already installed as PWA — hide the button
-            btn.style.display = 'none';
+            // Already installed as PWA — hide the drawer item
+            if (item) item.style.display = 'none';
             return;
         }
 
         if (isIOS) {
             // iPhone/iPad: show Add to Home Screen guide
-            btn.innerHTML = `
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            link.innerHTML = `
+                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
                     <polyline points="16 6 12 2 8 6"/>
                     <line x1="12" y1="2" x2="12" y2="15"/>
                 </svg>
                 Add to Home Screen`;
-            btn.onclick = function () {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
                 iosBanner.style.display = 'block';
-            };
-        } else if (isAndroid) {
-            // Android: link to APK download page
-            btn.onclick = function () {
-                window.open('https://downloadunruly.netlify.app', '_blank');
-            };
-
-            // Also listen for native Chrome install prompt
+            });
+        } else {
+            // Android/desktop: listen for native install prompt
             let deferredPrompt = null;
             window.addEventListener('beforeinstallprompt', function (e) {
                 e.preventDefault();
                 deferredPrompt = e;
-                btn.onclick = async function () {
+                link.addEventListener('click', async function (clickEvent) {
                     if (deferredPrompt) {
+                        clickEvent.preventDefault();
                         deferredPrompt.prompt();
                         const { outcome } = await deferredPrompt.userChoice;
-                        if (outcome === 'accepted') btn.style.display = 'none';
+                        if (outcome === 'accepted' && item) item.style.display = 'none';
                         deferredPrompt = null;
-                    } else {
-                        window.open('https://downloadunruly.netlify.app', '_blank');
                     }
-                };
+                });
             });
-        } else {
-            // Desktop: hide the floating button (only needed on mobile)
-            btn.style.display = 'none';
         }
     })();
     </script>
+    <script defer src="js/app-shell.js"></script>
 </body>
 </html>

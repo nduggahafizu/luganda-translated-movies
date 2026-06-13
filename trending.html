@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/content-guide.css">
+    <link rel="stylesheet" href="css/app-shell.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     
     <!-- Google AdSense -->
@@ -300,38 +301,6 @@
         </div>
     </header>
 
-    <!-- Mobile Navigation -->
-    <nav class="mobile-nav">
-        <a href="index.html">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-            </svg>
-            <span>Home</span>
-        </a>
-        <a href="movies.html">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
-                <line x1="7" y1="2" x2="7" y2="22"></line>
-                <line x1="17" y1="2" x2="17" y2="22"></line>
-                <line x1="2" y1="12" x2="22" y2="12"></line>
-            </svg>
-            <span>Movies</span>
-        </a>
-        <a href="trending.html" class="active">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M23 6l-9.5 9.5-5-5L1 18"></path>
-            </svg>
-            <span>Trending</span>
-        </a>
-        <a href="search.html">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="M21 21l-4.35-4.35"></path>
-            </svg>
-            <span>Search</span>
-        </a>
-    </nav>
-
     <!-- Trending Hero -->
     <section class="trending-hero">
         <div class="container">
@@ -446,10 +415,12 @@
                         const title = movie.originalTitle || movie.lugandaTitle || movie.title;
                         const year = movie.year || movie.releaseYear || '';
                         const views = movie.views || 0;
-                        
+                        const vjBadge = formatVjBadge(movie.vjName);
+
                         return `
                             <a href="player.html?id=${movie._id}" class="trending-card" data-movie-id="${movie._id}">
                                 <div class="trending-rank ${rankClass}">${rank}</div>
+                                ${vjBadge ? `<div class="vj-badge">${vjBadge}</div>` : ''}
                                 <img src="${poster}" alt="${title}" loading="lazy" onerror="this.src='assets/images/placeholder.svg'">
                                 <div class="trending-card-info">
                                     <div class="trending-card-title">${title}</div>
@@ -495,6 +466,15 @@
                 return (views / 1000).toFixed(1) + 'K';
             }
             return views.toString();
+        }
+
+        function formatVjBadge(vjName) {
+            const name = (vjName || '').toString().trim();
+            if (!name) return '';
+            if (/^unknown\b/i.test(name)) return '';
+            const cleaned = name.replace(/^vj[\s:\-\.]*?/i, '').trim();
+            if (!cleaned) return '';
+            return `VJ ${cleaned}`;
         }
         
         // Initialize
@@ -556,5 +536,6 @@
             setTimeout(() => toast.remove(), 2500);
         }
     </script>
+    <script defer src="js/app-shell.js"></script>
 </body>
 </html>

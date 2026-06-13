@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="css/mobile-improvements.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/trailer-player.css">
+    <link rel="stylesheet" href="css/app-shell.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     
     <style>
@@ -322,7 +323,15 @@
         }
         
         .movie-vj {
+            display: inline-flex;
+            align-items: center;
             color: var(--primary-color);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            background: linear-gradient(135deg, rgba(74, 222, 128, 0.16), rgba(0, 217, 255, 0.08));
+            border: 1px solid rgba(74, 222, 128, 0.25);
+            border-radius: 999px;
         }
         
         /* List View Styles */
@@ -596,6 +605,10 @@
                             <line x1="6" y1="6" x2="18" y2="18"></line>
                         </svg>
                     </button>
+
+                    <div class="drawer-logo">
+                        <span class="drawer-logo-text">Unruly Movies</span>
+                    </div>
 
                     <ul class="nav">
                         <li>
@@ -1142,5 +1155,6 @@
             }
         });
     </script>
+    <script defer src="js/app-shell.js"></script>
 </body>
 </html>

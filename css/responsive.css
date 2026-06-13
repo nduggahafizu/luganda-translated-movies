@@ -48,10 +48,6 @@
     .app-footer {
         padding-bottom: env(safe-area-inset-bottom);
     }
-    /* Bottom CTA button clears the home indicator */
-    .mobile-app-cta {
-        bottom: calc(14px + env(safe-area-inset-bottom));
-    }
     /* Nav drawer clears home bar */
     .navbar-nav {
         padding-bottom: calc(40px + env(safe-area-inset-bottom));
