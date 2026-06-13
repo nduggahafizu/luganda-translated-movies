@@ -1061,52 +1061,6 @@
                                 <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
                             </div>
 
-                            <!-- Popular VJ Movies -->
-                            <div class="app-section movie-section">
-                                <div class="section-header">
-                                    <h2>
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="2">
-                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                        </svg>
-                                        Popular VJ Movies
-                                    </h2>
-                                    <a href="movies.html?sort=popular" class="view-all">
-                                        View All
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="9 18 15 12 9 6"></polyline>
-                                        </svg>
-                                    </a>
-                                </div>
-                                <div class="card-grid h-scroll" id="popularMovies">
-                                    <!-- Skeleton loaders -->
-                                    <div class="content-card">
-                                        <div class="skeleton skeleton-card"></div>
-                                        <div class="skeleton skeleton-title"></div>
-                                        <div class="skeleton skeleton-meta"></div>
-                                    </div>
-                                    <div class="content-card">
-                                        <div class="skeleton skeleton-card"></div>
-                                        <div class="skeleton skeleton-title"></div>
-                                        <div class="skeleton skeleton-meta"></div>
-                                    </div>
-                                    <div class="content-card">
-                                        <div class="skeleton skeleton-card"></div>
-                                        <div class="skeleton skeleton-title"></div>
-                                        <div class="skeleton skeleton-meta"></div>
-                                    </div>
-                                    <div class="content-card">
-                                        <div class="skeleton skeleton-card"></div>
-                                        <div class="skeleton skeleton-title"></div>
-                                        <div class="skeleton skeleton-meta"></div>
-                                    </div>
-                                    <div class="content-card">
-                                        <div class="skeleton skeleton-card"></div>
-                                        <div class="skeleton skeleton-title"></div>
-                                        <div class="skeleton skeleton-meta"></div>
-                                    </div>
-                                </div>
-                            </div>
-
                             <!-- Per-VJ Sections (each VJ's movies in their own row) -->
                             <div id="vjSectionsContainer"></div>
 
@@ -1570,11 +1524,7 @@
                     
                     // Update hero slider with first 3 movies
                     updateHeroSlider(allMovies.slice(0, 3));
-                    
-                    // Also populate popular movies section (sorted by views)
-                    const popularMovies = [...allMovies].sort((a, b) => (b.views || 0) - (a.views || 0));
-                    renderMovies(popularMovies.slice(0, 5), 'popularMovies');
-                    
+
                     // Load trending section (based on views + recent)
                     loadTrendingMovies(allMovies);
                     
