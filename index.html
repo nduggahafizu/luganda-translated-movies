@@ -313,30 +313,6 @@
             line-height: 1.7;
             margin: 0;
         }
-        .trust-links {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 16px;
-        }
-        .trust-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 11px 16px;
-            border-radius: 999px;
-            text-decoration: none;
-            font-weight: 600;
-            color: #fff;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: all 0.2s ease;
-        }
-        .trust-link:hover {
-            color: #000;
-            background: var(--primary-color);
-            border-color: var(--primary-color);
-        }
         .founder-note {
             margin-top: 18px;
             padding: 18px 20px;
@@ -1131,6 +1107,9 @@
                                 </div>
                             </div>
 
+                            <!-- Per-VJ Sections (each VJ's movies in their own row) -->
+                            <div id="vjSectionsContainer"></div>
+
                             <!-- Content Guide: Genre Overview -->
                             <div class="content-guide">
                                 <h2>Browse Luganda-Translated Movies & Series by Genre</h2>
@@ -1185,14 +1164,6 @@
                                     <strong>Founder note:</strong> I built Unruly Movies to make Luganda-translated entertainment easier to discover,
                                     more respectful to VJ identity, and better organized for mobile users. The goal is to combine streaming, series,
                                     and Ugandan TV access in one place while keeping the experience simple, fast, and community-focused.
-                                </div>
-
-                                <div class="trust-links">
-                                    <a class="trust-link" href="about.html">About the platform</a>
-                                    <a class="trust-link" href="editorial-standards.html">Editorial standards</a>
-                                    <a class="trust-link" href="contact.html">Contact the founder</a>
-                                    <a class="trust-link" href="faq.html">Viewer FAQ</a>
-                                    <a class="trust-link" href="dmca.html">DMCA policy</a>
                                 </div>
                             </div>
                         </div>
@@ -1612,6 +1583,9 @@
                     
                     // Load TV Series
                     loadNewSeries();
+
+                    // Load per-VJ sections
+                    loadVJSections();
                 } else {
                     // Show message if no movies
                     document.getElementById('allMovies').innerHTML = `
@@ -2340,8 +2314,77 @@
                 });
             }, 100);
         }
+
+        // Load per-VJ sections - each VJ's movies appear in their own row
+        async function loadVJSections() {
+            const container = document.getElementById('vjSectionsContainer');
+            if (!container) return;
+
+            try {
+                const vjResponse = await LugandaMoviesAPI.getAllVJs();
+                const vjList = (vjResponse.data || [])
+                    .filter(vj => (vj.movieCount || 0) >= 3)
+                    .slice(0, 6);
+
+                if (vjList.length === 0) return;
+
+                let sectionsHTML = '';
+                const sections = [];
+
+                vjList.forEach((vj, index) => {
+                    const vjName = vj._id || vj.name;
+                    if (!vjName) return;
+
+                    const badge = formatVjBadge(vjName) || vjName;
+                    const containerId = `vjSection-${index}`;
+                    sections.push({ vjName, containerId });
+
+                    sectionsHTML += `
+                        <div class="app-section movie-section">
+                            <div class="section-header">
+                                <h2>
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                    ${badge}
+                                </h2>
+                                <a href="movies.html?vj=${encodeURIComponent(vjName)}" class="view-all">
+                                    View All
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="9 18 15 12 9 6"></polyline>
+                                    </svg>
+                                </a>
+                            </div>
+                            <div class="card-grid h-scroll" id="${containerId}"></div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = sectionsHTML;
+
+                // Fetch and render each VJ's movies into its row
+                for (const { vjName, containerId } of sections) {
+                    try {
+                        const moviesResponse = await LugandaMoviesAPI.getByVJ(vjName, 10);
+                        const movies = moviesResponse.data || moviesResponse.movies || [];
+                        if (movies.length > 0) {
+                            renderMovies(movies, containerId);
+                        } else {
+                            document.getElementById(containerId)?.closest('.movie-section')?.remove();
+                        }
+                    } catch (e) {
+                        document.getElementById(containerId)?.closest('.movie-section')?.remove();
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading VJ sections:', error);
+            }
+        }
     </script>
-    
+
     <!-- Social Sharing -->
     <script src="js/social-share.js"></script>
     

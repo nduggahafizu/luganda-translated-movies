@@ -403,12 +403,12 @@
 }
 
 .h-scroll > .content-card {
-    flex: 0 0 130px !important;
-    width: 130px !important;
-    max-width: 130px !important;
+    flex: 0 0 110px !important;
+    width: 110px !important;
+    max-width: 110px !important;
 }
 
-@media (min-width: 576px) {
+@media (min-width: 768px) and (max-width: 1023px) {
     .h-scroll > .content-card {
         flex: 0 0 160px !important;
         width: 160px !important;
@@ -416,11 +416,11 @@
     }
 }
 
-@media (min-width: 992px) {
+@media (min-width: 1024px) {
     .h-scroll > .content-card {
-        flex: 0 0 190px !important;
-        width: 190px !important;
-        max-width: 190px !important;
+        flex: 0 0 200px !important;
+        width: 200px !important;
+        max-width: 200px !important;
     }
 }
 

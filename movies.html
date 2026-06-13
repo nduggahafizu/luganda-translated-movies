@@ -752,7 +752,19 @@
         document.getElementById('styleToggle')?.addEventListener('click', toggleGridStyle);
 
 // Initial load from API
-        loadMovies();
+        (function() {
+            const vjFromUrl = new URLSearchParams(window.location.search).get('vj');
+            if (vjFromUrl) {
+                const vjSelect = document.getElementById('vjFilter');
+                const matchingOption = Array.from(vjSelect.options).find(opt => opt.value.toLowerCase() === vjFromUrl.toLowerCase());
+                if (matchingOption) {
+                    vjSelect.value = matchingOption.value;
+                }
+                loadMovies({ vj: vjFromUrl });
+            } else {
+                loadMovies();
+            }
+        })();
 
         // Filter functionality - now uses API
         document.querySelectorAll('.filter-select').forEach(select => {
