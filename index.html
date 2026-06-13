@@ -665,6 +665,24 @@
                         <span class="drawer-logo-text">Unruly Movies</span>
                     </div>
 
+                    <!-- Profile Card -->
+                    <a href="login.html" class="drawer-profile" id="drawerProfile">
+                        <div class="dp-circle">
+                            <img src="" alt="" class="d-none" id="drawerProfileAvatar">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="drawerProfileIcon">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <div class="dp-info">
+                            <h4 id="drawerProfileName">Sign In</h4>
+                            <p id="drawerProfileSub">Tap to access your account</p>
+                        </div>
+                        <svg class="dp-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </a>
+
                     <!-- Main Navigation -->
                     <ul class="nav">
                         <li class="nav-header">Menu</li>
@@ -934,7 +952,7 @@
                                         </svg>
                                     </a>
                                 </div>
-                                <div class="card-grid" id="trendingMovies">
+                                <div class="card-grid h-scroll" id="trendingMovies">
                                     <!-- Skeleton loaders -->
                                     <div class="content-card">
                                         <div class="skeleton skeleton-card"></div>
@@ -1000,7 +1018,7 @@
                                         </svg>
                                     </a>
                                 </div>
-                                <div class="card-grid" id="allMovies">
+                                <div class="card-grid h-scroll" id="allMovies">
                                     <!-- Skeleton loaders -->
                                     <div class="content-card">
                                         <div class="skeleton skeleton-card"></div>
@@ -1047,7 +1065,7 @@
                                         </svg>
                                     </a>
                                 </div>
-                                <div class="card-grid" id="newSeries">
+                                <div class="card-grid h-scroll" id="newSeries">
                                     <!-- Series will be loaded here dynamically -->
                                     <div class="loading-state">
                                         <div class="loading-spinner"></div>
@@ -1083,7 +1101,7 @@
                                         </svg>
                                     </a>
                                 </div>
-                                <div class="card-grid" id="popularMovies">
+                                <div class="card-grid h-scroll" id="popularMovies">
                                     <!-- Skeleton loaders -->
                                     <div class="content-card">
                                         <div class="skeleton skeleton-card"></div>
@@ -1815,6 +1833,12 @@
             const userName = document.getElementById('userName');
             const notificationBell = document.getElementById('notificationBell');
             
+            const drawerProfile = document.getElementById('drawerProfile');
+            const drawerProfileAvatar = document.getElementById('drawerProfileAvatar');
+            const drawerProfileIcon = document.getElementById('drawerProfileIcon');
+            const drawerProfileName = document.getElementById('drawerProfileName');
+            const drawerProfileSub = document.getElementById('drawerProfileSub');
+
             if (token && user) {
                 try {
                     const userData = JSON.parse(user);
@@ -1828,7 +1852,17 @@
                     const userFullName = userData.name || userData.fullName || 'User';
                     if (userAvatar && userPicture) userAvatar.src = userPicture;
                     if (userName) userName.textContent = userFullName.split(' ')[0];
-                    
+
+                    // Update drawer profile card
+                    if (drawerProfile) drawerProfile.href = 'dashboard.html';
+                    if (drawerProfileName) drawerProfileName.textContent = userFullName;
+                    if (drawerProfileSub) drawerProfileSub.textContent = 'View your account';
+                    if (userPicture && drawerProfileAvatar && drawerProfileIcon) {
+                        drawerProfileAvatar.src = userPicture;
+                        drawerProfileAvatar.classList.remove('d-none');
+                        drawerProfileIcon.classList.add('d-none');
+                    }
+
                     // Load notifications
                     loadNotifications(token);
                 } catch (e) {
@@ -1840,6 +1874,11 @@
                 if (sidebarLoginItem) sidebarLoginItem.classList.remove('d-none');
                 if (userMenu) userMenu.classList.add('d-none');
                 if (notificationBell) notificationBell.classList.add('d-none');
+
+                // Reset drawer profile card to "Sign In" state
+                if (drawerProfile) drawerProfile.href = 'login.html';
+                if (drawerProfileName) drawerProfileName.textContent = 'Sign In';
+                if (drawerProfileSub) drawerProfileSub.textContent = 'Tap to access your account';
             }
             
             // Setup logout button
@@ -2049,28 +2088,30 @@
                 const title = movie.title || movie.originalTitle || 'Movie';
                 const movieId = movie._id || movie.id;
                 const year = movie.year || movie.releaseYear || '';
-                const genre = (movie.genres && movie.genres[0]) || '';
+                const quality = movie.video?.quality || 'HD';
+                const overview = movie.description || movie.plot || '';
                 const vjBadge = formatVjBadge(movie.vjName);
 
                 slide.innerHTML = `
                     <div class="slide poster-slide">
                         <img src="${poster}" alt="${title}" class="slide-poster-img" loading="${index === 0 ? 'eager' : 'lazy'}" onerror="this.src='https://placehold.co/1280x720/16161f/4ade80?text=${encodeURIComponent(title.substring(0,20))}'">
+                        <div class="hero-overlay"></div>
                         <div class="hero-content">
                             <h2 class="hero-title">${title}</h2>
                             <div class="hero-meta">
-                                ${year ? `<span>${year}</span>` : ''}
-                                ${genre ? `<span>${genre}</span>` : ''}
-                                ${vjBadge ? `<span class="vj-badge-pill">${vjBadge}</span>` : ''}
+                                ${year ? `<span class="meta-tag">${year}</span>` : ''}
+                                <span class="meta-tag">${quality}</span>
+                                ${vjBadge ? `<span class="meta-tag meta-vj">${vjBadge}</span>` : ''}
                             </div>
+                            ${overview ? `<p class="hero-overview">${overview}</p>` : ''}
                             <div class="hero-btns">
-                                <a href="player.html?id=${movieId}" class="btn-watch-now">
+                                <a href="player.html?id=${movieId}" class="play-btn">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                                     Play Now
                                 </a>
-                                <a href="player.html?id=${movieId}" class="btn-more-info">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                                    More Info
-                                </a>
+                                <button class="save-btn" onclick="addToWatchlist('${movieId}'); this.classList.toggle('saved')" aria-label="Save to watchlist">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+                                </button>
                             </div>
                         </div>
                     </div>

@@ -675,4 +675,41 @@
         showNotification('No internet connection', 'error');
     });
 
+    // ===================================
+    // Drawer Profile Card (pearlpix-style)
+    // ===================================
+    // Populates the #drawerProfile card (if present on the page) based on
+    // stored auth state. index.html has its own richer checkUserLoginState()
+    // that also handles the desktop user-menu, so skip it there.
+    (function initDrawerProfile() {
+        const drawerProfile = document.getElementById('drawerProfile');
+        if (!drawerProfile || document.getElementById('userMenu')) return;
+
+        const token = localStorage.getItem('token') || localStorage.getItem('authToken') ||
+                      sessionStorage.getItem('token') || sessionStorage.getItem('authToken');
+        const userJson = localStorage.getItem('user') || sessionStorage.getItem('user');
+        const nameEl = document.getElementById('drawerProfileName');
+        const subEl = document.getElementById('drawerProfileSub');
+        const avatarEl = document.getElementById('drawerProfileAvatar');
+        const iconEl = document.getElementById('drawerProfileIcon');
+
+        if (token && userJson) {
+            try {
+                const userData = JSON.parse(userJson);
+                const userPicture = userData.picture || userData.profileImage;
+                const userFullName = userData.name || userData.fullName || 'User';
+                drawerProfile.href = 'dashboard.html';
+                if (nameEl) nameEl.textContent = userFullName;
+                if (subEl) subEl.textContent = 'View your account';
+                if (userPicture && avatarEl && iconEl) {
+                    avatarEl.src = userPicture;
+                    avatarEl.classList.remove('d-none');
+                    iconEl.classList.add('d-none');
+                }
+            } catch (e) {
+                // Keep default "Sign In" state if user data is malformed
+            }
+        }
+    })();
+
 })();

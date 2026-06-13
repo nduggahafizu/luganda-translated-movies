@@ -4,21 +4,21 @@
    Pearlpix-inspired layout, Unruly green/black theme.
 ============================================ */
 
-/* ---------- Floating Bottom Nav ---------- */
+/* ---------- Floating Bottom Nav (pearlpix .nav-bar) ---------- */
 .app-bottom-nav {
     position: fixed;
     left: 50%;
-    bottom: 14px;
+    bottom: 10px;
     transform: translateX(-50%);
     z-index: 1500;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 4px;
-    width: calc(100% - 24px);
+    width: calc(100% - 20px);
     max-width: 600px;
-    padding: 10px 18px;
-    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    height: 55px;
+    padding: 0 18px;
     background: rgba(20, 20, 28, 0.7);
     border: 1px solid rgba(74, 222, 128, 0.15);
     border-radius: 20px;
@@ -31,18 +31,21 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 4px;
     flex: 1;
+    height: 100%;
     color: var(--text-secondary, rgba(255, 255, 255, 0.6));
     text-decoration: none;
-    font-size: 11px;
-    font-weight: 500;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
     transition: var(--transition-base, all 0.25s cubic-bezier(0.4, 0, 0.2, 1));
 }
 
 .app-bottom-nav .nav-item svg {
-    width: 22px;
-    height: 22px;
+    width: 18px;
+    height: 18px;
     transition: var(--transition-base, all 0.25s cubic-bezier(0.4, 0, 0.2, 1));
 }
 
@@ -52,6 +55,7 @@
 
 .app-bottom-nav .nav-item.active {
     color: var(--primary-color, #4ade80);
+    text-shadow: 0 0 10px var(--primary-glow, rgba(74, 222, 128, 0.6));
 }
 
 .app-bottom-nav .nav-item.active svg {
@@ -63,7 +67,7 @@
    doesn't cover content. */
 @media (max-width: 768px) {
     body.has-app-bottom-nav:not(:has(.app-container)) {
-        padding-bottom: calc(70px + env(safe-area-inset-bottom));
+        padding-bottom: calc(75px + env(safe-area-inset-bottom));
     }
 }
 
@@ -73,112 +77,211 @@
     }
 }
 
-/* ---------- Hero Content Overlay ---------- */
+/* ---------- Hero Banner (pearlpix-style) ---------- */
 .hero-content {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 60px 28px 24px;
-    background: linear-gradient(to top, rgba(5, 5, 12, 0.92) 0%, rgba(5, 5, 12, 0.55) 55%, transparent 100%);
+    inset: 0;
     z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 60px 24px clamp(30px, 8vw, 50px);
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+        linear-gradient(0deg, var(--background-dark, #09090f) 5%, rgba(9, 9, 15, 0.6) 45%, transparent 100%),
+        linear-gradient(90deg, rgba(9, 9, 15, 0.85) 0%, rgba(9, 9, 15, 0.35) 55%, transparent 100%);
 }
 
 .hero-title {
-    font-size: 22px;
-    font-weight: 800;
-    color: #fff;
-    margin: 0 0 8px;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+    position: relative;
+    z-index: 2;
+    font-size: clamp(20px, 7vw, 36px);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 10px;
+    text-shadow: 2px 4px 15px rgba(0, 0, 0, 0.9);
+    background: linear-gradient(to right, #ffffff, var(--primary-light, #86efac));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 100%;
 }
 
-/* ---------- Hero Meta & Action Buttons ---------- */
+/* ---------- Hero Meta Pills ---------- */
 .hero-meta {
+    position: relative;
+    z-index: 2;
     display: flex;
     align-items: center;
     gap: 8px;
     flex-wrap: wrap;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
-.hero-meta span {
-    font-size: 13px;
-    color: var(--text-secondary, rgba(255, 255, 255, 0.6));
-    font-weight: 500;
+.meta-tag {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #fff;
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
-.hero-meta .vj-badge-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 10px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--primary-color, #4ade80);
-    background: linear-gradient(135deg, rgba(74, 222, 128, 0.16), rgba(0, 217, 255, 0.08));
-    border: 1px solid rgba(74, 222, 128, 0.25);
-    border-radius: 999px;
+.meta-tag.meta-vj {
+    background: var(--primary-color, #4ade80);
+    color: #06240f;
+    border: none;
+    box-shadow: 0 0 10px var(--primary-glow, rgba(74, 222, 128, 0.4));
 }
 
+/* ---------- Hero Overview ---------- */
+.hero-overview {
+    position: relative;
+    z-index: 2;
+    font-size: clamp(11px, 3.5vw, 13px);
+    color: var(--text-primary, #f1f1f5);
+    margin: 0 0 16px;
+    max-width: 95%;
+    line-height: 1.5;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ---------- Hero Action Buttons ---------- */
 .hero-btns {
+    position: relative;
+    z-index: 2;
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-top: 12px;
+    gap: 12px;
+}
+
+.play-btn {
+    background: linear-gradient(45deg, var(--primary-dark, #22c55e), var(--primary-color, #4ade80));
+    box-shadow: 0 8px 20px var(--primary-glow, rgba(74, 222, 128, 0.4));
+    color: #06240f;
+    padding: 12px 28px;
+    border-radius: 30px;
+    font-weight: 800;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.play-btn:active {
+    transform: scale(0.95);
+}
+
+.save-btn {
+    background: rgba(5, 5, 5, 0.5);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #fff;
+    cursor: pointer;
+    transition: var(--transition-base, all 0.25s cubic-bezier(0.4, 0, 0.2, 1));
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    flex-shrink: 0;
+}
+
+.save-btn:hover {
+    border-color: var(--primary-color, #4ade80);
+    color: var(--primary-color, #4ade80);
+}
+
+.save-btn.saved {
+    color: #06240f;
+    border-color: var(--primary-color, #4ade80);
+    background: var(--primary-color, #4ade80);
+    box-shadow: 0 0 15px var(--primary-glow, rgba(74, 222, 128, 0.6));
 }
 
 @media (max-width: 576px) {
     .hero-content {
-        padding: 40px 16px 16px;
+        padding: 40px 16px 24px;
     }
 
-    .hero-title {
-        font-size: 16px;
-        margin-bottom: 6px;
-    }
-
-    .hero-meta {
-        margin-bottom: 6px;
-    }
-
-    .hero-meta span {
+    .hero-overview {
         font-size: 11px;
+        margin-bottom: 12px;
+        -webkit-line-clamp: 2;
     }
 
-    .hero-btns .btn-watch-now,
-    .hero-btns .btn-more-info {
-        padding: 8px 14px;
+    .play-btn {
+        padding: 9px 20px;
         font-size: 12px;
-        gap: 4px;
     }
 
-    .hero-btns .btn-watch-now svg,
-    .hero-btns .btn-more-info svg {
-        width: 13px;
-        height: 13px;
+    .save-btn {
+        width: 38px;
+        height: 38px;
     }
 }
 
-/* ---------- VJ Badge Pill (on card posters) ---------- */
-/* Top-right corner — keeps clear of .trending-rank and .card-badges,
-   which both occupy the top-left of the poster. */
-.vj-badge {
+@media (min-width: 769px) {
+    .hero-content {
+        padding: 60px 50px clamp(40px, 6vw, 80px);
+    }
+
+    .hero-overview {
+        max-width: 55%;
+        font-size: 15px;
+    }
+}
+
+/* ---------- VJ Ribbon Badge (on card posters) ---------- */
+/* Top-right corner — keeps clear of .trending-rank, which occupies
+   the top-left of the poster. Solid pearlpix-style ribbon. Pulled
+   out of the .card-badges flex row via absolute positioning so
+   .badge-quality lands alone at top-left (still inside the existing
+   .card-badges markup, no HTML changes needed). */
+.badge-vj {
     position: absolute;
     top: 10px;
     right: 10px;
     z-index: 3;
-    padding: 3px 9px;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--primary-color, #4ade80);
-    background: linear-gradient(135deg, rgba(74, 222, 128, 0.18), rgba(0, 217, 255, 0.08));
-    border: 1px solid rgba(74, 222, 128, 0.25);
-    border-radius: 999px;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    padding: 3px 10px;
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    color: #06240f;
+    background: var(--primary-color, #4ade80);
+    border: none;
+    border-radius: 4px 12px 4px 12px;
+    box-shadow: 0 0 10px var(--primary-glow, rgba(74, 222, 128, 0.4));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
 }
 
 /* ---------- Drawer Polish ---------- */
@@ -197,4 +300,142 @@
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
+}
+
+/* ---------- Drawer Profile Card ---------- */
+.app-aside .drawer-profile {
+    margin: 0 4px 18px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(74, 222, 128, 0.12);
+    border-radius: 15px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: var(--transition-base, all 0.25s cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.app-aside .drawer-profile:hover {
+    border-color: var(--primary-color, #4ade80);
+    background: rgba(74, 222, 128, 0.06);
+}
+
+.app-aside .drawer-profile .dp-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--background-card, #16161f), var(--background-dark, #09090f));
+    border: 2px solid var(--primary-color, #4ade80);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color, #4ade80);
+    box-shadow: 0 0 10px var(--primary-glow, rgba(74, 222, 128, 0.3));
+    flex-shrink: 0;
+}
+
+.app-aside .drawer-profile .dp-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.app-aside .drawer-profile .dp-info h4 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary, #f1f1f5);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.app-aside .drawer-profile .dp-info p {
+    margin: 2px 0 0;
+    font-size: 11px;
+    color: var(--text-secondary, #8b8b99);
+}
+
+.app-aside .drawer-profile .dp-arrow {
+    color: var(--text-secondary, #8b8b99);
+    flex-shrink: 0;
+}
+
+/* Active nav item icon glow, matching pearlpix's drawer-item active state */
+.nav li.active .nav-icon,
+.nav li a:hover .nav-icon {
+    filter: drop-shadow(0 0 6px var(--primary-color, #4ade80));
+}
+
+/* ---------- Section Headers (pearlpix .section-title / .see-more) ---------- */
+.section-header h2 {
+    font-size: 18px;
+    font-weight: 800;
+    border-left: 4px solid var(--primary-color, #4ade80);
+    padding-left: 10px;
+    text-shadow: 0 0 8px var(--primary-glow, rgba(74, 222, 128, 0.4));
+}
+
+.view-all {
+    font-weight: 700;
+    color: var(--primary-color, #4ade80);
+}
+
+/* ---------- Horizontal Scroll Rows ---------- */
+/* !important needed: mobile-improvements.css forces .card-grid to
+   display:grid and .card-grid > * to width:100%/flex:none with
+   !important at equal specificity, which would otherwise win by
+   source order. */
+.h-scroll {
+    display: flex !important;
+    grid-template-columns: none !important;
+    gap: 12px !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+}
+
+.h-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.h-scroll > .content-card {
+    flex: 0 0 130px !important;
+    width: 130px !important;
+    max-width: 130px !important;
+}
+
+@media (min-width: 576px) {
+    .h-scroll > .content-card {
+        flex: 0 0 160px !important;
+        width: 160px !important;
+        max-width: 160px !important;
+    }
+}
+
+@media (min-width: 992px) {
+    .h-scroll > .content-card {
+        flex: 0 0 190px !important;
+        width: 190px !important;
+        max-width: 190px !important;
+    }
+}
+
+/* ---------- Filter Pills (movies/series/search/genres selects) ---------- */
+.filter-select {
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: var(--transition-base, all 0.25s cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.filter-select:focus {
+    border-color: var(--primary-color, #4ade80);
+    box-shadow: 0 0 0 2px var(--primary-glow, rgba(74, 222, 128, 0.2));
+    outline: none;
 }
