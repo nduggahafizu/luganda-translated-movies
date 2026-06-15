@@ -10,7 +10,7 @@ html, body {
     .navbar-nav {
         position: fixed;
         top: 60px;
-        left: 0;
+        left: 50%;
         width: 100vw;
         background: var(--background-dark);
         flex-direction: column;
@@ -18,14 +18,14 @@ html, body {
         gap: 0;
         padding: 20px 0 40px 0;
         z-index: 2000;
-        transform: translateY(-120%);
+        transform: translateX(-50%) translateY(-120%);
         opacity: 0;
         pointer-events: none;
         transition: transform 0.3s, opacity 0.3s;
         box-shadow: 0 8px 32px rgba(0,0,0,0.7);
     }
     .navbar-nav.open {
-        transform: translateY(0);
+        transform: translateX(-50%) translateY(0);
         opacity: 1;
         pointer-events: auto;
     }
