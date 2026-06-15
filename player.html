@@ -25,6 +25,7 @@
     
     <!-- Config -->
     <script src="js/config.js"></script>
+    <script src="js/watchlist-manager.js"></script>
     
     <style>
         :root {
@@ -388,6 +389,222 @@
             object-fit: cover !important;
         }
         
+        /* ========== SKIP / NEXT BUTTON ========== */
+        .player-skip-btn {
+            position: absolute;
+            bottom: 100px;
+            right: 24px;
+            padding: 12px 22px;
+            background: rgba(20,20,20,0.85);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: var(--text-primary);
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 45;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.25s ease, transform 0.25s ease, background 0.2s;
+        }
+
+        .player-skip-btn.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .player-skip-btn:hover {
+            background: rgba(74, 222, 128, 0.9);
+            color: #000;
+            border-color: var(--accent);
+        }
+
+        .player-skip-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* ========== UP NEXT OVERLAY ========== */
+        .up-next-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 70;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease;
+        }
+
+        .up-next-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .up-next-card {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            max-width: 480px;
+            width: calc(100% - 40px);
+            box-shadow: var(--shadow);
+        }
+
+        .up-next-poster {
+            width: 80px;
+            height: 120px;
+            border-radius: 10px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .up-next-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .up-next-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .up-next-title {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .up-next-meta {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
+
+        .up-next-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .up-next-play,
+        .up-next-cancel {
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .up-next-play {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .up-next-play:hover {
+            background: var(--accent-hover);
+        }
+
+        .up-next-cancel {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-primary);
+        }
+
+        .up-next-cancel:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* ========== DOUBLE-TAP SEEK FEEDBACK ========== */
+        .seek-flash {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 40%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            color: #fff;
+            background: rgba(255,255,255,0.06);
+            z-index: 40;
+            pointer-events: none;
+            animation: seekFlashFade 0.6s ease forwards;
+        }
+
+        .seek-flash-left {
+            left: 0;
+            border-radius: 0 100% 100% 0 / 0 50% 50% 0;
+        }
+
+        .seek-flash-right {
+            right: 0;
+            border-radius: 100% 0 0 100% / 50% 0 0 50%;
+        }
+
+        .seek-flash span {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        @keyframes seekFlashFade {
+            0% { opacity: 0; }
+            25% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* ========== RESUME TOAST ========== */
+        .resume-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.9);
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            animation: fadeIn 0.3s ease;
+            transition: opacity 0.3s;
+        }
+
+        .resume-toast button {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
         /* ========== LOADING OVERLAY ========== */
         .loading-overlay {
             position: absolute;
@@ -1016,6 +1233,28 @@
                 grid-template-columns: repeat(3, 1fr);
                 gap: 12px;
             }
+
+            .player-skip-btn {
+                bottom: 76px;
+                right: 12px;
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+
+            .up-next-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 16px;
+            }
+
+            .up-next-poster {
+                width: 100px;
+                height: 150px;
+            }
+
+            .up-next-actions {
+                justify-content: center;
+            }
         }
         
         /* ========== LANDSCAPE MOBILE ========== */
@@ -1089,6 +1328,31 @@
                 <div class="error-title">Video Unavailable</div>
                 <div class="error-message" id="errorMessage">Sorry, this video cannot be played.</div>
                 <button class="error-btn" onclick="location.reload()">Try Again</button>
+            </div>
+
+            <!-- Skip Outro / Next -->
+            <button class="player-skip-btn skip-next-btn" id="skipNextBtn">
+                <span>Next</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 4 15 12 5 20 5 4"></polygon>
+                    <line x1="19" y1="5" x2="19" y2="19"></line>
+                </svg>
+            </button>
+
+            <!-- Up Next Overlay -->
+            <div class="up-next-overlay" id="upNextOverlay">
+                <div class="up-next-card">
+                    <img class="up-next-poster" id="upNextPoster" src="assets/images/placeholder.svg" alt="">
+                    <div class="up-next-info">
+                        <div class="up-next-label">Up Next</div>
+                        <div class="up-next-title" id="upNextTitle"></div>
+                        <div class="up-next-meta" id="upNextMeta"></div>
+                        <div class="up-next-actions">
+                            <button class="up-next-play" id="upNextPlayBtn">Play Now</button>
+                            <button class="up-next-cancel" id="upNextCancelBtn">Cancel</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -1188,6 +1452,24 @@
         let player = null;
         let currentMovie = null;
         let fullscreenRotateApplied = false;
+
+        // ========== SUPER PLAYER STATE ==========
+        const playerWrapper = document.getElementById('playerWrapper');
+        const skipNextBtn = document.getElementById('skipNextBtn');
+        const upNextOverlay = document.getElementById('upNextOverlay');
+        const upNextPlayBtn = document.getElementById('upNextPlayBtn');
+        const upNextCancelBtn = document.getElementById('upNextCancelBtn');
+
+        let upNextMovie = null;
+        let lastProgressSave = 0;
+        let upNextCountdownInterval = null;
+
+        const OUTRO_WINDOW = 60;            // show "Next" button when this many seconds remain
+        const SKIP_MIN_DURATION = 20 * 60;  // only show the Next button for movies longer than this
+        const UP_NEXT_COUNTDOWN = 10;       // seconds before auto-advancing to next movie
+        const PROGRESS_SAVE_INTERVAL = 5000; // ms between history saves
+        const RESUME_MIN_PROGRESS = 15;     // don't offer resume below this many seconds
+        const RESUME_MAX_PERCENT = 95;      // don't offer resume if basically finished
 
         function getAuthToken() {
             return (
@@ -1300,7 +1582,10 @@
                     ]
                 },
                 userActions: {
-                    hotkeys: true
+                    hotkeys: {
+                        seekStep: 10,
+                        enableModifiersForNumbers: false
+                    }
                 }
             });
             
@@ -1344,8 +1629,35 @@
             
             player.on('pause', () => {
                 showHeader();
+                saveProgress();
             });
-            
+
+            // ========== RESUME PLAYBACK ==========
+            player.one('loadedmetadata', () => {
+                const history = WatchlistManager.getHistory();
+                const saved = currentMovie && history.find(item => item.id === currentMovie._id);
+                if (saved && saved.progress > RESUME_MIN_PROGRESS && saved.percentComplete < RESUME_MAX_PERCENT) {
+                    player.currentTime(saved.progress);
+                    showResumeToast(saved.progress);
+                }
+            });
+
+            // ========== PROGRESS TRACKING + SKIP BUTTONS ==========
+            player.on('timeupdate', () => {
+                const now = Date.now();
+                if (now - lastProgressSave > PROGRESS_SAVE_INTERVAL) {
+                    lastProgressSave = now;
+                    saveProgress();
+                }
+                updateSkipButtons();
+            });
+
+            // ========== NEXT-MOVIE AUTOPLAY ==========
+            player.on('ended', () => {
+                saveProgress();
+                showUpNextOverlay();
+            });
+
             player.on('fullscreenchange', async () => {
                 const isFullscreen = player.isFullscreen();
                 document.body.classList.toggle('fullscreen-active', isFullscreen);
@@ -1359,12 +1671,15 @@
                 syncPlayerLayout();
             });
             
-            // Fit/Fill toggle with Z key
+            // Custom keyboard shortcuts (in addition to Video.js hotkeys:
+            // Space/K play-pause, Left/Right seek 10s, Up/Down volume, M mute, F fullscreen, 0-9 seek %)
             document.addEventListener('keydown', (e) => {
                 if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-                
+
                 if (e.key === 'z' || e.key === 'Z') {
                     toggleVideoFit();
+                } else if (e.key === 'n' || e.key === 'N') {
+                    if (upNextMovie) playUpNext();
                 }
             });
             
@@ -1470,7 +1785,174 @@
                 vjsEl.classList.add('video-fill');
             }
         }
-        
+
+        // ========== TIME FORMATTING ==========
+        function formatTime(seconds) {
+            seconds = Math.max(0, Math.floor(seconds));
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
+            if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            return `${m}:${String(s).padStart(2, '0')}`;
+        }
+
+        // ========== RESUME PLAYBACK / WATCH HISTORY ==========
+        function getHistoryMovieData() {
+            if (!currentMovie) return null;
+            return {
+                id: currentMovie._id,
+                title: currentMovie.originalTitle || currentMovie.title,
+                poster: currentMovie.poster,
+                year: currentMovie.year || currentMovie.releaseYear,
+                vj: currentMovie.vjName,
+                genres: currentMovie.genres || [],
+                contentType: 'movie'
+            };
+        }
+
+        function saveProgress() {
+            if (!player || !currentMovie) return;
+            const duration = player.duration();
+            const currentTime = player.currentTime();
+            if (!duration || !isFinite(duration) || !currentTime) return;
+            WatchlistManager.addToHistory(getHistoryMovieData(), currentTime, duration);
+        }
+
+        function showResumeToast(seconds) {
+            const toast = document.createElement('div');
+            toast.className = 'resume-toast';
+            toast.innerHTML = `
+                <span>Resumed from ${formatTime(seconds)}</span>
+                <button>Start Over</button>
+            `;
+            document.body.appendChild(toast);
+
+            toast.querySelector('button').addEventListener('click', () => {
+                if (player) player.currentTime(0);
+                toast.remove();
+            });
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 6000);
+        }
+
+        // ========== SKIP TO NEXT (OUTRO) ==========
+        function updateSkipButtons() {
+            if (!player) return;
+            const duration = player.duration();
+            const currentTime = player.currentTime();
+            if (!duration || !isFinite(duration)) return;
+
+            const remaining = duration - currentTime;
+            const showNext = duration > SKIP_MIN_DURATION && !!upNextMovie && remaining > 0 && remaining < OUTRO_WINDOW;
+            skipNextBtn.classList.toggle('visible', showNext);
+        }
+
+        skipNextBtn.addEventListener('click', () => playUpNext());
+
+        // ========== UP NEXT / AUTOPLAY ==========
+        function showUpNextOverlay() {
+            if (!upNextMovie) return;
+
+            const title = upNextMovie.originalTitle || upNextMovie.title || 'Next movie';
+            const poster = upNextMovie.poster || 'assets/images/placeholder.svg';
+            const vj = (upNextMovie.vjName || '').replace(/^vj\s*/i, '').trim();
+
+            document.getElementById('upNextTitle').textContent = title;
+            document.getElementById('upNextPoster').src = poster;
+
+            const metaParts = [];
+            if (upNextMovie.year) metaParts.push(upNextMovie.year);
+            if (vj) metaParts.push(`VJ ${vj}`);
+            document.getElementById('upNextMeta').textContent = metaParts.join(' · ');
+
+            skipNextBtn.classList.remove('visible');
+            upNextOverlay.classList.add('visible');
+
+            let remaining = UP_NEXT_COUNTDOWN;
+            upNextPlayBtn.textContent = `Play Now (${remaining})`;
+
+            clearInterval(upNextCountdownInterval);
+            upNextCountdownInterval = setInterval(() => {
+                remaining--;
+                if (remaining <= 0) {
+                    clearInterval(upNextCountdownInterval);
+                    playUpNext();
+                    return;
+                }
+                upNextPlayBtn.textContent = `Play Now (${remaining})`;
+            }, 1000);
+        }
+
+        function hideUpNextOverlay() {
+            clearInterval(upNextCountdownInterval);
+            upNextOverlay.classList.remove('visible');
+        }
+
+        function playUpNext() {
+            if (!upNextMovie) return;
+            clearInterval(upNextCountdownInterval);
+            window.location.href = `player.html?id=${upNextMovie._id}`;
+        }
+
+        upNextCancelBtn.addEventListener('click', hideUpNextOverlay);
+        upNextPlayBtn.addEventListener('click', () => playUpNext());
+
+        // ========== DOUBLE-TAP SEEK (MOBILE) ==========
+        function showSeekFeedback(side, label) {
+            const flash = document.createElement('div');
+            flash.className = `seek-flash seek-flash-${side}`;
+            flash.innerHTML = `
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                    ${side === 'left'
+                        ? '<path d="M11 18V6l-8.5 6 8.5 6zM20 18V6l-8.5 6 8.5 6z"/>'
+                        : '<path d="M4 18V6l8.5 6-8.5 6zm9-12v12l8.5-6-8.5-6z"/>'}
+                </svg>
+                <span>${label}</span>
+            `;
+            playerWrapper.appendChild(flash);
+            setTimeout(() => flash.remove(), 600);
+        }
+
+        let lastTapTime = 0;
+        let lastTapX = 0;
+
+        playerWrapper.addEventListener('touchend', (e) => {
+            if (!player || !isTouchDevice()) return;
+            if (e.target.closest('.vjs-control-bar, .player-skip-btn, .up-next-overlay')) return;
+
+            const touch = e.changedTouches[0];
+            const rect = playerWrapper.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const now = Date.now();
+            const isDoubleTap = (now - lastTapTime) < 300 && Math.abs(x - lastTapX) < 80;
+
+            if (isDoubleTap) {
+                e.preventDefault();
+                const duration = player.duration();
+                if (x < rect.width / 2) {
+                    player.currentTime(Math.max(0, player.currentTime() - 10));
+                    showSeekFeedback('left', '-10s');
+                } else {
+                    const target = isFinite(duration) ? Math.min(duration, player.currentTime() + 10) : player.currentTime() + 10;
+                    player.currentTime(target);
+                    showSeekFeedback('right', '+10s');
+                }
+                lastTapTime = 0;
+            } else {
+                lastTapTime = now;
+                lastTapX = x;
+            }
+        });
+
+        // Save progress when the tab is hidden or the page unloads
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') saveProgress();
+        });
+        window.addEventListener('beforeunload', saveProgress);
+
         // ========== HEADER AUTO-HIDE ==========
         let headerTimeout = null;
         
@@ -1844,6 +2326,7 @@
                 
                 if ((data.success || data.status === 'success') && data.data) {
                     const movies = data.data.filter(m => m._id !== currentMovie._id).slice(0, 6);
+                    upNextMovie = movies[0] || null;
                     renderRelatedMovies(movies);
                 }
             } catch (e) {

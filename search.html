@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/mobile-improvements.css">
     <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/card-grid.css">
     <link rel="stylesheet" href="css/trailer-player.css">
     <link rel="stylesheet" href="css/app-shell.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
@@ -89,47 +90,26 @@
         }
         
         .filters-section {
-            background: var(--background-light);
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.98) 100%);
             padding: 25px;
-            border-radius: 15px;
+            border-radius: 20px;
             margin-bottom: 30px;
+            border: 1px solid rgba(74, 222, 128, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
-        
+
         .filters-row {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             flex-wrap: wrap;
+            align-items: flex-end;
         }
-        
+
         .filter-group {
             flex: 1;
-            min-width: 200px;
+            min-width: 180px;
         }
-        
-        .filter-label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
-        }
-        
-        .filter-select {
-            width: 100%;
-            padding: 12px 15px;
-            background: var(--background-dark);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-size: 14px;
-            cursor: pointer;
-        }
-        
-        .filter-select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-        
+
         .active-filters {
             display: flex;
             gap: 10px;
