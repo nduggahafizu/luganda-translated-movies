@@ -376,11 +376,11 @@
             width: 100vw !important;
             height: 100vh !important;
         }
-        
+
         .video-js.vjs-fullscreen video {
             object-fit: contain;
         }
-        
+
         .video-js.video-fit video {
             object-fit: contain !important;
         }
@@ -388,7 +388,27 @@
         .video-js.video-fill video {
             object-fit: cover !important;
         }
-        
+
+        /* Make the wrapper itself a full-viewport overlay in fullscreen so it never
+           clips/constrains the fullscreen video.js element on any screen size */
+        body.fullscreen-active .player-wrapper {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            max-width: 100%;
+            aspect-ratio: unset;
+            margin: 0;
+            border-radius: 0;
+            box-shadow: none;
+            z-index: 1000;
+        }
+
+        body.fullscreen-active .header,
+        body.fullscreen-active .content {
+            display: none;
+        }
+
         /* ========== SKIP / NEXT BUTTON ========== */
         .player-skip-btn {
             position: absolute;
@@ -1261,18 +1281,6 @@
         @media (max-width: 920px) and (orientation: landscape) {
             .header {
                 opacity: 0;
-            }
-            
-            body.fullscreen-active .player-wrapper {
-                margin-top: 0;
-                height: 100vh;
-                aspect-ratio: unset;
-                max-width: 100%;
-                border-radius: 0;
-            }
-            
-            body.fullscreen-active .content {
-                display: none;
             }
         }
     </style>

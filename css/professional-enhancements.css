@@ -630,10 +630,6 @@ input:focus {
 
 /* Ultra-wide Desktop */
 @media (min-width: 1800px) {
-    .container {
-        max-width: 1700px;
-    }
-    
     .app-content {
         padding: 50px 0 !important;
     }

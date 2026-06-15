@@ -588,18 +588,14 @@
 
 /* Large Desktop (1400px and up) */
 @media (min-width: 1400px) {
-    .container {
-        max-width: 1600px;
-    }
-    
     .slide {
         height: 550px;
     }
-    
+
     .slide .title {
         font-size: 48px;
     }
-    
+
     .list-scrollable > .col {
         width: 220px;
     }
@@ -607,14 +603,10 @@
 
 /* Extra Large Desktop (1920px and up) */
 @media (min-width: 1920px) {
-    .container {
-        max-width: 1800px;
-    }
-    
     .slide {
         height: 600px;
     }
-    
+
     .app-heading .text {
         font-size: 28px;
     }
