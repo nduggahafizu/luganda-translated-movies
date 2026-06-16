@@ -98,6 +98,7 @@ Disallow: /offline
 Disallow: /error
 Disallow: /404
 Disallow: /amp
+Disallow: /amp.html
 Disallow: /munowatch
 Disallow: /assets/images/og-image-generator
 Disallow: /assets/images/logo-generator
