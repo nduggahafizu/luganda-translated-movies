@@ -243,6 +243,7 @@
                 border-radius: 50%;
                 background: #fff;
                 padding: 5px;
+                object-fit: contain;
             }
             
             .chat-header h4 {

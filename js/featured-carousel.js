@@ -403,6 +403,7 @@ const FeaturedCarousel = {
                 height: 36px;
                 border-radius: 50%;
                 border: 2px solid var(--primary-color);
+                object-fit: cover;
             }
 
             .carousel-actions {

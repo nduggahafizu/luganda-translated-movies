@@ -177,6 +177,19 @@ app.use('/api/', generalLimiter);
 // Static files
 app.use('/uploads', express.static('uploads'));
 
+// Vendor assets — versioned, safe to cache for 1 year
+app.use('/vendor', express.static(path.join(__dirname, '../vendor'), {
+    maxAge: '365d',
+    immutable: true,
+}));
+
+// Other frontend static assets (CSS, JS, images) — 1 day cache
+app.use(express.static(path.join(__dirname, '..'), {
+    maxAge: '1d',
+    etag: true,
+    index: false, // don't auto-serve index.html from here; let the SPA handle routing
+}));
+
 // Database connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/luganda-movies';
 

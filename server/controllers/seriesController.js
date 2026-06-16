@@ -1,5 +1,13 @@
 const LugandaMovie = require('../models/LugandaMovie');
 
+// Web push notifications — optional, won't crash if not configured
+let notifyNewSeriesPush = async () => {};
+try {
+    notifyNewSeriesPush = require('../services/pushService').notifyNewSeriesPush;
+} catch (e) {
+    console.warn('Push service unavailable:', e.message);
+}
+
 // Helper function to transform LugandaMovie to series format for frontend compatibility
 const transformToSeriesFormat = (movie) => {
     if (!movie) return null;
@@ -270,7 +278,12 @@ exports.createSeries = async (req, res) => {
         };
         
         const series = await LugandaMovie.create(seriesData);
-        
+
+        // Notify subscribed users — fire and forget, don't block the response
+        notifyNewSeriesPush(series).catch(err =>
+            console.warn('Series push notification failed:', err.message)
+        );
+
         res.status(201).json({
             success: true,
             data: transformToSeriesFormat(series),

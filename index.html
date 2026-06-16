@@ -139,26 +139,25 @@
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     
-    <!-- Styles -->
+    <!-- Styles (critical above-fold CSS loaded synchronously) -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/card-grid.css">
     <link rel="stylesheet" href="css/mobile-improvements.css">
-    <link rel="stylesheet" href="css/trailer-player.css">
-    <link rel="stylesheet" href="css/professional-enhancements.css">
-    <link rel="stylesheet" href="css/adsense-styles.css">
     <link rel="stylesheet" href="css/modern-ui.css">
-    <link rel="stylesheet" href="css/content-guide.css">
     <link rel="stylesheet" href="css/app-shell.css">
-    <link rel="stylesheet" href="css/payment-modal.css">
+    <!-- Non-critical CSS loaded asynchronously to unblock render -->
+    <link rel="stylesheet" href="css/trailer-player.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/professional-enhancements.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/adsense-styles.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/content-guide.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/payment-modal.css" media="print" onload="this.media='all'">
+
+    <!-- Fonts (preconnects already declared above; font CSS deferred to reduce render-blocking) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     
-    <!-- Preload fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-    
-    <!-- Video.js for enhanced video playback -->
-    <link href="https://vjs.zencdn.net/8.16.1/video-js.css" rel="stylesheet">
+    <!-- Video.js CSS (non-critical — deferred to unblock render) -->
+    <link href="/vendor/video-js/video-js.css" rel="stylesheet" media="print" onload="this.media='all'">
 
     <style>
         /* Skeleton Loader */
@@ -362,6 +361,7 @@
             width: 32px;
             height: 32px;
             border-radius: 8px;
+            object-fit: contain;
         }
         #iosInstallBanner .ios-banner-steps {
             color: #ccc;
@@ -470,7 +470,10 @@
                     </div>
                     <div class="app-navbar">
                         <a href="index.html" class="navbar-brand">
-                            <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
+                            <picture>
+                                <source srcset="assets/images/logo-wordmark.webp" type="image/webp">
+                                <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
+                            </picture>
                         </a>
                     </div>
                     <div class="search-btn d-md-none d-block" id="mobileSearchBtn">
@@ -861,7 +864,7 @@
                 </div>
 
                 <!-- Main Content -->
-                <div class="app-container flex-fill">
+                <main class="app-container flex-fill">
                     <div class="container">
                         <div class="app-content pt-md-3">
                             
@@ -1122,7 +1125,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </main>
             </div>
 
             <!-- Professional Footer -->
@@ -1131,7 +1134,10 @@
                     <div class="footer-grid">
                         <div class="footer-brand">
                             <a href="index.html" class="footer-logo">
-                                <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
+                                <picture>
+                                    <source srcset="assets/images/logo-wordmark.webp" type="image/webp">
+                                    <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
+                                </picture>
                             </a>
                             <p class="footer-tagline">Uganda's premier platform for Luganda VJ translated movies.</p>
                             <div class="footer-social">
@@ -1214,18 +1220,18 @@
         window.scrollTo(0, 0);
     </script>
     
-    <!-- Video.js Library -->
-    <script src="https://vjs.zencdn.net/8.16.1/video.min.js"></script>
-    
-    <!-- API Configuration (must load first) -->
-    <script src="js/config.js"></script>
-    <script src="js/tmdb-api.js"></script>
-    <script src="js/luganda-movies-api.js"></script>
-    <script src="js/myvj-features.js"></script>
-    <script src="js/trailer-player.js"></script>
-    <script src="js/notifications.js"></script>
-    <script src="js/payment-manager.js"></script>
-    <script src="js/main.js"></script>
+    <!-- Video.js Library (deferred — not needed until trailer is played) -->
+    <script defer src="/vendor/video-js/video.min.js"></script>
+
+    <!-- Core scripts (defer preserves execution order after DOM is parsed) -->
+    <script defer src="js/config.js"></script>
+    <script defer src="js/tmdb-api.js"></script>
+    <script defer src="js/luganda-movies-api.js"></script>
+    <script defer src="js/myvj-features.js"></script>
+    <script defer src="js/trailer-player.js"></script>
+    <script defer src="js/notifications.js"></script>
+    <script defer src="js/payment-manager.js"></script>
+    <script defer src="js/main.js"></script>
     
     <!-- Global Trailer Player Function -->
     <script>
@@ -1322,176 +1328,65 @@
     </style>
     
     <script>
-        // 2. This code loads the IFrame Player API code asynchronously.
-        var tag = document.createElement('script');
-
-        tag.src = "https://www.youtube.com/iframe_api";
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-        // 3. This function creates an <iframe> (and YouTube player)
-        //    after the API code downloads.
+        // YouTube player — lazy loaded only when openVideoModal(videoId) is called.
+        // This avoids YouTube cookies, console noise, and API requests on page load.
         var player;
         var playerInitialized = false;
+        var ytApiLoaded = false;
 
-        function onYouTubeIframeAPIReady() {
-            // Wait for DOM to be fully loaded before creating player
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initializePlayer);
-            } else {
-                initializePlayer();
-            }
-        }
-
-        function initializePlayer() {
-            const playerElement = document.getElementById('youtubePlayer');
-            if (!playerElement) {
-                console.error('YouTube player element not found');
+        function loadYouTubeAPI(videoId) {
+            window._pendingYtVideoId = videoId;
+            if (ytApiLoaded) {
+                if (player && playerInitialized) {
+                    player.loadVideoById(videoId);
+                    player.playVideo();
+                }
                 return;
             }
-
-            try {
-                player = new YT.Player('youtubePlayer', {
-                    height: '390',
-                    width: '640',
-                    videoId: 'dQw4w9WgXcQ', // Changed to a known working video ID
-                    playerVars: {
-                        'autoplay': 0,
-                        'controls': 1,
-                        'modestbranding': 1,
-                        'rel': 0,
-                        'fs': 1,
-                        'playsinline': 1
-                    },
-                    events: {
-                        'onReady': onPlayerReady,
-                        'onStateChange': onPlayerStateChange,
-                        'onError': onPlayerError
-                    }
-                });
-                playerInitialized = true;
-                console.log('YouTube player initialized successfully');
-            } catch (error) {
-                console.error('Error initializing YouTube player:', error);
-            }
+            ytApiLoaded = true;
+            var tag = document.createElement('script');
+            tag.src = 'https://www.youtube.com/iframe_api';
+            document.head.appendChild(tag);
         }
 
-        function onPlayerError(event) {
-            console.error('YouTube player error:', event.data);
-            let errorMessage = '';
-            
-            // Handle different error types
-            switch(event.data) {
-                case 2:
-                    errorMessage = 'Invalid video ID or parameter';
-                    console.error('Error 2: Invalid video ID');
-                    break;
-                case 5:
-                    errorMessage = 'HTML5 player error';
-                    console.error('Error 5: HTML5 player error');
-                    break;
-                case 100:
-                    errorMessage = 'Video not found or has been removed';
-                    console.error('Error 100: Video not found');
-                    break;
-                case 101:
-                    errorMessage = 'Video owner does not allow embedding';
-                    console.error('Error 101: Embedding not allowed by video owner');
-                    break;
-                case 150:
-                    errorMessage = 'Video owner does not allow embedding';
-                    console.error('Error 150: Embedding not allowed by video owner');
-                    break;
-                case 153:
-                    errorMessage = 'Video player configuration error - Please check player settings';
-                    console.error('Error 153: Player configuration error');
-                    break;
-                default:
-                    errorMessage = 'Unknown player error occurred';
-                    console.error('Unknown player error:', event.data);
-            }
-            
-            // Display error message to user
-            alert('Video Player Error: ' + errorMessage);
-        }
-
-        // 4. The API will call this function when the video player is ready.
-        var playerReady = false;
-        function onPlayerReady(event) {
-            playerReady = true;
-            console.log('YouTube player is ready');
-        }
-
-        // 5. The API calls this function when the player's state changes.
-        function onPlayerStateChange(event) {
-            console.log('Player state changed:', event.data);
-            if (event.data == YT.PlayerState.PLAYING) {
-                console.log('Video started playing');
-            } else if (event.data == YT.PlayerState.ENDED) {
-                console.log('Video ended');
-            } else if (event.data == YT.PlayerState.PAUSED) {
-                console.log('Video paused');
-            }
-        }
+        window.onYouTubeIframeAPIReady = function() {
+            var videoId = window._pendingYtVideoId || '';
+            player = new YT.Player('youtubePlayer', {
+                height: '390',
+                width: '640',
+                videoId: videoId,
+                playerVars: { autoplay: 1, controls: 1, modestbranding: 1, rel: 0, fs: 1, playsinline: 1 },
+                events: {
+                    'onReady': function() { playerInitialized = true; player.playVideo(); },
+                    'onError': function(e) { console.warn('YouTube player error:', e.data); }
+                }
+            });
+        };
 
         function stopVideo() {
-            if (player && player.stopVideo) {
-                player.stopVideo();
-            }
+            if (player && player.stopVideo) player.stopVideo();
         }
 
-        // Video Modal Functions
-        function openVideoModal() {
+        function openVideoModal(videoId) {
             const modal = document.getElementById('videoModal');
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
-
-            // Start playing the video when modal opens (only if player is ready)
-            if (playerReady && player && player.playVideo) {
-                try {
-                    player.playVideo();
-                    console.log('Video play command sent');
-                } catch (error) {
-                    console.error('Error playing video:', error);
-                }
-            } else {
-                console.log('Player not ready yet, waiting...');
-                // Retry after a short delay
-                setTimeout(() => {
-                    if (playerReady && player && player.playVideo) {
-                        try {
-                            player.playVideo();
-                        } catch (error) {
-                            console.error('Error playing video after delay:', error);
-                        }
-                    }
-                }, 1000);
-            }
+            if (videoId) loadYouTubeAPI(videoId);
         }
 
         function closeVideoModal() {
             const modal = document.getElementById('videoModal');
             modal.style.display = 'none';
             document.body.style.overflow = 'auto';
-
-            // Stop the video when modal closes
-            if (player && player.stopVideo) {
-                player.stopVideo();
-            }
+            if (player && player.stopVideo) player.stopVideo();
         }
 
-        // Close modal when clicking outside
         document.getElementById('videoModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeVideoModal();
-            }
+            if (e.target === this) closeVideoModal();
         });
 
-        // Close modal with Escape key
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeVideoModal();
-            }
+            if (e.key === 'Escape') closeVideoModal();
         });
 
         // Load Luganda movies on page load
@@ -1680,27 +1575,23 @@
                 const quality = movie.video?.quality || 'HD';
                 const rating = movie.rating?.translationRating || movie.rating?.userRating || 4.0;
                 const fallbackPoster = getPlaceholderPoster(movie.originalTitle, movie.year);
-                const posterUrl = movie.poster || fallbackPoster;
+                const posterUrl = tmdbResize(movie.poster, 'w342') || movie.poster || fallbackPoster;
                 const vjBadge = formatVjBadge(movie.vjName);
                 const posterId = `${containerId}-poster-${index}`;
                 const movieTitle = movie.originalTitle || movie.lugandaTitle || 'Unknown Title';
                 const year = movie.year || '';
                 const genres = movie.genres || [];
                 const rank = index + 1;
-                
+
                 // Store poster data for later loading
                 if (movie.poster) {
-                    posterData.push({ posterId, posterUrl: movie.poster, fallbackPoster });
+                    posterData.push({ posterId, posterUrl: tmdbResize(movie.poster, 'w342') || movie.poster, fallbackPoster });
                 }
                 
                 const movieCard = `
                     <a href="player.html?id=${movie._id}" class="content-card" data-movie-id="${movie._id}">
                         <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
-                            <span class="trending-rank">${rank}</span>
-                            <div class="card-badges">
-                                <span class="card-badge badge-quality">${quality}</span>
-                                ${vjBadge ? `<span class="card-badge badge-vj">${vjBadge}</span>` : ''}
-                            </div>
+                            ${vjBadge ? `<div class="card-badges"><span class="card-badge badge-vj">${vjBadge}</span></div>` : ''}
                             <div class="play-overlay">
                                 <svg viewBox="0 0 24 24" fill="currentColor">
                                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
@@ -1712,16 +1603,15 @@
                             <div class="card-meta">
                                 ${year ? `<span>${year}</span>` : ''}
                                 ${genres.length > 0 ? `<span>${genres[0]}</span>` : ''}
-                                ${vjBadge ? `<span>${vjBadge}</span>` : ''}
                             </div>
                         </div>
                     </a>
                 `;
                 cardsHTML += movieCard;
             });
-            
+
             container.innerHTML = cardsHTML;
-            
+
             // Load posters with validation after DOM is updated
             setTimeout(() => {
                 posterData.forEach(({ posterId, posterUrl, fallbackPoster }) => {
@@ -1732,7 +1622,7 @@
                 });
             }, 100);
         }
-        
+
         function getStoredAuthToken() {
             return (
                 localStorage.getItem('token') ||
@@ -1999,6 +1889,12 @@
             sidebar.innerHTML = html;
         }
         
+        // Swap TMDB image size without touching the rest of the URL
+        function tmdbResize(url, size) {
+            if (!url) return '';
+            return url.replace(/\/t\/p\/[^/]+\//, `/t/p/${size}/`);
+        }
+
         // Update hero slider with actual movies from database
         function updateHeroSlider(movies) {
             if (!movies || movies.length === 0) return;
@@ -2008,17 +1904,29 @@
                 const slide = document.getElementById(slideId);
                 if (!slide) return;
 
-                const poster = movie.backdrop || movie.poster || '';
+                const rawPoster = movie.backdrop || movie.poster || '';
+                const poster = tmdbResize(rawPoster, 'w1280') || rawPoster;
                 const title = movie.title || movie.originalTitle || 'Movie';
                 const movieId = movie._id || movie.id;
                 const year = movie.year || movie.releaseYear || '';
                 const quality = movie.video?.quality || 'HD';
                 const overview = movie.description || movie.plot || '';
                 const vjBadge = formatVjBadge(movie.vjName);
+                const isFirst = index === 0;
+
+                // Inject preload hint for LCP image as early as possible
+                if (isFirst && poster) {
+                    const preload = document.createElement('link');
+                    preload.rel = 'preload';
+                    preload.as = 'image';
+                    preload.href = poster;
+                    preload.fetchPriority = 'high';
+                    document.head.appendChild(preload);
+                }
 
                 slide.innerHTML = `
                     <div class="slide poster-slide">
-                        <img src="${poster}" alt="${title}" class="slide-poster-img" loading="${index === 0 ? 'eager' : 'lazy'}" onerror="this.src='https://placehold.co/1280x720/16161f/4ade80?text=${encodeURIComponent(title.substring(0,20))}'">
+                        <img src="${poster}" alt="${title}" class="slide-poster-img" loading="${isFirst ? 'eager' : 'lazy'}"${isFirst ? ' fetchpriority="high"' : ''} onerror="this.src='https://placehold.co/1280x720/16161f/4ade80?text=${encodeURIComponent(title.substring(0,20))}'">
                         <div class="hero-overlay"></div>
                         <div class="hero-content">
                             <h2 class="hero-title">${title}</h2>
@@ -2091,12 +1999,12 @@
                 const quality = movie.video?.quality || 'HD';
                 const rating = movie.rating?.translationRating || movie.rating?.userRating || 4.0;
                 const fallbackPoster = getPlaceholderPoster(movie.originalTitle, movie.year);
-                const posterUrl = movie.poster || fallbackPoster;
+                const posterUrl = tmdbResize(movie.poster, 'w342') || movie.poster || fallbackPoster;
                 const vjBadge = formatVjBadge(movie.vjName);
                 const posterId = `${containerId}-poster-${index}`;
                 const tmdbId = movie.tmdbId || movie.metaData?.tmdbId || movie.externalIds?.tmdbId || null;
                 const movieTitle = movie.originalTitle || movie.lugandaTitle || 'Unknown Title';
-                
+
                 // Determine featured badge
                 let featuredBadge = '';
                 const movieAge = Math.floor((Date.now() - new Date(movie.createdAt || movie.releaseDate)) / (1000 * 60 * 60 * 24));
@@ -2107,20 +2015,16 @@
                 }
                 const year = movie.year || '';
                 const genres = movie.genres || [];
-                
+
                 // Store poster data for later loading
                 if (movie.poster) {
-                    posterData.push({ posterId, posterUrl: movie.poster, fallbackPoster });
+                    posterData.push({ posterId, posterUrl: tmdbResize(movie.poster, 'w342') || movie.poster, fallbackPoster });
                 }
                 
                 const movieCard = `
                     <a href="player.html?id=${movie._id}" class="content-card" data-movie-id="${movie._id}">
-                        ${featuredBadge}
                         <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
-                            <div class="card-badges">
-                                <span class="card-badge badge-quality">${quality}</span>
-                                ${vjBadge ? `<span class="card-badge badge-vj">${vjBadge}</span>` : ''}
-                            </div>
+                            ${vjBadge ? `<div class="card-badges"><span class="card-badge badge-vj">${vjBadge}</span></div>` : ''}
                             <div class="play-overlay">
                                 <svg viewBox="0 0 24 24" fill="currentColor">
                                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
@@ -2132,7 +2036,6 @@
                             <div class="card-meta">
                                 ${year ? `<span>${year}</span>` : ''}
                                 ${genres.length > 0 ? `<span>${genres[0]}</span>` : ''}
-                                ${vjBadge ? `<span>${vjBadge}</span>` : ''}
                             </div>
                         </div>
                     </a>
@@ -2336,10 +2239,10 @@
     </script>
 
     <!-- Social Sharing -->
-    <script src="js/social-share.js"></script>
-    
+    <script defer src="js/social-share.js"></script>
+
     <!-- Netflix-Style Lazy Loading -->
-    <script src="js/lazy-load.js"></script>
+    <script defer src="js/lazy-load.js"></script>
     
     <!-- Service Worker Registration -->
     <script>
@@ -2357,23 +2260,22 @@
     </script>
     
     <!-- Cookie Consent Banner -->
-    <script src="js/cookie-consent.js"></script>
-    
+    <script defer src="js/cookie-consent.js"></script>
+
     <!-- Live Chat Widget -->
-    <script src="js/chat-widget.js"></script>
-    
-    <!-- System Notification (centralized config in js/system-notification.js) -->
-    <script src="js/system-notification.js"></script>
-    
-    <!-- Native App Notifications (Capacitor) -->
-    <script src="https://unpkg.com/@capgo/capacitor-updater"></script>
-    <script src="js/native-notifications.js"></script>
-    
+    <script defer src="js/chat-widget.js"></script>
+
+    <!-- System Notification -->
+    <script defer src="js/system-notification.js"></script>
+
+    <!-- Native App Notifications (native-notifications.js guards itself with window.Capacitor check) -->
+    <script defer src="js/native-notifications.js"></script>
+
     <!-- User Engagement Scripts -->
-    <script src="js/live-chat-widget.js"></script>
-    
+    <script defer src="js/live-chat-widget.js"></script>
+
     <!-- Web Push Notifications -->
-    <script src="js/push-notifications.js"></script>
+    <script defer src="js/push-notifications.js"></script>
 
     <script>
     (function () {

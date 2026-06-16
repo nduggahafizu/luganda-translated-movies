@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="robots" content="noindex, nofollow">
+    <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#0a0a0a">
     <title>Watch - Unruly Movies</title>
 
@@ -17,11 +17,11 @@
     <link rel="stylesheet" href="css/app-shell.css">
 
     <!-- Video.js -->
-    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet">
-    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
-    
+    <link href="/vendor/video-js/video-js.css" rel="stylesheet">
+    <script src="/vendor/video-js/video.min.js"></script>
+
     <!-- HLS Support -->
-    <script src="https://cdn.jsdelivr.net/npm/@videojs/http-streaming@3.10.0/dist/videojs-http-streaming.min.js"></script>
+    <script src="/vendor/video-js/videojs-http-streaming.min.js"></script>
     
     <!-- Config -->
     <script src="js/config.js"></script>
@@ -629,14 +629,29 @@
         .loading-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: #0a0a0a;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 50;
+            overflow: hidden;
         }
-        
+
+        .loading-poster-bg {
+            position: absolute;
+            inset: -30px;
+            background-size: cover;
+            background-position: center;
+            filter: blur(28px);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-poster-bg.visible {
+            opacity: 0.45;
+        }
+
         .loading-overlay.hidden {
             display: none;
         }
@@ -1283,6 +1298,96 @@
                 opacity: 0;
             }
         }
+
+        /* ========== AUTH GATE OVERLAY ========== */
+        .auth-gate-overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            z-index: 30;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(4px);
+        }
+        .auth-gate-overlay.visible {
+            display: flex;
+        }
+        .auth-gate-poster-bg {
+            position: absolute;
+            inset: -30px;
+            background-size: cover;
+            background-position: center;
+            filter: blur(24px);
+            opacity: 0.35;
+            pointer-events: none;
+        }
+        .auth-gate-content {
+            position: relative;
+            text-align: center;
+            padding: 32px 24px;
+            max-width: 380px;
+        }
+        .auth-gate-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(74,222,128,0.12);
+            border: 2px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+        .auth-gate-icon svg { color: var(--accent); }
+        .auth-gate-content h3 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .auth-gate-content p {
+            font-size: 14px;
+            color: rgba(255,255,255,0.65);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        .auth-gate-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .auth-gate-login {
+            padding: 13px 28px;
+            background: var(--accent);
+            color: #000;
+            font-weight: 700;
+            font-size: 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: block;
+        }
+        .auth-gate-login:hover { background: var(--accent-hover); }
+        .auth-gate-register {
+            padding: 12px 28px;
+            background: transparent;
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+            text-decoration: none;
+            display: block;
+        }
+        .auth-gate-register:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
     </style>
 </head>
 
@@ -1322,6 +1427,7 @@
             
             <!-- Loading Overlay -->
             <div class="loading-overlay" id="loadingOverlay">
+                <div class="loading-poster-bg" id="loadingPosterBg"></div>
                 <div class="spinner"></div>
                 <div class="loading-text">Loading video...</div>
             </div>
@@ -1336,6 +1442,25 @@
                 <div class="error-title">Video Unavailable</div>
                 <div class="error-message" id="errorMessage">Sorry, this video cannot be played.</div>
                 <button class="error-btn" onclick="location.reload()">Try Again</button>
+            </div>
+
+            <!-- Auth Gate — shown to logged-out visitors; trailer is still free -->
+            <div class="auth-gate-overlay" id="authGateOverlay">
+                <div class="auth-gate-poster-bg" id="authGatePosterBg"></div>
+                <div class="auth-gate-content">
+                    <div class="auth-gate-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    </div>
+                    <h3>Members Only</h3>
+                    <p>Login or create account to watch the full Luganda translation. or <button onclick="document.getElementById('trailerBtn').click()" style="background:none;border:none;color:var(--accent);font-size:inherit;cursor:pointer;padding:0;text-decoration:underline;">watch trailer</button>.</p>
+                    <div class="auth-gate-btns">
+                        <button class="auth-gate-login" onclick="watchFullMovie()">Login to Watch Full Movie</button>
+                        <a href="register.html" class="auth-gate-register">Create Free Account</a>
+                    </div>
+                </div>
             </div>
 
             <!-- Skip Outro / Next -->
@@ -1568,6 +1693,7 @@
         
         // ========== INITIALIZE VIDEO.JS ==========
         function initPlayer() {
+            if (player) return; // already initialised
             player = videojs('videoPlayer', {
                 controls: true,
                 autoplay: false,
@@ -2008,7 +2134,7 @@
                 showError('No video URL provided');
                 return;
             }
-            
+
             // Clear any previous error state
             hideError();
             
@@ -2130,27 +2256,34 @@
                     // Track view for analytics
                     fetch(`${API_BASE}/api/luganda-movies/${movieId}/view`, { method: 'POST' }).catch(() => {});
 
-                    // Update UI
+                    // Update UI (public — no auth needed)
                     updateMovieInfo(currentMovie);
-                    
+
+                    // Load related movies (public)
+                    loadRelatedMovies();
+
                     // Get video URL
                     const rawVideoUrl = currentMovie.video?.embedUrl || currentMovie.embedUrl || currentMovie.video?.url;
                     const videoUrl = typeof rawVideoUrl === 'string' ? rawVideoUrl.trim() : rawVideoUrl;
                     const provider = (currentMovie.video?.provider || '').toLowerCase();
                     const format = (currentMovie.video?.format || '').toLowerCase();
-                    
-                    if (videoUrl && (isDirectVideo(videoUrl) || format === 'mp4' || format === 'm3u8' || format === 'webm')) {
-                        loadVideo(videoUrl);
-                    } else if (videoUrl && provider !== 'streamtape') {
-                        await loadEmbedVideo(videoUrl);
-                    } else if (videoUrl) {
-                        loadVideo(videoUrl);
+
+                    // Gate the actual video behind auth; trailers are always free
+                    const authed = await isLoggedIn();
+                    if (authed) {
+                        initPlayer();
+                        if (videoUrl && (isDirectVideo(videoUrl) || format === 'mp4' || format === 'm3u8' || format === 'webm')) {
+                            loadVideo(videoUrl);
+                        } else if (videoUrl && provider !== 'streamtape') {
+                            await loadEmbedVideo(videoUrl);
+                        } else if (videoUrl) {
+                            loadVideo(videoUrl);
+                        } else {
+                            showError('Video not available for this movie');
+                        }
                     } else {
-                        showError('Video not available for this movie');
+                        showAuthGate(videoUrl, provider, format, currentMovie);
                     }
-                    
-                    // Load related movies
-                    loadRelatedMovies();
                     
                 } else {
                     showError('Movie not found');
@@ -2209,7 +2342,15 @@
         // ========== UPDATE MOVIE INFO ==========
         function updateMovieInfo(movie) {
             document.title = `${movie.originalTitle || movie.title} - Unruly Movies`;
-            
+
+            // Show movie poster as blurred background in the loading overlay
+            const posterBg = document.getElementById('loadingPosterBg');
+            const posterUrl = movie.backdrop || movie.poster;
+            if (posterBg && posterUrl) {
+                posterBg.style.backgroundImage = `url('${posterUrl}')`;
+                posterBg.classList.add('visible');
+            }
+
             document.getElementById('movieTitle').textContent = movie.originalTitle || movie.title;
             document.getElementById('movieDescription').textContent = movie.plot || movie.description || 'No description available.';
             
@@ -2605,12 +2746,66 @@
             }
         });
         
-        // ========== INITIALIZE ==========
-        document.addEventListener('DOMContentLoaded', async () => {
+        // ========== SOFT AUTH CHECK (no redirect) ==========
+        async function isLoggedIn() {
+            const token = normalizeBearerToken(getAuthToken());
+            if (!token) return false;
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) return false;
+                const data = await res.json();
+                return !!(data?.success || data?.user || data?.data);
+            } catch {
+                return !!token; // network error — trust token
+            }
+        }
+
+        // ========== AUTH GATE ==========
+        let _pendingVideoUrl = null, _pendingVideoProvider = null, _pendingVideoFormat = null;
+
+        function showAuthGate(videoUrl, provider, format, movie) {
+            _pendingVideoUrl = videoUrl;
+            _pendingVideoProvider = provider;
+            _pendingVideoFormat = format;
+
+            // Mirror the blurred poster into the auth gate background
+            const posterBg = document.getElementById('authGatePosterBg');
+            const posterUrl = movie?.backdrop || movie?.poster;
+            if (posterBg && posterUrl) {
+                posterBg.style.backgroundImage = `url('${posterUrl}')`;
+            }
+            document.getElementById('authGateOverlay').classList.add('visible');
+            hideLoading();
+        }
+
+        async function watchFullMovie() {
+            // Hard auth check with redirect on failure
             const isAuthorized = await requireLoggedInMember();
             if (!isAuthorized) return;
 
+            document.getElementById('authGateOverlay').classList.remove('visible');
             initPlayer();
+
+            const url = _pendingVideoUrl;
+            const provider = _pendingVideoProvider;
+            const format = _pendingVideoFormat;
+
+            if (!url) { showError('Video not available for this movie'); return; }
+
+            if (isDirectVideo(url) || format === 'mp4' || format === 'm3u8' || format === 'webm') {
+                loadVideo(url);
+            } else if (provider !== 'streamtape') {
+                await loadEmbedVideo(url);
+            } else {
+                loadVideo(url);
+            }
+        }
+
+        // ========== INITIALIZE ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load movie info publicly — no auth required at this stage
             updateWatchlistButton();
             updateLikeButton();
             loadMovieData();

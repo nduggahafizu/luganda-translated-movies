@@ -202,9 +202,9 @@
 }
 
 .content-card:hover {
-    transform: translateY(-6px) scale(1.015);
-    box-shadow: 0 18px 40px rgba(74, 222, 128, 0.18), 0 0 0 1px rgba(74, 222, 128, 0.2);
-    border-color: rgba(74, 222, 128, 0.35);
+    transform: scale(1.04);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(74, 222, 128, 0.25);
+    border-color: rgba(74, 222, 128, 0.3);
 }
 
 .content-card::before {
@@ -236,6 +236,16 @@
     background-image: linear-gradient(145deg, #1c1c28, #0f0f17);
     overflow: hidden;
     flex-shrink: 0;
+}
+
+/* Gradient fade so VJ badge always reads over any poster image */
+.card-poster::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 45%);
+    pointer-events: none;
+    z-index: 2;
 }
 
 .card-poster img {
@@ -280,24 +290,20 @@
 /* Badges */
 .card-badges {
     position: absolute;
-    top: 10px;
+    bottom: 10px;
     left: 10px;
     right: 10px;
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 6px;
+    align-items: flex-end;
     z-index: 5;
 }
 
 .card-badge {
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 10px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 11px;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.2px;
 }
 
 .badge-quality {
@@ -306,12 +312,18 @@
 }
 
 .badge-vj {
-    background: linear-gradient(135deg, rgba(74, 222, 128, 0.2), rgba(0, 217, 255, 0.1));
+    background: rgba(10, 10, 10, 0.82);
     color: #4ade80;
-    border: 1px solid rgba(74, 222, 128, 0.3);
-    border-radius: 999px;
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
+    border: 1px solid rgba(74, 222, 128, 0.4);
+    border-radius: 6px;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    font-size: 11px;
+    font-weight: 700;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .badge-year {
@@ -393,16 +405,16 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0);
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #4ade80, #00D9FF);
+    width: 56px;
+    height: 56px;
+    background: rgba(74, 222, 128, 0.92);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 3;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 20px rgba(74, 222, 128, 0.5);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
+    box-shadow: 0 4px 20px rgba(74, 222, 128, 0.45);
 }
 
 .play-overlay svg {
@@ -516,32 +528,6 @@
     box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.15);
 }
 
-.filter-group-style {
-    min-width: 170px;
-}
-
-.filter-button {
-    width: 100%;
-    padding: 12px 16px;
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(74, 222, 128, 0.2);
-    border-radius: 10px;
-    color: #fff;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: left;
-}
-
-.filter-button:hover {
-    border-color: rgba(74, 222, 128, 0.4);
-}
-
-.filter-button:focus {
-    outline: none;
-    border-color: #4ade80;
-    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.15);
-}
 
 /* ===== PAGINATION ===== */
 .pagination {
@@ -670,6 +656,18 @@
         font-size: 8px;
         padding: 3px 6px;
     }
+
+    .badge-vj {
+        font-size: 9px;
+        padding: 3px 7px;
+        max-width: calc(100% - 8px);
+    }
+
+    .card-badges {
+        bottom: 7px;
+        left: 7px;
+        right: 7px;
+    }
     
     .card-info {
         padding: 10px;
@@ -694,16 +692,38 @@
     }
     
     .filter-section {
-        padding: 15px;
+        padding: 12px;
+        border-radius: 14px;
     }
-    
+
+    /* Horizontal scroll row on mobile */
+    .filter-row {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 10px;
+        padding-bottom: 4px;
+        scrollbar-width: none; /* Firefox */
+    }
+    .filter-row::-webkit-scrollbar {
+        display: none; /* Chrome/Safari */
+    }
+
     .filter-group {
-        min-width: 100%;
+        flex: 0 0 auto;
+        min-width: 140px;
+        width: 140px;
     }
-    
+
+    .filter-label {
+        font-size: 10px;
+        margin-bottom: 5px;
+    }
+
     .filter-select {
-        padding: 10px 14px;
-        font-size: 13px;
+        padding: 9px 32px 9px 10px;
+        font-size: 12px;
+        border-radius: 8px;
     }
     
     .pagination {
@@ -748,3 +768,19 @@
     
     .card-info {
         padding: 8px;
+    }
+
+    /* VJ badge on very small cards — shrink text, never overflow */
+    .badge-vj {
+        font-size: 8px;
+        padding: 2px 5px;
+        max-width: calc(100% - 6px);
+        letter-spacing: 0;
+    }
+
+    .card-badges {
+        bottom: 5px;
+        left: 5px;
+        right: 5px;
+    }
+}

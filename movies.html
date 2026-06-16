@@ -371,12 +371,6 @@
                                         </select>
                                     </div>
 
-                                    <div class="filter-group filter-group-style">
-                                        <label class="filter-label">Style</label>
-                                        <button type="button" id="styleToggle" class="filter-button" aria-pressed="true" aria-label="Toggle movies grid style">
-                                            Poster Grid (Munowatch-like)
-                                        </button>
-                                    </div>
                                 </div>
                             </div>
 
@@ -531,30 +525,6 @@
         let currentPage = 1;
         let totalPages = 1;
 
-        // Style toggle (poster-first grid like Munowatch)
-        function applyGridStyleFromStorage() {
-            const grid = document.getElementById('moviesGrid');
-            const btn = document.getElementById('styleToggle');
-            if (!grid || !btn) return;
-
-            const mode = localStorage.getItem('moviesGridStyle') || 'muno';
-            if (mode === 'muno') {
-                grid.classList.add('muno-style');
-                btn.textContent = 'Poster Grid (Munowatch-like)';
-                btn.setAttribute('aria-pressed', 'true');
-            } else {
-                grid.classList.remove('muno-style');
-                btn.textContent = 'Detailed Grid (Current)';
-                btn.setAttribute('aria-pressed', 'false');
-            }
-        }
-
-        function toggleGridStyle() {
-            const current = localStorage.getItem('moviesGridStyle') || 'muno';
-            localStorage.setItem('moviesGridStyle', current === 'muno' ? 'detailed' : 'muno');
-            applyGridStyleFromStorage();
-        }
-
         // Load movies from API
         async function loadMovies(params = {}) {
             const grid = document.getElementById('moviesGrid');
@@ -672,9 +642,6 @@
             const grid = document.getElementById('moviesGrid');
             grid.innerHTML = '';
 
-            // Ensure style class is applied before adding cards
-            applyGridStyleFromStorage();
-            
             if (moviesToRender.length === 0) {
                 grid.innerHTML = `
                     <div class="empty-state">
@@ -749,9 +716,7 @@
             }, 100);
         }
 
-        document.getElementById('styleToggle')?.addEventListener('click', toggleGridStyle);
-
-// Initial load from API
+        // Initial load from API
         (function() {
             const vjFromUrl = new URLSearchParams(window.location.search).get('vj');
             if (vjFromUrl) {
@@ -774,14 +739,6 @@
             });
         });
 
-        // Style toggle wiring
-        document.addEventListener('DOMContentLoaded', () => {
-            const btn = document.getElementById('styleToggle');
-            applyGridStyleFromStorage();
-            if (btn) {
-                btn.addEventListener('click', toggleGridStyle);
-            }
-        });
     </script>
     
     <!-- Trailer Player -->
