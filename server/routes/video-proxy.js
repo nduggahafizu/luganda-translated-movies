@@ -758,15 +758,8 @@ router.get('/stream-proxy', async (req, res) => {
         // Add appropriate Referer for restricted CDNs
         const urlLower = fetchUrl.toLowerCase();
         if (urlLower.includes('b-cdn.net')) {
-            // Extract the actual subdomain for proper referer
-            const match = fetchUrl.match(/https?:\/\/([^\/]+\.b-cdn\.net)/i);
-            if (match) {
-                headers['Referer'] = `https://${match[1]}/`;
-                headers['Origin'] = `https://${match[1]}`;
-            } else {
-                headers['Referer'] = 'https://b-cdn.net/';
-                headers['Origin'] = 'https://b-cdn.net';
-            }
+            // BunnyCDN hotlink protection allows no-referer (direct access) but blocks wrong-referer.
+            // Don't set Referer/Origin — this makes the request look like direct browser navigation.
         } else if (urlLower.includes('pearlpix.xyz') || urlLower.includes('jimmy.pearlpix.xyz')) {
             headers['Referer'] = 'https://pearlpix.net/';
             headers['Origin'] = 'https://pearlpix.net';

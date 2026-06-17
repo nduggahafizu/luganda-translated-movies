@@ -904,10 +904,12 @@
                                 const embedUrl = currentEp.video.embedUrl || currentEp.video.originalVideoPath || '';
                                 const isDirectVideo = embedUrl.match(/\.(mp4|mkv|webm|avi|mov)(\?|$)/i);
                                 const isMkv = embedUrl.toLowerCase().includes('.mkv');
-                                
+                                const needsCdnProxy = isMkv || embedUrl.toLowerCase().includes('b-cdn.net');
+
                                 if (isDirectVideo) {
                                     // Use native video player for direct video files
-                                    const videoSrc = isMkv 
+                                    // Route through proxy for MKV and BunnyCDN URLs (CORS/hotlink protection)
+                                    const videoSrc = needsCdnProxy
                                         ? `${API_BASE_URL}/api/video/stream-proxy?url=${encodeURIComponent(embedUrl)}`
                                         : embedUrl;
                                     return `
