@@ -345,52 +345,194 @@
                 <p class="page-hero-subtitle">Meet Uganda's talented Video Jockeys who bring movies to life in Luganda</p>
             </div>
 
-            <!-- Static fallback content for SEO -->
-            <noscript>
-                <div class="vj-grid">
-                    <div class="vj-card">
-                        <div class="vj-avatar">VJ</div>
-                        <h3 class="vj-name">VJ Junior</h3>
-                        <p style="color:#aaa;font-size:0.85rem;">One of Uganda's most popular VJ translators known for action and comedy movies.</p>
-                        <a href="movies.html?vj=VJ%20Junior" class="vj-btn">View Movies</a>
-                    </div>
-                    <div class="vj-card">
-                        <div class="vj-avatar">VJ</div>
-                        <h3 class="vj-name">VJ Jingo</h3>
-                        <p style="color:#aaa;font-size:0.85rem;">Expert in drama and thriller translations with distinctive commentary style.</p>
-                        <a href="movies.html?vj=VJ%20Jingo" class="vj-btn">View Movies</a>
-                    </div>
-                    <div class="vj-card">
-                        <div class="vj-avatar">VJ</div>
-                        <h3 class="vj-name">VJ Mark</h3>
-                        <p style="color:#aaa;font-size:0.85rem;">Known for horror and suspense movie translations.</p>
-                        <a href="movies.html?vj=VJ%20Mark" class="vj-btn">View Movies</a>
-                    </div>
-                    <div class="vj-card">
-                        <div class="vj-avatar">IP</div>
-                        <h3 class="vj-name">Omutaka Ice P</h3>
-                        <p style="color:#aaa;font-size:0.85rem;">Popular for family and comedy movie translations.</p>
-                        <a href="movies.html?vj=Omutaka%20Ice%20P" class="vj-btn">View Movies</a>
-                    </div>
-                    <div class="vj-card">
-                        <div class="vj-avatar">KK</div>
-                        <h3 class="vj-name">KK the Best</h3>
-                        <p style="color:#aaa;font-size:0.85rem;">Versatile translator covering multiple genres.</p>
-                        <a href="movies.html?vj=KK%20the%20Best" class="vj-btn">View Movies</a>
-                    </div>
-                    <div class="vj-card">
-                        <div class="vj-avatar">VE</div>
-                        <h3 class="vj-name">VJ Emmy</h3>
-                        <p style="color:#aaa;font-size:0.85rem;">Specializes in action and adventure movie translations.</p>
-                        <a href="movies.html?vj=VJ%20Emmy" class="vj-btn">View Movies</a>
-                    </div>
-                </div>
-                <p style="text-align:center;color:#888;margin-top:20px;">Enable JavaScript to view full VJ profiles and movie counts.</p>
-            </noscript>
-
             <div id="vjGrid" class="vj-grid">
                 <div class="loading-spinner">Loading VJ translators...</div>
             </div>
+
+            <!-- VJ Spotlight: rich static profiles with movie lists — always visible to crawlers -->
+            <section class="vj-spotlight" aria-label="VJ Translator Profiles">
+                <h2 class="vj-spotlight-heading">VJ Spotlight</h2>
+                <p class="vj-spotlight-sub">Discover our featured translators and the Luganda movies they have brought to life</p>
+                <div class="vj-spotlight-grid">
+
+                    <article class="vj-profile-card">
+                        <header class="vpc-header">
+                            <div class="vpc-avatar">JR</div>
+                            <div class="vpc-info">
+                                <h3 class="vpc-name">VJ Junior</h3>
+                                <div class="vpc-genres"><span>Action</span><span>Comedy</span><span>Sci-Fi</span></div>
+                            </div>
+                        </header>
+                        <p class="vpc-bio">VJ Junior is one of Uganda's most recognised VJ translators, celebrated for his energetic and fast-paced Luganda narration that keeps action scenes lively and comedy beats perfectly timed. He has built a loyal following for his work on Hollywood blockbusters, particularly sci-fi and action films where his animated delivery matches the on-screen intensity.</p>
+                        <div class="vpc-movies">
+                            <h4>Movies by VJ Junior</h4>
+                            <ul>
+                                <li><strong>Edge of Tomorrow (2014)</strong> — Tom Cruise's time-loop alien-war film, narrated with relentless energy in Luganda.</li>
+                                <li><strong>Elysium (2013)</strong> — Matt Damon fights a class-divided future; VJ Junior's commentary highlights the social tension.</li>
+                                <li><strong>Robin Hood (2025)</strong> — The outlaw legend reimagined; VJ Junior brings the rebellion alive for Luganda audiences.</li>
+                                <li><strong>Spider-Noir (2026)</strong> — A gritty noir Spider-Man universe story, translated with cinematic flair.</li>
+                                <li><strong>Superman (2025)</strong> — The Man of Steel's latest chapter, with every heroic moment captured in Luganda.</li>
+                            </ul>
+                        </div>
+                        <a href="movies.html?vj=VJ+Junior" class="vpc-link">Browse VJ Junior's Movies →</a>
+                    </article>
+
+                    <article class="vj-profile-card">
+                        <header class="vpc-header">
+                            <div class="vpc-avatar">IP</div>
+                            <div class="vpc-info">
+                                <h3 class="vpc-name">Omutaka Ice P</h3>
+                                <div class="vpc-genres"><span>Sci-Fi</span><span>Thriller</span><span>Drama</span></div>
+                            </div>
+                        </header>
+                        <p class="vpc-bio">Known to fans as VJ Ice P, Omutaka Ice P is celebrated for his composed and precise narration style that suits complex narratives and slow-burn thrillers. He brings intellectual depth to his Luganda translations, making difficult story lines accessible without losing the original atmosphere or tension that makes a film special.</p>
+                        <div class="vpc-movies">
+                            <h4>Movies by Omutaka Ice P</h4>
+                            <ul>
+                                <li><strong>Blade Runner 2049 (2017)</strong> — Denis Villeneuve's dystopian masterpiece; Ice P's steady narration mirrors the film's philosophical depth.</li>
+                                <li><strong>Ex Machina (2014)</strong> — A chilling AI thriller where Ice P's precise Luganda delivery builds suspense scene by scene.</li>
+                                <li><strong>The Night Agent (2023)</strong> — A White House aide uncovers a conspiracy; Ice P's sharp narration keeps every twist clear.</li>
+                                <li><strong>Avatar: Fire and Ash (2025)</strong> — The Na'vi saga continues; VJ Ice P handles the world-building with confidence.</li>
+                                <li><strong>Almost Human (2025)</strong> — Near-future action where humanity and AI collide, translated with Ice P's signature clarity.</li>
+                            </ul>
+                        </div>
+                        <a href="movies.html?vj=Omutaka+Ice+P" class="vpc-link">Browse Omutaka Ice P's Movies →</a>
+                    </article>
+
+                    <article class="vj-profile-card">
+                        <header class="vpc-header">
+                            <div class="vpc-avatar">EM</div>
+                            <div class="vpc-info">
+                                <h3 class="vpc-name">VJ Emmy</h3>
+                                <div class="vpc-genres"><span>Adventure</span><span>Horror</span><span>Sci-Fi</span></div>
+                            </div>
+                        </header>
+                        <p class="vpc-bio">VJ Emmy specialises in adventure and high-stakes films, narrating with an enthusiasm that pulls Luganda audiences into every perilous situation on screen. Whether the heroes are surviving Mars or fleeing from monsters, Emmy's narration makes the danger feel immediate and every triumph feel hard-won.</p>
+                        <div class="vpc-movies">
+                            <h4>Movies by VJ Emmy</h4>
+                            <ul>
+                                <li><strong>The Martian (2015)</strong> — Matt Damon survives alone on Mars; VJ Emmy makes the science feel exciting for everyone.</li>
+                                <li><strong>Gravity (2013)</strong> — Two astronauts struggle in the void of space; Emmy's narration carries the weight of isolation.</li>
+                                <li><strong>Anaconda (2025)</strong> — A deadly jungle hunt where the predator becomes the hunted; VJ Emmy's tension amps the horror.</li>
+                                <li><strong>Scream 7 (2026)</strong> — Ghostface returns; VJ Emmy's horror-attuned Luganda keeps every scare landing hard.</li>
+                                <li><strong>Arrival (2016)</strong> — Linguists race to decode alien language; VJ Emmy handles the emotional depth beautifully.</li>
+                            </ul>
+                        </div>
+                        <a href="movies.html?vj=VJ+Emmy" class="vpc-link">Browse VJ Emmy's Movies →</a>
+                    </article>
+
+                    <article class="vj-profile-card">
+                        <header class="vpc-header">
+                            <div class="vpc-avatar">JG</div>
+                            <div class="vpc-info">
+                                <h3 class="vpc-name">VJ Jingo</h3>
+                                <div class="vpc-genres"><span>Action</span><span>War</span><span>Drama</span></div>
+                            </div>
+                        </header>
+                        <p class="vpc-bio">VJ Jingo has built a reputation as the go-to translator for action-heavy and war films, delivering punchy Luganda narration that keeps fight scenes and battle sequences gripping from first minute to last. His distinctive voice adds grit and urgency to any film that demands tension and high stakes throughout.</p>
+                        <div class="vpc-movies">
+                            <h4>Movies by VJ Jingo</h4>
+                            <ul>
+                                <li><strong>Blades of the Guardians</strong> — A swordplay epic where Jingo's commentary highlights every duel and betrayal.</li>
+                                <li><strong>Man on Fire</strong> — Denzel Washington's revenge thriller, narrated with the raw intensity the story deserves.</li>
+                                <li><strong>Beast of War (2025)</strong> — A modern military thriller where Jingo's action narration never lets up for a moment.</li>
+                                <li><strong>The Dogs of War</strong> — Mercenaries on a covert mission; VJ Jingo's gritty Luganda matches the film's dark tone.</li>
+                                <li><strong>Seven Snipers (2026)</strong> — A precision military thriller narrated with surgical focus by VJ Jingo.</li>
+                            </ul>
+                        </div>
+                        <a href="movies.html?vj=VJ+Jingo" class="vpc-link">Browse VJ Jingo's Movies →</a>
+                    </article>
+
+                    <article class="vj-profile-card">
+                        <header class="vpc-header">
+                            <div class="vpc-avatar">TM</div>
+                            <div class="vpc-info">
+                                <h3 class="vpc-name">VJ Tom</h3>
+                                <div class="vpc-genres"><span>Sci-Fi</span><span>Thriller</span><span>Mystery</span></div>
+                            </div>
+                        </header>
+                        <p class="vpc-bio">VJ Tom brings a thoughtful, measured approach to Luganda narration that suits complex and intellectually driven films. He excels at translating dialogue-heavy scripts and science-fiction concepts so Ugandan audiences can fully understand and enjoy deeper layers of storytelling without losing the mystery or tension that makes the genre compelling.</p>
+                        <div class="vpc-movies">
+                            <h4>Movies by VJ Tom</h4>
+                            <ul>
+                                <li><strong>The Wandering Earth (2019)</strong> — Epic Chinese sci-fi about moving Earth itself; VJ Tom's narration handles the science with authority.</li>
+                                <li><strong>Oblivion (2013)</strong> — Tom Cruise in a post-apocalyptic mystery; VJ Tom builds each plot reveal perfectly in Luganda.</li>
+                                <li><strong>Berlin (2023)</strong> — A tense European spy thriller where VJ Tom's careful pacing reveals each twist at the right moment.</li>
+                                <li><strong>Memory of a Killer (2026)</strong> — A psychological thriller where VJ Tom's narration keeps the tension at constant simmer.</li>
+                                <li><strong>Ex Machina (2014)</strong> — AI consciousness and deception; VJ Tom unpacks the philosophy clearly for Luganda audiences.</li>
+                            </ul>
+                        </div>
+                        <a href="movies.html?vj=VJ+Tom" class="vpc-link">Browse VJ Tom's Movies →</a>
+                    </article>
+
+                    <article class="vj-profile-card">
+                        <header class="vpc-header">
+                            <div class="vpc-avatar">SK</div>
+                            <div class="vpc-info">
+                                <h3 class="vpc-name">VJ Shao Khan</h3>
+                                <div class="vpc-genres"><span>Martial Arts</span><span>Action</span><span>Fighting</span></div>
+                            </div>
+                        </header>
+                        <p class="vpc-bio">VJ Shao Khan is Unruly Movies' premier martial arts and fight-film specialist, known for rapid intense narration that keeps pace with the fastest fight choreography on screen. Fans who follow martial arts cinema choose Shao Khan's translations because he understands the technical detail of combat and communicates it vividly and accurately in Luganda.</p>
+                        <div class="vpc-movies">
+                            <h4>Movies by VJ Shao Khan</h4>
+                            <ul>
+                                <li><strong>BKO: Bangkok Knockout (2010)</strong> — Thailand's most brutal stunt film; Shao Khan's narration matches every hit and acrobatic flip.</li>
+                                <li><strong>Mortal Kombat 2 (2026)</strong> — The tournament of champions continues; VJ Shao Khan's iconic delivery fits this world perfectly.</li>
+                                <li><strong>Crazy Fist (2021)</strong> — Underground martial arts action; Shao Khan's commentary names every fighting style in Luganda.</li>
+                                <li><strong>Mission of Justice</strong> — A justice-seeking martial arts film where Shao Khan's narration drives the urgency home.</li>
+                                <li><strong>Bholaa (2023)</strong> — Ajay Devgn's high-octane Bollywood action film, translated with the same intensity the fights demand.</li>
+                            </ul>
+                        </div>
+                        <a href="movies.html?vj=VJ+Shao+Khan" class="vpc-link">Browse VJ Shao Khan's Movies →</a>
+                    </article>
+
+                    <article class="vj-profile-card">
+                        <header class="vpc-header">
+                            <div class="vpc-avatar">KV</div>
+                            <div class="vpc-info">
+                                <h3 class="vpc-name">VJ Kevo</h3>
+                                <div class="vpc-genres"><span>Comedy</span><span>Romance</span><span>Drama</span></div>
+                            </div>
+                        </header>
+                        <p class="vpc-bio">VJ Kevo is the platform's specialist in comedy and feel-good cinema, bringing natural comedic timing to his Luganda narration that makes funny scenes genuinely hilarious for Ugandan audiences. His translations of romance and light-hearted films feel culturally tuned to the local sense of humour without ever losing the heart of the original story.</p>
+                        <div class="vpc-movies">
+                            <h4>Movies by VJ Kevo</h4>
+                            <ul>
+                                <li><strong>Crazy, Stupid, Love (2011)</strong> — Romantic comedy about reinvention; VJ Kevo's delivery makes every awkward scene funnier.</li>
+                                <li><strong>The Mask (1994)</strong> — Jim Carrey's slapstick classic; VJ Kevo's comedic Luganda narration is perfectly matched to the chaos.</li>
+                                <li><strong>Police Academy (1984)</strong> — The beloved comedy series; VJ Kevo adds Ugandan flair to classic slapstick humour.</li>
+                                <li><strong>Looper (2012)</strong> — A dark sci-fi thriller with black humor; VJ Kevo balances the tones expertly in Luganda.</li>
+                                <li><strong>Almost Cops (2025)</strong> — A buddy-cop comedy where VJ Kevo's natural comedic timing makes every punchline land.</li>
+                            </ul>
+                        </div>
+                        <a href="movies.html?vj=VJ+Kevo" class="vpc-link">Browse VJ Kevo's Movies →</a>
+                    </article>
+
+                    <article class="vj-profile-card">
+                        <header class="vpc-header">
+                            <div class="vpc-avatar">JV</div>
+                            <div class="vpc-info">
+                                <h3 class="vpc-name">VJ Jovan</h3>
+                                <div class="vpc-genres"><span>Drama</span><span>Historical</span><span>Action</span></div>
+                            </div>
+                        </header>
+                        <p class="vpc-bio">VJ Jovan brings cinematic gravity to his Luganda narration, particularly suited to historical epics, crime dramas, and films with strong character development. His deep, resonant delivery gives weight to powerful speeches, moral dilemmas, and high-stakes confrontations that define classic storytelling in cinema.</p>
+                        <div class="vpc-movies">
+                            <h4>Movies by VJ Jovan</h4>
+                            <ul>
+                                <li><strong>Spartacus (2010)</strong> — The gladiator rebellion against Rome; VJ Jovan's narration gives every speech its full dramatic weight.</li>
+                                <li><strong>Pompeii (2014)</strong> — A love story set against volcanic destruction; Jovan's narration carries the tragedy with grace.</li>
+                                <li><strong>Marked Man (1996)</strong> — A gritty crime thriller where Jovan's voice anchors the moral complexity throughout.</li>
+                                <li><strong>Pit Fighter (2005)</strong> — Underground fighting and survival; VJ Jovan adds character depth beyond the action sequences.</li>
+                                <li><strong>Iron Fighter (2023)</strong> — A contemporary action drama where Jovan's storytelling instincts shine in Luganda.</li>
+                            </ul>
+                        </div>
+                        <a href="movies.html?vj=VJ+Jovan" class="vpc-link">Browse VJ Jovan's Movies →</a>
+                    </article>
+
+                </div>
+            </section>
 
             <!-- Content Guide: About Our VJ Translators -->
             <div class="content-guide">
@@ -437,6 +579,7 @@
                                 <ul>
                                     <li><a href="index.html">Home</a></li>
                                     <li><a href="movies.html">Browse Movies</a></li>
+                                    <li><a href="catalog.html">Full Catalog</a></li>
                                     <li><a href="vjs.html">VJ Translators</a></li>
                                     <li><a href="genres.html">Genres</a></li>
                                 </ul>

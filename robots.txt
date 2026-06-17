@@ -9,6 +9,7 @@ Allow: /
 # Explicitly allow main content pages
 Allow: /
 Allow: /movies
+Allow: /catalog
 Allow: /trending
 Allow: /series
 Allow: /genres

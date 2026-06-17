@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Full Movie Catalog — Luganda Translated Movies | Unruly Movies</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="Browse the full catalog of Luganda VJ-translated movies on Unruly Movies. Action, sci-fi, comedy, drama, horror and more — all narrated in Luganda by Uganda's top VJ translators.">
+    <meta name="keywords" content="Luganda movies, VJ translated movies, Uganda streaming, Luganda films catalog, VJ Junior movies, VJ Jingo movies, VJ Emmy movies">
+    <meta name="author" content="Unruly Movies">
+    <meta name="robots" content="index, follow">
+    <meta name="google-adsense-account" content="ca-pub-1904736753681797">
+
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
+    <link rel="canonical" href="https://unrulymovies.com/catalog">
+    <meta name="theme-color" content="#4ade80">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Full Luganda Movie Catalog — Unruly Movies">
+    <meta property="og:description" content="Browse 39+ Luganda VJ-translated movies across action, sci-fi, comedy, drama, and horror genres.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://unrulymovies.com/catalog">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": "Full Luganda Movie Catalog — Unruly Movies",
+        "description": "Complete catalog of Luganda VJ-translated movies available on Unruly Movies",
+        "url": "https://unrulymovies.com/catalog",
+        "publisher": {
+            "@type": "Organization",
+            "name": "Unruly Movies",
+            "url": "https://unrulymovies.com"
+        }
+    }
+    </script>
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMF82HVT9G"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-HMF82HVT9G');
+    </script>
+
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/card-grid.css">
+    <link rel="stylesheet" href="css/mobile-improvements.css">
+    <link rel="stylesheet" href="css/content-guide.css">
+    <link rel="stylesheet" href="css/app-shell.css">
+</head>
+<body>
+    <div class="container">
+        <div class="app">
+            <!-- Header -->
+            <div class="app-header">
+                <div class="navbar navbar-expand-lg">
+                    <div class="menu" id="menuToggle" role="button" aria-label="Open navigation menu" tabindex="0">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </div>
+                    <div class="app-navbar">
+                        <a href="index.html" class="navbar-brand">
+                            <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
+                        </a>
+                    </div>
+                    <div class="search-btn d-md-none d-block" id="mobileSearchBtn">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </div>
+                    <form class="mobile-search-form" id="mobileSearchForm" method="get" action="search.html">
+                        <input type="text" name="q" placeholder="Search movies, VJs..." class="mobile-search-input" id="mobileSearchInput" required>
+                        <button type="submit" class="mobile-search-submit" title="Search">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+                        </button>
+                        <button type="button" class="mobile-search-close" id="mobileSearchClose" title="Close search">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </form>
+                    <form class="header-search input-group d-md-block d-none" method="get" action="search.html">
+                        <div class="typeahead__container app-search">
+                            <div class="typeahead__field">
+                                <div class="typeahead__query">
+                                    <label for="search-input" class="btn px-0 mb-0" aria-label="Search">
+                                        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <path d="m21 21-4.35-4.35"></path>
+                                        </svg>
+                                    </label>
+                                    <input class="video-search form-control" name="q" type="text" id="search-input" placeholder="Search Luganda movies, VJs..." autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <ul class="navbar-nav navbar-user ml-auto align-items-center text-nowrap">
+                        <li class="nav-item"><a class="nav-link btn-login" href="login.html">Login</a></li>
+                        <li class="nav-item"><a class="nav-link btn-register" href="register.html">Sign Up</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="app-wrapper">
+                <!-- Sidebar -->
+                <div class="app-aside nav-aside" id="aside">
+                    <button class="modal-close" data-dismiss="modal" aria-label="Close menu" title="Close menu">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div class="drawer-logo"><span class="drawer-logo-text">Unruly Movies</span></div>
+                    <a href="login.html" class="drawer-profile" id="drawerProfile">
+                        <div class="dp-circle">
+                            <img src="" alt="" class="d-none" id="drawerProfileAvatar">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="drawerProfileIcon">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <div class="dp-info">
+                            <h4 id="drawerProfileName">Sign In</h4>
+                            <p id="drawerProfileSub">Tap to access your account</p>
+                        </div>
+                        <svg class="dp-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </a>
+                    <ul class="nav">
+                        <li><a href="index.html">
+                            <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>Home</a></li>
+                        <li><a href="movies.html">
+                            <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                                <line x1="7" y1="2" x2="7" y2="22"></line>
+                                <line x1="17" y1="2" x2="17" y2="22"></line>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                                <line x1="2" y1="7" x2="7" y2="7"></line>
+                                <line x1="2" y1="17" x2="7" y2="17"></line>
+                                <line x1="17" y1="17" x2="22" y2="17"></line>
+                                <line x1="17" y1="7" x2="22" y2="7"></line>
+                            </svg>Movies</a></li>
+                        <li class="active"><a href="catalog.html">
+                            <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="8" y1="6" x2="21" y2="6"></line>
+                                <line x1="8" y1="12" x2="21" y2="12"></line>
+                                <line x1="8" y1="18" x2="21" y2="18"></line>
+                                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                            </svg>Full Catalog</a></li>
+                        <li><a href="vjs.html">
+                            <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>VJ Translators</a></li>
+                        <li><a href="uganda-tv.html">
+                            <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                                <line x1="12" y1="7" x2="12" y2="22"></line>
+                            </svg>Uganda TV</a></li>
+                    </ul>
+                </div>
+
+                <!-- Main Content -->
+                <div class="app-main">
+                    <main class="app-content" id="mainContent">
+                        <div class="page-hero">
+                            <h1>
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="vertical-align:middle;margin-right:8px;">
+                                    <line x1="8" y1="6" x2="21" y2="6"></line>
+                                    <line x1="8" y1="12" x2="21" y2="12"></line>
+                                    <line x1="8" y1="18" x2="21" y2="18"></line>
+                                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                                </svg>
+                                Full Luganda Movie Catalog
+                            </h1>
+                            <p class="page-hero-subtitle">39+ movies translated into Luganda by Uganda's top VJ translators. Browse by genre and find your next watch.</p>
+                        </div>
+
+                        <!-- Sci-Fi & Space -->
+                        <section class="catalog-section" id="scifi">
+                            <h2 class="catalog-section-title">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                Sci-Fi &amp; Space
+                            </h2>
+                            <ul class="catalog-movie-list">
+                                <li class="catalog-movie-item" id="edge-of-tomorrow">
+                                    <h3 class="cmi-title">Edge of Tomorrow</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2014</span><span class="cmi-vj">VJ Junior</span></div>
+                                    <p class="cmi-desc">Major William Cage is thrown into a time loop, reliving the same alien-invasion battle until he masters warfare and finds a way to turn the tide. VJ Junior's relentless, high-energy Luganda narration makes every repeated cycle feel fresh and increasingly intense.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="blade-runner-2049">
+                                    <h3 class="cmi-title">Blade Runner 2049</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2017</span><span class="cmi-vj">Omutaka Ice P</span></div>
+                                    <p class="cmi-desc">A young blade runner discovers a long-buried secret that has the power to plunge society into chaos. Omutaka Ice P's calm and deliberate Luganda narration mirrors the film's meditative pace and philosophical weight.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="the-martian">
+                                    <h3 class="cmi-title">The Martian</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2015</span><span class="cmi-vj">VJ Emmy</span></div>
+                                    <p class="cmi-desc">Stranded alone on Mars, astronaut Mark Watney must use science, botany, and ingenuity to survive until a rescue mission can reach him. VJ Emmy's enthusiastic Luganda narration keeps the science accessible while ensuring every moment of tension and humour lands perfectly.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="gravity">
+                                    <h3 class="cmi-title">Gravity</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2013</span><span class="cmi-vj">VJ Emmy</span></div>
+                                    <p class="cmi-desc">Two astronauts must work together to survive after their spacecraft is destroyed, leaving them adrift in the void of space. VJ Emmy's narration carries every second of claustrophobic dread and breathtaking beauty that makes this Oscar-winning film unforgettable.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="arrival">
+                                    <h3 class="cmi-title">Arrival</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2016</span><span class="cmi-vj">VJ Emmy</span></div>
+                                    <p class="cmi-desc">When mysterious alien spacecraft land across the Earth, a linguist is recruited to communicate with the visitors before global tensions erupt into war. VJ Emmy's Luganda translation handles the film's emotional depth and non-linear structure with remarkable clarity.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="elysium">
+                                    <h3 class="cmi-title">Elysium</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2013</span><span class="cmi-vj">VJ Junior</span></div>
+                                    <p class="cmi-desc">In a future where the wealthy elite live on a pristine orbiting space station while Earth's population suffers in poverty, one man takes on a mission to bring equality to the divided worlds. VJ Junior's narration highlights the social tension with sharp Luganda commentary.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="oblivion">
+                                    <h3 class="cmi-title">Oblivion</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2013</span><span class="cmi-vj">VJ Tom</span></div>
+                                    <p class="cmi-desc">A drone repairman stationed on a ravaged Earth begins to question everything he knows after a shocking discovery challenges his entire understanding of reality. VJ Tom's mystery-attuned Luganda narration builds the reveal layer by layer with expert pacing.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="the-wandering-earth">
+                                    <h3 class="cmi-title">The Wandering Earth</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2019</span><span class="cmi-vj">VJ Tom</span></div>
+                                    <p class="cmi-desc">As the sun begins expanding, humanity installs massive thruster engines on Earth to push the entire planet out of the solar system on a 2,500-year journey to a new star. VJ Tom's measured Luganda commentary makes the grand science and emotional stakes fully understandable for Ugandan audiences.</p>
+                                </li>
+                            </ul>
+                        </section>
+
+                        <!-- Action & Adventure -->
+                        <section class="catalog-section" id="action">
+                            <h2 class="catalog-section-title">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                Action &amp; Adventure
+                            </h2>
+                            <ul class="catalog-movie-list">
+                                <li class="catalog-movie-item" id="blades-of-the-guardians">
+                                    <h3 class="cmi-title">Blades of the Guardians</h3>
+                                    <div class="cmi-meta"><span class="cmi-vj">VJ Jingo</span></div>
+                                    <p class="cmi-desc">A lone assassin turned unlikely guardian must protect a young boy whose fate is bound to the destiny of an entire kingdom, hunted at every turn by those who want the boy dead. VJ Jingo's tense Luganda narration draws out every sword duel and betrayal perfectly.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="man-on-fire">
+                                    <h3 class="cmi-title">Man on Fire</h3>
+                                    <div class="cmi-meta"><span class="cmi-vj">VJ Jingo</span></div>
+                                    <p class="cmi-desc">A burned-out CIA operative takes a job as a bodyguard in Mexico City and wages a one-man war against a kidnapping ring after the girl in his charge is abducted. VJ Jingo's raw intensity narration matches Denzel Washington's searing performance note for note.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="beast-of-war-2025">
+                                    <h3 class="cmi-title">Beast of War</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2025</span><span class="cmi-vj">VJ Jingo</span></div>
+                                    <p class="cmi-desc">A crack military unit is deployed on a high-risk covert mission against a formidable enemy force, where battlefield tactics and personal sacrifice determine who survives. VJ Jingo's non-stop action narration in Luganda never lets the tension drop for a single moment.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="the-dogs-of-war">
+                                    <h3 class="cmi-title">The Dogs of War</h3>
+                                    <div class="cmi-meta"><span class="cmi-vj">VJ Jingo</span></div>
+                                    <p class="cmi-desc">A group of mercenaries is hired to overthrow the government of a small West African nation rich in natural resources, uncovering layers of political betrayal along the way. VJ Jingo's gritty Luganda commentary captures the moral darkness and tactical detail of this classic war thriller.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="robin-hood-2025">
+                                    <h3 class="cmi-title">Robin Hood</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2025</span><span class="cmi-vj">VJ Junior</span></div>
+                                    <p class="cmi-desc">The outlaw legend of Sherwood Forest is reimagined for a new era, following a skilled archer who becomes the champion of the poor against a corrupt sheriff and his brutal enforcers. VJ Junior brings the rebellion and adventure alive for Luganda audiences with trademark energy.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="superman-2025">
+                                    <h3 class="cmi-title">Superman</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2025</span><span class="cmi-vj">VJ Junior</span></div>
+                                    <p class="cmi-desc">The Man of Steel faces a threat unlike any he has encountered before in this new chapter of the DC universe, testing the limits of his power and his belief in humanity. VJ Junior's heroic Luganda narration captures every flight, fight, and emotional moment with the weight the character demands.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="spider-noir-2026">
+                                    <h3 class="cmi-title">Spider-Noir</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2026</span><span class="cmi-vj">VJ Junior</span></div>
+                                    <p class="cmi-desc">A gritty noir take on the Spider-Man universe set in a rain-soaked, crime-ridden alternate New York where the wall-crawler operates as a hard-boiled detective. VJ Junior's cinematic Luganda narration perfectly matches the film's darkly stylish aesthetic.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="avatar-fire-and-ash">
+                                    <h3 class="cmi-title">Avatar: Fire and Ash</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2025</span><span class="cmi-vj">Omutaka Ice P</span></div>
+                                    <p class="cmi-desc">The Na'vi face a new existential threat as volcanic forces and an aggressive new human faction threaten to tear Pandora apart in this third chapter of James Cameron's saga. Omutaka Ice P's confident Luganda narration handles the rich world-building and emotional character arcs with full authority.</p>
+                                </li>
+                            </ul>
+                        </section>
+
+                        <!-- Martial Arts & Fighting -->
+                        <section class="catalog-section" id="martial-arts">
+                            <h2 class="catalog-section-title">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"></path><path d="M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"></path><path d="M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z"></path><path d="M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z"></path><path d="M14 14.5c0-.83.67-1.5 1.5-1.5h5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5z"></path><path d="M15.5 19H14v1.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5-.67-1.5-1.5-1.5z"></path><path d="M10 9.5C10 8.67 9.33 8 8.5 8h-5C2.67 8 2 8.67 2 9.5S2.67 11 3.5 11h5c.83 0 1.5-.67 1.5-1.5z"></path><path d="M8.5 5H10V3.5C10 2.67 9.33 2 8.5 2S7 2.67 7 3.5 7.67 5 8.5 5z"></path></svg>
+                                Martial Arts &amp; Fighting
+                            </h2>
+                            <ul class="catalog-movie-list">
+                                <li class="catalog-movie-item" id="bko-bangkok-knockout">
+                                    <h3 class="cmi-title">BKO: Bangkok Knockout</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2010</span><span class="cmi-vj">VJ Shao Khan</span></div>
+                                    <p class="cmi-desc">An elite Thai stunt team is drugged, stripped of their weapons, and forced to fight for their lives in a closed underground arena against professional killers hired for sport. VJ Shao Khan's rapid-fire Luganda commentary identifies every fighting style and keeps pace with the film's breathtaking action choreography.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="mortal-kombat-2">
+                                    <h3 class="cmi-title">Mortal Kombat 2</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2026</span><span class="cmi-vj">VJ Shao Khan</span></div>
+                                    <p class="cmi-desc">Earth's champions return to battle in the tournament of champions, facing even deadlier opponents from Outworld in a fight for the survival of the human realm. VJ Shao Khan's narration — whose name shares the film's iconic villain — is the definitive way to experience this in Luganda.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="crazy-fist-2021">
+                                    <h3 class="cmi-title">Crazy Fist</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2021</span><span class="cmi-vj">VJ Shao Khan</span></div>
+                                    <p class="cmi-desc">A skilled martial artist is drawn into an underground fighting circuit where the stakes are life or death, and only the most technically gifted and mentally tough fighter can survive. VJ Shao Khan's Luganda commentary breaks down the fighting techniques with the knowledge of a true martial arts fan.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="mission-of-justice">
+                                    <h3 class="cmi-title">Mission of Justice</h3>
+                                    <div class="cmi-meta"><span class="cmi-vj">VJ Shao Khan</span></div>
+                                    <p class="cmi-desc">A fighter goes undercover in a corrupt martial arts organisation to expose its criminal activities and bring justice to those who have been victimised. VJ Shao Khan narrates the action sequences with urgent, precise Luganda that keeps every punch and kick clearly communicated.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="bholaa-2023">
+                                    <h3 class="cmi-title">Bholaa</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2023</span><span class="cmi-vj">VJ Shao Khan</span></div>
+                                    <p class="cmi-desc">Ajay Devgn's high-octane Bollywood action remake follows an ex-convict who must fight through an entire criminal underworld to reach his daughter. VJ Shao Khan translates the film's relentless action and emotional core with the same power the original brings to Hindi audiences.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="iron-fighter-2023">
+                                    <h3 class="cmi-title">Iron Fighter</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2023</span><span class="cmi-vj">VJ Jovan</span></div>
+                                    <p class="cmi-desc">A disciplined fighter with an iron will battles through a series of increasingly dangerous opponents, driven by a personal code of honour and a score that needs settling. VJ Jovan's deep, character-driven Luganda narration adds emotional weight to every bout in this modern action drama.</p>
+                                </li>
+                            </ul>
+                        </section>
+
+                        <!-- Comedy & Romance -->
+                        <section class="catalog-section" id="comedy">
+                            <h2 class="catalog-section-title">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M8 13s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+                                Comedy &amp; Romance
+                            </h2>
+                            <ul class="catalog-movie-list">
+                                <li class="catalog-movie-item" id="crazy-stupid-love">
+                                    <h3 class="cmi-title">Crazy, Stupid, Love</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2011</span><span class="cmi-vj">VJ Kevo</span></div>
+                                    <p class="cmi-desc">A middle-aged man whose wife asks for a divorce finds himself adrift until a charming bachelor takes him under his wing to help him rediscover himself — with unexpected results for everyone involved. VJ Kevo's natural comedic timing in Luganda makes every awkward moment genuinely hilarious and relatable for Ugandan audiences.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="the-mask-1994">
+                                    <h3 class="cmi-title">The Mask</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">1994</span><span class="cmi-vj">VJ Kevo</span></div>
+                                    <p class="cmi-desc">A mild-mannered bank clerk discovers a magical mask that transforms him into a fast-talking, explosive, and unstoppable trickster who wreaks chaotic havoc across the city. Jim Carrey's legendary slapstick performance gets even funnier with VJ Kevo's perfectly timed Luganda comedy narration.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="police-academy-1984">
+                                    <h3 class="cmi-title">Police Academy</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">1984</span><span class="cmi-vj">VJ Kevo</span></div>
+                                    <p class="cmi-desc">A group of wildly mismatched recruits enters a police academy where the commander is desperate to weed them out, resulting in one disaster after another. VJ Kevo's Luganda narration adds a Ugandan cultural layer to the classic slapstick comedy that brings audiences of all ages to tears of laughter.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="looper-2012">
+                                    <h3 class="cmi-title">Looper</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2012</span><span class="cmi-vj">VJ Kevo</span></div>
+                                    <p class="cmi-desc">In the future, time travel is used by criminal syndicates to send targets back in time for execution by hired killers called loopers — until one looper is sent to kill his future self. VJ Kevo navigates the film's dark humour and time-travel logic with a Luganda translation that keeps the concept clear and entertaining.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="almost-cops-2025">
+                                    <h3 class="cmi-title">Almost Cops</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2025</span><span class="cmi-vj">VJ Kevo</span></div>
+                                    <p class="cmi-desc">Two complete amateurs stumble their way into a police investigation, getting tangled up with actual criminals while trying to play detective with zero training. VJ Kevo's effortless comedic Luganda narration makes every blunder funnier and every near-miss more tense in this buddy-cop comedy.</p>
+                                </li>
+                            </ul>
+                        </section>
+
+                        <!-- Historical & War Drama -->
+                        <section class="catalog-section" id="historical">
+                            <h2 class="catalog-section-title">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+                                Historical &amp; War Drama
+                            </h2>
+                            <ul class="catalog-movie-list">
+                                <li class="catalog-movie-item" id="spartacus-2010">
+                                    <h3 class="cmi-title">Spartacus</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2010</span><span class="cmi-vj">VJ Jovan</span></div>
+                                    <p class="cmi-desc">The legendary Thracian slave endures the brutal Roman gladiator system before rising to lead a massive slave rebellion that challenges the might of the Roman Republic itself. VJ Jovan's resonant, dramatic Luganda narration gives every battle speech and arena confrontation the full cinematic weight it deserves.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="pompeii-2014">
+                                    <h3 class="cmi-title">Pompeii</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2014</span><span class="cmi-vj">VJ Jovan</span></div>
+                                    <p class="cmi-desc">A slave-turned-gladiator falls for a wealthy merchant's daughter in ancient Pompeii, fighting against corrupt Roman power while the ominous volcano Vesuvius begins to rumble. VJ Jovan's narration carries both the romance and the building catastrophe with equal dramatic grace in Luganda.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="marked-man-1996">
+                                    <h3 class="cmi-title">Marked Man</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">1996</span><span class="cmi-vj">VJ Jovan</span></div>
+                                    <p class="cmi-desc">A witness to a brutal murder is hunted by the criminal syndicate he saw in action, forced to stay one step ahead while trying to bring the killers to justice. VJ Jovan's deep, morally attuned Luganda narration grounds the gritty thriller in character and consequence.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="pit-fighter-2005">
+                                    <h3 class="cmi-title">Pit Fighter</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2005</span><span class="cmi-vj">VJ Jovan</span></div>
+                                    <p class="cmi-desc">A tough ex-convict is forced back into the underground fighting world to protect his family and settle old debts, using his fists when the law can offer no protection. VJ Jovan's character-focused Luganda narration adds depth to a film that goes far beyond its fight sequences.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="seven-snipers-2026">
+                                    <h3 class="cmi-title">Seven Snipers</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2026</span><span class="cmi-vj">VJ Jingo</span></div>
+                                    <p class="cmi-desc">Seven elite marksmen from different nations are assembled for a surgical strike operation behind enemy lines, where precise coordination and individual skill are the only things between success and annihilation. VJ Jingo's focused, tactical Luganda narration perfectly matches the film's high-precision military tone.</p>
+                                </li>
+                            </ul>
+                        </section>
+
+                        <!-- Thriller & Mystery -->
+                        <section class="catalog-section" id="thriller">
+                            <h2 class="catalog-section-title">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                Thriller &amp; Mystery
+                            </h2>
+                            <ul class="catalog-movie-list">
+                                <li class="catalog-movie-item" id="ex-machina-2014">
+                                    <h3 class="cmi-title">Ex Machina</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2014</span><span class="cmi-vj">VJ Tom</span></div>
+                                    <p class="cmi-desc">A young programmer is invited to administer a Turing test on a humanoid robot with a sophisticated AI, only to find himself drawn into something far more complex and dangerous than expected. VJ Tom's precise Luganda delivery builds the psychological tension and philosophical dread with every scene.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="the-night-agent-2023">
+                                    <h3 class="cmi-title">The Night Agent</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2023</span><span class="cmi-vj">Omutaka Ice P</span></div>
+                                    <p class="cmi-desc">A low-level FBI agent working a dead-end desk job at the White House answers an emergency hotline call that pulls him into a vast conspiracy reaching the highest levels of government. Omutaka Ice P's sharp Luganda narration keeps every twist and revelation crystal clear.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="berlin-2023">
+                                    <h3 class="cmi-title">Berlin</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2023</span><span class="cmi-vj">VJ Tom</span></div>
+                                    <p class="cmi-desc">A charismatic international thief and his crew operate in the shadows of Berlin's art and society world, pulling off an elaborate heist that attracts the attention of a relentless detective. VJ Tom's methodical Luganda narration reveals each layer of the plan and counter-plan with surgical precision.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="memory-of-a-killer-2026">
+                                    <h3 class="cmi-title">Memory of a Killer</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2026</span><span class="cmi-vj">VJ Tom</span></div>
+                                    <p class="cmi-desc">An ageing hitman with early onset Alzheimer's disease uses his remaining clarity to carry out one final contract while simultaneously hunting those who ordered his own elimination. VJ Tom's Luganda narration captures the character's fractured mental state and moral reckoning with deeply felt precision.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="almost-human-2025">
+                                    <h3 class="cmi-title">Almost Human</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2025</span><span class="cmi-vj">Omutaka Ice P</span></div>
+                                    <p class="cmi-desc">In a near-future city where synthetic humans work alongside the population, a detective begins to question whether the line between human and artificial life is as clear as society insists. Omutaka Ice P's thoughtful Luganda narration navigates the film's ethical questions without losing sight of the thriller plot.</p>
+                                </li>
+                            </ul>
+                        </section>
+
+                        <!-- Horror -->
+                        <section class="catalog-section" id="horror">
+                            <h2 class="catalog-section-title">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                                Horror &amp; Survival
+                            </h2>
+                            <ul class="catalog-movie-list">
+                                <li class="catalog-movie-item" id="anaconda-2025">
+                                    <h3 class="cmi-title">Anaconda</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2025</span><span class="cmi-vj">VJ Emmy</span></div>
+                                    <p class="cmi-desc">Deep in the Amazon jungle, a research team and their guides come face to face with a gargantuan anaconda that turns their expedition into a desperate fight for survival. VJ Emmy's adrenaline-fuelled Luganda narration amps up every attack sequence and near-miss escape in this creature-feature horror revival.</p>
+                                </li>
+                                <li class="catalog-movie-item" id="scream-7-2026">
+                                    <h3 class="cmi-title">Scream 7</h3>
+                                    <div class="cmi-meta"><span class="cmi-year">2026</span><span class="cmi-vj">VJ Emmy</span></div>
+                                    <p class="cmi-desc">Ghostface returns with a new identity and a new killing spree, targeting a group of survivors who thought the nightmare was finally over. VJ Emmy's horror-tuned Luganda narration ensures every jump scare, red herring, and twist lands with maximum effect on Ugandan audiences.</p>
+                                </li>
+                            </ul>
+                        </section>
+
+                        <!-- About this Catalog -->
+                        <div class="content-guide">
+                            <h2>About the Unruly Movies Catalog</h2>
+                            <p>Every movie listed here has been translated into Luganda by a credited VJ (Video Jockey) — a Ugandan commentator who narrates over the original audio, translating dialogue and adding cultural context in real time. This tradition grew out of Kampala's video halls and is now one of Uganda's most beloved ways to enjoy international cinema.</p>
+                            <p>Unruly Movies credits each VJ by name so you can discover translators whose style you prefer and follow their work across multiple titles. The catalog is organised by genre to help you find the type of film you are in the mood for, each with a summary of the story and the VJ who brought it to life in Luganda.</p>
+                            <div class="content-guide-grid">
+                                <div class="content-guide-point"><strong>VJ Junior</strong>Action and sci-fi specialist; fast-paced narration for blockbusters and superhero films.</div>
+                                <div class="content-guide-point"><strong>Omutaka Ice P</strong>Sci-fi and thriller narrator; measured delivery that suits complex, layered stories.</div>
+                                <div class="content-guide-point"><strong>VJ Emmy</strong>Adventure and horror translator; enthusiastic narration that heightens every set piece.</div>
+                                <div class="content-guide-point"><strong>VJ Jingo</strong>Action and war film narrator; gritty, punchy delivery for high-stakes films.</div>
+                                <div class="content-guide-point"><strong>VJ Tom</strong>Mystery and sci-fi specialist; thoughtful narration that unpacks complex plots.</div>
+                                <div class="content-guide-point"><strong>VJ Shao Khan</strong>Martial arts expert; rapid commentary that names fighting styles and captures technique.</div>
+                                <div class="content-guide-point"><strong>VJ Kevo</strong>Comedy and romance narrator; natural comedic timing that lands every punchline.</div>
+                                <div class="content-guide-point"><strong>VJ Jovan</strong>Drama and historical epic narrator; deep voice with gravitas for serious cinema.</div>
+                            </div>
+                            <p style="margin-top:16px;">Browse all movies by VJ translator on our <a href="movies.html" style="color:#4ade80;">Movies page</a>, or visit <a href="vjs.html" style="color:#4ade80;">VJ Translators</a> to learn more about each narrator and their full filmography on the platform.</p>
+                        </div>
+
+                    </main>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="site-footer">
+                <div class="footer-main">
+                    <div class="footer-grid">
+                        <div class="footer-brand">
+                            <a href="index.html" class="footer-logo">
+                                <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
+                            </a>
+                            <p class="footer-tagline">Uganda's premier platform for Luganda VJ translated movies.</p>
+                            <div class="footer-social">
+                                <a href="mailto:nduggahafizu@gmail.com" aria-label="Email support" class="social-link">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                                </a>
+                                <a href="https://wa.me/256743311809" aria-label="WhatsApp support" class="social-link">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                                </a>
+                                <a href="faq.html" aria-label="Read the FAQ" class="social-link">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="footer-links">
+                            <h4>Quick Links</h4>
+                            <ul>
+                                <li><a href="index.html">Home</a></li>
+                                <li><a href="movies.html">Browse Movies</a></li>
+                                <li><a href="catalog.html">Full Catalog</a></li>
+                                <li><a href="vjs.html">VJ Translators</a></li>
+                                <li><a href="genres.html">Genres</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-links">
+                            <h4>Legal</h4>
+                            <ul>
+                                <li><a href="terms.html">Terms of Service</a></li>
+                                <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                                <li><a href="dmca.html">DMCA Policy</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-links">
+                            <h4>Company</h4>
+                            <ul>
+                                <li><a href="about.html">About Us</a></li>
+                                <li><a href="editorial-standards.html">Editorial Standards</a></li>
+                                <li><a href="contact.html">Contact</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>Copyright © 2026 Unruly Movies</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Scroll to Top -->
+    <div class="scroll-up">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

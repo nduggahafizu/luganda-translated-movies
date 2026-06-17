@@ -15,9 +15,15 @@
   <!-- Movie Catalog -->
   <url>
     <loc>https://unrulymovies.com/movies</loc>
-    <lastmod>2026-06-16</lastmod>
+    <lastmod>2026-06-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://unrulymovies.com/catalog</loc>
+    <lastmod>2026-06-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.92</priority>
   </url>
   <url>
     <loc>https://unrulymovies.com/trending</loc>
