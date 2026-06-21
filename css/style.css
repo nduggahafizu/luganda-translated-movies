@@ -674,7 +674,7 @@ img {
 
 .app-container {
     flex: 1;
-    padding: 10px;
+    padding: 0;
 }
 
 .app-container > .container {
