@@ -18,6 +18,7 @@ http://unrulymovies.com/* https://unrulymovies.com/:splat 301!
 
 # Clean URLs - serve HTML files without .html extension
 /movies           /movies.html           200
+/catalog          /catalog.html          200
 /player           /player.html           200
 /series           /series.html           200
 /series-player    /series-player.html    200

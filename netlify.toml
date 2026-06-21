@@ -17,6 +17,11 @@
   status = 200
 
 [[redirects]]
+  from = "/catalog"
+  to = "/catalog.html"
+  status = 200
+
+[[redirects]]
   from = "/player"
   to = "/player.html"
   status = 200
