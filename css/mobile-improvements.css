@@ -61,17 +61,18 @@ html, body {
     box-sizing: border-box;
 }
 
-/* ===== HERO SLIDER — edge to edge =====  */
+/* ===== HERO SLIDER — edge to edge ===== */
 .app-slider,
 .carousel,
 .carousel .slide,
 .hero-slider {
     border-radius: 0 !important;
-    margin-left: calc(-1 * var(--page-pad-md));
-    margin-right: calc(-1 * var(--page-pad-md));
+    margin-left: 0;
+    margin-right: 0;
 }
 .slide {
-    height: clamp(220px, 48vw, 640px) !important;
+    height: clamp(250px, 50vw, 600px) !important;
+    border-radius: 0 !important;
 }
 
 /* ===== CARD GRID ===== */

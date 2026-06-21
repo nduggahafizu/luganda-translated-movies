@@ -793,16 +793,15 @@ img {
    =================================== */
 
 .app-slider {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     position: relative;
 }
 
 .carousel {
     position: relative;
-    border-radius: 24px;
+    border-radius: 0;
     overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-    background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+    background: #000;
 }
 
 .carousel-inner {
@@ -826,9 +825,9 @@ img {
 .slide {
     display: block;
     position: relative;
-    height: clamp(480px, 60vh, 680px);
-    background: #111118;
-    border-radius: 20px;
+    height: clamp(300px, 55vw, 600px);
+    background: #000;
+    border-radius: 0;
     overflow: hidden;
 }
 
@@ -924,13 +923,41 @@ img {
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 100px 60px 60px;
-    background: linear-gradient(to top, 
-        rgba(0,0,0,0.98) 0%, 
-        rgba(0,0,0,0.85) 30%, 
-        rgba(0,0,0,0.5) 60%, 
+    padding: 80px 40px 40px;
+    background: linear-gradient(to top,
+        rgba(0,0,0,0.95) 0%,
+        rgba(0,0,0,0.7) 40%,
         transparent 100%);
     z-index: 2;
+}
+
+@media (max-width: 576px) {
+    .slide-caption {
+        padding: 50px 16px 20px;
+    }
+    .slide .title {
+        font-size: clamp(18px, 5vw, 28px);
+        margin-bottom: 8px;
+    }
+    .slide .description {
+        font-size: 12px;
+        line-height: 1.5;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .hero-cta {
+        margin-top: 12px;
+        gap: 8px;
+    }
+    .carousel-control { padding: 0 8px; }
+    .control-prev, .control-next { width: 36px; height: 36px; }
+    .control-prev svg, .control-next svg { width: 24px; height: 24px; }
+    .carousel-indicators { bottom: 12px; padding: 6px 12px; gap: 6px; }
+    .carousel-indicators li { width: 20px; height: 3px; }
+    .carousel-indicators li.active { width: 36px; }
 }
 
 .slide-header {
@@ -3455,10 +3482,6 @@ a:focus-visible {
    Tablet Hero Slider Styles
    =================================== */
 @media (max-width: 992px) {
-    .slide {
-        height: 420px;
-    }
-    
     .slide-poster-title {
         font-size: 16px;
     }
@@ -3531,11 +3554,6 @@ a:focus-visible {
     .list-scrollable > .col {
         width: 46%;
         min-width: 150px;
-    }
-    
-    .slide {
-        height: 280px;
-        border-radius: 16px;
     }
     
     .slide-poster-footer {

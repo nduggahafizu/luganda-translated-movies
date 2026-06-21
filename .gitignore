@@ -1,3 +1,7 @@
+# Claude Code
+.claude/
+TODO.md
+
 # Dependencies
 node_modules/
 server/node_modules/
