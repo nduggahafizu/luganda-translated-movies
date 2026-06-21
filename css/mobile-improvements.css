@@ -29,7 +29,7 @@ html, body {
     width: 100%;
     max-width: 100%;
     margin: 0;
-    padding: 0 var(--page-pad-md);
+    padding: 0;
     box-sizing: border-box;
 }
 
@@ -57,7 +57,7 @@ html, body {
 
 .app-container {
     width: 100%;
-    padding: var(--page-pad-md) var(--page-pad-md);
+    padding: 0;
     box-sizing: border-box;
 }
 
