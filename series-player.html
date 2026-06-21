@@ -221,13 +221,18 @@
             background: #000;
         }
         
-        .video-container iframe {
+        .video-container iframe,
+        .video-container .video-js {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             border: none;
+        }
+
+        .video-loading-overlay {
+            z-index: 10;
         }
 
         .video-container:fullscreen,
@@ -922,7 +927,6 @@
                                         </div>
                                         <video id="series-video" class="video-js vjs-big-play-centered"
                                                playsinline webkit-playsinline
-                                               style="position:absolute;top:0;left:0;width:100%;height:100%;"
                                                data-src="${videoSrc}" data-original-url="${embedUrl}">
                                         </video>
                                     `;
@@ -1059,7 +1063,6 @@
                 controls: true,
                 autoplay: true,
                 preload: 'auto',
-                fluid: true,
                 playbackRates: [1],
                 controlBar: {
                     pictureInPictureToggle: false
