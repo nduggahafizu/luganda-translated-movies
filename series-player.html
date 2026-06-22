@@ -938,7 +938,7 @@
                                             </svg>
                                         </button>
                                         <video id="series-video" controls controlslist="nodownload noplaybackrate" disablepictureinpicture
-                                               playsinline
+                                               autoplay preload="auto" playsinline
                                                style="position:absolute;top:0;left:0;width:100%;height:100%;background:#000;"
                                                oncontextmenu="return false"
                                                oncanplay="hideVideoLoading(); if(!this._adPlayed){this._adPlayed=true;playPreRollAd();setupMidRolls();}"
@@ -1158,7 +1158,9 @@
         function playPreRollAd() {
             const video = document.getElementById('series-video');
             const adContainer = document.getElementById('ad-container');
+            console.log('🎬 Pre-roll: video=', !!video, 'adContainer=', !!adContainer, 'IMA=', typeof google !== 'undefined' && !!google?.ima);
             if (!video || !adContainer || typeof google === 'undefined' || !google.ima) {
+                console.warn('🎬 Pre-roll skipped: missing dependencies');
                 return;
             }
 
