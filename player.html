@@ -22,7 +22,14 @@
 
     <!-- HLS Support -->
     <script src="/vendor/video-js/videojs-http-streaming.min.js"></script>
-    
+
+    <!-- Google IMA SDK + Video.js IMA plugin (pre-roll ads) -->
+    <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-ads@7/dist/videojs.ads.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/videojs-ima@2/dist/videojs.ima.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/videojs-contrib-ads@7/dist/videojs.ads.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/videojs-ima@2/dist/videojs.ima.css" rel="stylesheet">
+
     <!-- Config -->
     <script src="js/config.js"></script>
     <script src="js/watchlist-manager.js"></script>
@@ -1727,9 +1734,21 @@
             player.ready(() => {
                 try {
                     player.playbackRate(1.0);
-                    console.log('⚙️ Playback rate enforced:', player.playbackRate());
-                } catch (e) {
-                    console.warn('⚠️ Could not enforce playbackRate:', e);
+                } catch (e) {}
+
+                // Pre-roll ad via Google IMA
+                if (typeof player.ima === 'function') {
+                    try {
+                        player.ima({
+                            adTagUrl: 'https://pubads.g.doubleclick.net/gampad/live/ads?iu=/23358450278/video-preroll&description_url=https%3A%2F%2Funrulymovies.com&tfcd=0&npa=0&sz=640x480&min_ad_duration=5000&max_ad_duration=30000&gdfp_req=1&unviewed_position_start=1&output=vast&env=vp&impl=s&correlator=',
+                            adsRenderingSettings: {
+                                enablePreloading: true
+                            }
+                        });
+                        player.ima.initializeAdDisplayContainer();
+                    } catch (e) {
+                        console.warn('Ad setup skipped:', e.message);
+                    }
                 }
             });
 
@@ -1776,6 +1795,24 @@
                 }
             });
 
+            // ========== MID-ROLL ADS (every 30 minutes) ==========
+            const MID_ROLL_INTERVAL = 30 * 60;
+            let nextMidRollTime = MID_ROLL_INTERVAL;
+            let midRollPlaying = false;
+
+            function requestMidRoll() {
+                if (midRollPlaying || typeof player.ima === 'undefined') return;
+                midRollPlaying = true;
+                try {
+                    player.ima.setContentWithAdTag(null, 'https://pubads.g.doubleclick.net/gampad/live/ads?iu=/23358450278/video-preroll&description_url=https%3A%2F%2Funrulymovies.com&tfcd=0&npa=0&sz=640x480&min_ad_duration=5000&max_ad_duration=30000&gdfp_req=1&unviewed_position_start=1&output=vast&env=vp&impl=s&correlator=');
+                    player.ima.requestAds();
+                } catch (e) {
+                    midRollPlaying = false;
+                }
+                player.one('ads-ad-ended', () => { midRollPlaying = false; });
+                player.one('adserror', () => { midRollPlaying = false; });
+            }
+
             // ========== PROGRESS TRACKING + SKIP BUTTONS ==========
             player.on('timeupdate', () => {
                 const now = Date.now();
@@ -1784,6 +1821,13 @@
                     saveProgress();
                 }
                 updateSkipButtons();
+
+                // Mid-roll check
+                const currentTime = player.currentTime();
+                if (currentTime >= nextMidRollTime && !midRollPlaying) {
+                    nextMidRollTime = currentTime + MID_ROLL_INTERVAL;
+                    requestMidRoll();
+                }
             });
 
             // ========== NEXT-MOVIE AUTOPLAY ==========
