@@ -2203,10 +2203,8 @@
             let type = 'video/mp4';
             const urlLower = url.toLowerCase();
             
-            // Check if URL needs proxying (CDNs with CORS/referer restrictions)
-            const needsProxy = urlLower.includes('b-cdn.net') ||
-                               urlLower.includes('pearlpix.xyz') ||
-                               urlLower.includes('.mkv');
+            // Only proxy MKV files (need remuxing to MP4 for browser playback)
+            const needsProxy = urlLower.includes('.mkv');
 
             // Save raw URL BEFORE proxying so the error-retry handler never double-proxies
             const rawUrl = url;

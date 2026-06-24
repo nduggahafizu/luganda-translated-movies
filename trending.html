@@ -31,6 +31,17 @@
     
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
+
+    <!-- Google Publisher Tag (Ad Manager) -->
+    <script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
+    <script>
+        window.googletag = window.googletag || {cmd: []};
+        googletag.cmd.push(function() {
+            googletag.defineSlot('/23358450278/anchor-banner', [[320,50],[728,90]], 'div-anchor-banner').addService(googletag.pubads());
+            googletag.enableServices();
+            googletag.setConfig({singleRequest: true});
+        });
+    </script>
     
     <style>
         .trending-hero {
@@ -672,5 +683,10 @@
         }
     </script>
     <script defer src="js/app-shell.js"></script>
+
+    <!-- Sticky Anchor Banner -->
+    <div id="div-anchor-banner" style="position:fixed;bottom:0;left:0;width:100%;z-index:1500;text-align:center;background:rgba(0,0,0,0.85);padding:4px 0;">
+        <script>googletag.cmd.push(function() { googletag.display('div-anchor-banner'); });</script>
+    </div>
 </body>
 </html>

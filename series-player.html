@@ -917,7 +917,7 @@
                                 const embedUrl = currentEp.video.embedUrl || currentEp.video.originalVideoPath || '';
                                 const isDirectVideo = embedUrl.match(/\.(mp4|mkv|webm|avi|mov)(\?|$)/i);
                                 const isMkv = embedUrl.toLowerCase().includes('.mkv');
-                                const needsCdnProxy = isMkv || embedUrl.toLowerCase().includes('b-cdn.net');
+                                const needsCdnProxy = isMkv;
 
                                 if (isDirectVideo) {
                                     const videoSrc = needsCdnProxy
