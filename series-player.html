@@ -941,7 +941,7 @@
                                                autoplay preload="auto" playsinline
                                                style="position:absolute;top:0;left:0;width:100%;height:100%;background:#000;"
                                                oncontextmenu="return false"
-                                               oncanplay="hideVideoLoading(); if(!this._adPlayed){this._adPlayed=true;playPreRollAd();setupMidRolls();}"
+                                               oncanplay="hideVideoLoading(); if(!this._adPlayed){this._adPlayed=true;playPreRollAd();}"
                                                onerror="handleVideoError(this, '${embedUrl}')">
                                             <source src="${videoSrc}" type="video/mp4">
                                             Your browser does not support the video tag.
@@ -1097,63 +1097,6 @@
         }
 
         const VAST_TAG = 'https://pubads.g.doubleclick.net/gampad/live/ads?iu=/23358450278/video-preroll&description_url=https%3A%2F%2Funrulymovies.com&tfcd=0&npa=0&sz=640x480&min_ad_duration=5000&max_ad_duration=30000&gdfp_req=1&unviewed_position_start=1&output=vast&env=vp&impl=s&correlator=';
-        const MID_ROLL_INTERVAL = 30 * 60;
-        let nextMidRollTime = MID_ROLL_INTERVAL;
-        let midRollActive = false;
-
-        function setupMidRolls() {
-            const video = document.getElementById('series-video');
-            if (!video) return;
-            nextMidRollTime = MID_ROLL_INTERVAL;
-            midRollActive = false;
-            video.addEventListener('timeupdate', () => {
-                if (midRollActive) return;
-                if (video.currentTime >= nextMidRollTime) {
-                    nextMidRollTime = video.currentTime + MID_ROLL_INTERVAL;
-                    midRollActive = true;
-                    playMidRollAd();
-                }
-            });
-        }
-
-        function playMidRollAd() {
-            const video = document.getElementById('series-video');
-            const adContainer = document.getElementById('ad-container');
-            if (!video || !adContainer || typeof google === 'undefined' || !google.ima) {
-                midRollActive = false;
-                return;
-            }
-            video.pause();
-            adContainer.style.display = 'block';
-
-            try {
-                const adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, video);
-                adDisplayContainer.initialize();
-                const adsLoader = new google.ima.AdsLoader(adDisplayContainer);
-
-                const onDone = () => { adContainer.style.display = 'none'; midRollActive = false; video.play(); };
-
-                adsLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, (e) => {
-                    const mgr = e.getAdsManager(video);
-                    mgr.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, onDone);
-                    mgr.addEventListener(google.ima.AdEvent.Type.COMPLETE, onDone);
-                    mgr.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onDone);
-                    try { mgr.init(adContainer.offsetWidth, adContainer.offsetHeight, google.ima.ViewMode.NORMAL); mgr.start(); }
-                    catch (err) { onDone(); }
-                }, false);
-                adsLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onDone, false);
-
-                const req = new google.ima.AdsRequest();
-                req.adTagUrl = VAST_TAG;
-                req.linearAdSlotWidth = adContainer.offsetWidth;
-                req.linearAdSlotHeight = adContainer.offsetHeight;
-                adsLoader.requestAds(req);
-            } catch (e) {
-                adContainer.style.display = 'none';
-                midRollActive = false;
-                video.play();
-            }
-        }
 
         function playPreRollAd() {
             const video = document.getElementById('series-video');
