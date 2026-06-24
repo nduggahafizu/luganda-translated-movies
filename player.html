@@ -1795,6 +1795,64 @@
                 }
             });
 
+            // ========== MID-ROLL ADS (every 30 minutes, non-blocking) ==========
+            const MID_ROLL_INTERVAL = 30 * 60;
+            let nextMidRollTime = MID_ROLL_INTERVAL;
+            let midRollBusy = false;
+
+            function tryMidRoll() {
+                if (midRollBusy || typeof google === 'undefined' || !google.ima) return;
+                midRollBusy = true;
+
+                const videoEl = player.el().querySelector('video');
+                const wrapper = player.el();
+                let adContainer = document.getElementById('midroll-ad-container');
+                if (!adContainer) {
+                    adContainer = document.createElement('div');
+                    adContainer.id = 'midroll-ad-container';
+                    adContainer.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:50;display:none;';
+                    wrapper.appendChild(adContainer);
+                }
+
+                try {
+                    const adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, videoEl);
+                    adDisplayContainer.initialize();
+                    const adsLoader = new google.ima.AdsLoader(adDisplayContainer);
+
+                    const resume = () => {
+                        adContainer.style.display = 'none';
+                        midRollBusy = false;
+                        player.play();
+                    };
+
+                    adsLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, (e) => {
+                        const savedTime = player.currentTime();
+                        const mgr = e.getAdsManager(videoEl);
+                        mgr.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, resume);
+                        mgr.addEventListener(google.ima.AdEvent.Type.COMPLETE, resume);
+                        mgr.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, resume);
+                        try {
+                            player.pause();
+                            adContainer.style.display = 'block';
+                            mgr.init(adContainer.offsetWidth, adContainer.offsetHeight, google.ima.ViewMode.NORMAL);
+                            mgr.start();
+                        } catch (err) { resume(); }
+                    }, false);
+
+                    adsLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, () => {
+                        midRollBusy = false;
+                    }, false);
+
+                    const req = new google.ima.AdsRequest();
+                    req.adTagUrl = 'https://pubads.g.doubleclick.net/gampad/live/ads?iu=/23358450278/video-preroll&description_url=https%3A%2F%2Funrulymovies.com&tfcd=0&npa=0&sz=640x480&min_ad_duration=5000&max_ad_duration=30000&gdfp_req=1&unviewed_position_start=1&output=vast&env=vp&impl=s&correlator=';
+                    req.linearAdSlotWidth = adContainer.offsetWidth;
+                    req.linearAdSlotHeight = adContainer.offsetHeight;
+                    adsLoader.requestAds(req);
+                } catch (e) {
+                    midRollBusy = false;
+                }
+            }
+
             // ========== PROGRESS TRACKING + SKIP BUTTONS ==========
             player.on('timeupdate', () => {
                 const now = Date.now();
@@ -1803,6 +1861,12 @@
                     saveProgress();
                 }
                 updateSkipButtons();
+
+                const ct = player.currentTime();
+                if (ct >= nextMidRollTime && !midRollBusy) {
+                    nextMidRollTime = ct + MID_ROLL_INTERVAL;
+                    tryMidRoll();
+                }
             });
 
             // ========== NEXT-MOVIE AUTOPLAY ==========
