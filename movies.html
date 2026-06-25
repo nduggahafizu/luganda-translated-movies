@@ -654,6 +654,11 @@
             img.src = posterUrl;
         }
 
+        function tmdbResize(url, size) {
+            if (!url) return '';
+            return url.replace(/\/t\/p\/[^/]+\//, `/t/p/${size}/`);
+        }
+
         function formatVjBadge(vjName) {
             const name = (vjName || '').toString().trim();
             if (!name || name.toLowerCase() === 'unknown') return '';
@@ -695,7 +700,7 @@
                 const title = movie.originalTitle || movie.lugandaTitle || 'Unknown Title';
 
                 // Store poster data for later loading (always set fallback; swap to real poster when available)
-                posterData.push({ posterId, posterUrl: movie.poster || null, fallbackPoster });
+                posterData.push({ posterId, posterUrl: tmdbResize(movie.poster, 'w342') || movie.poster || null, fallbackPoster });
 
                 const movieCard = `
                     <a href="player.html?id=${movie._id}" class="content-card" data-movie-id="${movie._id}">
