@@ -816,6 +816,15 @@
     flex-shrink: 0;
 }
 
+.smc-poster {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    display: block;
+    border-radius: 14px 14px 0 0;
+}
+
 .smc-body {
     padding: 14px 16px 16px;
     display: flex;
