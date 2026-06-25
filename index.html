@@ -33,6 +33,9 @@
         });
     </script>
 
+    <!-- LCP preload — hero image starts downloading before CSS/JS -->
+    <link rel="preload" as="image" href="https://image.tmdb.org/t/p/w1280/2GSsbdvlKfZo2yMpVxMAJyQPA0Z.jpg" fetchpriority="high">
+
     <!-- DNS Prefetch and Preconnect for faster loading -->
     <link rel="preconnect" href="https://luganda-translated-movies-production.up.railway.app" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
@@ -896,9 +899,23 @@
                                             
                             <!-- Hero slides will be dynamically populated -->
                             <div class="carousel-item active" id="heroSlide1">
-                                <div class="slide media media-slide skeleton" style="min-height: 400px;">
-                                    <div class="slide-caption">
-                                        <div class="skeleton" style="width: 60%; height: 200px;"></div>
+                                <div class="slide poster-slide">
+                                    <img src="https://image.tmdb.org/t/p/w1280/2GSsbdvlKfZo2yMpVxMAJyQPA0Z.jpg" alt="Ugly Story — Luganda translated movie" class="slide-poster-img" loading="eager" fetchpriority="high">
+                                    <div class="hero-overlay"></div>
+                                    <div class="hero-content">
+                                        <h2 class="hero-title">Ugly Story</h2>
+                                        <div class="hero-meta">
+                                            <span class="meta-tag">2026</span>
+                                            <span class="meta-tag">HD</span>
+                                            <span class="meta-tag meta-vj">VJ Ice P</span>
+                                        </div>
+                                        <p class="hero-overview">Follows a man who becomes obsessively attached to a girl in love with someone else, descending into a dark psychological state.</p>
+                                        <div class="hero-btns">
+                                            <a href="player.html?id=6a3a8e461b50122619d6bee4" class="play-btn">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                                Play Now
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
