@@ -646,20 +646,11 @@
     
     <!-- Trailer Player -->
     <link rel="stylesheet" href="css/trailer-player.css">
-
-
-
-
-    console.error('Error playing trailer:', error);
-                showToast('Trailer not available', 'error');
-            }
-        }
-        
-        // Toast notification
+    <script>
         function showToast(message, type = 'info') {
             const existing = document.querySelector('.toast-notification');
             if (existing) existing.remove();
-            
+
             const toast = document.createElement('div');
             toast.className = 'toast-notification';
             toast.style.cssText = `
@@ -678,7 +669,7 @@
             `;
             toast.textContent = message;
             document.body.appendChild(toast);
-            
+
             setTimeout(() => toast.remove(), 2500);
         }
     </script>
