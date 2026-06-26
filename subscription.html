@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+
     <title>Subscription Plans - Premium Access | Unruly Movies</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -18,6 +20,8 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
     
     <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/payment-manager.js"></script>
     
     <style>
         .subscription-page {
@@ -379,12 +383,12 @@
         
         <div class="subscription-header">
             <h1>Choose Your Plan</h1>
-            <p>Pay with Airtel Money and start watching unlimited Luganda movies instantly</p>
+            <p>Pay with Mobile Money or Card and start watching unlimited Luganda movies instantly</p>
             <div class="airtel-badge">
-                <div style="background: #FF0000; padding: 5px 12px; border-radius: 6px;">
-                    <span style="font-weight: bold; color: #fff;">Airtel</span>
+                <div style="background: linear-gradient(135deg, #4ade80, #22c55e); padding: 5px 12px; border-radius: 6px;">
+                    <span style="font-weight: bold; color: #000;">PesaPal</span>
                 </div>
-                <span>Money Accepted</span>
+                <span>MTN · Airtel · Visa · Mastercard</span>
             </div>
         </div>
         
@@ -404,7 +408,7 @@
                     <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Ads Supported</li>
                 </ul>
                 <button class="btn-subscribe" onclick="showPaymentModal('starter')">
-                    Pay with Airtel
+                    Subscribe Now
                 </button>
             </div>
             
@@ -423,7 +427,7 @@
                     <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Limited Ads</li>
                 </ul>
                 <button class="btn-subscribe" onclick="showPaymentModal('basic')">
-                    Pay with Airtel
+                    Subscribe Now
                 </button>
             </div>
             
@@ -443,7 +447,7 @@
                     <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Downloads</li>
                 </ul>
                 <button class="btn-subscribe" onclick="showPaymentModal('standard')">
-                    Pay with Airtel
+                    Subscribe Now
                 </button>
             </div>
             
@@ -465,7 +469,7 @@
                     <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Offline Mode</li>
                 </ul>
                 <button class="btn-subscribe" onclick="showPaymentModal('premium')">
-                    Pay with Airtel
+                    Subscribe Now
                 </button>
             </div>
             
@@ -486,7 +490,7 @@
                     <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Best Value!</li>
                 </ul>
                 <button class="btn-subscribe" onclick="showPaymentModal('vip')">
-                    Pay with Airtel
+                    Subscribe Now
                 </button>
             </div>
         </div>

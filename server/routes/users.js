@@ -393,8 +393,17 @@ router.put('/profile', auth, async (req, res) => {
 // @access  Private
 router.delete('/account', auth, async (req, res) => {
     try {
-        await User.findByIdAndDelete(req.user.id);
-        
+        const userId = req.user.id;
+        const mongoose = require('mongoose');
+
+        // Clean up related data
+        const collections = ['payments', 'reviews', 'comments', 'notifications', 'pushsubscriptions', 'tokenblacklists'];
+        for (const col of collections) {
+            try { await mongoose.connection.collection(col).deleteMany({ user: new mongoose.Types.ObjectId(userId) }); } catch (e) {}
+        }
+
+        await User.findByIdAndDelete(userId);
+
         res.json({
             status: 'success',
             message: 'Account deleted successfully'

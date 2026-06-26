@@ -698,7 +698,7 @@
                 const userData = JSON.parse(userJson);
                 const userPicture = userData.picture || userData.profileImage;
                 const userFullName = userData.name || userData.fullName || 'User';
-                drawerProfile.href = 'dashboard.html';
+                drawerProfile.href = 'profile.html';
                 if (nameEl) nameEl.textContent = userFullName;
                 if (subEl) subEl.textContent = 'View your account';
                 if (userPicture && avatarEl && iconEl) {

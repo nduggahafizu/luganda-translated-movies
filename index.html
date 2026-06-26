@@ -607,7 +607,7 @@
                                             <p>No notifications yet</p>
                                         </div>
                                     </div>
-                                    <a href="dashboard.html#notifications" class="view-all-notifications">View All</a>
+                                    <a href="profile.html#notifications" class="view-all-notifications">View All</a>
                                 </div>
                             </div>
                         </li>
@@ -621,7 +621,7 @@
                                     </svg>
                                 </button>
                                 <div class="dropdown-menu">
-                                    <a href="dashboard.html" class="dropdown-item">
+                                    <a href="profile.html" class="dropdown-item">
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <rect x="3" y="3" width="7" height="7"></rect>
                                             <rect x="14" y="3" width="7" height="7"></rect>
@@ -820,7 +820,7 @@
                     <ul class="nav">
                         <li class="nav-header">Account</li>
                         <li>
-                            <a href="dashboard.html">
+                            <a href="profile.html">
                                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <rect x="3" y="3" width="7" height="7"></rect>
                                     <rect x="14" y="3" width="7" height="7"></rect>
@@ -1082,7 +1082,7 @@
                                         </svg>
                                         Continue Watching
                                     </div>
-                                    <a href="dashboard.html#history" class="all">View History</a>
+                                    <a href="profile.html#history" class="all">View History</a>
                                 </div>
                                 <div class="row row-cols-2 row-cols-md-5 list-scrollable" id="continueWatchingGrid">
                                     <!-- Continue watching items will be loaded here -->
@@ -1778,7 +1778,7 @@
                     if (userName) userName.textContent = userFullName.split(' ')[0];
 
                     // Update drawer profile card
-                    if (drawerProfile) drawerProfile.href = 'dashboard.html';
+                    if (drawerProfile) drawerProfile.href = 'profile.html';
                     if (drawerProfileName) drawerProfileName.textContent = userFullName;
                     if (drawerProfileSub) drawerProfileSub.textContent = 'View your account';
                     if (userPicture && drawerProfileAvatar && drawerProfileIcon) {

@@ -336,8 +336,7 @@ function updateAuthUI() {
                         <span class="d-none d-md-inline ml-2">${(user.fullName || user.name || 'User').split(' ')[0]}</span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" style="background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);">
-                        <a class="dropdown-item" href="dashboard.html" style="color:#fff;">Dashboard</a>
-                        <a class="dropdown-item" href="profile.html" style="color:#fff;">Profile</a>
+                        <a class="dropdown-item" href="profile.html" style="color:#fff;">My Account</a>
                         <div class="dropdown-divider" style="border-color:rgba(255,255,255,0.1);"></div>
                         <a class="dropdown-item" href="#" onclick="logout(); return false;" style="color:#ff6b6b;">Logout</a>
                     </div>

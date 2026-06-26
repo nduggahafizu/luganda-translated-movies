@@ -79,10 +79,6 @@ exports.protect = async (req, res, next) => {
                 });
             }
 
-            // Update lastVisit
-            req.user.lastVisit = new Date();
-            await req.user.save({ validateBeforeSave: false });
-
             // Check if token was issued before last security update
             if (req.user.lastSecurityUpdate) {
                 const tokenIssuedAt = new Date(decoded.iat * 1000);
@@ -95,14 +91,20 @@ exports.protect = async (req, res, next) => {
                 }
             }
 
-            // Store token for potential blacklisting on logout
+            // Store token + device info
             req.token = token;
-            
-            // Store device info
-            req.deviceInfo = {
-                userAgent: req.headers['user-agent'],
-                ip: req.ip || req.connection?.remoteAddress || req.headers['x-forwarded-for']
-            };
+            const ua = req.headers['user-agent'] || '';
+            const ip = req.ip || req.connection?.remoteAddress || req.headers['x-forwarded-for'] || '';
+            req.deviceInfo = { userAgent: ua, ip };
+
+            // Update lastVisit + register device in one save
+            try {
+                const crypto = require('crypto');
+                const deviceId = crypto.createHash('md5').update(ua + ip).digest('hex');
+                req.user.registerDevice(deviceId, ua, ip);
+            } catch (e) {}
+            req.user.lastVisit = new Date();
+            await req.user.save({ validateBeforeSave: false });
 
             next();
         } catch (error) {
@@ -144,22 +146,22 @@ exports.authorize = (...roles) => {
 // Check subscription access
 exports.checkSubscription = (requiredPlan) => {
     return (req, res, next) => {
-        const planHierarchy = { free: 0, basic: 1, premium: 2 };
-        const userPlanLevel = planHierarchy[req.user.subscription.plan];
-        const requiredPlanLevel = planHierarchy[requiredPlan];
+        const planHierarchy = { free: 0, starter: 1, basic: 2, standard: 3, premium: 4, vip: 5 };
+        const userPlanLevel = planHierarchy[req.user.subscription.plan] || 0;
+        const requiredPlanLevel = planHierarchy[requiredPlan] || 0;
 
-        // Check if user has active subscription
         if (!req.user.hasActiveSubscription()) {
             return res.status(403).json({
                 status: 'error',
+                code: 'SUBSCRIPTION_EXPIRED',
                 message: 'Your subscription has expired. Please renew to continue.'
             });
         }
 
-        // Check if user's plan meets requirement
         if (userPlanLevel < requiredPlanLevel) {
             return res.status(403).json({
                 status: 'error',
+                code: 'PLAN_REQUIRED',
                 message: `This content requires a ${requiredPlan} subscription or higher`,
                 requiredPlan,
                 currentPlan: req.user.subscription.plan
@@ -168,6 +170,33 @@ exports.checkSubscription = (requiredPlan) => {
 
         next();
     };
+};
+
+// Enforce device limit — 1 device per user, admins get 10
+exports.enforceDeviceLimit = async (req, res, next) => {
+    try {
+        if (!req.user) return next();
+
+        const crypto = require('crypto');
+        const ua = req.headers['user-agent'] || '';
+        const ip = req.ip || req.headers['x-forwarded-for'] || '';
+        const deviceId = crypto.createHash('md5').update(ua + ip).digest('hex');
+
+        const result = req.user.registerDevice(deviceId, ua, ip);
+        if (!result.allowed) {
+            return res.status(403).json({
+                status: 'error',
+                code: 'DEVICE_LIMIT',
+                message: `You can only use ${result.maxDevices} device at a time. Log out from your other device first.`,
+                maxDevices: result.maxDevices,
+                activeCount: result.activeCount
+            });
+        }
+        await req.user.save({ validateBeforeSave: false });
+        next();
+    } catch (e) {
+        next();
+    }
 };
 
 // Admin only middleware

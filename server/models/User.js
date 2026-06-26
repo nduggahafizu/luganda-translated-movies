@@ -63,7 +63,7 @@ const userSchema = new mongoose.Schema({
     subscription: {
         plan: {
             type: String,
-            enum: ['free', 'basic', 'premium'],
+            enum: ['free', 'starter', 'basic', 'standard', 'premium', 'vip'],
             default: 'free'
         },
         status: {
@@ -84,6 +84,12 @@ const userSchema = new mongoose.Schema({
             default: false
         }
     },
+    activeDevices: [{
+        deviceId: String,
+        userAgent: String,
+        ip: String,
+        lastActive: { type: Date, default: Date.now }
+    }],
     watchlist: [{
         contentType: {
             type: String,
@@ -255,11 +261,36 @@ userSchema.methods.hasActiveSubscription = function() {
 
 // Check if user can access content based on subscription
 userSchema.methods.canAccessContent = function(requiredPlan) {
-    const planHierarchy = { free: 0, basic: 1, premium: 2 };
-    const userPlanLevel = planHierarchy[this.subscription.plan];
-    const requiredPlanLevel = planHierarchy[requiredPlan];
-    
+    const planHierarchy = { free: 0, starter: 1, basic: 2, standard: 3, premium: 4, vip: 5 };
+    const userPlanLevel = planHierarchy[this.subscription.plan] || 0;
+    const requiredPlanLevel = planHierarchy[requiredPlan] || 0;
+
     return this.hasActiveSubscription() && userPlanLevel >= requiredPlanLevel;
+};
+
+// Get max allowed devices for this user
+userSchema.methods.getMaxDevices = function() {
+    if (this.role === 'admin' || this.role === 'superadmin') return 10;
+    return 1;
+};
+
+// Register a device, enforce limit
+userSchema.methods.registerDevice = function(deviceId, userAgent, ip) {
+    const maxDevices = this.getMaxDevices();
+    const existing = this.activeDevices.find(d => d.deviceId === deviceId);
+    if (existing) {
+        existing.lastActive = new Date();
+        existing.ip = ip;
+        return { allowed: true };
+    }
+    // Clean stale devices (inactive > 24 hours)
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    this.activeDevices = this.activeDevices.filter(d => d.lastActive > cutoff);
+    if (this.activeDevices.length >= maxDevices) {
+        return { allowed: false, maxDevices, activeCount: this.activeDevices.length };
+    }
+    this.activeDevices.push({ deviceId, userAgent, ip, lastActive: new Date() });
+    return { allowed: true };
 };
 
 // Add to watchlist

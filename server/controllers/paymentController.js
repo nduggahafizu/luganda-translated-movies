@@ -8,18 +8,11 @@ const { sendPaymentReceipt, sendSubscriptionEmail } = require('../utils/email');
 
 // Subscription pricing
 const SUBSCRIPTION_PRICES = {
-    basic: {
-        monthly: 7.99,
-        yearly: 77.99,
-        ugx_monthly: 17000,
-        ugx_yearly: 170000
-    },
-    premium: {
-        monthly: 14.99,
-        yearly: 149.99,
-        ugx_monthly: 55000,
-        ugx_yearly: 550000
-    }
+    starter: { ugx: 1000, days: 1 },
+    basic: { ugx: 5000, days: 7 },
+    standard: { ugx: 15000, days: 30 },
+    premium: { ugx: 30000, days: 30 },
+    vip: { ugx: 50000, days: 90 }
 };
 
 // @desc    Create Stripe payment intent
@@ -105,7 +98,7 @@ exports.confirmStripePayment = async (req, res) => {
                 user.subscription.startDate = Date.now();
                 
                 // Calculate end date
-                const duration = payment.subscriptionDuration === 'yearly' ? 365 : 30;
+                const duration = SUBSCRIPTION_PRICES[payment.subscriptionPlan]?.days || 30;
                 user.subscription.endDate = new Date(Date.now() + duration * 24 * 60 * 60 * 1000);
                 
                 await user.save();
@@ -218,7 +211,8 @@ exports.initiatePesapalPayment = async (req, res) => {
         });
 
         // Get price in UGX
-        const paymentAmount = amount || SUBSCRIPTION_PRICES[subscriptionPlan]?.[`ugx_${subscriptionDuration}`] || SUBSCRIPTION_PRICES[subscriptionPlan]?.ugx_monthly;
+        const planConfig = SUBSCRIPTION_PRICES[subscriptionPlan];
+        const paymentAmount = amount || planConfig?.ugx;
 
         if (!paymentAmount) {
             return res.status(400).json({
@@ -448,7 +442,7 @@ async function processSuccessfulPesapalPayment(payment, transactionData) {
         user.subscription.status = 'active';
         user.subscription.startDate = new Date();
         
-        const duration = payment.subscriptionDuration === 'yearly' ? 365 : 30;
+        const duration = SUBSCRIPTION_PRICES[payment.subscriptionPlan]?.days || 30;
         user.subscription.endDate = new Date(Date.now() + duration * 24 * 60 * 60 * 1000);
         
         await user.save();
@@ -561,7 +555,7 @@ exports.stripeWebhook = async (req, res) => {
                 user.subscription.status = 'active';
                 user.subscription.startDate = Date.now();
                 
-                const duration = payment.subscriptionDuration === 'yearly' ? 365 : 30;
+                const duration = SUBSCRIPTION_PRICES[payment.subscriptionPlan]?.days || 30;
                 user.subscription.endDate = new Date(Date.now() + duration * 24 * 60 * 60 * 1000);
                 
                 await user.save();

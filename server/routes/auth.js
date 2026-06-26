@@ -87,13 +87,14 @@ router.post('/logout-all', protect, async (req, res) => {
 // Get active sessions/devices
 router.get('/sessions', protect, async (req, res) => {
     try {
-        const user = await User.findById(req.user._id).select('trustedDevices lastLogin');
+        const user = await User.findById(req.user._id).select('activeDevices lastLogin role');
 
         res.json({
             status: 'success',
             data: {
-                devices: user.trustedDevices || [],
-                lastLogin: user.lastLogin
+                devices: user.activeDevices || [],
+                lastLogin: user.lastLogin,
+                maxDevices: (user.role === 'admin') ? 10 : 1
             }
         });
     } catch (error) {
@@ -114,6 +115,59 @@ router.get('/check-admin', protect, (req, res) => {
             id: req.user._id,
             email: req.user.email,
             role: req.user.role
+        }
+    });
+});
+
+const { enforceDeviceLimit } = require('../middleware/auth');
+
+// Remove a specific device
+router.delete('/devices/:deviceId', protect, async (req, res) => {
+    try {
+        const user = req.user;
+        const before = user.activeDevices.length;
+        user.activeDevices = user.activeDevices.filter(d => d.deviceId !== req.params.deviceId);
+        await user.save({ validateBeforeSave: false });
+        res.json({ success: true, removed: before - user.activeDevices.length, activeDevices: user.activeDevices.length });
+    } catch (e) {
+        res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+// Remove all devices except current
+router.delete('/devices', protect, async (req, res) => {
+    try {
+        const crypto = require('crypto');
+        const ua = req.headers['user-agent'] || '';
+        const ip = req.ip || req.headers['x-forwarded-for'] || '';
+        const currentDeviceId = crypto.createHash('md5').update(ua + ip).digest('hex');
+
+        const user = req.user;
+        user.activeDevices = user.activeDevices.filter(d => d.deviceId === currentDeviceId);
+        await user.save({ validateBeforeSave: false });
+        res.json({ success: true, message: 'All other devices logged out', activeDevices: user.activeDevices.length });
+    } catch (e) {
+        res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.get('/check-access', protect, enforceDeviceLimit, (req, res) => {
+    const user = req.user;
+    const plan = user.subscription.plan || 'free';
+    const isActive = user.hasActiveSubscription();
+    const isAdmin = user.role === 'admin' || user.role === 'superadmin';
+
+    res.json({
+        success: true,
+        access: {
+            plan,
+            isActive,
+            isAdmin,
+            canWatch: isActive && plan !== 'free',
+            freeUser: plan === 'free',
+            endDate: user.subscription.endDate,
+            maxDevices: user.getMaxDevices(),
+            activeDevices: user.activeDevices.length
         }
     });
 });
