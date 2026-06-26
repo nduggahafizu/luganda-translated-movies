@@ -101,7 +101,9 @@ exports.protect = async (req, res, next) => {
             try {
                 const crypto = require('crypto');
                 const deviceId = crypto.createHash('md5').update(ua + ip).digest('hex');
-                req.user.registerDevice(deviceId, ua, ip);
+                const result = req.user.registerDevice(deviceId, ua, ip);
+                req.deviceLimitExceeded = !result.allowed;
+                req.deviceId = deviceId;
             } catch (e) {}
             req.user.lastVisit = new Date();
             await req.user.save({ validateBeforeSave: false });
@@ -172,31 +174,9 @@ exports.checkSubscription = (requiredPlan) => {
     };
 };
 
-// Enforce device limit — 1 device per user, admins get 10
+// Device limit check — reports status but never blocks
 exports.enforceDeviceLimit = async (req, res, next) => {
-    try {
-        if (!req.user) return next();
-
-        const crypto = require('crypto');
-        const ua = req.headers['user-agent'] || '';
-        const ip = req.ip || req.headers['x-forwarded-for'] || '';
-        const deviceId = crypto.createHash('md5').update(ua + ip).digest('hex');
-
-        const result = req.user.registerDevice(deviceId, ua, ip);
-        if (!result.allowed) {
-            return res.status(403).json({
-                status: 'error',
-                code: 'DEVICE_LIMIT',
-                message: `You can only use ${result.maxDevices} device at a time. Log out from your other device first.`,
-                maxDevices: result.maxDevices,
-                activeCount: result.activeCount
-            });
-        }
-        await req.user.save({ validateBeforeSave: false });
-        next();
-    } catch (e) {
-        next();
-    }
+    next();
 };
 
 // Admin only middleware

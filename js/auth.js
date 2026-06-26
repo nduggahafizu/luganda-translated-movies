@@ -234,12 +234,32 @@ async function loginWithEmail(email, password, rememberMe) {
         const data = await response.json();
         
         if (data.status === 'success') {
-            // Save auth data
             saveAuthData(data.data.token, data.data.user, rememberMe);
-            
+
+            // Check device limit after login
+            try {
+                const deviceRes = await fetch(`${API_CONFIG.BASE_URL}/api/auth/device-check`, {
+                    headers: { 'Authorization': `Bearer ${data.data.token}` }
+                });
+                const deviceData = await deviceRes.json();
+
+                if (deviceData.status === 'device_limit') {
+                    showLoading(false);
+                    const deviceList = (deviceData.devices || []).map(d => `• ${d.label} (${d.ip})`).join('\n');
+                    const switchDevice = confirm(
+                        `Your account is already active on another device:\n\n${deviceList}\n\nLog out the other device and continue here?`
+                    );
+                    if (switchDevice) {
+                        await fetch(`${API_CONFIG.BASE_URL}/api/auth/device-switch`, {
+                            method: 'POST',
+                            headers: { 'Authorization': `Bearer ${data.data.token}` }
+                        });
+                    }
+                }
+            } catch (e) {}
+
             showNotification('Login successful! Redirecting...', 'success');
             setTimeout(() => {
-                // Check if there's a redirect URL saved (from login gate)
                 const redirectUrl = localStorage.getItem('redirectAfterLogin');
                 if (redirectUrl) {
                     localStorage.removeItem('redirectAfterLogin');

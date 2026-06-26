@@ -270,13 +270,12 @@ userSchema.methods.canAccessContent = function(requiredPlan) {
 
 // Get max allowed devices for this user
 userSchema.methods.getMaxDevices = function() {
-    if (this.role === 'admin' || this.role === 'superadmin') return 10;
-    return 1;
+    if (this.role === 'admin') return 10;
+    return 3;
 };
 
-// Register a device, enforce limit
+// Register a device — tracks and reports if limit exceeded
 userSchema.methods.registerDevice = function(deviceId, userAgent, ip) {
-    const maxDevices = this.getMaxDevices();
     const existing = this.activeDevices.find(d => d.deviceId === deviceId);
     if (existing) {
         existing.lastActive = new Date();
@@ -286,8 +285,10 @@ userSchema.methods.registerDevice = function(deviceId, userAgent, ip) {
     // Clean stale devices (inactive > 24 hours)
     const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
     this.activeDevices = this.activeDevices.filter(d => d.lastActive > cutoff);
+
+    const maxDevices = this.getMaxDevices();
     if (this.activeDevices.length >= maxDevices) {
-        return { allowed: false, maxDevices, activeCount: this.activeDevices.length };
+        return { allowed: false, maxDevices, activeCount: this.activeDevices.length, existingDevices: this.activeDevices };
     }
     this.activeDevices.push({ deviceId, userAgent, ip, lastActive: new Date() });
     return { allowed: true };

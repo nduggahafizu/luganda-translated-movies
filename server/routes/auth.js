@@ -121,6 +121,47 @@ router.get('/check-admin', protect, (req, res) => {
 
 const { enforceDeviceLimit } = require('../middleware/auth');
 
+// Check device status — tells frontend if another device needs to be logged out
+router.get('/device-check', protect, async (req, res) => {
+    const user = req.user;
+    const exceeded = req.deviceLimitExceeded || false;
+    const maxDevices = user.getMaxDevices();
+
+    if (exceeded) {
+        const devices = user.activeDevices.map(d => {
+            const browser = (d.userAgent || '').match(/(Chrome|Firefox|Safari|Edge|Opera|Mobile)/i)?.[1] || 'Browser';
+            const os = (d.userAgent || '').match(/(Windows|Mac|Linux|Android|iPhone|iPad)/i)?.[1] || 'Unknown';
+            return { deviceId: d.deviceId, label: `${browser} on ${os}`, ip: d.ip, lastActive: d.lastActive };
+        });
+        return res.json({
+            status: 'device_limit',
+            message: `Your account is already active on another device. Log out the other device to continue here.`,
+            maxDevices,
+            devices
+        });
+    }
+
+    res.json({ status: 'ok', activeDevices: user.activeDevices.length, maxDevices });
+});
+
+// Force switch — logout all other devices and register current one
+router.post('/device-switch', protect, async (req, res) => {
+    try {
+        const crypto = require('crypto');
+        const ua = req.headers['user-agent'] || '';
+        const ip = req.ip || req.headers['x-forwarded-for'] || '';
+        const deviceId = crypto.createHash('md5').update(ua + ip).digest('hex');
+
+        const user = req.user;
+        user.activeDevices = [{ deviceId, userAgent: ua, ip, lastActive: new Date() }];
+        await user.save({ validateBeforeSave: false });
+
+        res.json({ status: 'success', message: 'Switched to this device', activeDevices: 1 });
+    } catch (e) {
+        res.status(500).json({ status: 'error', message: e.message });
+    }
+});
+
 // Remove a specific device
 router.delete('/devices/:deviceId', protect, async (req, res) => {
     try {
