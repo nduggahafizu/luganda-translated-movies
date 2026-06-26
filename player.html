@@ -2349,27 +2349,18 @@
                     const provider = (currentMovie.video?.provider || '').toLowerCase();
                     const format = (currentMovie.video?.format || '').toLowerCase();
 
-                    // Gate the actual video behind auth + subscription
+                    // Gate the actual video behind auth only (subscription gate disabled)
                     const authed = await isLoggedIn();
                     if (authed) {
-                        const access = window._userAccess || {};
-                        if (!access.canWatch && !access.isAdmin) {
-                            showAuthGate(videoUrl, provider, format, currentMovie);
-                            const gateContent = document.querySelector('.auth-gate-content h3');
-                            if (gateContent) gateContent.textContent = access.freeUser ? 'Subscribe to Watch' : 'Subscription Expired';
-                            const gateDesc = document.querySelector('.auth-gate-content p');
-                            if (gateDesc) gateDesc.innerHTML = `<a href="subscription.html" style="color:var(--accent);text-decoration:underline;">Subscribe</a> to unlock full movies. or <button onclick="document.getElementById('trailerBtn').click()" style="background:none;border:none;color:var(--accent);font-size:inherit;cursor:pointer;padding:0;text-decoration:underline;">watch trailer</button>.`;
+                        initPlayer();
+                        if (videoUrl && (isDirectVideo(videoUrl) || format === 'mp4' || format === 'm3u8' || format === 'webm')) {
+                            loadVideo(videoUrl);
+                        } else if (videoUrl && provider !== 'streamtape') {
+                            await loadEmbedVideo(videoUrl);
+                        } else if (videoUrl) {
+                            loadVideo(videoUrl);
                         } else {
-                            initPlayer();
-                            if (videoUrl && (isDirectVideo(videoUrl) || format === 'mp4' || format === 'm3u8' || format === 'webm')) {
-                                loadVideo(videoUrl);
-                            } else if (videoUrl && provider !== 'streamtape') {
-                                await loadEmbedVideo(videoUrl);
-                            } else if (videoUrl) {
-                                loadVideo(videoUrl);
-                            } else {
-                                showError('Video not available for this movie');
-                            }
+                            showError('Video not available for this movie');
                         }
                     } else {
                         showAuthGate(videoUrl, provider, format, currentMovie);
