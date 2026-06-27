@@ -118,26 +118,23 @@
     background: linear-gradient(135deg, #FFD700, #FF00FF);
 }
 
-/* Responsive plan grid */
+/* Mobile: horizontal scroll for plans */
 @media (max-width: 500px) {
     .plan-selector {
-        grid-template-columns: repeat(3, 1fr);
+        display: flex;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 0 16px 8px;
+        gap: 8px;
     }
-    
-    .plan-selector .plan-card:nth-child(4),
-    .plan-selector .plan-card:nth-child(5) {
-        grid-column: span 1;
+    .plan-selector::-webkit-scrollbar { display: none; }
+    .plan-selector .plan-card {
+        flex: 0 0 100px;
+        min-width: 100px;
     }
-}
-
-@media (max-width: 380px) {
-    .plan-selector {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .plan-selector .plan-card:last-child {
-        grid-column: span 2;
-    }
+    .payment-modal-header { padding: 20px 20px 16px; }
+    .payment-modal-header h2 { font-size: 20px; }
 }
 
 /* Selected plan features */
@@ -466,13 +463,33 @@
     color: rgba(255, 255, 255, 0.5);
 }
 
+/* Payment bottom bar — always visible */
+.payment-bottom-bar {
+    background: #1a1a2e;
+    padding: 14px 20px 16px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    flex-shrink: 0;
+}
+
+/* Modal layout: flex column so bottom bar stays fixed */
+.modal-modern-content.payment-modal {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-modern-content.payment-modal > .payment-modal-header,
+.modal-modern-content.payment-modal > .plan-selector,
+.modal-modern-content.payment-modal > .payment-status {
+    flex-shrink: 0;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
     .modal-modern-content.payment-modal {
         width: 100%;
         max-width: 100%;
         border-radius: 20px 20px 0 0;
-        max-height: 95vh;
+        max-height: 90vh;
         position: fixed;
         bottom: 0;
         left: 0;

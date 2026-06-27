@@ -245,16 +245,8 @@ async function loginWithEmail(email, password, rememberMe) {
 
                 if (deviceData.status === 'device_limit') {
                     showLoading(false);
-                    const deviceList = (deviceData.devices || []).map(d => `• ${d.label} (${d.ip})`).join('\n');
-                    const switchDevice = confirm(
-                        `Your account is already active on another device:\n\n${deviceList}\n\nLog out the other device and continue here?`
-                    );
-                    if (switchDevice) {
-                        await fetch(`${API_CONFIG.BASE_URL}/api/auth/device-switch`, {
-                            method: 'POST',
-                            headers: { 'Authorization': `Bearer ${data.data.token}` }
-                        });
-                    }
+                    showDeviceLimitScreen(deviceData.devices || [], data.data.token);
+                    return;
                 }
             } catch (e) {}
 
@@ -379,6 +371,81 @@ function updateAuthUI() {
 }
 
 // Show loading state
+function showDeviceLimitScreen(devices, token) {
+    const overlay = document.createElement('div');
+    overlay.id = 'deviceLimitOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+
+    const deviceCards = devices.map(d => `
+        <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.05);border:1px solid #333;border-radius:10px;">
+            <div style="width:36px;height:36px;border-radius:8px;background:rgba(255,68,68,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff4444" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+            <div style="flex:1;min-width:0;">
+                <div style="color:#fff;font-weight:600;font-size:13px;">${d.label}</div>
+                <div style="color:#888;font-size:11px;">IP: ${d.ip || 'Unknown'}</div>
+            </div>
+            <button onclick="logoutSingleDevice('${d.deviceId}','${token}')" style="background:rgba(255,68,68,0.15);color:#ff4444;border:1px solid rgba(255,68,68,0.3);padding:6px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">Remove</button>
+        </div>
+    `).join('');
+
+    overlay.innerHTML = `
+        <div style="background:#1a1a2e;border-radius:16px;padding:28px;max-width:420px;width:100%;max-height:80vh;overflow-y:auto;">
+            <div style="text-align:center;margin-bottom:20px;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ff4444" stroke-width="1.5" style="margin-bottom:12px;">
+                    <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+                <h2 style="color:#fff;font-size:18px;margin-bottom:6px;">Device Limit Reached</h2>
+                <p style="color:#888;font-size:13px;">Your account is active on ${devices.length} devices. Maximum is 3. Remove a device to continue on this one.</p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+                ${deviceCards}
+            </div>
+            <button onclick="logoutAllAndContinue('${token}')" style="width:100%;padding:12px;background:linear-gradient(135deg,#4ade80,#22c55e);color:#000;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:10px;">Remove All & Continue Here</button>
+            <button onclick="document.getElementById('deviceLimitOverlay').remove()" style="width:100%;padding:10px;background:none;color:#888;border:1px solid #333;border-radius:8px;font-size:13px;cursor:pointer;">Cancel</button>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+}
+
+async function logoutSingleDevice(deviceId, token) {
+    try {
+        await fetch(`${API_CONFIG.BASE_URL}/api/auth/devices/${deviceId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        // Re-check device status
+        const res = await fetch(`${API_CONFIG.BASE_URL}/api/auth/device-check`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.status === 'device_limit') {
+            document.getElementById('deviceLimitOverlay').remove();
+            showDeviceLimitScreen(data.devices || [], token);
+        } else {
+            document.getElementById('deviceLimitOverlay').remove();
+            window.location.href = localStorage.getItem('redirectAfterLogin') || 'index.html';
+            localStorage.removeItem('redirectAfterLogin');
+        }
+    } catch (e) {
+        alert('Failed to remove device');
+    }
+}
+
+async function logoutAllAndContinue(token) {
+    try {
+        await fetch(`${API_CONFIG.BASE_URL}/api/auth/device-switch`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        document.getElementById('deviceLimitOverlay').remove();
+        window.location.href = localStorage.getItem('redirectAfterLogin') || 'index.html';
+        localStorage.removeItem('redirectAfterLogin');
+    } catch (e) {
+        alert('Failed to switch device');
+    }
+}
+
 function showLoading(show) {
     const submitBtns = document.querySelectorAll('button[type="submit"]');
     submitBtns.forEach(btn => {

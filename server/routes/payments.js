@@ -12,6 +12,7 @@ router.post('/stripe/confirm', protect, paymentController.confirmStripePayment);
 router.post('/pesapal/initiate', protect, paymentController.initiatePesapalPayment);
 router.get('/pesapal/callback', paymentController.pesapalCallback);
 router.post('/pesapal/ipn', paymentController.pesapalIPN);
+router.get('/pesapal/verify/:ref', protect, paymentController.verifyPesapalPayment);
 router.get('/history', protect, paymentController.getPaymentHistory);
 router.get('/:id', protect, paymentController.getPayment);
 

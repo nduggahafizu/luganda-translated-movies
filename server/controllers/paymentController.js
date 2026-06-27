@@ -10,7 +10,7 @@ const { sendPaymentReceipt, sendSubscriptionEmail } = require('../utils/email');
 const SUBSCRIPTION_PRICES = {
     starter: { ugx: 1000, days: 1 },
     basic: { ugx: 5000, days: 7 },
-    standard: { ugx: 15000, days: 30 },
+    standard: { ugx: 12000, days: 30 },
     premium: { ugx: 30000, days: 30 },
     vip: { ugx: 50000, days: 90 }
 };
@@ -291,7 +291,7 @@ exports.initiatePesapalPayment = async (req, res) => {
                 currency: 'UGX',
                 amount: paymentAmount,
                 description: description || `Unruly Movies ${subscriptionPlan || 'basic'} subscription (${subscriptionDuration || 'monthly'})`,
-                callback_url: `https://unrulymovies.com/payment-success.html?ref=${merchantReference}`,
+                callback_url: `${process.env.PESAPAL_CALLBACK_URL || 'https://unrulymovies.com/api/payments/pesapal/callback'}?ref=${merchantReference}`,
                 notification_id: ipnId,
                 billing_address: {
                     email_address: userEmail,
@@ -522,6 +522,58 @@ exports.pesapalIPN = async (req, res) => {
     } catch (error) {
         logger.error('PesapalIPN error', { error: error.message });
         res.status(500).json({ status: 'error' });
+    }
+};
+
+// @desc    Verify PesaPal payment (client-side check after redirect)
+// @route   GET /api/payments/pesapal/verify/:ref
+// @access  Private
+exports.verifyPesapalPayment = async (req, res) => {
+    try {
+        const { ref } = req.params;
+
+        const payment = await Payment.findOne({
+            $or: [
+                { transactionId: ref },
+                { 'paymentDetails.pesapalMerchantReference': ref }
+            ]
+        });
+
+        if (!payment) {
+            return res.status(404).json({ status: 'error', message: 'Payment not found' });
+        }
+
+        if (payment.status === 'completed') {
+            return res.json({ status: 'success', message: 'Payment already confirmed', plan: payment.subscriptionPlan });
+        }
+
+        const trackingId = payment.paymentDetails?.pesapalOrderTrackingId;
+        if (!trackingId) {
+            return res.status(400).json({ status: 'error', message: 'No tracking ID' });
+        }
+
+        const token = await getPesapalToken();
+        const statusResponse = await axios.get(
+            `${PESAPAL_CONFIG.baseUrl}/api/Transactions/GetTransactionStatus?orderTrackingId=${trackingId}`,
+            { headers: { 'Authorization': `Bearer ${token}` } }
+        );
+
+        const statusCode = statusResponse.data?.status_code;
+        logger.info('Verify payment status', { ref, statusCode, data: statusResponse.data });
+
+        if (statusCode === 1) {
+            await processSuccessfulPesapalPayment(payment, statusResponse.data);
+            return res.json({ status: 'success', message: 'Payment confirmed', plan: payment.subscriptionPlan });
+        } else if (statusCode === 2) {
+            payment.status = 'failed';
+            await payment.save();
+            return res.json({ status: 'failed', message: 'Payment failed' });
+        } else {
+            return res.json({ status: 'pending', message: 'Payment still processing' });
+        }
+    } catch (error) {
+        logger.error('Verify payment error', { error: error.message });
+        res.status(500).json({ status: 'error', message: error.message });
     }
 };
 

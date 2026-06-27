@@ -661,39 +661,37 @@
                 <div class="subscription-card">
                     <div class="subscription-header">
                         <div>
-                            <h2 class="subscription-title">Subscription Status</h2>
-                            <p class="subscription-subtitle">Manage your plan and billing</p>
+                            <h2 class="subscription-title">Download Access</h2>
+                            <p class="subscription-subtitle">Download movies and series for offline viewing</p>
                         </div>
                         <span class="plan-badge free" id="planBadge">FREE</span>
                     </div>
                     
                     <div class="subscription-details">
                         <div class="detail-item">
-                            <div class="detail-label">Current Plan</div>
+                            <div class="detail-label">Download Access</div>
+                            <div class="detail-value" id="downloadAccess">No</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Plan</div>
                             <div class="detail-value" id="currentPlan">Free</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Status</div>
-                            <div class="detail-value active" id="subStatus">Active</div>
+                            <div class="detail-value" id="subStatus">-</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Start Date</div>
-                            <div class="detail-value" id="subStartDate">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Renewal Date</div>
+                            <div class="detail-label">Expires</div>
                             <div class="detail-value" id="subEndDate">-</div>
                         </div>
                     </div>
-                    
-                    <div class="subscription-features">
-                        <h3 class="features-title">Plan Features</h3>
-                        <div class="features-list" id="featuresList">
-                            <!-- Features loaded dynamically -->
-                        </div>
+
+                    <div id="timeRemainingBox" style="display:none;margin-bottom:16px;padding:14px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);border-radius:10px;text-align:center;">
+                        <div style="font-size:12px;color:#888;margin-bottom:4px;">Time Remaining</div>
+                        <div id="timeRemaining" style="font-size:22px;font-weight:800;color:#4ade80;">-</div>
                     </div>
 
-                    <button id="upgradeBtn" class="btn-subscribe" style="width:100%;padding:14px;background:linear-gradient(135deg,#4ade80,#22c55e);color:#000;font-weight:700;font-size:15px;border:none;border-radius:10px;cursor:pointer;margin-top:10px;">Subscribe Now</button>
+                    <button id="upgradeBtn" onclick="window.location.href='subscription.html'" style="width:100%;padding:14px;background:linear-gradient(135deg,#4ade80,#22c55e);color:#000;font-weight:700;font-size:15px;border:none;border-radius:10px;cursor:pointer;">Get Download Access</button>
 
                 </div>
 
@@ -955,72 +953,86 @@
         function renderSubscription(subscription) {
             const plan = subscription?.plan || 'free';
             const status = subscription?.status || 'active';
-            
+            const hasDownload = ['basic', 'standard', 'premium', 'vip'].includes(plan) && status === 'active';
+            const dateOpts = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+
             // Plan badge
             const planBadge = document.getElementById('planBadge');
-            planBadge.textContent = plan.toUpperCase();
-            planBadge.className = `plan-badge ${plan}`;
-            
-            // Details
-            document.getElementById('currentPlan').textContent = plan.charAt(0).toUpperCase() + plan.slice(1);
-            
-            const statusEl = document.getElementById('subStatus');
-            statusEl.textContent = status.charAt(0).toUpperCase() + status.slice(1);
-            statusEl.className = `detail-value ${status === 'active' ? 'active' : 'expired'}`;
-            
-            // Dates with full date + time
-            const dateOpts = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-            if (subscription?.startDate) {
-                document.getElementById('subStartDate').textContent = new Date(subscription.startDate).toLocaleDateString('en-UG', dateOpts);
+            if (hasDownload) {
+                planBadge.textContent = 'DOWNLOAD ACCESS';
+                planBadge.className = 'plan-badge standard';
+            } else {
+                planBadge.textContent = 'FREE';
+                planBadge.className = 'plan-badge free';
             }
 
-            if (subscription?.endDate) {
+            // Download access
+            const dlEl = document.getElementById('downloadAccess');
+            if (hasDownload) {
+                dlEl.textContent = 'Active';
+                dlEl.className = 'detail-value active';
+            } else {
+                dlEl.textContent = 'No';
+                dlEl.className = 'detail-value expired';
+            }
+
+            // Plan name
+            const planNames = { free: 'Free', starter: 'Starter', basic: 'Weekly (7 days)', standard: 'Monthly (30 days)', premium: 'Premium', vip: 'VIP' };
+            document.getElementById('currentPlan').textContent = planNames[plan] || 'Free';
+
+            // Status
+            const statusEl = document.getElementById('subStatus');
+            if (plan === 'free') {
+                statusEl.textContent = 'No active plan';
+                statusEl.className = 'detail-value';
+            } else {
+                statusEl.textContent = status === 'active' ? 'Active' : 'Expired';
+                statusEl.className = `detail-value ${status === 'active' ? 'active' : 'expired'}`;
+            }
+
+            // Expiry + time remaining
+            if (subscription?.endDate && plan !== 'free') {
                 const endDate = new Date(subscription.endDate);
                 document.getElementById('subEndDate').textContent = endDate.toLocaleDateString('en-UG', dateOpts);
 
-                // Show remaining time
-                const now = Date.now();
-                const remaining = endDate.getTime() - now;
-                const timeLeft = document.createElement('div');
-                timeLeft.className = 'detail-item';
+                const remaining = endDate.getTime() - Date.now();
+                const box = document.getElementById('timeRemainingBox');
+                const timeEl = document.getElementById('timeRemaining');
+                box.style.display = 'block';
+
                 if (remaining > 0) {
                     const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
                     const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    timeLeft.innerHTML = `<div class="detail-label">Time Remaining</div><div class="detail-value active">${days}d ${hours}h left</div>`;
+                    const mins = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                    timeEl.textContent = days > 0 ? `${days}d ${hours}h ${mins}m` : `${hours}h ${mins}m`;
+                    timeEl.style.color = remaining < 6 * 60 * 60 * 1000 ? '#ff4444' : '#4ade80';
                 } else {
-                    timeLeft.innerHTML = `<div class="detail-label">Time Remaining</div><div class="detail-value expired">Expired</div>`;
+                    timeEl.textContent = 'Expired';
+                    timeEl.style.color = '#ff4444';
                 }
-                document.querySelector('.subscription-details').appendChild(timeLeft);
             } else {
-                document.getElementById('subEndDate').textContent = plan === 'free' ? 'No expiry' : '-';
+                document.getElementById('subEndDate').textContent = '-';
             }
-            
-            // Features
-            renderPlanFeatures(plan);
-            
-            // Upgrade button
+
+            // Button
             const upgradeBtn = document.getElementById('upgradeBtn');
-            if (plan === 'vip') {
-                upgradeBtn.textContent = 'Manage Subscription';
+            if (hasDownload) {
+                upgradeBtn.textContent = 'Renew Download Access';
             } else {
-                upgradeBtn.innerHTML = `
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                    </svg>
-                    ${plan === 'free' ? 'Subscribe Now' : 'Upgrade Plan'}
-                `;
-                upgradeBtn.onclick = () => window.location.href = 'subscription.html';
+                upgradeBtn.textContent = 'Get Download Access';
             }
         }
 
         function renderPlanFeatures(plan) {
             const features = [
-                { name: 'Access to all Luganda movies', free: true, basic: true, premium: true },
-                { name: 'HD Video Quality', free: false, basic: true, premium: true },
-                { name: 'No Ads', free: false, basic: true, premium: true },
-                { name: 'Download for offline', free: false, basic: false, premium: true },
-                { name: 'Early access to new releases', free: false, basic: false, premium: true },
-                { name: 'Multiple device streaming', free: false, basic: false, premium: true }
+                { name: 'Access to all Luganda movies', free: true, starter: true, basic: true, standard: true, premium: true, vip: true },
+                { name: 'HD Video Quality', free: false, starter: false, basic: false, standard: true, premium: true, vip: true },
+                { name: 'No Ads', free: false, starter: false, basic: false, standard: true, premium: true, vip: true },
+                { name: 'Download for offline', free: false, starter: false, basic: false, standard: true, premium: true, vip: true },
+                { name: '2+ Device streaming', free: false, starter: false, basic: false, standard: true, premium: true, vip: true },
+                { name: '4+ Device streaming', free: false, starter: false, basic: false, standard: false, premium: true, vip: true },
+                { name: 'Early access to new releases', free: false, starter: false, basic: false, standard: false, premium: false, vip: true },
+                { name: 'VIP Support', free: false, starter: false, basic: false, standard: false, premium: false, vip: true }
             ];
             
             const featuresList = document.getElementById('featuresList');

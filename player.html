@@ -2349,9 +2349,10 @@
                     const provider = (currentMovie.video?.provider || '').toLowerCase();
                     const format = (currentMovie.video?.format || '').toLowerCase();
 
-                    // Gate the actual video behind auth only (subscription gate disabled)
+                    // Auth check — login required, watching is free for all members
                     const authed = await isLoggedIn();
                     if (authed) {
+                        checkDownloadPermission(currentMovie);
                         initPlayer();
                         if (videoUrl && (isDirectVideo(videoUrl) || format === 'mp4' || format === 'm3u8' || format === 'webm')) {
                             loadVideo(videoUrl);
@@ -2496,25 +2497,20 @@
         
         // ========== DOWNLOAD PERMISSION ==========
         async function checkDownloadPermission(movie) {
-            if (!movie.allowDownload) return;
-            
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            if (!token) return;
-            
-            try {
-                const response = await fetch(`${API_BASE}/api/auth/me`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await response.json();
-                
-                if (data.success && data.data?.canDownload) {
-                    const downloadBtn = document.getElementById('downloadBtn');
-                    downloadBtn.style.display = 'inline-flex';
-                    downloadBtn.onclick = () => handleDownload(movie);
+            const downloadBtn = document.getElementById('downloadBtn');
+            if (!downloadBtn) return;
+            downloadBtn.style.display = 'inline-flex';
+
+            downloadBtn.onclick = () => {
+                const access = window._userAccess;
+                if (access && (access.canDownload || access.isAdmin)) {
+                    handleDownload(movie);
+                } else {
+                    if (confirm('Download access requires a paid package:\n\nWeekly — UGX 5,000\nMonthly — UGX 12,000\n\nSubscribe now?')) {
+                        window.location.href = 'subscription.html';
+                    }
                 }
-            } catch (e) {
-                console.log('Could not verify download permission');
-            }
+            };
         }
         
         function handleDownload(movie) {
@@ -2860,12 +2856,49 @@
             _pendingVideoProvider = provider;
             _pendingVideoFormat = format;
 
-            // Mirror the blurred poster into the auth gate background
             const posterBg = document.getElementById('authGatePosterBg');
             const posterUrl = movie?.backdrop || movie?.poster;
             if (posterBg && posterUrl) {
                 posterBg.style.backgroundImage = `url('${posterUrl}')`;
             }
+
+            const access = window._userAccess;
+            const isLoggedInUser = !!access;
+            const gateContent = document.querySelector('.auth-gate-content');
+
+            if (isLoggedInUser) {
+                gateContent.innerHTML = `
+                    <div class="auth-gate-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    </div>
+                    <h3>${access.freeUser ? 'Subscribe to Watch' : 'Subscription Expired'}</h3>
+                    <p>Get a subscription to unlock full Luganda translated movies and series.</p>
+                    <div class="auth-gate-btns">
+                        <a href="subscription.html" class="auth-gate-login" style="text-decoration:none;text-align:center;">Subscribe Now</a>
+                    </div>
+                    <p style="margin-top:12px;font-size:13px;"><button onclick="document.getElementById('trailerBtn')?.click()" style="background:none;border:none;color:var(--accent);font-size:inherit;cursor:pointer;padding:0;text-decoration:underline;">Watch trailer instead</button></p>
+                `;
+            } else {
+                gateContent.innerHTML = `
+                    <div class="auth-gate-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    </div>
+                    <h3>Members Only</h3>
+                    <p>Login or create an account to watch the full Luganda translation.</p>
+                    <div class="auth-gate-btns">
+                        <button class="auth-gate-login" onclick="watchFullMovie()">Login to Watch</button>
+                        <a href="register.html" class="auth-gate-register">Create Free Account</a>
+                    </div>
+                    <p style="margin-top:12px;font-size:13px;"><button onclick="document.getElementById('trailerBtn')?.click()" style="background:none;border:none;color:var(--accent);font-size:inherit;cursor:pointer;padding:0;text-decoration:underline;">Watch trailer instead</button></p>
+                `;
+            }
+
             document.getElementById('authGateOverlay').classList.add('visible');
             hideLoading();
         }

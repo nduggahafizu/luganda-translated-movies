@@ -124,10 +124,14 @@ const { enforceDeviceLimit } = require('../middleware/auth');
 // Check device status — tells frontend if another device needs to be logged out
 router.get('/device-check', protect, async (req, res) => {
     const user = req.user;
-    const exceeded = req.deviceLimitExceeded || false;
     const maxDevices = user.getMaxDevices();
 
-    if (exceeded) {
+    // Clean stale devices (>24h)
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    user.activeDevices = user.activeDevices.filter(d => d.lastActive > cutoff);
+    await user.save({ validateBeforeSave: false });
+
+    if (user.activeDevices.length > maxDevices) {
         const devices = user.activeDevices.map(d => {
             const browser = (d.userAgent || '').match(/(Chrome|Firefox|Safari|Edge|Opera|Mobile)/i)?.[1] || 'Browser';
             const os = (d.userAgent || '').match(/(Windows|Mac|Linux|Android|iPhone|iPad)/i)?.[1] || 'Unknown';
@@ -135,7 +139,7 @@ router.get('/device-check', protect, async (req, res) => {
         });
         return res.json({
             status: 'device_limit',
-            message: `Your account is already active on another device. Log out the other device to continue here.`,
+            message: `Your account is active on ${user.activeDevices.length} devices. Maximum is ${maxDevices}.`,
             maxDevices,
             devices
         });
@@ -196,7 +200,7 @@ router.get('/check-access', protect, enforceDeviceLimit, (req, res) => {
     const user = req.user;
     const plan = user.subscription.plan || 'free';
     const isActive = user.hasActiveSubscription();
-    const isAdmin = user.role === 'admin' || user.role === 'superadmin';
+    const isAdmin = user.role === 'admin';
 
     res.json({
         success: true,
@@ -205,6 +209,8 @@ router.get('/check-access', protect, enforceDeviceLimit, (req, res) => {
             isActive,
             isAdmin,
             canWatch: isActive && plan !== 'free',
+            canDownload: user.hasDownloadAccess(),
+            showAds: user.shouldSeeAds(),
             freeUser: plan === 'free',
             endDate: user.subscription.endDate,
             maxDevices: user.getMaxDevices(),

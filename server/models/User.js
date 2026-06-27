@@ -268,11 +268,39 @@ userSchema.methods.canAccessContent = function(requiredPlan) {
     return this.hasActiveSubscription() && userPlanLevel >= requiredPlanLevel;
 };
 
+// Plan capabilities
+const PLAN_CONFIG = {
+    free:     { devices: 3, download: false, ads: true },
+    starter:  { devices: 3, download: false, ads: true },
+    basic:    { devices: 3, download: true,  ads: true },
+    standard: { devices: 3, download: true,  ads: false },
+    premium:  { devices: 3, download: true,  ads: false },
+    vip:      { devices: 3, download: true,  ads: false }
+};
+
+userSchema.methods.getPlanConfig = function() {
+    return PLAN_CONFIG[this.subscription.plan] || PLAN_CONFIG.free;
+};
+
 // Get max allowed devices for this user
 userSchema.methods.getMaxDevices = function() {
     if (this.role === 'admin') return 10;
-    return 3;
+    return this.getPlanConfig().devices;
 };
+
+// Check if user can download
+userSchema.methods.hasDownloadAccess = function() {
+    if (this.role === 'admin') return true;
+    return this.hasActiveSubscription() && this.getPlanConfig().download;
+};
+
+// Check if user should see ads
+userSchema.methods.shouldSeeAds = function() {
+    if (this.role === 'admin') return false;
+    return this.getPlanConfig().ads;
+};
+
+userSchema.statics.PLAN_CONFIG = PLAN_CONFIG;
 
 // Register a device — tracks and reports if limit exceeded
 userSchema.methods.registerDevice = function(deviceId, userAgent, ip) {

@@ -13,10 +13,12 @@ exports.validateAdminUserUpdate = [
         .isObject().withMessage('Subscription must be an object'),
     body('subscription.plan')
         .optional()
-        .isIn(['free', 'basic', 'premium']).withMessage('Invalid subscription plan'),
+        .isIn(['free', 'starter', 'basic', 'standard', 'premium', 'vip']).withMessage('Invalid subscription plan'),
     body('subscription.status')
         .optional()
-        .isIn(['active', 'inactive', 'canceled']).withMessage('Invalid subscription status'),
+        .isIn(['active', 'inactive', 'cancelled', 'expired']).withMessage('Invalid subscription status'),
+    body('subscription.startDate').optional(),
+    body('subscription.endDate').optional(),
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {

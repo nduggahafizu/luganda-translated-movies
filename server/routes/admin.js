@@ -44,7 +44,7 @@ router.get('/dashboard', [auth, adminOnly], async (req, res) => {
             VJ.countDocuments(),
             Review.countDocuments(),
             Comment.countDocuments(),
-            User.countDocuments({ 'subscription.plan': { $in: ['basic', 'premium'] } }),
+            User.countDocuments({ 'subscription.plan': { $in: ['starter', 'basic', 'standard', 'premium', 'vip'] } }),
             User.countDocuments({ 
                 'subscription.status': 'active',
                 'subscription.plan': { $ne: 'free' }
@@ -197,6 +197,8 @@ router.put('/users/:id', [auth, adminOnly, validateAdminUserUpdate], async (req,
         if (subscription) {
             if (subscription.plan) updateData['subscription.plan'] = subscription.plan;
             if (subscription.status) updateData['subscription.status'] = subscription.status;
+            if (subscription.startDate) updateData['subscription.startDate'] = subscription.startDate;
+            if (subscription.endDate !== undefined) updateData['subscription.endDate'] = subscription.endDate;
         }
         
         const user = await User.findByIdAndUpdate(

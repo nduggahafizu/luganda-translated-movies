@@ -21,7 +21,7 @@
     
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/payment-manager.js"></script>
+    <script src="js/payment-manager.js?v=2"></script>
     
     <style>
         .subscription-page {
@@ -382,8 +382,8 @@
         </div>
         
         <div class="subscription-header">
-            <h1>Choose Your Plan</h1>
-            <p>Pay with Mobile Money or Card and start watching unlimited Luganda movies instantly</p>
+            <h1>Download Access</h1>
+            <p>Subscribe to download Luganda translated movies and series for offline viewing</p>
             <div class="airtel-badge">
                 <div style="background: linear-gradient(135deg, #4ade80, #22c55e); padding: 5px 12px; border-radius: 6px;">
                     <span style="font-weight: bold; color: #000;">PesaPal</span>
@@ -392,106 +392,35 @@
             </div>
         </div>
         
-        <div class="plans-container">
-            <!-- Starter Plan -->
-            <div class="plan-card" style="--plan-color: #888888;">
-                <div class="plan-icon">🎬</div>
-                <h3 class="plan-name">Starter</h3>
-                <div class="plan-duration">1 Day Access</div>
-                <div class="plan-price">
-                    <span class="currency">UGX</span>
-                    <span class="amount">1,000</span>
-                </div>
+        <div class="plans-container" style="max-width:600px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <div class="plan-card" data-plan="basic" style="--plan-color: #00D9FF;">
+                <div class="plan-icon" style="font-size:36px;">📥</div>
+                <h3 class="plan-name">Weekly</h3>
+                <div class="plan-duration">7 Days Download Access</div>
+                <div class="plan-price"><span class="currency">UGX</span><span class="amount">5,000</span></div>
                 <ul class="plan-features">
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> SD Streaming</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 1 Device</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Ads Supported</li>
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Download any movie</li>
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Download series episodes</li>
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Watch offline</li>
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 7 days access</li>
                 </ul>
-                <button class="btn-subscribe" onclick="showPaymentModal('starter')">
-                    Subscribe Now
-                </button>
+                <button class="btn-subscribe" onclick="paymentManager.subscribe('basic')">Pay UGX 5,000</button>
             </div>
-            
-            <!-- Basic Plan -->
-            <div class="plan-card" style="--plan-color: #00D9FF;">
-                <div class="plan-icon">⭐</div>
-                <h3 class="plan-name">Basic</h3>
-                <div class="plan-duration">1 Week Access</div>
-                <div class="plan-price">
-                    <span class="currency">UGX</span>
-                    <span class="amount">5,000</span>
-                </div>
+
+            <div class="plan-card popular" data-plan="standard" style="--plan-color: #4ade80;">
+                <div class="popular-badge">Best Value</div>
+                <div class="plan-icon" style="font-size:36px;">📥</div>
+                <h3 class="plan-name">Monthly</h3>
+                <div class="plan-duration">30 Days Download Access</div>
+                <div class="plan-price"><span class="currency">UGX</span><span class="amount">12,000</span></div>
                 <ul class="plan-features">
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> HD Streaming</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 1 Device</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Limited Ads</li>
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Download any movie</li>
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Download series episodes</li>
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Watch offline</li>
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 30 days access</li>
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Save 58% vs weekly</li>
                 </ul>
-                <button class="btn-subscribe" onclick="showPaymentModal('basic')">
-                    Subscribe Now
-                </button>
-            </div>
-            
-            <!-- Standard Plan -->
-            <div class="plan-card" style="--plan-color: #00FF88;">
-                <div class="plan-icon">🌟</div>
-                <h3 class="plan-name">Standard</h3>
-                <div class="plan-duration">1 Month Access</div>
-                <div class="plan-price">
-                    <span class="currency">UGX</span>
-                    <span class="amount">15,000</span>
-                </div>
-                <ul class="plan-features">
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Full HD Streaming</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 2 Devices</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> No Ads</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Downloads</li>
-                </ul>
-                <button class="btn-subscribe" onclick="showPaymentModal('standard')">
-                    Subscribe Now
-                </button>
-            </div>
-            
-            <!-- Premium Plan (Popular) -->
-            <div class="plan-card popular" style="--plan-color: #FFD700;">
-                <div class="popular-badge">👑 Most Popular</div>
-                <div class="plan-icon">👑</div>
-                <h3 class="plan-name">Premium</h3>
-                <div class="plan-duration">1 Month Access</div>
-                <div class="plan-price">
-                    <span class="currency">UGX</span>
-                    <span class="amount">30,000</span>
-                </div>
-                <ul class="plan-features">
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 4K Streaming</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 4 Devices</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> No Ads</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Downloads</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Offline Mode</li>
-                </ul>
-                <button class="btn-subscribe" onclick="showPaymentModal('premium')">
-                    Subscribe Now
-                </button>
-            </div>
-            
-            <!-- VIP Plan -->
-            <div class="plan-card" style="--plan-color: #FF00FF;">
-                <div class="plan-icon">💎</div>
-                <h3 class="plan-name">VIP</h3>
-                <div class="plan-duration">3 Months Access</div>
-                <div class="plan-price">
-                    <span class="currency">UGX</span>
-                    <span class="amount">50,000</span>
-                </div>
-                <ul class="plan-features">
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 4K Streaming</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Unlimited Devices</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Early Access</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> VIP Support</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Best Value!</li>
-                </ul>
-                <button class="btn-subscribe" onclick="showPaymentModal('vip')">
-                    Subscribe Now
-                </button>
+                <button class="btn-subscribe" onclick="paymentManager.subscribe('standard')">Pay UGX 12,000</button>
             </div>
         </div>
         
@@ -609,22 +538,10 @@
             }
         });
         
-        // Show payment modal
-        function showPaymentModal(plan) {
-            const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-            
-            if (!token) {
-                window.location.href = 'login.html?redirect=subscription.html';
-                return;
-            }
-            
-            // Use the PaymentManager
-            if (typeof paymentManager !== 'undefined') {
-                paymentManager.showPaymentModal(plan);
-            } else {
-                alert('Payment system loading... Please try again.');
-            }
-        }
+        // Add spin animation for loading buttons
+        const style = document.createElement('style');
+        style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+        document.head.appendChild(style);
     </script>
 </body>
 </html>

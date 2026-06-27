@@ -483,6 +483,50 @@ app.listen(PORT, () => {
         
         console.log('🔄 Keep-alive enabled');
     }
+
+    // Subscription expiry checker — runs every hour
+    const User = require('./models/User');
+    async function checkSubscriptionExpiry() {
+        try {
+            const now = new Date();
+
+            const expired = await User.updateMany(
+                { 'subscription.status': 'active', 'subscription.endDate': { $lte: now }, 'subscription.plan': { $ne: 'free' } },
+                { $set: { 'subscription.status': 'expired', 'subscription.plan': 'free' } }
+            );
+            if (expired.modifiedCount > 0) {
+                console.log(`⏰ Expired ${expired.modifiedCount} subscriptions`);
+            }
+
+            const reminderCutoff = new Date(now.getTime() + 6 * 60 * 60 * 1000);
+            const expiringSoon = await User.find({
+                'subscription.status': 'active',
+                'subscription.plan': { $ne: 'free' },
+                'subscription.endDate': { $gt: now, $lte: reminderCutoff },
+                'subscription._reminderSent': { $ne: true }
+            }).select('email fullName subscription pushSubscriptions');
+
+            for (const user of expiringSoon) {
+                try {
+                    const notifyPush = require('./services/pushService').sendPushToUser;
+                    if (notifyPush) {
+                        await notifyPush(user._id, {
+                            title: 'Subscription expiring soon',
+                            body: `Your ${user.subscription.plan} plan expires in less than 6 hours. Renew to keep watching!`,
+                            url: '/subscription.html'
+                        }).catch(() => {});
+                    }
+                    await User.updateOne({ _id: user._id }, { $set: { 'subscription._reminderSent': true } });
+                } catch (e) {}
+            }
+        } catch (err) {
+            console.error('Subscription check error:', err.message);
+        }
+    }
+    // Run immediately on startup, then every 10 minutes
+    checkSubscriptionExpiry();
+    setInterval(checkSubscriptionExpiry, 10 * 60 * 1000);
+    console.log('⏰ Subscription expiry checker enabled (every 10 min)');
 });
 
 // Handle unhandled promise rejections
