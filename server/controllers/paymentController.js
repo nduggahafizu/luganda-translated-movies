@@ -291,7 +291,7 @@ exports.initiatePesapalPayment = async (req, res) => {
                 currency: 'UGX',
                 amount: paymentAmount,
                 description: description || `Unruly Movies ${subscriptionPlan || 'basic'} subscription (${subscriptionDuration || 'monthly'})`,
-                callback_url: `${process.env.PESAPAL_CALLBACK_URL || 'https://unrulymovies.com/api/payments/pesapal/callback'}?ref=${merchantReference}`,
+                callback_url: `https://unrulymovies.com/payment-success.html?ref=${merchantReference}`,
                 notification_id: ipnId,
                 billing_address: {
                     email_address: userEmail,
