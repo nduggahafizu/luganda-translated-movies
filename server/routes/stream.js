@@ -94,9 +94,7 @@ function redirectForUrl(res, movieId, rawUrl) {
 // One DB lookup happens here; the resolved URL is encrypted into the token.
 router.get('/token/:movieId', protect, async (req, res) => {
     try {
-        const movie = await LugandaMovie.findById(req.params.movieId)
-            .select('+video.embedUrl +video.originalVideoPath +embedUrl video.format')
-            .lean();
+        const movie = await LugandaMovie.findById(req.params.movieId).lean();
         if (!movie) return res.status(404).json({ status: 'error', message: 'Movie not found' });
 
         const rawUrl = movie.video?.originalVideoPath || movie.video?.embedUrl || movie.embedUrl;
@@ -106,7 +104,8 @@ router.get('/token/:movieId', protect, async (req, res) => {
         // /play never has to do extraction work on the hot path.
         const resolvedUrl = await resolveDirectUrl(rawUrl);
 
-        const token = encryptToken({ mid: req.params.movieId, u: resolvedUrl });
+        const title = (movie.originalTitle || movie.lugandaTitle || 'movie').replace(/[^a-zA-Z0-9 _-]/g, '').trim();
+        const token = encryptToken({ mid: req.params.movieId, u: resolvedUrl, t: title });
         res.json({ status: 'success', token, format: movie.video?.format || null });
     } catch (e) {
         res.status(500).json({ status: 'error', message: 'Could not generate stream token' });
@@ -128,7 +127,8 @@ router.get('/download/:movieId', (req, res) => {
     if (!data || data.mid !== req.params.movieId) {
         return res.status(401).json({ status: 'error', message: 'Invalid or expired token' });
     }
-    res.setHeader('Content-Disposition', `attachment; filename="movie.mp4"`);
+    const titleName = data.t || 'movie';
+    res.setHeader('Content-Disposition', `attachment; filename="${titleName}.mp4"`);
     redirectForUrl(res, req.params.movieId, data.u);
 });
 
