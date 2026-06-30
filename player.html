@@ -2228,20 +2228,14 @@
             // Clear any previous error state
             hideError();
             
-            // Fix mixed content - convert http to https for known CDNs
+            // Fix mixed content - convert http to https
             if (url.startsWith('http://')) {
-                const httpsUrl = url.replace('http://', 'https://');
-                console.log('🔒 Converting to HTTPS:', httpsUrl);
-                url = httpsUrl;
+                url = url.replace('http://', 'https://');
             }
-            
-            // Decode URL-encoded characters (like %20 for spaces)
-            try {
-                url = decodeURIComponent(url);
-                console.log('🔓 Decoded URL:', url);
-            } catch (e) {
-                console.warn('URL decode failed:', e);
-            }
+
+            // Ensure spaces and other invalid chars are percent-encoded
+            // (do NOT decodeURIComponent — that turns %20 into literal spaces which breaks Video.js)
+            url = url.replace(/ /g, '%20');
             
             console.log('🎬 Loading video:', url);
             
@@ -2249,8 +2243,11 @@
             let type = 'video/mp4';
             const urlLower = url.toLowerCase();
             
-            // Only proxy MKV files (need remuxing to MP4 for browser playback)
-            const needsProxy = urlLower.includes('.mkv');
+            // Proxy MKV files (need remuxing) and BunnyCDN URLs (hotlink protection
+            // blocks direct browser requests — stream-proxy bypasses it server-side)
+            const needsProxy = urlLower.includes('.mkv') ||
+                               urlLower.includes('b-cdn.net') ||
+                               urlLower.includes('bunnycdn');
 
             // Save raw URL BEFORE proxying so the error-retry handler never double-proxies
             const rawUrl = url;
@@ -2356,24 +2353,22 @@
                     const provider = (currentMovie.video?.provider || '').toLowerCase();
                     const format = (currentMovie.video?.format || '').toLowerCase();
 
-                    // Auth check and stream-token fetch run in PARALLEL (both just need
-                    // the bearer token) instead of waiting on each other sequentially —
-                    // shaves a full round-trip off time-to-first-frame.
-                    const token = normalizeBearerToken(getAuthToken());
-                    if (!token) {
-                        showAuthGate('', provider, format, currentMovie);
-                    } else {
-                        const [authed, streamData] = await Promise.all([
-                            isLoggedIn(),
-                            fetchStreamToken(movieId)
-                        ]);
-                        if (authed) {
-                            checkDownloadPermission(currentMovie);
-                            initPlayer();
-                            playSecureStream(movieId, streamData, format);
+                    // Auth check — login required, watching is free for all members
+                    const authed = await isLoggedIn();
+                    if (authed) {
+                        checkDownloadPermission(currentMovie);
+                        initPlayer();
+                        if (videoUrl && (isDirectVideo(videoUrl) || format === 'mp4' || format === 'm3u8' || format === 'webm')) {
+                            loadVideo(videoUrl);
+                        } else if (videoUrl && provider !== 'streamtape') {
+                            await loadEmbedVideo(videoUrl);
+                        } else if (videoUrl) {
+                            loadVideo(videoUrl);
                         } else {
-                            showAuthGate('', provider, format, currentMovie);
+                            showError('Video not available for this movie');
                         }
+                    } else {
+                        showAuthGate(videoUrl, provider, format, currentMovie);
                     }
                     
                 } else {
@@ -2553,40 +2548,7 @@
             document.body.appendChild(overlay);
         }
 
-        // Fetch the stream token only — does NOT touch the player. Called in parallel
-        // with the auth check so we don't pay two sequential round-trips before playback.
-        async function fetchStreamToken(movieId) {
-            const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-            try {
-                const res = await fetch(`${API_BASE}/api/stream/token/${movieId}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-                if (data.status !== 'success' || !data.token) return null;
-                return data;
-            } catch (e) {
-                return null;
-            }
-        }
 
-        // Apply an already-fetched token to the player
-        function playSecureStream(movieId, streamData, format) {
-            if (!streamData) {
-                showError('Video not available. Please try again.');
-                return;
-            }
-            const secureUrl = `${API_BASE}/api/stream/play/${movieId}?token=${encodeURIComponent(streamData.token)}`;
-            const fmt = (streamData.format || format || '').toLowerCase();
-            let mimeType = 'video/mp4';
-            if (fmt === 'm3u8' || fmt === 'hls') mimeType = 'application/x-mpegURL';
-            else if (fmt === 'webm') mimeType = 'video/webm';
-
-            player.pause();
-            player.currentTime(0);
-            player.src({ src: secureUrl, type: mimeType });
-            player.load();
-            hideError();
-        }
 
         // Detect iOS — Safari ignores the `download` attribute for video files
         // and always opens the native player instead. This is an Apple platform
@@ -2597,39 +2559,31 @@
         }
 
         // Route download through backend — avoids new tab, hides raw URL
-        async function handleDownload(movie) {
-            const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-            const mid = movie._id;
-            if (!mid) return;
+        function handleDownload(movie) {
+            const videoUrl = movie.video?.embedUrl || movie.embedUrl;
+            if (!videoUrl) return;
 
-            showNotification('Preparing download…');
-            try {
-                const res = await fetch(`${API_BASE}/api/stream/token/${mid}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-                if (data.status !== 'success' || !data.token) throw new Error('Download unavailable');
+            if (isIOS()) {
+                showIOSDownloadInstructions(videoUrl);
+                return;
+            }
 
-                const downloadUrl = `${API_BASE}/api/stream/download/${mid}?token=${encodeURIComponent(data.token)}`;
+            const fileName = `${(movie.originalTitle || movie.lugandaTitle || 'movie').replace(/[^a-zA-Z0-9 _-]/g, '').trim()}.mp4`;
 
-                if (isIOS()) {
-                    // iOS Safari can't be forced to download video — show instructions
-                    // and open the video so the user can save it via the native player.
-                    showIOSDownloadInstructions(downloadUrl);
-                    return;
-                }
-
-                const fileName = `${movie.originalTitle || movie.lugandaTitle || 'movie'}.mp4`;
+            // Route through the backend stream-proxy with ?download= so the server adds
+            // Content-Disposition: attachment — this forces a download even for cross-origin
+            // CDN URLs where <a download> is ignored by the browser.
+            if (videoUrl.match(/\.(mp4|mkv|webm|m4v)/i)) {
+                const proxyDownload = `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(videoUrl)}&download=${encodeURIComponent(fileName)}`;
                 const link = document.createElement('a');
-                link.href = downloadUrl;
+                link.href = proxyDownload;
                 link.download = fileName;
-                // No target="_blank" — browser follows the redirect in-page and downloads
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
                 showNotification('Download started!');
-            } catch (e) {
-                showNotification('Download not available right now', 'error');
+            } else {
+                window.open(videoUrl, '_blank');
             }
         }
 

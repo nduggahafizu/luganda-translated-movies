@@ -787,17 +787,23 @@ router.get('/stream-proxy', async (req, res) => {
         // Determine content type - use video/mp4 even for MKV (browser will try to play)
         const contentType = response.headers['content-type'] || 'video/mp4';
         res.setHeader('Content-Type', contentType);
-        
+
         if (response.headers['content-length']) {
             res.setHeader('Content-Length', response.headers['content-length']);
         }
         if (response.headers['content-range']) {
             res.setHeader('Content-Range', response.headers['content-range']);
         }
-        
+
         res.setHeader('Accept-Ranges', 'bytes');
         res.setHeader('Cache-Control', 'public, max-age=3600');
         res.setHeader('Access-Control-Expose-Headers', 'Content-Length, Content-Range, Accept-Ranges');
+
+        // When ?download=filename is set, force browser to save instead of play
+        if (req.query.download) {
+            const filename = String(req.query.download).replace(/[^a-zA-Z0-9._\- ]/g, '') || 'movie.mp4';
+            res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        }
 
         res.status(response.status);
         response.data.pipe(res);
@@ -964,6 +970,3 @@ router.get('/probe', async (req, res) => {
 });
 
 module.exports = router;
-// Exposed so other routes (stream.js) can extract direct video URLs server-side
-// without an extra internal HTTP round-trip.
-module.exports.extractors = { extractStreamtape, extractDoodstream, extractFilemoon };

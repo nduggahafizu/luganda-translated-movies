@@ -32,19 +32,7 @@ const transformToSeriesFormat = (movie) => {
             name: data.vjName || 'Unknown VJ'
         },
         vjName: data.vjName,
-        // Strip raw video source fields — frontend fetches a signed token from
-        // /api/stream/episode-token/:id/:season/:episode instead. `available`
-        // tells the UI whether an episode has a video without exposing the URL.
-        seasons: (data.seasons || []).map(season => ({
-            ...season,
-            episodes: (season.episodes || []).map(ep => ({
-                ...ep,
-                video: {
-                    provider: ep.video?.provider,
-                    available: !!(ep.video?.embedUrl || ep.video?.streamtapeId || ep.video?.archiveUrl)
-                }
-            }))
-        })),
+        seasons: data.seasons || [],
         totalSeasons: data.totalSeasons || 0,
         totalEpisodes: data.totalEpisodes || 0,
         cast: data.cast || [],

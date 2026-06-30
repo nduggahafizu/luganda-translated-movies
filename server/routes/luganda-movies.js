@@ -68,22 +68,9 @@ const generateSlug = (title) => {
 };
 
 // Helper: sanitize movie objects for public responses.
-// Raw stream URLs are NEVER sent to the browser — the player fetches
-// a signed token from /api/stream/token/:id instead.
 const sanitizeMovieForPublic = (movie) => {
     if (!movie) return movie;
-
     const movieObj = typeof movie.toObject === 'function' ? movie.toObject() : { ...movie };
-
-    // Always strip all raw video source fields
-    delete movieObj.embedUrl;
-    if (movieObj.video) {
-        delete movieObj.video.embedUrl;
-        delete movieObj.video.originalVideoPath;
-        delete movieObj.video.url;
-        // Keep non-sensitive video metadata (provider, quality, duration, etc.)
-    }
-
     return movieObj;
 };
 
