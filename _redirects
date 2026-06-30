@@ -14,7 +14,7 @@ http://www.unrulymovies.com/* https://unrulymovies.com/:splat 301!
 http://unrulymovies.com/* https://unrulymovies.com/:splat 301!
 
 # API proxy
-/api/* https://luganda-translated-movies-production.up.railway.app/:splat 200
+/api/* https://luganda-translated-movies-production.up.railway.app/api/:splat 200
 
 # Clean URLs - serve HTML files without .html extension
 /movies           /movies.html           200

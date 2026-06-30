@@ -2356,16 +2356,24 @@
                     const provider = (currentMovie.video?.provider || '').toLowerCase();
                     const format = (currentMovie.video?.format || '').toLowerCase();
 
-                    // Auth check — login required, watching is free for all members
-                    const authed = await isLoggedIn();
-                    if (authed) {
-                        checkDownloadPermission(currentMovie);
-                        initPlayer();
-                        // Fetch a signed, time-limited stream URL from the backend.
-                        // The raw source URL never touches the browser — only our /api/stream/play URL does.
-                        await loadSecureStream(movieId, provider, format);
-                    } else {
+                    // Auth check and stream-token fetch run in PARALLEL (both just need
+                    // the bearer token) instead of waiting on each other sequentially —
+                    // shaves a full round-trip off time-to-first-frame.
+                    const token = normalizeBearerToken(getAuthToken());
+                    if (!token) {
                         showAuthGate('', provider, format, currentMovie);
+                    } else {
+                        const [authed, streamData] = await Promise.all([
+                            isLoggedIn(),
+                            fetchStreamToken(movieId)
+                        ]);
+                        if (authed) {
+                            checkDownloadPermission(currentMovie);
+                            initPlayer();
+                            playSecureStream(movieId, streamData, format);
+                        } else {
+                            showAuthGate('', provider, format, currentMovie);
+                        }
                     }
                     
                 } else {
@@ -2545,33 +2553,47 @@
             document.body.appendChild(overlay);
         }
 
-        // Fetch a signed token then play via /api/stream/play — raw URL stays on server
-        async function loadSecureStream(movieId, provider, format) {
+        // Fetch the stream token only — does NOT touch the player. Called in parallel
+        // with the auth check so we don't pay two sequential round-trips before playback.
+        async function fetchStreamToken(movieId) {
             const token = localStorage.getItem('token') || localStorage.getItem('authToken');
             try {
                 const res = await fetch(`${API_BASE}/api/stream/token/${movieId}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await res.json();
-                if (data.status !== 'success' || !data.token) throw new Error('Stream unavailable');
-
-                // The secure URL is a backend redirect — always use loadVideo(), never embed.
-                // Pass the known format so the player picks the right codec without guessing
-                // from the URL extension (which is /api/stream/play/..., not .mp4/.m3u8).
-                const secureUrl = `${API_BASE}/api/stream/play/${movieId}?token=${encodeURIComponent(data.token)}`;
-                const fmt = (format || '').toLowerCase();
-                let mimeType = 'video/mp4';
-                if (fmt === 'm3u8' || fmt === 'hls') mimeType = 'application/x-mpegURL';
-                else if (fmt === 'webm') mimeType = 'video/webm';
-
-                player.pause();
-                player.currentTime(0);
-                player.src({ src: secureUrl, type: mimeType });
-                player.load();
-                hideError();
+                if (data.status !== 'success' || !data.token) return null;
+                return data;
             } catch (e) {
-                showError('Video not available. Please try again.');
+                return null;
             }
+        }
+
+        // Apply an already-fetched token to the player
+        function playSecureStream(movieId, streamData, format) {
+            if (!streamData) {
+                showError('Video not available. Please try again.');
+                return;
+            }
+            const secureUrl = `${API_BASE}/api/stream/play/${movieId}?token=${encodeURIComponent(streamData.token)}`;
+            const fmt = (streamData.format || format || '').toLowerCase();
+            let mimeType = 'video/mp4';
+            if (fmt === 'm3u8' || fmt === 'hls') mimeType = 'application/x-mpegURL';
+            else if (fmt === 'webm') mimeType = 'video/webm';
+
+            player.pause();
+            player.currentTime(0);
+            player.src({ src: secureUrl, type: mimeType });
+            player.load();
+            hideError();
+        }
+
+        // Detect iOS — Safari ignores the `download` attribute for video files
+        // and always opens the native player instead. This is an Apple platform
+        // restriction, not something JS can override.
+        function isIOS() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPadOS
         }
 
         // Route download through backend — avoids new tab, hides raw URL
@@ -2589,8 +2611,15 @@
                 if (data.status !== 'success' || !data.token) throw new Error('Download unavailable');
 
                 const downloadUrl = `${API_BASE}/api/stream/download/${mid}?token=${encodeURIComponent(data.token)}`;
-                const fileName = `${movie.originalTitle || movie.lugandaTitle || 'movie'}.mp4`;
 
+                if (isIOS()) {
+                    // iOS Safari can't be forced to download video — show instructions
+                    // and open the video so the user can save it via the native player.
+                    showIOSDownloadInstructions(downloadUrl);
+                    return;
+                }
+
+                const fileName = `${movie.originalTitle || movie.lugandaTitle || 'movie'}.mp4`;
                 const link = document.createElement('a');
                 link.href = downloadUrl;
                 link.download = fileName;
@@ -2602,6 +2631,49 @@
             } catch (e) {
                 showNotification('Download not available right now', 'error');
             }
+        }
+
+        function showIOSDownloadInstructions(downloadUrl) {
+            const existing = document.getElementById('iosDownloadPrompt');
+            if (existing) existing.remove();
+
+            const overlay = document.createElement('div');
+            overlay.id = 'iosDownloadPrompt';
+            overlay.style.cssText = `
+                position: fixed; inset: 0; z-index: 99999;
+                background: rgba(0,0,0,0.8); backdrop-filter: blur(6px);
+                display: flex; align-items: center; justify-content: center; padding: 20px;
+            `;
+            overlay.innerHTML = `
+                <div style="background:#13131f;border:1px solid rgba(74,222,128,0.2);border-radius:20px;
+                            max-width:380px;width:100%;padding:28px 24px;text-align:center;">
+                    <div style="width:56px;height:56px;border-radius:50%;background:rgba(74,222,128,0.12);
+                                display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </div>
+                    <h3 style="color:#fff;font-size:18px;margin:0 0 10px;">Saving on iPhone/iPad</h3>
+                    <p style="color:#999;font-size:14px;line-height:1.6;margin:0 0 20px;">
+                        Safari can't auto-download videos. Tap <strong style="color:#fff">Open Video</strong> below,
+                        then tap and hold the video and choose <strong style="color:#fff">"Download Video"</strong> or
+                        use the Share button to save it.
+                    </p>
+                    <a href="${downloadUrl}" target="_blank"
+                       style="display:block;background:#4ade80;color:#000;font-weight:700;
+                              padding:13px;border-radius:12px;text-decoration:none;font-size:15px;margin-bottom:10px;">
+                        Open Video
+                    </a>
+                    <button onclick="document.getElementById('iosDownloadPrompt').remove()"
+                            style="background:none;border:none;color:#666;font-size:13px;cursor:pointer;padding:8px;">
+                        Cancel
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
         }
         
         // ========== RELATED MOVIES ==========

@@ -136,13 +136,8 @@
   to = "/faq.html"
   status = 200
 
-# API proxy — hides Railway backend URL from browser DevTools
-# All /api/* requests are transparently forwarded to the Railway backend
-[[redirects]]
-  from = "/api/*"
-  to = "https://luganda-translated-movies-production.up.railway.app/api/:splat"
-  status = 200
-  force = true
+# Note: the /api/* proxy rule lives in _redirects (Netlify gives that file priority),
+# not here — having it in both places risks the two falling out of sync.
 
 # 404 fallback
 [[redirects]]

@@ -964,3 +964,6 @@ router.get('/probe', async (req, res) => {
 });
 
 module.exports = router;
+// Exposed so other routes (stream.js) can extract direct video URLs server-side
+// without an extra internal HTTP round-trip.
+module.exports.extractors = { extractStreamtape, extractDoodstream, extractFilemoon };
