@@ -1,6 +1,8 @@
 <!DOCTYPE html>  
 <html lang="en">
 <head>
+    <!-- AdCash (gated for paid subscribers) -->
+    <script src="js/ad-gate.js"></script>
     <!-- Ezoic Privacy & Ad Scripts -->
     <script data-cfasync="false" src="https://cmp.gatekeeperconsent.com/min.js"></script>
     <script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js"></script>
@@ -908,18 +910,14 @@
                                     <img src="https://image.tmdb.org/t/p/w1280/2GSsbdvlKfZo2yMpVxMAJyQPA0Z.jpg" alt="Ugly Story — Luganda translated movie" class="slide-poster-img" loading="eager" fetchpriority="high">
                                     <div class="hero-overlay"></div>
                                     <div class="hero-content">
-                                        <h2 class="hero-title">Ugly Story</h2>
-                                        <div class="hero-meta">
-                                            <span class="meta-tag">2026</span>
-                                            <span class="meta-tag">HD</span>
-                                            <span class="meta-tag meta-vj">VJ Ice P</span>
-                                        </div>
-                                        <p class="hero-overview">Follows a man who becomes obsessively attached to a girl in love with someone else, descending into a dark psychological state.</p>
-                                        <div class="hero-btns">
-                                            <a href="player.html?id=6a3a8e461b50122619d6bee4" class="play-btn">
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                                                Play Now
-                                            </a>
+                                        <div class="hero-info-panel">
+                                            <h2 class="hero-title">Ugly Story</h2>
+                                            <div class="hero-btns">
+                                                <a href="player.html?id=6a3a8e461b50122619d6bee4" class="play-btn">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                                    Play Now
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1167,10 +1165,11 @@
                                         <p>Popular Luganda-translated TV series on Unruly Movies include <strong>Blades of the Guardians</strong> (translated by VJ Junior), <strong>The Night Agent</strong> (VJ Ice P), <strong>Spartacus: Blood and Sand</strong> (VJ Jovan), <strong>Berlin</strong> (VJ Tom), and <strong>Squid Game</strong> (VJ Emmy). Each series features full Luganda VJ narration across all episodes and seasons.</p>
                                     </div>
                                     </noscript>
-                                    <div class="loading-state">
-                                        <div class="loading-spinner"></div>
-                                        <p class="loading-text">Loading TV series...</p>
-                                    </div>
+                                    <div class="content-card"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-meta"></div></div>
+                                    <div class="content-card"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-meta"></div></div>
+                                    <div class="content-card"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-meta"></div></div>
+                                    <div class="content-card"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-meta"></div></div>
+                                    <div class="content-card"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-meta"></div></div>
                                 </div>
                             </div>
 
@@ -1179,65 +1178,82 @@
                                 <script>googletag.cmd.push(function() { googletag.display('div-in-feed'); });</script>
                             </div>
 
+                            <!-- Horror Section -->
+                            <div class="app-section movie-section" id="horrorSection" style="display:none;">
+                                <div class="section-header">
+                                    <h2>
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff4444" stroke-width="2">
+                                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                        </svg>
+                                        Horror
+                                    </h2>
+                                    <a href="movies.html?genre=horror" class="view-all">
+                                        View All
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                    </a>
+                                </div>
+                                <div class="card-grid h-scroll" id="horrorMovies"></div>
+                            </div>
+
+                            <!-- Sci-Fi Section -->
+                            <div class="app-section movie-section" id="scifiSection" style="display:none;">
+                                <div class="section-header">
+                                    <h2>
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d9ff" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                                        </svg>
+                                        Sci-Fi &amp; Adventure
+                                    </h2>
+                                    <a href="movies.html?genre=sci-fi" class="view-all">
+                                        View All
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                    </a>
+                                </div>
+                                <div class="card-grid h-scroll" id="scifiMovies"></div>
+                            </div>
+
                             <!-- Per-VJ Sections (each VJ's movies in their own row) -->
                             <div id="vjSectionsContainer"></div>
 
-                            <!-- Content Guide: Genre Overview -->
-                            <div class="content-guide">
-                                <h2>Browse Luganda-Translated Movies & Series by Genre</h2>
-                                <p>Unruly Movies hosts a growing catalog of Hollywood, Nollywood, and international films and TV series, each translated live into Luganda by one of Uganda's licensed Video Jockeys (VJs). Every title is organized by genre so you can quickly find the kind of story you're in the mood for, with the VJ who translated it credited on every page.</p>
-                                <div class="content-guide-grid">
-                                    <div class="content-guide-point"><strong>Action</strong>High-energy blockbusters and martial arts films, translated with the same intensity and street-smart slang VJs are known for in Kampala.</div>
-                                    <div class="content-guide-point"><strong>Comedy</strong>Light-hearted films and sitcoms where VJ humor and Luganda wordplay add an extra layer of laughs to the original script.</div>
-                                    <div class="content-guide-point"><strong>Drama</strong>Character-driven stories translated with care so the emotional weight of the original dialogue comes through in Luganda.</div>
-                                    <div class="content-guide-point"><strong>Horror</strong>Suspense and horror films given the full VJ treatment — tense narration that keeps the scares intact.</div>
-                                    <div class="content-guide-point"><strong>Romance</strong>Love stories and romantic comedies translated for a local audience, keeping the chemistry and humor of the leads.</div>
-                                    <div class="content-guide-point"><strong>Thriller</strong>Twisty crime and espionage films, narrated to keep every plot turn clear in Luganda.</div>
-                                    <div class="content-guide-point"><strong>Sci-Fi & Adventure</strong>Big-budget sci-fi and adventure epics, translated so the world-building and action sequences stay easy to follow.</div>
-                                    <div class="content-guide-point"><strong>Animation & Family</strong>Animated films and family-friendly titles translated for viewers of all ages to enjoy together.</div>
+                            <!-- Browse by Genre — quick filter strip -->
+                            <div class="app-section">
+                                <div class="section-header">
+                                    <h2>
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2">
+                                            <line x1="4" y1="6" x2="20" y2="6"></line>
+                                            <line x1="4" y1="12" x2="14" y2="12"></line>
+                                            <line x1="4" y1="18" x2="10" y2="18"></line>
+                                        </svg>
+                                        Browse by Genre
+                                    </h2>
                                 </div>
-                                <p style="margin-top:16px;"><a href="genres.html" style="color:#4ade80; font-weight:600;">View all genres &rarr;</a></p>
-                            </div>
-
-                            <div class="app-section trust-section">
-                                <h2>Why Unruly Movies is different</h2>
-                                <p>
-                                    Unruly Movies is not just a list of videos. We focus on Luganda-translated entertainment with proper VJ crediting,
-                                    clear movie details, category organization, and a local audience experience built for viewers in Uganda and the wider
-                                    East African community. Every title is published with editorial context such as translator name, release information,
-                                    viewing category, and platform navigation that helps users discover content quickly.
-                                </p>
-
-                                <div class="trust-grid">
-                                    <div class="trust-card">
-                                        <h3>Original local focus</h3>
-                                        <p>
-                                            The platform is built specifically for fans of Luganda-translated movies, series, and Ugandan TV channels.
-                                            Our pages are written for this audience instead of being generic entertainment placeholders.
-                                        </p>
-                                    </div>
-                                    <div class="trust-card">
-                                        <h3>Named VJ crediting</h3>
-                                        <p>
-                                            We highlight translators and VJs so viewers can follow the voices and translation styles they trust.
-                                            That makes the catalog more useful than a basic embed directory.
-                                        </p>
-                                    </div>
-                                    <div class="trust-card">
-                                        <h3>Clear ownership and support</h3>
-                                        <p>
-                                            Unruly Movies is maintained by Nduga Hafizu with public contact, privacy, terms, and DMCA pages so visitors,
-                                            reviewers, and advertisers can verify who operates the site.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div class="founder-note">
-                                    <strong>Founder note:</strong> I built Unruly Movies to make Luganda-translated entertainment easier to discover,
-                                    more respectful to VJ identity, and better organized for mobile users. The goal is to combine streaming, series,
-                                    and Ugandan TV access in one place while keeping the experience simple, fast, and community-focused.
+                                <div class="genre-strip">
+                                    <a href="movies.html?genre=action" class="genre-chip">Action</a>
+                                    <a href="movies.html?genre=comedy" class="genre-chip">Comedy</a>
+                                    <a href="movies.html?genre=drama" class="genre-chip">Drama</a>
+                                    <a href="movies.html?genre=horror" class="genre-chip">Horror</a>
+                                    <a href="movies.html?genre=romance" class="genre-chip">Romance</a>
+                                    <a href="movies.html?genre=thriller" class="genre-chip">Thriller</a>
+                                    <a href="movies.html?genre=sci-fi" class="genre-chip">Sci-Fi</a>
+                                    <a href="genres.html" class="genre-chip genre-chip-all">All Genres →</a>
                                 </div>
                             </div>
+
+                            <!-- Uganda TV teaser -->
+                            <div class="app-section">
+                                <div class="uganda-tv-band">
+                                    <div class="uganda-tv-band-text">
+                                        <span class="live-dot"></span>
+                                        <div>
+                                            <h3>Watch Uganda TV Live</h3>
+                                            <p>Stream NBS, NTV, BBS Terefayina and more Ugandan channels free, right alongside your movies.</p>
+                                        </div>
+                                    </div>
+                                    <a href="uganda-tv.html" class="uganda-tv-band-btn">Watch Live</a>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </main>
@@ -1340,6 +1356,7 @@
 
     <!-- Core scripts (defer preserves execution order after DOM is parsed) -->
     <script defer src="js/config.js"></script>
+    <script defer src="js/header-search.js"></script>
     <script defer src="js/tmdb-api.js"></script>
     <script defer src="js/luganda-movies-api.js"></script>
     <script defer src="js/myvj-features.js"></script>
@@ -1350,10 +1367,33 @@
     
     <!-- Global Trailer Player Function -->
     <script>
+        // Lightweight toast — used instead of browser alert() for user-facing messages
+        function showToast(message, type = 'info') {
+            const existing = document.querySelector('.app-toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.className = 'app-toast';
+            toast.style.cssText = `
+                position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+                background: ${type === 'error' ? '#ff4444' : '#16161f'};
+                color: #fff; border: 1px solid ${type === 'error' ? 'rgba(255,68,68,0.4)' : 'rgba(74,222,128,0.3)'};
+                padding: 12px 22px; border-radius: 24px; font-size: 14px; font-weight: 600;
+                box-shadow: 0 12px 32px rgba(0,0,0,0.5); z-index: 10000;
+                animation: toastIn 0.25s cubic-bezier(0.4,0,0.2,1);
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'toastOut 0.25s ease forwards';
+                setTimeout(() => toast.remove(), 250);
+            }, 2800);
+        }
+
         // Play movie trailer using TMDB ID
         async function playMovieTrailer(tmdbId, movieTitle) {
             if (!tmdbId) {
-                alert('Trailer information not available for this movie');
+                showToast('Trailer not available for this movie', 'error');
                 return;
             }
             if (!trailerPlayer) {
@@ -1364,7 +1404,7 @@
                 await trailerPlayer.playTrailer(tmdbId, movieTitle);
             } catch (error) {
                 console.error('Error playing trailer:', error);
-                alert('Trailer not available for this movie');
+                showToast('Trailer not available for this movie', 'error');
             }
         }
         
@@ -1544,6 +1584,10 @@
                     // Load TV Series
                     loadNewSeries();
 
+                    // Load genre rows
+                    loadGenreRow(allMovies, 'horror', 'horrorMovies', 'horrorSection');
+                    loadGenreRow(allMovies, 'sci-fi', 'scifiMovies', 'scifiSection');
+
                     // Load per-VJ sections
                     loadVJSections();
                 } else {
@@ -1653,6 +1697,18 @@
         }
         
         // Load Trending Movies section - prioritize movies marked as trending
+        function loadGenreRow(allMovies, genreKeyword, gridId, sectionId) {
+            const matches = allMovies.filter(m =>
+                (m.genres || []).some(g => g.toLowerCase().includes(genreKeyword.toLowerCase()))
+            ).slice(0, 12);
+
+            if (matches.length === 0) return;
+
+            renderMovies(matches, gridId);
+            const section = document.getElementById(sectionId);
+            if (section) section.style.display = '';
+        }
+
         function loadTrendingMovies(allMovies) {
             const grid = document.getElementById('trendingMovies');
             if (!grid || !allMovies.length) return;
@@ -2044,21 +2100,17 @@
                         <img src="${poster}" alt="${title}" class="slide-poster-img" loading="${isFirst ? 'eager' : 'lazy'}"${isFirst ? ' fetchpriority="high"' : ''} onerror="this.src='https://placehold.co/1280x720/16161f/4ade80?text=${encodeURIComponent(title.substring(0,20))}'">
                         <div class="hero-overlay"></div>
                         <div class="hero-content">
-                            <h2 class="hero-title">${title}</h2>
-                            <div class="hero-meta">
-                                ${year ? `<span class="meta-tag">${year}</span>` : ''}
-                                <span class="meta-tag">${quality}</span>
-                                ${vjBadge ? `<span class="meta-tag meta-vj">${vjBadge}</span>` : ''}
-                            </div>
-                            ${overview ? `<p class="hero-overview">${overview}</p>` : ''}
-                            <div class="hero-btns">
-                                <a href="player.html?id=${movieId}" class="play-btn">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                                    Play Now
-                                </a>
-                                <button class="save-btn" onclick="addToWatchlist('${movieId}'); this.classList.toggle('saved')" aria-label="Save to watchlist">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
-                                </button>
+                            <div class="hero-info-panel">
+                                <h2 class="hero-title">${title}</h2>
+                                <div class="hero-btns">
+                                    <a href="player.html?id=${movieId}" class="play-btn">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                        Play Now
+                                    </a>
+                                    <button class="save-btn" onclick="addToWatchlist('${movieId}'); this.classList.toggle('saved')" aria-label="Save to watchlist">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2068,12 +2120,9 @@
         
         // Helper function to generate placeholder poster URL based on movie title
         function getPlaceholderPoster(title, year) {
-            const colors = ['4ade80', 'FF6B6B', '4ECDC4', '9D4EDD', 'A855F7', 'EC4899', '06B6D4', 'F97316'];
-            const colorIndex = (title || '').length % colors.length;
-            const color = colors[colorIndex];
             const displayTitle = (title || 'Movie').substring(0, 20);
             const displayYear = year || '';
-            return `https://placehold.co/300x450/1a1a2e/${color}?text=${encodeURIComponent(displayTitle)}%0A${displayYear}`;
+            return `https://placehold.co/300x450/16161f/4ade80?text=${encodeURIComponent(displayTitle)}%0A${displayYear}`;
         }
 
         // Function to load and validate poster image
@@ -2183,19 +2232,30 @@
                 
                 if (series.length === 0) {
                     container.innerHTML = `
-                        <div class="empty-state" style="text-align: center; padding: 40px; color: #888;">
-                            <p>No TV series available yet. Check back soon!</p>
+                        <div class="empty-state">
+                            <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                                <polyline points="17 2 12 7 7 2"></polyline>
+                            </svg>
+                            <p class="empty-text">No TV series available yet</p>
+                            <p class="empty-subtext">Check back soon for new releases</p>
                         </div>
                     `;
                     return;
                 }
-                
+
                 renderSeries(series, 'newSeries');
             } catch (error) {
                 console.error('Error loading series:', error);
                 container.innerHTML = `
-                    <div class="empty-state" style="text-align: center; padding: 40px; color: #888;">
-                        <p>Unable to load TV series.</p>
+                    <div class="empty-state">
+                        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <p class="empty-text">Unable to load TV series</p>
+                        <p class="empty-subtext">Please refresh the page or try again later</p>
                     </div>
                 `;
             }

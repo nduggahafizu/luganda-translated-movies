@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- AdCash (gated for paid subscribers) -->
+    <script src="js/ad-gate.js"></script>
     <!-- Ezoic Privacy & Ad Scripts -->
     <script data-cfasync="false" src="https://cmp.gatekeeperconsent.com/min.js"></script>
     <script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js"></script>
@@ -2359,17 +2361,11 @@
                     if (authed) {
                         checkDownloadPermission(currentMovie);
                         initPlayer();
-                        if (videoUrl && (isDirectVideo(videoUrl) || format === 'mp4' || format === 'm3u8' || format === 'webm')) {
-                            loadVideo(videoUrl);
-                        } else if (videoUrl && provider !== 'streamtape') {
-                            await loadEmbedVideo(videoUrl);
-                        } else if (videoUrl) {
-                            loadVideo(videoUrl);
-                        } else {
-                            showError('Video not available for this movie');
-                        }
+                        // Fetch a signed, time-limited stream URL from the backend.
+                        // The raw source URL never touches the browser — only our /api/stream/play URL does.
+                        await loadSecureStream(movieId, provider, format);
                     } else {
-                        showAuthGate(videoUrl, provider, format, currentMovie);
+                        showAuthGate('', provider, format, currentMovie);
                     }
                     
                 } else {
@@ -2549,24 +2545,62 @@
             document.body.appendChild(overlay);
         }
 
-        function handleDownload(movie) {
-            const videoUrl = movie.video?.embedUrl || movie.embedUrl;
-            if (!videoUrl) return;
-            
-            const fileName = `${movie.title || movie.originalTitle || 'movie'}.mp4`;
-            
-            if (videoUrl.includes('.mp4') || videoUrl.includes('.mkv') || videoUrl.includes('.webm')) {
+        // Fetch a signed token then play via /api/stream/play — raw URL stays on server
+        async function loadSecureStream(movieId, provider, format) {
+            const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+            try {
+                const res = await fetch(`${API_BASE}/api/stream/token/${movieId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.status !== 'success' || !data.token) throw new Error('Stream unavailable');
+
+                // The secure URL is a backend redirect — always use loadVideo(), never embed.
+                // Pass the known format so the player picks the right codec without guessing
+                // from the URL extension (which is /api/stream/play/..., not .mp4/.m3u8).
+                const secureUrl = `${API_BASE}/api/stream/play/${movieId}?token=${encodeURIComponent(data.token)}`;
+                const fmt = (format || '').toLowerCase();
+                let mimeType = 'video/mp4';
+                if (fmt === 'm3u8' || fmt === 'hls') mimeType = 'application/x-mpegURL';
+                else if (fmt === 'webm') mimeType = 'video/webm';
+
+                player.pause();
+                player.currentTime(0);
+                player.src({ src: secureUrl, type: mimeType });
+                player.load();
+                hideError();
+            } catch (e) {
+                showError('Video not available. Please try again.');
+            }
+        }
+
+        // Route download through backend — avoids new tab, hides raw URL
+        async function handleDownload(movie) {
+            const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+            const mid = movie._id;
+            if (!mid) return;
+
+            showNotification('Preparing download…');
+            try {
+                const res = await fetch(`${API_BASE}/api/stream/token/${mid}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.status !== 'success' || !data.token) throw new Error('Download unavailable');
+
+                const downloadUrl = `${API_BASE}/api/stream/download/${mid}?token=${encodeURIComponent(data.token)}`;
+                const fileName = `${movie.originalTitle || movie.lugandaTitle || 'movie'}.mp4`;
+
                 const link = document.createElement('a');
-                link.href = videoUrl;
+                link.href = downloadUrl;
                 link.download = fileName;
-                link.target = '_blank';
+                // No target="_blank" — browser follows the redirect in-page and downloads
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
                 showNotification('Download started!');
-            } else {
-                window.open(videoUrl, '_blank');
-                showNotification('Opening video source');
+            } catch (e) {
+                showNotification('Download not available right now', 'error');
             }
         }
         

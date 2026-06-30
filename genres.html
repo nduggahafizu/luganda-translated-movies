@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- AdCash (gated for paid subscribers) -->
+    <script src="js/ad-gate.js"></script>
     <!-- Ezoic Privacy & Ad Scripts -->
     <script data-cfasync="false" src="https://cmp.gatekeeperconsent.com/min.js"></script>
     <script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js"></script>
@@ -416,26 +418,14 @@
                 </noscript>
                 
                 <div id="genresGrid" class="genres-grid">
-                    <div class="loading-spinner">Loading genres...</div>
+                    <div class="genre-card skeleton" style="height:110px;"></div>
+                    <div class="genre-card skeleton" style="height:110px;"></div>
+                    <div class="genre-card skeleton" style="height:110px;"></div>
+                    <div class="genre-card skeleton" style="height:110px;"></div>
+                    <div class="genre-card skeleton" style="height:110px;"></div>
+                    <div class="genre-card skeleton" style="height:110px;"></div>
                 </div>
 
-                <!-- Content Guide: Explore Movies by Genre -->
-                <div class="content-guide">
-                    <h2>Explore Movies by Genre</h2>
-                    <p>Every movie in the Unruly Movies catalog is tagged with a genre so you can jump straight to the kind of story you're after, with Luganda VJ translation throughout. Here's what to expect from each category:</p>
-                    <div class="content-guide-grid">
-                        <div class="content-guide-point"><strong>Action</strong>Explosive blockbusters, fight scenes, and chases — narrated with the high energy VJs are famous for.</div>
-                        <div class="content-guide-point"><strong>Comedy</strong>Sitcoms and comedies where Luganda ad-libs and local humor often top the original jokes.</div>
-                        <div class="content-guide-point"><strong>Drama</strong>Character-driven films translated carefully to keep emotional dialogue and pacing intact.</div>
-                        <div class="content-guide-point"><strong>Horror</strong>Scary movies narrated to preserve every jump-scare and twist in Luganda.</div>
-                        <div class="content-guide-point"><strong>Romance</strong>Love stories and rom-coms translated to keep the chemistry between leads natural.</div>
-                        <div class="content-guide-point"><strong>Thriller</strong>Crime, mystery, and espionage films where VJ narration helps you follow every plot turn.</div>
-                        <div class="content-guide-point"><strong>Sci-Fi</strong>Futuristic and high-concept films, translated so world-building and technical dialogue stay clear.</div>
-                        <div class="content-guide-point"><strong>Adventure</strong>Epic journeys and quests, narrated to keep the scale and excitement of the original.</div>
-                        <div class="content-guide-point"><strong>Animation</strong>Animated films translated for both kids and adults to enjoy together.</div>
-                        <div class="content-guide-point"><strong>Family</strong>Family-friendly titles with translations suitable for viewers of all ages.</div>
-                    </div>
-                </div>
             </section>
 
             <!-- Genre Movies Section (Hidden by default) -->
@@ -445,7 +435,11 @@
                     <button class="back-btn" onclick="showAllGenres()">← All Genres</button>
                 </div>
                 <div id="genreMoviesGrid" class="movies-grid">
-                    <div class="loading-spinner">Loading movies...</div>
+                    <div class="content-card"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-meta"></div></div>
+                    <div class="content-card"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-meta"></div></div>
+                    <div class="content-card"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-meta"></div></div>
+                    <div class="content-card"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-meta"></div></div>
+                    <div class="content-card"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-meta"></div></div>
                 </div>
             </section>
 
@@ -517,6 +511,7 @@
     </div>
 
     <script src="js/config.js"></script>
+    <script src="js/header-search.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/main.js"></script>
     <script>
@@ -566,7 +561,16 @@
                 if (data.success && data.data.length > 0) {
                     renderGenres(data.data);
                 } else {
-                    genresGrid.innerHTML = '<p style="text-align: center; color: #888; grid-column: 1/-1;">No genres found.</p>';
+                    genresGrid.innerHTML = `
+                        <div class="empty-state">
+                            <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            <p class="empty-text">No genres found</p>
+                            <p class="empty-subtext">Please refresh the page or try again later</p>
+                        </div>`;
                 }
             } catch (error) {
                 console.error('Error loading genres:', error);
@@ -595,7 +599,7 @@
             document.getElementById('selectedGenreName').textContent = genre.charAt(0).toUpperCase() + genre.slice(1);
             
             const moviesGrid = document.getElementById('genreMoviesGrid');
-            moviesGrid.innerHTML = '<div class="loading-spinner">Loading movies...</div>';
+            moviesGrid.innerHTML = Array(5).fill('<div class="content-card"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-meta"></div></div>').join('');
             
             try {
                 const response = await fetch(`${API_CONFIG.API_ENDPOINTS.LUGANDA_MOVIES}/genre/${encodeURIComponent(genre)}?limit=30`);
@@ -604,7 +608,17 @@
                 if (data.success && data.data.length > 0) {
                     renderMovies(data.data);
                 } else {
-                    moviesGrid.innerHTML = '<p style="text-align: center; color: #888; grid-column: 1/-1;">No movies found in this genre.</p>';
+                    moviesGrid.innerHTML = `
+                        <div class="empty-state">
+                            <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                                <line x1="7" y1="2" x2="7" y2="22"></line>
+                                <line x1="17" y1="2" x2="17" y2="22"></line>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                            </svg>
+                            <p class="empty-text">No movies found in this genre</p>
+                            <p class="empty-subtext">Check back soon — new titles are added regularly</p>
+                        </div>`;
                 }
             } catch (error) {
                 console.error('Error loading genre movies:', error);

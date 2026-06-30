@@ -77,7 +77,7 @@
     }
 }
 
-/* ---------- Hero Banner (pearlpix-style) ---------- */
+/* ---------- Hero Banner — floating glass panel, unique to Unruly ---------- */
 .hero-content {
     position: absolute;
     inset: 0;
@@ -85,7 +85,7 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    padding: 60px 24px clamp(30px, 8vw, 50px);
+    padding: 60px 24px clamp(24px, 6vw, 44px);
 }
 
 .hero-overlay {
@@ -93,24 +93,52 @@
     inset: 0;
     z-index: 1;
     background:
-        linear-gradient(0deg, var(--background-dark, #09090f) 5%, rgba(9, 9, 15, 0.6) 45%, transparent 100%),
-        linear-gradient(90deg, rgba(9, 9, 15, 0.85) 0%, rgba(9, 9, 15, 0.35) 55%, transparent 100%);
+        linear-gradient(0deg, var(--background-dark, #09090f) 8%, rgba(9, 9, 15, 0.55) 42%, transparent 100%),
+        linear-gradient(90deg, rgba(9, 9, 15, 0.88) 0%, rgba(9, 9, 15, 0.4) 50%, transparent 100%),
+        linear-gradient(180deg, rgba(74, 222, 128, 0.08) 0%, transparent 25%);
+}
+
+/* Slow cinematic zoom on the active poster */
+.carousel-item.active .slide-poster-img {
+    animation: heroKenBurns 9s ease-out forwards;
+}
+
+@keyframes heroKenBurns {
+    from { transform: scale(1.0); }
+    to { transform: scale(1.06); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .carousel-item.active .slide-poster-img { animation: none; }
+}
+
+/* Floating glass info panel — distinct from flat gradient-text overlays */
+.hero-info-panel {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 420px;
+    width: fit-content;
+    padding: 16px 20px;
+    background: rgba(9, 9, 15, 0.45);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 3px solid var(--primary-color, #4ade80);
+    border-radius: 4px 16px 16px 4px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
 }
 
 .hero-title {
     position: relative;
     z-index: 2;
-    font-size: clamp(20px, 7vw, 36px);
+    font-size: clamp(18px, 5vw, 28px);
     font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin: 0 0 10px;
-    text-shadow: 2px 4px 15px rgba(0, 0, 0, 0.9);
-    background: linear-gradient(to right, #ffffff, var(--primary-light, #86efac));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
+    letter-spacing: -0.3px;
+    margin: 0 0 12px;
+    color: #fff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -191,6 +219,12 @@
     transition: transform 0.3s, box-shadow 0.3s;
 }
 
+.play-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px var(--primary-glow, rgba(74, 222, 128, 0.5));
+    filter: brightness(1.08);
+}
+
 .play-btn:active {
     transform: scale(0.95);
 }
@@ -227,12 +261,18 @@
 
 @media (max-width: 576px) {
     .hero-content {
-        padding: 40px 16px 24px;
+        padding: 16px;
+    }
+
+    .hero-info-panel {
+        padding: 12px 14px;
+        border-radius: 3px 12px 12px 3px;
+        max-width: 100%;
     }
 
     .hero-overview {
         font-size: 11px;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
         -webkit-line-clamp: 2;
     }
 
@@ -249,12 +289,19 @@
 
 @media (min-width: 769px) {
     .hero-content {
-        padding: 60px 50px clamp(40px, 6vw, 80px);
+        padding: 0 44px clamp(32px, 5vw, 56px);
     }
 
-    .hero-overview {
-        max-width: 55%;
-        font-size: 15px;
+    .hero-info-panel {
+        padding: 20px 26px;
+        max-width: 460px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .hero-info-panel {
+        max-width: 480px;
+        padding: 22px 28px;
     }
 }
 

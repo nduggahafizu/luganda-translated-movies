@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- AdCash (gated for paid subscribers) -->
+    <script src="js/ad-gate.js"></script>
     <!-- Ezoic Privacy & Ad Scripts -->
     <script data-cfasync="false" src="https://cmp.gatekeeperconsent.com/min.js"></script>
     <script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js"></script>
@@ -11,7 +13,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="Browse Luganda translated movies on Unruly Movies. Watch films translated by licensed Ugandan VJs. A legitimate platform developed by Nduga Hafizu.">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#66BB6A">
+    <meta name="theme-color" content="#4ade80">
     <meta name="robots" content="index, follow">
     <meta name="author" content="Nduga Hafizu">
     <link rel="canonical" href="https://unrulymovies.com/movies">
@@ -459,20 +461,6 @@
                                 </div>
                             </div>
 
-                            <!-- Content Guide: VJ Translation & Genres -->
-                            <div class="content-guide">
-                                <h2>How VJ Translation Works & Movie Genres on Unruly Movies</h2>
-                                <p>Every movie on this page has been translated into Luganda by a licensed Video Jockey (VJ) — a Ugandan commentator who narrates over the original audio, explaining dialogue, jokes, and cultural references in real time so local audiences can follow the story naturally. This tradition started in Kampala's video halls and has grown into one of Uganda's most distinctive entertainment formats. Each movie page on Unruly Movies credits the VJ who recorded the translation, so you can follow your favorite translators across multiple titles.</p>
-                                <p>The catalog spans the genres below — use the genre filter above to jump straight to the type of movie you're looking for:</p>
-                                <div class="content-guide-grid">
-                                    <div class="content-guide-point"><strong>Action & Adventure</strong>Fast-paced blockbusters where VJ narration keeps the energy high through every fight and chase scene.</div>
-                                    <div class="content-guide-point"><strong>Comedy</strong>Films where Luganda wordplay and VJ ad-libs often add as many laughs as the original script.</div>
-                                    <div class="content-guide-point"><strong>Drama & Romance</strong>Character-focused stories translated carefully to preserve emotional tone and dialogue nuance.</div>
-                                    <div class="content-guide-point"><strong>Horror & Thriller</strong>Suspenseful films narrated to keep tension and plot twists intact in Luganda.</div>
-                                    <div class="content-guide-point"><strong>Sci-Fi & Animation</strong>Big-concept and animated films translated for both adult and family audiences.</div>
-                                    <div class="content-guide-point"><strong>Documentary & Family</strong>Informative and family-friendly titles translated for viewers of all ages.</div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -541,6 +529,7 @@
     </div>
 
     <script src="js/config.js"></script>
+    <script src="js/header-search.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/tmdb-api.js"></script>
     <script src="js/trailer-player.js"></script>
@@ -556,11 +545,7 @@
         // Load movies from API
         async function loadMovies(params = {}) {
             const grid = document.getElementById('moviesGrid');
-            grid.innerHTML = `
-                <div class="loading-state">
-                    <div class="loading-spinner"></div>
-                    <p class="loading-text">Loading movies...</p>
-                </div>`;
+            grid.innerHTML = Array(10).fill('<div class="content-card"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-meta"></div></div>').join('');
             
             try {
                 const queryParams = {
@@ -639,12 +624,9 @@
 
         // Helper function to generate placeholder poster URL based on movie title
         function getPlaceholderPoster(title, year) {
-            const colors = ['4ade80', 'FF6B6B', '4ECDC4', 'FFE66D', 'A855F7', 'EC4899', '06B6D4', 'F97316'];
-            const colorIndex = (title || '').length % colors.length;
-            const color = colors[colorIndex];
             const displayTitle = (title || 'Movie').substring(0, 20);
             const displayYear = year || '';
-            return `https://placehold.co/300x450/1a1a2e/${color}?text=${encodeURIComponent(displayTitle)}%0A${displayYear}`;
+            return `https://placehold.co/300x450/16161f/4ade80?text=${encodeURIComponent(displayTitle)}%0A${displayYear}`;
         }
 
         // Function to load and validate poster image

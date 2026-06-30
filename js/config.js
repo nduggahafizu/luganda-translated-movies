@@ -33,7 +33,9 @@ const API_CONFIG = (function() {
     const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
 
     // Backend URLs
-    const PRODUCTION_API_URL = 'https://luganda-translated-movies-production.up.railway.app';
+    // Production uses empty string so all requests go to /api/* on the same domain.
+    // Netlify proxies /api/* → Railway, so the Railway URL never appears in DevTools.
+    const PRODUCTION_API_URL = '';
     const DEVELOPMENT_API_URL = 'http://localhost:5000'; // Use local server for development
 
     // Allow forcing production API when running the frontend locally.

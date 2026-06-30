@@ -1112,7 +1112,7 @@
                 });
                 loadUserProfile();
             } catch (e) {
-                alert('Failed to logout device');
+                showNotification('Failed to logout device', 'error');
             }
         }
 
@@ -1125,7 +1125,7 @@
                 });
                 loadUserProfile();
             } catch (e) {
-                alert('Failed to logout devices');
+                showNotification('Failed to logout devices', 'error');
             }
         }
 
@@ -1410,8 +1410,8 @@
                 
                 if (data.status === 'success') {
                     clearAuthData();
-                    alert('Your account has been deleted. Goodbye!');
-                    window.location.href = 'index.html';
+                    showNotification('Your account has been deleted. Goodbye!', 'success');
+                    setTimeout(() => { window.location.href = 'index.html'; }, 1800);
                 } else {
                     showError(data.message || 'Failed to delete account');
                 }

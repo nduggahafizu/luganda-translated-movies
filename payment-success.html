@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Payment Successful - Unruly Movies</title>
+    <title>Payment — Unruly Movies</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#4ade80">
@@ -9,157 +9,190 @@
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <style>
-        .success-container {
-            max-width: 600px;
-            margin: 100px auto;
-            padding: 40px;
+        body { background: #09090f; }
+        .ps-wrap {
+            max-width: 520px;
+            margin: 80px auto;
+            padding: 24px;
             text-align: center;
         }
-        .success-icon {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, #4ade80, #00D9FF);
+        .ps-icon {
+            width: 88px; height: 88px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 30px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 24px;
         }
-        .success-icon svg {
-            width: 50px;
-            height: 50px;
-            stroke: #000;
+        .ps-icon svg { width: 44px; height: 44px; }
+        .ps-icon.loading { background: rgba(255,255,255,0.06); }
+        .ps-icon.success { background: rgba(74,222,128,0.15); }
+        .ps-icon.pending { background: rgba(255,215,0,0.12); }
+        .ps-icon.failed  { background: rgba(255,68,68,0.12); }
+
+        .ps-spinner {
+            width: 44px; height: 44px; border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #4ade80;
+            animation: psSpin 0.8s linear infinite;
         }
-        .success-title {
-            font-size: 32px;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 15px;
+
+        .ps-title {
+            font-size: 26px; font-weight: 800;
+            color: #fff; margin: 0 0 10px;
         }
-        .success-message {
-            font-size: 18px;
-            color: #aaa;
-            margin-bottom: 30px;
-            line-height: 1.6;
+        .ps-subtitle {
+            font-size: 14px; color: #888;
+            margin: 0 0 28px; line-height: 1.6;
         }
-        .success-details {
-            background: #1a1a1a;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
+        .ps-card {
+            background: #13131f;
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
             text-align: left;
         }
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #333;
+        .ps-row {
+            display: flex; justify-content: space-between;
+            align-items: center;
+            padding: 11px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 14px;
         }
-        .detail-row:last-child {
-            border-bottom: none;
-        }
-        .detail-label {
-            color: #888;
-        }
-        .detail-value {
-            color: #fff;
-            font-weight: 600;
-        }
-        .btn-home {
+        .ps-row:last-child { border-bottom: none; }
+        .ps-row-label { color: #666; }
+        .ps-row-value { color: #fff; font-weight: 600; }
+        .ps-btn {
             display: inline-block;
-            padding: 15px 40px;
-            background: linear-gradient(135deg, #4ade80, #5BC200);
-            color: #000;
+            padding: 13px 36px;
+            border-radius: 50px;
+            font-weight: 700; font-size: 15px;
             text-decoration: none;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 16px;
-            transition: all 0.3s ease;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: none; cursor: pointer;
         }
-        .btn-home:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(74, 222, 128, 0.3);
+        .ps-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(74,222,128,0.3); }
+        .ps-btn.primary { background: #4ade80; color: #000; }
+        .ps-btn.secondary {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #aaa; margin-top: 10px;
         }
+        @keyframes psSpin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="app">
-            <div class="success-container">
-                <div class="success-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
+            <div class="ps-wrap" id="psWrap">
+                <!-- Populated by JS based on verify result -->
+                <div class="ps-icon loading">
+                    <div class="ps-spinner"></div>
                 </div>
-                
-                <h1 class="success-title">Payment Successful!</h1>
-                <p class="success-message">
-                    Thank you for subscribing to Unruly Movies. Your subscription is now active and you can enjoy all premium features.
-                </p>
-                
-                <div class="success-details">
-                    <div class="detail-row">
-                        <span class="detail-label">Status</span>
-                        <span class="detail-value" style="color: #4ade80;">✓ Completed</span>
+                <h1 class="ps-title">Verifying Payment…</h1>
+                <p class="ps-subtitle">Please wait while we confirm your payment with PesaPal.</p>
+                <div class="ps-card">
+                    <div class="ps-row">
+                        <span class="ps-row-label">Reference</span>
+                        <span class="ps-row-value" id="psRef">—</span>
                     </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Reference</span>
-                        <span class="detail-value" id="paymentRef">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Date</span>
-                        <span class="detail-value" id="paymentDate">-</span>
+                    <div class="ps-row">
+                        <span class="ps-row-label">Date</span>
+                        <span class="ps-row-value" id="psDate">—</span>
                     </div>
                 </div>
-                
-                <a href="index.html" class="btn-home">Start Watching Now</a>
             </div>
         </div>
     </div>
-    
+
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const ref = urlParams.get('ref');
+        const inIframe = window !== window.top;
 
-        if (ref) {
-            document.getElementById('paymentRef').textContent = ref;
-        }
-        document.getElementById('paymentDate').textContent = new Date().toLocaleDateString('en-UG', {
-            year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        document.getElementById('psRef').textContent = ref || '—';
+        document.getElementById('psDate').textContent = new Date().toLocaleDateString('en-UG', {
+            year: 'numeric', month: 'long', day: 'numeric',
+            hour: '2-digit', minute: '2-digit'
         });
 
-        // Verify payment and activate subscription
-        async function verifyPayment() {
-            if (!ref) return;
-            const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-            if (!token) return;
+        function showState(type, title, subtitle, actionHtml) {
+            const iconMap = {
+                loading: `<div class="ps-spinner"></div>`,
+                success: `<svg viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
+                pending: `<svg viewBox="0 0 24 24" fill="none" stroke="#ffd700" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
+                failed:  `<svg viewBox="0 0 24 24" fill="none" stroke="#ff4444" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`
+            };
 
-            const statusEl = document.querySelector('.detail-value[style]');
-            statusEl.textContent = '⏳ Verifying...';
-            statusEl.style.color = '#ffd700';
+            document.querySelector('.ps-icon').className = `ps-icon ${type}`;
+            document.querySelector('.ps-icon').innerHTML = iconMap[type];
+            document.querySelector('.ps-title').textContent = title;
+            document.querySelector('.ps-subtitle').innerHTML = subtitle;
+
+            const existing = document.getElementById('psAction');
+            if (existing) existing.remove();
+            if (actionHtml) {
+                const div = document.createElement('div');
+                div.id = 'psAction';
+                div.innerHTML = actionHtml;
+                document.getElementById('psWrap').appendChild(div);
+            }
+        }
+
+        async function verifyPayment() {
+            if (!ref) {
+                showState('failed', 'Missing Reference', 'No payment reference found in the URL.', `<a href="subscription.html" class="ps-btn primary">Try Again</a>`);
+                return;
+            }
+
+            const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+            if (!token) {
+                showState('failed', 'Not Logged In', 'Please log in to verify your payment.', `<a href="login.html" class="ps-btn primary">Log In</a>`);
+                return;
+            }
 
             try {
-                const apiUrl = API_CONFIG.BASE_URL;
-                const res = await fetch(`${apiUrl}/api/payments/pesapal/verify/${ref}`, {
+                const res = await fetch(`${API_CONFIG.BASE_URL}/api/payments/pesapal/verify/${ref}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await res.json();
 
                 if (data.status === 'success') {
-                    statusEl.textContent = '✓ Confirmed — ' + (data.plan || 'Active');
-                    statusEl.style.color = '#4ade80';
+                    if (inIframe) {
+                        showState('success', 'Payment Confirmed!', 'Closing payment window…', null);
+                    } else {
+                        showState('success', 'Payment Successful!',
+                            `Your <strong style="color:#fff">${data.plan || ''}</strong> plan is now active. Enjoy Unruly Movies!`,
+                            `<a href="index.html" class="ps-btn primary">Start Watching</a>`
+                        );
+                        setTimeout(() => {
+                            try { window.close(); } catch (_) {}
+                            setTimeout(() => { window.location.href = 'profile.html'; }, 800);
+                        }, 2000);
+                    }
+
                 } else if (data.status === 'pending') {
-                    statusEl.textContent = '⏳ Processing — check back shortly';
-                    statusEl.style.color = '#ffd700';
+                    showState('pending', 'Payment Processing',
+                        'PesaPal is still confirming your payment. This usually takes a few seconds.',
+                        null
+                    );
                     setTimeout(verifyPayment, 5000);
+
                 } else {
-                    statusEl.textContent = '✗ ' + (data.message || 'Failed');
-                    statusEl.style.color = '#ff4444';
+                    showState('failed', 'Payment Failed',
+                        (data.message || 'Your payment could not be completed.') +
+                        '<br><br>No money has been taken from your account. Please try again.',
+                        `<a href="subscription.html" class="ps-btn primary">Try Again</a>
+                         <br><a href="index.html" class="ps-btn secondary">Back to Home</a>`
+                    );
                 }
+
             } catch (e) {
-                statusEl.textContent = '⏳ Verifying...';
+                showState('pending', 'Verifying…',
+                    'Still checking your payment status. Please wait.',
+                    null
+                );
                 setTimeout(verifyPayment, 5000);
             }
         }

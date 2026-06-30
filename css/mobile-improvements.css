@@ -61,18 +61,48 @@ html, body {
     box-sizing: border-box;
 }
 
-/* ===== HERO SLIDER — edge to edge ===== */
+/* ===== HERO SLIDER — edge to edge on mobile, rounded on desktop (see style.css) ===== */
 .app-slider,
 .carousel,
 .carousel .slide,
 .hero-slider {
-    border-radius: 0 !important;
     margin-left: 0;
     margin-right: 0;
 }
+
+@media (max-width: 768px) {
+    .app-slider,
+    .carousel,
+    .carousel .slide,
+    .hero-slider {
+        border-radius: 0 !important;
+    }
+}
+
+/* Mobile default */
 .slide {
-    height: clamp(250px, 50vw, 600px) !important;
+    height: 280px !important;
     border-radius: 0 !important;
+}
+
+/* Small tablets */
+@media (min-width: 576px) {
+    .slide { height: 360px !important; }
+}
+
+/* Tablets */
+@media (min-width: 768px) {
+    .slide { height: 440px !important; }
+}
+
+/* Small desktop / laptop */
+@media (min-width: 1024px) {
+    .slide { height: 500px !important; }
+}
+
+/* Large desktop */
+@media (min-width: 1440px) {
+    .slide { height: 560px !important; }
 }
 
 /* ===== CARD GRID ===== */
@@ -140,7 +170,7 @@ html, body {
         gap: 3px;
     }
     .slide {
-        height: clamp(180px, 52vw, 260px) !important;
+        height: 220px !important;
     }
 }
 
@@ -187,9 +217,6 @@ html, body {
     .card-meta  { font-size: 11px; }
     .card-badge { font-size: 9px; padding: 2px 6px; }
     .card-rating { padding: 4px 7px; font-size: 11px; bottom: 8px; right: 8px; }
-    .slide {
-        height: clamp(300px, 42vw, 520px) !important;
-    }
 }
 
 /* Desktop (992px – 1199px) — 6 columns */
@@ -207,16 +234,6 @@ html, body {
     .card-meta  { font-size: 12px; }
     .card-badge { font-size: 10px; padding: 4px 10px; }
     .card-rating { padding: 4px 8px; font-size: 11px; bottom: 10px; right: 10px; }
-    .slide {
-        height: clamp(380px, 36vw, 600px) !important;
-    }
-    /* Slider edge-to-edge ignores content padding */
-    .app-slider,
-    .carousel,
-    .carousel .slide {
-        margin-left: calc(-1 * var(--page-pad-md));
-        margin-right: calc(-1 * var(--page-pad-md));
-    }
 }
 
 /* Large desktop (1200px+) — 7 columns */

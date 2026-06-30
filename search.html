@@ -835,16 +835,17 @@
             try {
                 const response = await fetch(`${API_URL}/vjs`);
                 const data = await response.json();
-                
+
                 const vjSelect = document.getElementById('vjFilter');
-                if (data.data?.vjs) {
-                    data.data.vjs.forEach(vj => {
-                        const option = document.createElement('option');
-                        option.value = vj._id;
-                        option.textContent = vj.name;
-                        vjSelect.appendChild(option);
-                    });
-                }
+                const vjs = Array.isArray(data.data) ? data.data : [];
+                vjs.forEach(vj => {
+                    const name = vj._id || vj.name;
+                    if (!name) return;
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    vjSelect.appendChild(option);
+                });
             } catch (error) {
                 console.error('Load VJs error:', error);
             }
@@ -934,7 +935,7 @@
                 const filters = { page: currentPage, limit: 20 };
                 
                 if (genre) filters.genre = genre;
-                if (vj) filters.vjName = vj;
+                if (vj) filters.vj = vj;
                 if (year) filters.year = year;
                 if (sort) filters.sort = sort;
                 

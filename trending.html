@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- AdCash (gated for paid subscribers) -->
+    <script src="js/ad-gate.js"></script>
     <!-- Ezoic Privacy & Ad Scripts -->
     <script data-cfasync="false" src="https://cmp.gatekeeperconsent.com/min.js"></script>
     <script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js"></script>
@@ -50,7 +52,7 @@
     
     <style>
         .trending-hero {
-            background: linear-gradient(135deg, rgba(102, 187, 106, 0.2) 0%, rgba(30, 30, 30, 0.95) 50%);
+            background: linear-gradient(135deg, rgba(74, 222, 128, 0.2) 0%, rgba(30, 30, 30, 0.95) 50%);
             padding: 60px 0 40px;
             margin-bottom: 40px;
         }
@@ -90,7 +92,7 @@
         
         .trending-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 15px 40px rgba(102, 187, 106, 0.2);
+            box-shadow: 0 15px 40px rgba(74, 222, 128, 0.2);
         }
         
         .trending-rank {
@@ -251,7 +253,7 @@
         .loading-spinner .spinner {
             width: 50px;
             height: 50px;
-            border: 4px solid rgba(102, 187, 106, 0.2);
+            border: 4px solid rgba(74, 222, 128, 0.2);
             border-top-color: var(--primary-color);
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -457,18 +459,6 @@
             </div>
         </div>
 
-        <!-- Content Guide: What's Trending & Why It Matters -->
-        <div class="content-guide">
-            <h2>What's Trending & Why It Matters</h2>
-            <p>The Trending page highlights the Luganda-translated movies that viewers on Unruly Movies are watching most right now, ranked by recent views, ratings, and overall popularity. It's updated regularly, so the lineup shifts as new releases gain traction and older favorites are rediscovered.</p>
-            <p>Trending lists are a quick way to find out what other viewers across Uganda are enjoying this week — whether that's a big-budget action film with a fresh VJ translation, a comedy everyone's been talking about, or a drama that's picking up word-of-mouth attention. Each title here links through to its full movie page, where you'll find the genre, runtime, plot summary, and the VJ credited for the Luganda narration.</p>
-            <div class="content-guide-grid">
-                <div class="content-guide-point"><strong>Updated Regularly</strong>Rankings refresh as view counts and ratings change, so the list reflects what's popular right now.</div>
-                <div class="content-guide-point"><strong>All Genres Welcome</strong>Trending titles span action, comedy, drama, horror, and more — popularity isn't limited to one category.</div>
-                <div class="content-guide-point"><strong>VJ Credited</strong>Every trending title shows which VJ provided the Luganda translation, just like the rest of the catalog.</div>
-            </div>
-        </div>
-
                         </div>
                     </div>
                 </div>
@@ -537,6 +527,7 @@
     </div>
 
     <script src="js/config.js"></script>
+    <script src="js/header-search.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/main.js"></script>
     <script>

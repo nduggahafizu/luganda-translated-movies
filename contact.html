@@ -646,14 +646,14 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    alert('✅ ' + data.message);
+                    showNotification(data.message || 'Message sent successfully!', 'success');
                     this.reset();
                 } else {
-                    alert('❌ ' + (data.message || 'Failed to send message. Please try again.'));
+                    showNotification(data.message || 'Failed to send message. Please try again.', 'error');
                 }
             } catch (error) {
                 console.error('Contact form error:', error);
-                alert('❌ Network error. Please check your connection and try again.');
+                showNotification('Network error. Please check your connection and try again.', 'error');
             } finally {
                 submitBtn.textContent = originalText;
                 submitBtn.disabled = false;

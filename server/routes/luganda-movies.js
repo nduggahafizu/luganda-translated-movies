@@ -67,60 +67,21 @@ const generateSlug = (title) => {
         .replace(/(^-|-$)/g, '');
 };
 
-// Helper: sanitize movie objects for public responses (avoid leaking Archive.org URLs)
+// Helper: sanitize movie objects for public responses.
+// Raw stream URLs are NEVER sent to the browser — the player fetches
+// a signed token from /api/stream/token/:id instead.
 const sanitizeMovieForPublic = (movie) => {
     if (!movie) return movie;
 
     const movieObj = typeof movie.toObject === 'function' ? movie.toObject() : { ...movie };
 
-    const clean = (v) => (typeof v === 'string' ? v.trim().replace(/\s+/g, '') : v);
-    const urlCandidates = [
-        clean(movieObj?.video?.originalVideoPath),
-        clean(movieObj?.video?.embedUrl),
-        clean(movieObj?.embedUrl),
-        clean(movieObj?.video?.url)
-    ].filter(Boolean);
-
-    const isArchiveSource = urlCandidates.some(u =>
-        u.includes('archive.org/') || /ia\d+\.us\.archive\.org/i.test(u)
-    );
-
-    const extractArchiveItemId = (u) => {
-        const s = clean(u);
-        if (!s) return null;
-        const embedMatch = s.match(/archive\.org\/embed\/([^/?#]+)/i);
-        if (embedMatch) return embedMatch[1];
-        const detailsMatch = s.match(/archive\.org\/details\/([^/?#]+)/i);
-        if (detailsMatch) return detailsMatch[1];
-        const downloadMatch = s.match(/archive\.org\/download\/([^/?#]+)/i);
-        if (downloadMatch) return downloadMatch[1];
-        const cdnMatch = s.match(/\/items\/([^/?#]+)/i);
-        if (cdnMatch) return cdnMatch[1];
-        return null;
-    };
-
-    if (isArchiveSource) {
-        if (!movieObj.video) movieObj.video = {};
-        movieObj.video.provider = 'archive';
-        movieObj.video.secureStreamPath = `/api/video/stream/luganda/${movieObj._id}`;
-        movieObj.video.archiveItemId = extractArchiveItemId(urlCandidates[0] || '') || null;
-
-        // Keep direct MP4 URLs for direct playback (better performance)
-        const firstUrl = urlCandidates[0] || '';
-        const isDirectMp4 = firstUrl.match(/\.(mp4|webm|mkv|m3u8)(\?|$)/i);
-        
-        if (isDirectMp4) {
-            // Keep the direct URL for MP4/video files
-            movieObj.video.originalVideoPath = firstUrl;
-        } else {
-            // For embed URLs, remove them and use proxy only
-            delete movieObj.embedUrl;
-            if (movieObj.video) {
-                delete movieObj.video.originalVideoPath;
-                delete movieObj.video.embedUrl;
-                delete movieObj.video.url;
-            }
-        }
+    // Always strip all raw video source fields
+    delete movieObj.embedUrl;
+    if (movieObj.video) {
+        delete movieObj.video.embedUrl;
+        delete movieObj.video.originalVideoPath;
+        delete movieObj.video.url;
+        // Keep non-sensitive video metadata (provider, quality, duration, etc.)
     }
 
     return movieObj;
@@ -990,11 +951,11 @@ router.get('/vj/:vjName', async (req, res) => {
 router.get('/search', async (req, res) => {
     setCorsHeaders(req, res);
     try {
-        const { q, genre, vj, year, limit: limitParam } = req.query;
+        const { q, genre, vj, year, sort, limit: limitParam } = req.query;
         const limit = parseInt(limitParam) || 20;
-        
+
         let query = { status: 'published' };
-        
+
         if (q) {
             query.$or = [
                 { originalTitle: { $regex: q, $options: 'i' } },
@@ -1005,8 +966,14 @@ router.get('/search', async (req, res) => {
         if (genre) query.genres = { $regex: new RegExp(genre, 'i') };
         if (vj) query.vjName = { $regex: new RegExp(vj, 'i') };
         if (year) query.year = parseInt(year);
-        
-        const movies = await LugandaMovie.find(query).sort({ createdAt: -1 }).limit(limit);
+
+        let sortOption = { createdAt: -1 };
+        if (sort === 'popular') sortOption = { views: -1 };
+        else if (sort === 'rating') sortOption = { 'rating.userRating': -1 };
+        else if (sort === 'title') sortOption = { originalTitle: 1 };
+        else if (sort === 'year') sortOption = { year: -1 };
+
+        const movies = await LugandaMovie.find(query).sort(sortOption).limit(limit);
         res.json({ success: true, data: sanitizeMoviesForPublic(movies), count: movies.length });
     } catch (error) {
         console.error('Error searching movies:', error);
