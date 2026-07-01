@@ -41,7 +41,7 @@
     </script>
 
     <!-- LCP preload — hero image starts downloading before CSS/JS -->
-    <link rel="preload" as="image" href="https://image.tmdb.org/t/p/w1280/2GSsbdvlKfZo2yMpVxMAJyQPA0Z.jpg" fetchpriority="high">
+    <link rel="preload" as="image" href="https://image.tmdb.org/t/p/w1280/2GSsbdvlKfZo2yMpVxMAJyQPA0Z.jpg" imagesrcset="https://image.tmdb.org/t/p/w780/2GSsbdvlKfZo2yMpVxMAJyQPA0Z.jpg 780w, https://image.tmdb.org/t/p/w1280/2GSsbdvlKfZo2yMpVxMAJyQPA0Z.jpg 1280w" imagesizes="100vw" fetchpriority="high">
 
     <!-- DNS Prefetch and Preconnect for faster loading -->
     <link rel="preconnect" href="https://luganda-translated-movies-production.up.railway.app" crossorigin>
@@ -49,6 +49,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="//image.tmdb.org">
     <link rel="dns-prefetch" href="//archive.org">
+    <link rel="preconnect" href="https://api.dicebear.com" crossorigin>
+    <link rel="preconnect" href="https://www.ezojs.com" crossorigin>
+    <link rel="preconnect" href="https://cmp.gatekeeperconsent.com" crossorigin>
+    <link rel="preconnect" href="https://the.gatekeeperconsent.com" crossorigin>
     
     <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMF82HVT9G"></script>
@@ -165,9 +169,9 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/card-grid.css">
-    <link rel="stylesheet" href="css/mobile-improvements.css">
-    <link rel="stylesheet" href="css/modern-ui.css">
-    <link rel="stylesheet" href="css/app-shell.css">
+    <link rel="stylesheet" href="css/mobile-improvements.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="css/mobile-improvements.css"></noscript>
+    <link rel="stylesheet" href="css/modern-ui.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="css/modern-ui.css"></noscript>
+    <link rel="stylesheet" href="css/app-shell.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="css/app-shell.css"></noscript>
     <!-- Non-critical CSS loaded asynchronously to unblock render -->
     <link rel="stylesheet" href="css/trailer-player.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="css/professional-enhancements.css" media="print" onload="this.media='all'">
@@ -907,7 +911,7 @@
                             <!-- Hero slides will be dynamically populated -->
                             <div class="carousel-item active" id="heroSlide1">
                                 <div class="slide poster-slide">
-                                    <img src="https://image.tmdb.org/t/p/w1280/2GSsbdvlKfZo2yMpVxMAJyQPA0Z.jpg" alt="Ugly Story — Luganda translated movie" class="slide-poster-img" loading="eager" fetchpriority="high">
+                                    <img src="https://image.tmdb.org/t/p/w1280/2GSsbdvlKfZo2yMpVxMAJyQPA0Z.jpg" srcset="https://image.tmdb.org/t/p/w780/2GSsbdvlKfZo2yMpVxMAJyQPA0Z.jpg 780w, https://image.tmdb.org/t/p/w1280/2GSsbdvlKfZo2yMpVxMAJyQPA0Z.jpg 1280w" sizes="100vw" alt="Ugly Story — Luganda translated movie" class="slide-poster-img" loading="eager" fetchpriority="high">
                                     <div class="hero-overlay"></div>
                                     <div class="hero-content">
                                         <div class="hero-info-panel">
@@ -954,7 +958,7 @@
                                 </div>
                                 <div class="static-movies-grid">
                                     <article class="static-movie-card">
-                                        <img src="https://image.tmdb.org/t/p/w342/p4RafgAPk558muOjnBMHhMArjS2.jpg" alt="Crazy, Stupid, Love movie poster" class="smc-poster" width="342" height="513" loading="lazy">
+                                        <img src="https://image.tmdb.org/t/p/w185/p4RafgAPk558muOjnBMHhMArjS2.jpg" alt="Crazy, Stupid, Love movie poster" class="smc-poster" width="185" height="278" loading="lazy">
                                         <div class="smc-body">
                                             <h3 class="smc-title">Crazy, Stupid, Love <span class="smc-year">(2011)</span></h3>
                                             <div class="smc-meta"><span class="smc-genre">Comedy · Romance</span><span class="smc-vj">VJ Junior</span></div>
@@ -963,7 +967,7 @@
                                         </div>
                                     </article>
                                     <article class="static-movie-card">
-                                        <img src="https://image.tmdb.org/t/p/w342/c2GKN4VHCj1dnjFMANRpGkCVBae.jpg" alt="Spartacus movie poster" class="smc-poster" width="342" height="513" loading="lazy">
+                                        <img src="https://image.tmdb.org/t/p/w185/c2GKN4VHCj1dnjFMANRpGkCVBae.jpg" alt="Spartacus movie poster" class="smc-poster" width="185" height="278" loading="lazy">
                                         <div class="smc-body">
                                             <h3 class="smc-title">Spartacus <span class="smc-year">(2010)</span></h3>
                                             <div class="smc-meta"><span class="smc-genre">Action · Drama</span><span class="smc-vj">VJ Junior</span></div>
@@ -972,7 +976,7 @@
                                         </div>
                                     </article>
                                     <article class="static-movie-card">
-                                        <img src="https://image.tmdb.org/t/p/w342/AbunjMKX4P1sDNlKfhYrWkIoRD9.jpg" alt="Blades of the Guardians poster" class="smc-poster" width="342" height="513" loading="lazy">
+                                        <img src="https://image.tmdb.org/t/p/w185/AbunjMKX4P1sDNlKfhYrWkIoRD9.jpg" alt="Blades of the Guardians poster" class="smc-poster" width="185" height="278" loading="lazy">
                                         <div class="smc-body">
                                             <h3 class="smc-title">Blades of the Guardians <span class="smc-year">(2026)</span></h3>
                                             <div class="smc-meta"><span class="smc-genre">Action · Period Drama</span><span class="smc-vj">VJ Junior</span></div>
@@ -981,7 +985,7 @@
                                         </div>
                                     </article>
                                     <article class="static-movie-card">
-                                        <img src="https://image.tmdb.org/t/p/w342/lIsMeDbwntNXSUVHmWMMRXEZOVc.jpg" alt="Mortal Kombat 2 poster" class="smc-poster" width="342" height="513" loading="lazy">
+                                        <img src="https://image.tmdb.org/t/p/w185/lIsMeDbwntNXSUVHmWMMRXEZOVc.jpg" alt="Mortal Kombat 2 poster" class="smc-poster" width="185" height="278" loading="lazy">
                                         <div class="smc-body">
                                             <h3 class="smc-title">Mortal Kombat 2 <span class="smc-year">(2026)</span></h3>
                                             <div class="smc-meta"><span class="smc-genre">Action · Fighting</span><span class="smc-vj">VJ Ice P</span></div>
@@ -990,7 +994,7 @@
                                         </div>
                                     </article>
                                     <article class="static-movie-card">
-                                        <img src="https://image.tmdb.org/t/p/w342/z3MXFdFjrYmoxOEFgE1wuphwo2a.jpg" alt="The Wandering Earth poster" class="smc-poster" width="342" height="513" loading="lazy">
+                                        <img src="https://image.tmdb.org/t/p/w185/z3MXFdFjrYmoxOEFgE1wuphwo2a.jpg" alt="The Wandering Earth poster" class="smc-poster" width="185" height="278" loading="lazy">
                                         <div class="smc-body">
                                             <h3 class="smc-title">The Wandering Earth <span class="smc-year">(2019)</span></h3>
                                             <div class="smc-meta"><span class="smc-genre">Sci-Fi · Disaster</span><span class="smc-vj">Vj Ulio</span></div>
@@ -999,7 +1003,7 @@
                                         </div>
                                     </article>
                                     <article class="static-movie-card">
-                                        <img src="https://image.tmdb.org/t/p/w342/nV5316WUsVij8sVXLCF1g7TFitg.jpg" alt="Collateral poster" class="smc-poster" width="342" height="513" loading="lazy">
+                                        <img src="https://image.tmdb.org/t/p/w185/nV5316WUsVij8sVXLCF1g7TFitg.jpg" alt="Collateral poster" class="smc-poster" width="185" height="278" loading="lazy">
                                         <div class="smc-body">
                                             <h3 class="smc-title">Collateral <span class="smc-year">(2004)</span></h3>
                                             <div class="smc-meta"><span class="smc-genre">Thriller · Crime</span><span class="smc-vj">Vj Ulio</span></div>
@@ -1008,7 +1012,7 @@
                                         </div>
                                     </article>
                                     <article class="static-movie-card">
-                                        <img src="https://image.tmdb.org/t/p/w342/5MHtxPEfmN4b0rHzfEZRcm6v9WI.jpg" alt="Citadel poster" class="smc-poster" width="342" height="513" loading="lazy">
+                                        <img src="https://image.tmdb.org/t/p/w185/5MHtxPEfmN4b0rHzfEZRcm6v9WI.jpg" alt="Citadel poster" class="smc-poster" width="185" height="278" loading="lazy">
                                         <div class="smc-body">
                                             <h3 class="smc-title">Citadel <span class="smc-year">(2023)</span></h3>
                                             <div class="smc-meta"><span class="smc-genre">Action · Spy</span><span class="smc-vj">VJ Junior</span></div>
@@ -1017,7 +1021,7 @@
                                         </div>
                                     </article>
                                     <article class="static-movie-card">
-                                        <img src="https://image.tmdb.org/t/p/w342/gFjEggtrejCN79r6SXRjM269OtG.jpg" alt="Pressure poster" class="smc-poster" width="342" height="513" loading="lazy">
+                                        <img src="https://image.tmdb.org/t/p/w185/gFjEggtrejCN79r6SXRjM269OtG.jpg" alt="Pressure poster" class="smc-poster" width="185" height="278" loading="lazy">
                                         <div class="smc-body">
                                             <h3 class="smc-title">Pressure <span class="smc-year">(2026)</span></h3>
                                             <div class="smc-meta"><span class="smc-genre">Action · Thriller</span><span class="smc-vj">VJ Emmy</span></div>
@@ -1761,7 +1765,7 @@
                 const quality = movie.video?.quality || 'HD';
                 const rating = movie.rating?.translationRating || movie.rating?.userRating || 4.0;
                 const fallbackPoster = getPlaceholderPoster(movie.originalTitle, movie.year);
-                const posterUrl = tmdbResize(movie.poster, 'w342') || movie.poster || fallbackPoster;
+                const posterUrl = tmdbResize(movie.poster, 'w185') || movie.poster || fallbackPoster;
                 const vjBadge = formatVjBadge(movie.vjName);
                 const posterId = `${containerId}-poster-${index}`;
                 const movieTitle = movie.originalTitle || movie.lugandaTitle || 'Unknown Title';
@@ -1771,7 +1775,7 @@
 
                 // Store poster data for later loading
                 if (movie.poster) {
-                    posterData.push({ posterId, posterUrl: tmdbResize(movie.poster, 'w342') || movie.poster, fallbackPoster });
+                    posterData.push({ posterId, posterUrl: tmdbResize(movie.poster, 'w185') || movie.poster, fallbackPoster });
                 }
                 
                 const movieCard = `
@@ -2178,7 +2182,7 @@
                 const quality = movie.video?.quality || 'HD';
                 const rating = movie.rating?.translationRating || movie.rating?.userRating || 4.0;
                 const fallbackPoster = getPlaceholderPoster(movie.originalTitle, movie.year);
-                const posterUrl = tmdbResize(movie.poster, 'w342') || movie.poster || fallbackPoster;
+                const posterUrl = tmdbResize(movie.poster, 'w185') || movie.poster || fallbackPoster;
                 const vjBadge = formatVjBadge(movie.vjName);
                 const posterId = `${containerId}-poster-${index}`;
                 const tmdbId = movie.tmdbId || movie.metaData?.tmdbId || movie.externalIds?.tmdbId || null;
@@ -2197,7 +2201,7 @@
 
                 // Store poster data for later loading
                 if (movie.poster) {
-                    posterData.push({ posterId, posterUrl: tmdbResize(movie.poster, 'w342') || movie.poster, fallbackPoster });
+                    posterData.push({ posterId, posterUrl: tmdbResize(movie.poster, 'w185') || movie.poster, fallbackPoster });
                 }
                 
                 const movieCard = `

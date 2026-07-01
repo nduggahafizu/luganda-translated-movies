@@ -2613,44 +2613,25 @@
 
 
 
-        // Detect iOS — Safari ignores the `download` attribute for video files
-        // and always opens the native player instead. This is an Apple platform
-        // restriction, not something JS can override.
-        function isIOS() {
-            return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPadOS
-        }
-
-        // Route download through backend — avoids new tab, hides raw URL
+        // Route download through backend proxy — Content-Disposition: attachment forces
+        // a save dialog on all platforms including iOS Safari 13+ (Downloads manager).
         function handleDownload(movie) {
             const videoUrl = movie.video?.embedUrl || movie.embedUrl;
             if (!videoUrl) return;
 
-            if (isIOS()) {
-                showIOSDownloadInstructions(videoUrl);
-                return;
-            }
-
             const fileName = `${(movie.originalTitle || movie.lugandaTitle || 'movie').replace(/[^a-zA-Z0-9 _-]/g, '').trim()}.mp4`;
-
-            // Route through the backend stream-proxy with ?download= so the server adds
-            // Content-Disposition: attachment — this forces a download even for cross-origin
-            // CDN URLs where <a download> is ignored by the browser.
-            if (videoUrl.match(/\.(mp4|mkv|webm|m4v)/i)) {
-                const proxyDownload = `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(videoUrl)}&download=${encodeURIComponent(fileName)}`;
-                const link = document.createElement('a');
-                link.href = proxyDownload;
-                link.download = fileName;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                showNotification('Download started!');
-            } else {
-                window.open(videoUrl, '_blank');
-            }
+            const proxyDownload = `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(videoUrl)}&download=${encodeURIComponent(fileName)}`;
+            const link = document.createElement('a');
+            link.href = proxyDownload;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showNotification('Download started!');
         }
 
         function showIOSDownloadInstructions(downloadUrl) {
+            // Kept for legacy call sites — now unused since proxy handles iOS directly
             const existing = document.getElementById('iosDownloadPrompt');
             if (existing) existing.remove();
 
