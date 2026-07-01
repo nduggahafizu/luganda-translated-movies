@@ -375,13 +375,16 @@ const lugandaMovieSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Create slug from Luganda title before saving
+function makeSlug(str) {
+    return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+// Generate slug from lugandaTitle, falling back to originalTitle
 lugandaMovieSchema.pre('save', function(next) {
-    if (this.isModified('lugandaTitle')) {
-        this.slug = this.lugandaTitle
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/(^-|-$)/g, '');
+    const titleChanged = this.isModified('lugandaTitle') || this.isModified('originalTitle') || this.isModified('title');
+    if (titleChanged || !this.slug) {
+        const source = this.lugandaTitle || this.originalTitle || this.title;
+        if (source) this.slug = makeSlug(source);
     }
     next();
 });

@@ -2425,9 +2425,72 @@
             }, 2000);
         }
         
+        // ========== STRUCTURED DATA (JSON-LD) ==========
+        function injectMovieStructuredData(movie) {
+            const existing = document.getElementById('movie-jsonld');
+            if (existing) existing.remove();
+            const schema = {
+                "@context": "https://schema.org",
+                "@type": "Movie",
+                "name": movie.originalTitle || movie.title || '',
+                "description": movie.plot || movie.description || '',
+                "image": movie.poster || '',
+                "dateCreated": movie.year ? String(movie.year) : undefined,
+                "genre": movie.genres || [],
+                "inLanguage": "lg",
+                "url": window.location.href,
+                "director": movie.director ? { "@type": "Person", "name": movie.director } : undefined,
+                "productionCompany": {
+                    "@type": "Organization",
+                    "name": "Unruly Movies",
+                    "url": "https://unrulymovies.com"
+                },
+                "offers": {
+                    "@type": "Offer",
+                    "availability": "https://schema.org/OnlineOnly",
+                    "price": "0",
+                    "priceCurrency": "UGX",
+                    "url": window.location.href
+                },
+                "potentialAction": {
+                    "@type": "WatchAction",
+                    "target": window.location.href
+                }
+            };
+            // Remove undefined keys
+            Object.keys(schema).forEach(k => schema[k] === undefined && delete schema[k]);
+            const script = document.createElement('script');
+            script.id = 'movie-jsonld';
+            script.type = 'application/ld+json';
+            script.textContent = JSON.stringify(schema);
+            document.head.appendChild(script);
+
+            // Also update meta description with movie-specific content
+            let metaDesc = document.querySelector('meta[name="description"]');
+            if (!metaDesc) { metaDesc = document.createElement('meta'); metaDesc.name = 'description'; document.head.appendChild(metaDesc); }
+            const vjText = movie.vjName ? ` Narrated in Luganda by ${movie.vjName}.` : '';
+            metaDesc.content = `Watch ${movie.originalTitle || movie.title} (${movie.year || ''}) translated to Luganda.${vjText} ${(movie.plot || movie.description || '').slice(0, 120)}`;
+
+            // Update OG tags
+            let ogTitle = document.querySelector('meta[property="og:title"]');
+            if (!ogTitle) { ogTitle = document.createElement('meta'); ogTitle.setAttribute('property','og:title'); document.head.appendChild(ogTitle); }
+            ogTitle.content = `${movie.originalTitle || movie.title} — Luganda VJ Translation | Unruly Movies`;
+
+            let ogDesc = document.querySelector('meta[property="og:description"]');
+            if (!ogDesc) { ogDesc = document.createElement('meta'); ogDesc.setAttribute('property','og:description'); document.head.appendChild(ogDesc); }
+            ogDesc.content = metaDesc.content;
+
+            if (movie.poster) {
+                let ogImg = document.querySelector('meta[property="og:image"]');
+                if (!ogImg) { ogImg = document.createElement('meta'); ogImg.setAttribute('property','og:image'); document.head.appendChild(ogImg); }
+                ogImg.content = movie.poster;
+            }
+        }
+
         // ========== UPDATE MOVIE INFO ==========
         function updateMovieInfo(movie) {
             document.title = `${movie.originalTitle || movie.title} - Unruly Movies`;
+            injectMovieStructuredData(movie);
 
             // Show movie poster as blurred background in the loading overlay
             const posterBg = document.getElementById('loadingPosterBg');

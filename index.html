@@ -890,8 +890,8 @@
                     <div class="container">
                         <div class="app-content pt-md-3">
                             
-                            <!-- SEO H1 - Visually hidden but accessible -->
-                            <h1 class="sr-only" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Unruly Movies - Watch Luganda Translated Movies by Uganda's Licensed VJs</h1>
+                            <!-- Page heading — visible and indexable -->
+                            <h1 style="font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--primary-color,#4ade80);margin:0 0 10px 4px;opacity:0.85;">Luganda Translated Movies — Uganda's Licensed VJ Platform</h1>
 
                             <!-- Hero Slider -->
                             <div class="app-section">
@@ -1256,6 +1256,21 @@
 
                         </div>
                     </div>
+
+                    <!-- Static editorial section — crawlable without JS -->
+                    <div style="max-width:900px;margin:56px auto 0;padding:0 20px 64px;">
+                        <h2 style="font-size:22px;font-weight:800;color:#fff;margin-bottom:16px;">What Is Unruly Movies?</h2>
+                        <p style="font-size:15px;line-height:1.9;color:rgba(255,255,255,.6);margin-bottom:16px;">Unruly Movies is Uganda's licensed platform for Luganda VJ-translated films. Every movie in our catalog has been narrated in real-time Luganda by a professional Video Jockey — a tradition that began in Kampala's video halls in the 1990s and is now available online for the first time in a legal, high-quality format.</p>
+                        <p style="font-size:15px;line-height:1.9;color:rgba(255,255,255,.6);margin-bottom:16px;">A Video Jockey (VJ) sits beside the screen and translates the dialogue, sound effects, and mood of a film into Luganda in real time. The result is a deeply personal experience — the VJ becomes part of the film, adding local context, Ugandan humour, and cultural references that subtitles never capture. Our platform hosts translations by Uganda's most respected VJs including <a href="/vjs.html" style="color:#4ade80;text-decoration:none;">VJ Junior, VJ Ice P, VJ Emmy, VJ Jingo, and VJ Ulio</a>.</p>
+                        <p style="font-size:15px;line-height:1.9;color:rgba(255,255,255,.6);margin-bottom:28px;">Our catalog covers action, drama, comedy, horror, thriller, romance, and sci-fi — all narrated in Luganda. New movies are added every week. <a href="/register.html" style="color:#4ade80;text-decoration:none;">Sign up free</a> to start watching, or <a href="/blog.html" style="color:#4ade80;text-decoration:none;">read our blog</a> to learn more about Uganda's VJ culture.</p>
+                        <div style="display:flex;flex-wrap:wrap;gap:10px;">
+                            <a href="/movies.html" style="padding:9px 20px;border-radius:8px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);color:#4ade80;font-size:13px;font-weight:600;text-decoration:none;">Browse All Movies</a>
+                            <a href="/genres.html" style="padding:9px 20px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.65);font-size:13px;font-weight:600;text-decoration:none;">Browse by Genre</a>
+                            <a href="/vjs.html" style="padding:9px 20px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.65);font-size:13px;font-weight:600;text-decoration:none;">Meet the VJs</a>
+                            <a href="/blog.html" style="padding:9px 20px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.65);font-size:13px;font-weight:600;text-decoration:none;">VJ Culture Blog</a>
+                        </div>
+                    </div>
+
                 </main>
             </div>
 
@@ -1760,7 +1775,7 @@
                 }
                 
                 const movieCard = `
-                    <a href="player.html?id=${movie._id}" class="content-card" data-movie-id="${movie._id}">
+                    <a href="/movie/${movie.slug || movie._id}" class="content-card" data-movie-id="${movie._id}">
                         <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
                             ${vjBadge ? `<div class="card-badges"><span class="card-badge badge-vj">${vjBadge}</span></div>` : ''}
                             <div class="play-overlay">
@@ -2044,7 +2059,7 @@
                 const viewsText = views >= 1000 ? `${(views / 1000).toFixed(1)}K views` : `${views} views`;
                 html += `
                     <li>
-                        <a href="player.html?id=${movie._id}" class="nav-content">
+                        <a href="/movie/${movie.slug || movie._id}" class="nav-content">
                             <div>${movie.originalTitle || movie.title}</div>
                             <div class="view">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2186,7 +2201,7 @@
                 }
                 
                 const movieCard = `
-                    <a href="player.html?id=${movie._id}" class="content-card" data-movie-id="${movie._id}">
+                    <a href="/movie/${movie.slug || movie._id}" class="content-card" data-movie-id="${movie._id}">
                         <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
                             ${vjBadge ? `<div class="card-badges"><span class="card-badge badge-vj">${vjBadge}</span></div>` : ''}
                             <div class="play-overlay">

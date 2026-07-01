@@ -1,6 +1,6 @@
 // Service Worker for Unruly Movies PWA
-const CACHE_NAME = 'unruly-movies-v3';
-const DYNAMIC_CACHE = 'unruly-dynamic-v3';
+const CACHE_NAME = 'unruly-movies-v5';
+const DYNAMIC_CACHE = 'unruly-dynamic-v5';
 
 // Files to cache immediately
 const STATIC_ASSETS = [
@@ -84,8 +84,15 @@ self.addEventListener('fetch', event => {
         event.respondWith(networkFirst(request));
         return;
     }
-    
-    // For other assets, use cache-first strategy
+
+    // CSS and JS change with every deploy — always fetch fresh, cache as fallback
+    const ext = url.pathname.split('.').pop().toLowerCase();
+    if (ext === 'css' || ext === 'js') {
+        event.respondWith(networkFirst(request));
+        return;
+    }
+
+    // For images and other static assets, cache-first is fine
     event.respondWith(cacheFirst(request));
 });
 

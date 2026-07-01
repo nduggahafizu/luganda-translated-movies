@@ -400,22 +400,52 @@
                     <p class="page-hero-subtitle">Browse movies by your favorite category</p>
                 </div>
 
-                <!-- Static fallback content for SEO -->
-                <noscript>
-                    <div class="genres-grid">
-                        <a href="?genre=action" class="genre-card"><div class="genre-icon">💥</div><div class="genre-name">Action</div></a>
-                        <a href="?genre=comedy" class="genre-card"><div class="genre-icon">😂</div><div class="genre-name">Comedy</div></a>
-                        <a href="?genre=drama" class="genre-card"><div class="genre-icon">🎭</div><div class="genre-name">Drama</div></a>
-                        <a href="?genre=horror" class="genre-card"><div class="genre-icon">👻</div><div class="genre-name">Horror</div></a>
-                        <a href="?genre=romance" class="genre-card"><div class="genre-icon">💕</div><div class="genre-name">Romance</div></a>
-                        <a href="?genre=thriller" class="genre-card"><div class="genre-icon">😱</div><div class="genre-name">Thriller</div></a>
-                        <a href="?genre=sci-fi" class="genre-card"><div class="genre-icon">🚀</div><div class="genre-name">Sci-Fi</div></a>
-                        <a href="?genre=adventure" class="genre-card"><div class="genre-icon">🗺️</div><div class="genre-name">Adventure</div></a>
-                        <a href="?genre=animation" class="genre-card"><div class="genre-icon">🎨</div><div class="genre-name">Animation</div></a>
-                        <a href="?genre=family" class="genre-card"><div class="genre-icon">👨‍👩‍👧‍👦</div><div class="genre-name">Family</div></a>
+                <!-- Genre descriptions — always visible, crawlable editorial content -->
+                <div class="genre-descriptions" style="max-width:900px;margin:0 auto 36px;padding:0 4px;">
+                    <p style="font-size:15px;line-height:1.8;color:rgba(255,255,255,0.65);margin-bottom:24px;">Every movie in the Unruly Movies catalog is tagged by genre so you can find the right type of film for your mood. All titles are narrated in Luganda by Uganda's licensed Video Jockeys — click a genre below to browse its full catalog.</p>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:32px;">
+                        <a href="genres.html?genre=action" style="display:block;padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;color:inherit;">
+                            <div style="font-size:28px;margin-bottom:8px;">💥</div>
+                            <strong style="color:var(--primary-color,#4ade80);font-size:16px;">Action</strong>
+                            <p style="font-size:13px;color:rgba(255,255,255,0.55);margin:6px 0 0;line-height:1.5;">Fight sequences, car chases, and high-stakes confrontations narrated with the energy and pace that Ugandan action fans expect from Uganda's top VJs.</p>
+                        </a>
+                        <a href="genres.html?genre=comedy" style="display:block;padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;color:inherit;">
+                            <div style="font-size:28px;margin-bottom:8px;">😂</div>
+                            <strong style="color:var(--primary-color,#4ade80);font-size:16px;">Comedy</strong>
+                            <p style="font-size:13px;color:rgba(255,255,255,0.55);margin:6px 0 0;line-height:1.5;">The hardest genre to translate — and the most rewarding when a VJ gets it right. Ugandan humour woven into international comedies by translators who understand both worlds.</p>
+                        </a>
+                        <a href="genres.html?genre=drama" style="display:block;padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;color:inherit;">
+                            <div style="font-size:28px;margin-bottom:8px;">🎭</div>
+                            <strong style="color:var(--primary-color,#4ade80);font-size:16px;">Drama</strong>
+                            <p style="font-size:13px;color:rgba(255,255,255,0.55);margin:6px 0 0;line-height:1.5;">Character-driven stories where emotional depth is everything. VJs like Emmy excel at bringing the full weight of dramatic performances into Luganda without losing a note of feeling.</p>
+                        </a>
+                        <a href="genres.html?genre=thriller" style="display:block;padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;color:inherit;">
+                            <div style="font-size:28px;margin-bottom:8px;">😱</div>
+                            <strong style="color:var(--primary-color,#4ade80);font-size:16px;">Thriller</strong>
+                            <p style="font-size:13px;color:rgba(255,255,255,0.55);margin:6px 0 0;line-height:1.5;">Suspense films where pacing and atmosphere define the experience. VJ Ice P's measured Luganda delivery is widely considered the best match for the thriller genre.</p>
+                        </a>
+                        <a href="genres.html?genre=romance" style="display:block;padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;color:inherit;">
+                            <div style="font-size:28px;margin-bottom:8px;">💕</div>
+                            <strong style="color:var(--primary-color,#4ade80);font-size:16px;">Romance</strong>
+                            <p style="font-size:13px;color:rgba(255,255,255,0.55);margin:6px 0 0;line-height:1.5;">Love stories that work across cultures. Luganda romance narration softens the distance between international filmmaking and East African audiences in a way subtitles never achieve.</p>
+                        </a>
+                        <a href="genres.html?genre=horror" style="display:block;padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;color:inherit;">
+                            <div style="font-size:28px;margin-bottom:8px;">👻</div>
+                            <strong style="color:var(--primary-color,#4ade80);font-size:16px;">Horror</strong>
+                            <p style="font-size:13px;color:rgba(255,255,255,0.55);margin:6px 0 0;line-height:1.5;">Fear in any language. Horror films translated to Luganda hit differently — the VJ's voice in the quiet moments before a scare is part of what makes them work so well on Ugandan audiences.</p>
+                        </a>
+                        <a href="genres.html?genre=sci-fi" style="display:block;padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;color:inherit;">
+                            <div style="font-size:28px;margin-bottom:8px;">🚀</div>
+                            <strong style="color:var(--primary-color,#4ade80);font-size:16px;">Sci-Fi</strong>
+                            <p style="font-size:13px;color:rgba(255,255,255,0.55);margin:6px 0 0;line-height:1.5;">Science fiction titles that reach Ugandan audiences in Luganda for the first time. Space operas, dystopian futures, and speculative thrillers narrated by VJs who make the extraordinary feel immediate.</p>
+                        </a>
+                        <a href="genres.html?genre=adventure" style="display:block;padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;color:inherit;">
+                            <div style="font-size:28px;margin-bottom:8px;">🗺️</div>
+                            <strong style="color:var(--primary-color,#4ade80);font-size:16px;">Adventure</strong>
+                            <p style="font-size:13px;color:rgba(255,255,255,0.55);margin:6px 0 0;line-height:1.5;">Epic journeys and high-stakes exploration. Adventure films in Luganda let Ugandan audiences experience the world's greatest stories in the language they know best.</p>
+                        </a>
                     </div>
-                    <p style="text-align:center;color:#888;margin-top:20px;">Enable JavaScript to browse the full catalog dynamically.</p>
-                </noscript>
+                </div>
                 
                 <div id="genresGrid" class="genres-grid">
                     <div class="genre-card skeleton" style="height:110px;"></div>
@@ -645,7 +675,7 @@
                 const vjName = movie.vjName || 'Unknown';
                 
                 return `
-                    <a href="player.html?id=${movie._id}" class="movie-card">
+                    <a href="/movie/${movie.slug || movie._id}" class="movie-card">
                         <div class="movie-poster" style="background-image: url('${poster}')">
                             <span class="movie-quality">${quality}</span>
                             <span class="movie-rating">★ ${rating.toFixed(1)}</span>

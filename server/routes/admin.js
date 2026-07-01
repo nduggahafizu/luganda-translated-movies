@@ -1705,4 +1705,34 @@ router.patch('/users/:id/download-permission', [auth, adminOnly], async (req, re
     }
 });
 
+// One-time backfill: generate slugs for all movies that are missing them
+router.post('/backfill-slugs', [auth, adminOnly], async (req, res) => {
+    try {
+        const LugandaMovie = require('../models/LugandaMovie');
+        const movies = await LugandaMovie.find({ slug: { $in: [null, '', undefined] } });
+
+        function makeSlug(str) {
+            return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        }
+
+        let updated = 0, skipped = 0;
+        for (const movie of movies) {
+            const source = movie.lugandaTitle || movie.originalTitle || movie.title;
+            if (!source) { skipped++; continue; }
+
+            const candidate = makeSlug(source);
+            // Avoid duplicate slugs by appending the short id
+            const exists = await LugandaMovie.findOne({ slug: candidate, _id: { $ne: movie._id } });
+            movie.slug = exists ? `${candidate}-${String(movie._id).slice(-5)}` : candidate;
+            await movie.save({ validateBeforeSave: false });
+            updated++;
+        }
+
+        res.json({ success: true, updated, skipped, total: movies.length });
+    } catch (err) {
+        console.error('[backfill-slugs]', err.message);
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
 module.exports = router;

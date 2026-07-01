@@ -83,7 +83,7 @@ Disallow: /admin-*
 Disallow: /dashboard
 Disallow: /profile
 Disallow: /player
-Disallow: /movie
+Allow: /movie/
 Disallow: /series-player
 Disallow: /series-detail
 Disallow: /local-admin-upload
@@ -110,6 +110,7 @@ Disallow: /scripts/
 
 # Sitemap location
 Sitemap: https://unrulymovies.com/sitemap.xml
+Sitemap: https://unrulymovies.com/sitemap-movies.xml
 
 # IndexNow key for instant Bing/Yandex indexing
 # Key file: https://unrulymovies.com/unrulymovies2026.txt

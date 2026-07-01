@@ -16,6 +16,12 @@ http://unrulymovies.com/* https://unrulymovies.com/:splat 301!
 # API proxy
 /api/* https://luganda-translated-movies-production.up.railway.app/api/:splat 200
 
+# SSR movie pages — Railway renders full HTML per movie, no build step needed
+/movie/* https://luganda-translated-movies-production.up.railway.app/api/movie-page/:splat 200
+
+# Dynamic movie sitemap — served from Railway, updates automatically on upload
+/sitemap-movies.xml https://luganda-translated-movies-production.up.railway.app/api/sitemap-movies 200
+
 # Clean URLs - serve HTML files without .html extension
 /movies           /movies.html           200
 /catalog          /catalog.html          200
@@ -33,7 +39,7 @@ http://unrulymovies.com/* https://unrulymovies.com/:splat 301!
 /uganda-tv        /uganda-tv.html        200
 /tv-stations      /tv-stations.html      200
 /vjs              /vjs.html              200
-/vj               /vj.html               200
+/vj               /vjs.html              301
 /genres           /genres.html           200
 /trending         /trending.html         200
 /about            /about.html            200
@@ -48,6 +54,19 @@ http://unrulymovies.com/* https://unrulymovies.com/:splat 301!
 /admin            /admin.html            200
 /admin-users      /admin-users.html      200
 /admin-movies     /admin-movies.html     200
+
+# Blog
+/blog                                    /blog.html                                          200
+/blog/what-is-a-vj                       /blog/what-is-a-vj.html                             200
+/blog/luganda-translation-history        /blog/luganda-translation-history.html              200
+/blog/vj-junior-uganda                   /blog/vj-junior-uganda.html                         200
+/blog/why-ugandans-prefer-vj-over-subtitles /blog/why-ugandans-prefer-vj-over-subtitles.html 200
+/blog/top-10-luganda-action-movies       /blog/top-10-luganda-action-movies.html             200
+/blog/art-of-vj-narration               /blog/art-of-vj-narration.html                      200
+/blog/ugandan-video-hall-culture         /blog/ugandan-video-hall-culture.html               200
+/blog/best-comedy-movies-luganda         /blog/best-comedy-movies-luganda.html               200
+/blog/how-to-choose-your-vj              /blog/how-to-choose-your-vj.html                    200
+/blog/future-of-luganda-movies           /blog/future-of-luganda-movies.html                 200
 
 # Serve static files (don't redirect these to index.html)
 /.well-known/*  /.well-known/:splat  200

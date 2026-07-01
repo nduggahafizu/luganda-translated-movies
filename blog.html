@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Blog — Ugandan Cinema, Luganda VJ Culture & Movie Reviews | Unruly Movies</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Articles about Luganda VJ culture, Ugandan cinema history, movie reviews, and the tradition of VJ-translated movies in Uganda. Written by the Unruly Movies team.">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#4ade80">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Nduga Hafizu">
+    <link rel="canonical" href="https://unrulymovies.com/blog">
+
+    <meta name="google-adsense-account" content="ca-pub-1904736753681797">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Blog — Ugandan Cinema & Luganda VJ Culture">
+    <meta property="og:description" content="Articles about Luganda VJ culture, Ugandan cinema, and movie reviews from Unruly Movies.">
+    <meta property="og:site_name" content="Unruly Movies">
+    <meta property="og:url" content="https://unrulymovies.com/blog">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Blog",
+        "name": "Unruly Movies Blog",
+        "description": "Articles about Luganda VJ culture, Ugandan cinema, and translated movies",
+        "url": "https://unrulymovies.com/blog",
+        "publisher": {
+            "@type": "Organization",
+            "name": "Unruly Movies",
+            "url": "https://unrulymovies.com"
+        }
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        .blog-content { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+        .blog-hero {
+            text-align: center;
+            padding: 60px 20px 50px;
+            background: linear-gradient(135deg, rgba(74,222,128,0.1), rgba(74,222,128,0.04));
+            border-radius: 20px;
+            margin-bottom: 50px;
+        }
+        .blog-hero h1 { font-size: 42px; font-weight: 900; color: var(--primary-color); margin-bottom: 16px; }
+        .blog-hero p { font-size: 18px; color: var(--text-secondary); max-width: 600px; margin: 0 auto; line-height: 1.7; }
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 28px;
+            margin-top: 10px;
+        }
+        .article-card {
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+        }
+        .article-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary-color);
+            box-shadow: 0 12px 36px rgba(74,222,128,0.15);
+        }
+        .article-thumb {
+            height: 180px;
+            background: linear-gradient(135deg, #1a2a1a, #0d1a0d);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 56px;
+        }
+        .article-body { padding: 22px; flex: 1; display: flex; flex-direction: column; }
+        .article-category {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        .article-card h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 10px;
+            line-height: 1.4;
+        }
+        .article-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin: 0 0 16px;
+            flex: 1;
+        }
+        .article-meta {
+            font-size: 12px;
+            color: rgba(255,255,255,0.4);
+            display: flex;
+            gap: 14px;
+        }
+        .read-more {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-top: 12px;
+        }
+        @media (max-width: 600px) {
+            .blog-hero h1 { font-size: 28px; }
+            .articles-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<div class="app">
+    <div class="app-header">
+        <div class="navbar navbar-expand-lg">
+            <div class="menu" id="menuToggle" role="button" aria-label="Open navigation menu" tabindex="0">
+                <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </div>
+            <div class="app-navbar">
+                <a href="index.html" class="navbar-brand">
+                    <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
+                </a>
+            </div>
+            <form class="header-search input-group d-md-block d-none" method="get" action="search.html">
+                <div class="typeahead__container app-search">
+                    <div class="typeahead__field">
+                        <div class="typeahead__query">
+                            <label for="search-input" class="btn px-0 mb-0" aria-label="Search">
+                                <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <path d="m21 21-4.35-4.35"></path>
+                                </svg>
+                            </label>
+                            <input class="video-search form-control" name="q" type="text" id="search-input" placeholder="Search Luganda movies, VJs..." autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <ul class="navbar-nav navbar-user ml-auto align-items-center text-nowrap">
+                <li class="nav-item"><a class="nav-link btn-login" href="login.html">Login</a></li>
+                <li class="nav-item"><a class="nav-link btn-register" href="register.html">Sign Up</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="app-wrapper">
+        <div class="app-aside nav-aside" id="aside">
+            <button class="modal-close" data-dismiss="modal" aria-label="Close menu">
+                <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <ul class="nav">
+                <li><a href="index.html">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    Home
+                </a></li>
+                <li><a href="movies.html">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+                    Movies
+                </a></li>
+                <li><a href="vjs.html">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    VJ Translators
+                </a></li>
+                <li><a href="blog.html" class="active">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                    Blog
+                </a></li>
+                <li><a href="about.html">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    About
+                </a></li>
+            </ul>
+        </div>
+
+        <main class="app-container flex-fill">
+            <div class="blog-content">
+                <div class="blog-hero">
+                    <h1>Unruly Movies Blog</h1>
+                    <p>Stories about Luganda VJ culture, Ugandan cinema history, and the people who made movie translation an art form in Uganda.</p>
+                </div>
+
+                <div class="articles-grid">
+
+                    <a class="article-card" href="blog/what-is-a-vj.html">
+                        <div class="article-thumb">🎙️</div>
+                        <div class="article-body">
+                            <div class="article-category">VJ Culture</div>
+                            <h2>What Is a VJ? Understanding Uganda's Unique Movie Narration Tradition</h2>
+                            <p>A Video Jockey (VJ) does something no subtitle can do — they make you feel at home in a Hollywood film. Here is how this Ugandan tradition started and why it endures.</p>
+                            <div class="article-meta">
+                                <span>July 2026</span>
+                                <span>6 min read</span>
+                            </div>
+                            <span class="read-more">Read article →</span>
+                        </div>
+                    </a>
+
+                    <a class="article-card" href="blog/luganda-translation-history.html">
+                        <div class="article-thumb">🎬</div>
+                        <div class="article-body">
+                            <div class="article-category">History</div>
+                            <h2>How Luganda Translations Changed Movie Watching in Uganda Forever</h2>
+                            <p>Before streaming, before DVD, Uganda had video halls. And video halls had VJs. The story of how Luganda became the language of cinema for millions of Ugandans.</p>
+                            <div class="article-meta">
+                                <span>July 2026</span>
+                                <span>7 min read</span>
+                            </div>
+                            <span class="read-more">Read article →</span>
+                        </div>
+                    </a>
+
+                    <a class="article-card" href="blog/vj-junior-uganda.html">
+                        <div class="article-thumb">⭐</div>
+                        <div class="article-body">
+                            <div class="article-category">VJ Spotlight</div>
+                            <h2>VJ Junior: The Voice That Defined a Generation of Ugandan Movie Fans</h2>
+                            <p>No single VJ has shaped Uganda's movie culture more than VJ Junior. From tiny video halls in Kampala to nationwide recognition, this is his story.</p>
+                            <div class="article-meta">
+                                <span>July 2026</span>
+                                <span>6 min read</span>
+                            </div>
+                            <span class="read-more">Read article →</span>
+                        </div>
+                    </a>
+
+                    <a class="article-card" href="blog/why-ugandans-prefer-vj-over-subtitles.html">
+                        <div class="article-thumb">🗣️</div>
+                        <div class="article-body">
+                            <div class="article-category">Opinion</div>
+                            <h2>Why Ugandans Choose VJ Audio Over Subtitles — And Why It Makes Sense</h2>
+                            <p>Subtitles keep you at arm's length from the story. A skilled VJ pulls you in. We explore why voice narration wins in Uganda every single time.</p>
+                            <div class="article-meta">
+                                <span>July 2026</span>
+                                <span>5 min read</span>
+                            </div>
+                            <span class="read-more">Read article →</span>
+                        </div>
+                    </a>
+
+                    <a class="article-card" href="blog/top-10-luganda-action-movies.html">
+                        <div class="article-thumb">💥</div>
+                        <div class="article-body">
+                            <div class="article-category">Top Lists</div>
+                            <h2>Top 10 Must-Watch Action Movies with Luganda VJ Translations</h2>
+                            <p>From kung fu classics to modern blockbusters, these are the action films that Ugandan VJs turned into unforgettable experiences. Our definitive ranked list.</p>
+                            <div class="article-meta">
+                                <span>July 2026</span>
+                                <span>5 min read</span>
+                            </div>
+                            <span class="read-more">Read article →</span>
+                        </div>
+                    </a>
+
+                    <a class="article-card" href="blog/art-of-vj-narration.html">
+                        <div class="article-thumb">🎭</div>
+                        <div class="article-body">
+                            <div class="article-category">Craft</div>
+                            <h2>The Art of Real-Time Movie Translation: How Uganda's VJs Bring Films to Life</h2>
+                            <p>Translating a movie in real time while matching tone, emotion, and timing is harder than it looks. A behind-the-scenes look at the VJ craft few people truly understand.</p>
+                            <div class="article-meta">
+                                <span>July 2026</span>
+                                <span>6 min read</span>
+                            </div>
+                            <span class="read-more">Read article →</span>
+                        </div>
+                    </a>
+
+                    <a class="article-card" href="blog/ugandan-video-hall-culture.html">
+                        <div class="article-thumb">🏠</div>
+                        <div class="article-body">
+                            <div class="article-category">Culture</div>
+                            <h2>From Video Halls to Online Streaming: Uganda's 30-Year Love Affair with Movies</h2>
+                            <p>The darkened rooms, wooden benches, and a single TV screen. Uganda's video hall era created a movie culture unlike anywhere else in the world. We look back at its legacy.</p>
+                            <div class="article-meta">
+                                <span>July 2026</span>
+                                <span>7 min read</span>
+                            </div>
+                            <span class="read-more">Read article →</span>
+                        </div>
+                    </a>
+
+                    <a class="article-card" href="blog/best-comedy-movies-luganda.html">
+                        <div class="article-thumb">😂</div>
+                        <div class="article-body">
+                            <div class="article-category">Reviews</div>
+                            <h2>Best Comedy Movies in Luganda: The Films That Made Uganda Laugh</h2>
+                            <p>Comedy is the hardest genre to translate. Cultural humour rarely crosses borders — unless a skilled VJ bridges the gap. These are the comedies that landed perfectly in Luganda.</p>
+                            <div class="article-meta">
+                                <span>July 2026</span>
+                                <span>5 min read</span>
+                            </div>
+                            <span class="read-more">Read article →</span>
+                        </div>
+                    </a>
+
+                    <a class="article-card" href="blog/how-to-choose-your-vj.html">
+                        <div class="article-thumb">🎯</div>
+                        <div class="article-body">
+                            <div class="article-category">Guide</div>
+                            <h2>How to Pick the Right VJ for Your Movie Mood — A Practical Guide</h2>
+                            <p>Not all VJs translate the same way. Some excel at action, others shine in drama or comedy. This guide helps you match the right voice to the right film.</p>
+                            <div class="article-meta">
+                                <span>July 2026</span>
+                                <span>4 min read</span>
+                            </div>
+                            <span class="read-more">Read article →</span>
+                        </div>
+                    </a>
+
+                    <a class="article-card" href="blog/future-of-luganda-movies.html">
+                        <div class="article-thumb">🚀</div>
+                        <div class="article-body">
+                            <div class="article-category">Opinion</div>
+                            <h2>The Future of Luganda Entertainment in the Digital Streaming Age</h2>
+                            <p>As smartphones reach deeper into Uganda, the audience for Luganda content is growing fast. Here is where VJ translation culture is heading — and what it means for Ugandan cinema.</p>
+                            <div class="article-meta">
+                                <span>July 2026</span>
+                                <span>5 min read</span>
+                            </div>
+                            <span class="read-more">Read article →</span>
+                        </div>
+                    </a>
+
+                </div>
+            </div>
+
+            <footer class="site-footer" style="margin-top: 60px;">
+                <div class="footer-bottom">
+                    <p>Copyright © Unruly Movies 2026 &nbsp;|&nbsp; <a href="about.html" style="color:var(--primary-color)">About</a> &nbsp;|&nbsp; <a href="contact.html" style="color:var(--primary-color)">Contact</a> &nbsp;|&nbsp; <a href="privacy-policy.html" style="color:var(--primary-color)">Privacy</a></p>
+                </div>
+            </footer>
+        </main>
+    </div>
+</div>
+</div>
+
+<script src="js/app.js" defer></script>
+</body>
+</html>
