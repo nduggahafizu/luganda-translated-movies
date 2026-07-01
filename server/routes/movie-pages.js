@@ -281,7 +281,7 @@ a{text-decoration:none;color:inherit}
   </div>
 
   <!-- Video element — Video.js initialises this -->
-  <video id="moviePlayer" class="video-js vjs-default-skin" playsinline></video>
+  <video id="moviePlayer" class="video-js vjs-default-skin" playsinline controlsList="nodownload" disablePictureInPicture oncontextmenu="return false"></video>
 </div>
 
 <!-- Logged-out strip — shown by JS when no valid session -->
@@ -398,12 +398,12 @@ async function checkAuth() {
     const token = cleanToken(raw);
     if (!token) return false;
     try {
-        const r = await fetch(API_BASE + '/api/auth/verify', {
+        const r = await fetch(API_BASE + '/api/auth/check-access', {
             headers: { 'Authorization': 'Bearer ' + token }
         });
         if (r.ok) {
             const d = await r.json();
-            window._userAccess = d.data || d.user || {};
+            window._userAccess = d.access || d.data || {};
         }
         return r.ok;
     } catch {
@@ -489,9 +489,16 @@ async function loadEmbed(url) {
 async function boot() {
     const m = window.__MOVIE__;
 
-    // Verify runs in background for download-permission only — token presence is
-    // enough to let the user watch (video URLs are direct CDN links).
-    checkAuth().catch(() => {});
+    // Access check runs in background — token presence is enough to play.
+    // Once resolved, surface the download button for admins/subscribers without
+    // requiring them to press play first.
+    checkAuth().then(() => {
+        const access = window._userAccess || {};
+        if (access.canDownload || access.isAdmin) {
+            const btn = document.getElementById('downloadBtn');
+            if (btn) { btn.style.display = 'inline-flex'; btn.onclick = handleDownload; }
+        }
+    }).catch(() => {});
 
     if (!m.videoUrl) {
         try {
@@ -611,6 +618,9 @@ function renderRelatedMovies(movies) {
         </a>\`;
     }).join('');
 }
+
+// Block right-click / "Save Video As" on the entire player area
+document.querySelector('.player-wrap').addEventListener('contextmenu', e => e.preventDefault());
 
 // Share button
 document.getElementById('shareBtn').addEventListener('click', () => {
