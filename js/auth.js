@@ -509,7 +509,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (isOnLoginPage && hasValidAuth) {
         console.log('Auth Debug - Redirecting logged-in user from login page');
-        window.location.href = 'index.html';
+        const pendingRedirect = localStorage.getItem('redirectAfterLogin');
+        if (pendingRedirect) {
+            localStorage.removeItem('redirectAfterLogin');
+            window.location.href = pendingRedirect;
+        } else {
+            window.location.href = 'index.html';
+        }
     } else if (isOnLoginPage) {
         console.log('Auth Debug - User NOT logged in, staying on login page');
     }

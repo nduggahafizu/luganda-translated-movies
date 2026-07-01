@@ -487,27 +487,25 @@ async function loadEmbed(url) {
 }
 
 async function boot() {
-    const authed = await checkAuth();
-    if (!authed) { showGate(); return; }
-
     const m = window.__MOVIE__;
+
+    // Verify runs in background for download-permission only — token presence is
+    // enough to let the user watch (video URLs are direct CDN links).
+    checkAuth().catch(() => {});
+
     if (!m.videoUrl) {
-        // No video URL in embedded data — fetch from API
         try {
             const token = cleanToken(getToken());
             const r = await fetch(API_BASE + '/api/luganda-movies/' + m.id, {
                 headers: { 'Authorization': 'Bearer ' + token }
             });
             const d = await r.json();
-            if (d.data?.video?.embedUrl) {
-                m.videoUrl = d.data.video.embedUrl;
-            }
+            if (d.data?.video?.embedUrl) m.videoUrl = d.data.video.embedUrl;
         } catch (e) {}
     }
 
     initVjs(m.videoUrl || '');
     loadRelatedMovies();
-    // Track view
     fetch(API_BASE + '/api/luganda-movies/' + m.id + '/view', { method: 'POST' }).catch(() => {});
 }
 
