@@ -291,6 +291,7 @@ userSchema.methods.getMaxDevices = function() {
 // Check if user can download
 userSchema.methods.hasDownloadAccess = function() {
     if (this.role === 'admin') return true;
+    if (this.canDownload === true) return true;
     return this.hasActiveSubscription() && this.getPlanConfig().download;
 };
 

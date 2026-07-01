@@ -110,6 +110,12 @@ function renderMoviePage(movie) {
 <link href="/vendor/video-js/video-js.css" rel="stylesheet">
 <script src="/vendor/video-js/video.min.js"></script>
 <script src="/vendor/video-js/videojs-http-streaming.min.js"></script>
+<!-- IMA / VAST ad integration (mirrors player.html setup) -->
+<script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js" async></script>
+<link href="https://cdn.jsdelivr.net/npm/videojs-contrib-ads@7/dist/videojs.ads.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/videojs-ima@2/dist/videojs.ima.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/videojs-contrib-ads@7/dist/videojs.ads.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/videojs-ima@2/dist/videojs.ima.min.js" defer></script>
 <script src="/js/config.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -416,6 +422,11 @@ function isDirectUrl(url) {
     const u = url.toLowerCase();
     return ['.mp4','.m3u8','.webm','.mkv','.m4v','pearlpix.xyz','b-cdn.net','r2.dev','archive.org','cloudflare'].some(x => u.includes(x));
 }
+// Upgrade http:// → https:// so the browser never loads mixed content on our HTTPS page
+function safeUrl(url) {
+    if (!url) return url;
+    return url.startsWith('http://') ? 'https://' + url.slice(7) : url;
+}
 
 function hideLoading()  { playerLoading.classList.add('hide'); }
 function showGate()     { authGate.classList.add('show'); hideLoading(); logoutStrip.classList.add('show'); }
@@ -439,16 +450,33 @@ function initVjs(videoUrl) {
 
     vjsPlayer.ready(() => {
         hideLoading();
-        if (isDirectUrl(videoUrl)) {
-            const type = videoUrl.toLowerCase().includes('.m3u8') ? 'application/x-mpegURL' : 'video/mp4';
-            vjsPlayer.src({ src: videoUrl, type });
+        const playUrl = safeUrl(videoUrl);
+        if (isDirectUrl(playUrl)) {
+            const type = playUrl.toLowerCase().includes('.m3u8') ? 'application/x-mpegURL' : 'video/mp4';
+            vjsPlayer.src({ src: playUrl, type });
         } else {
-            loadEmbed(videoUrl);
+            loadEmbed(playUrl);
         }
     });
 
     vjsPlayer.on('play', () => { showPlaying(); checkDownloadPermission(); });
     vjsPlayer.on('error', () => { console.error('Player error', vjsPlayer.error()); });
+
+    // VAST pre-roll ads — wait up to 800ms for checkAuth() to populate _userAccess,
+    // then skip ads for admins/paid plans (showAds === false), fire for free users.
+    setTimeout(() => {
+        const showAds = window._userAccess ? window._userAccess.showAds !== false : true;
+        if (!showAds) return;
+        try {
+            if (typeof vjsPlayer.ima === 'function') {
+                vjsPlayer.ima({
+                    adTagUrl: 'https://pubads.g.doubleclick.net/gampad/live/ads?iu=/23358450278/video-preroll&description_url=https%3A%2F%2Funrulymovies.com&tfcd=0&npa=0&sz=640x480&min_ad_duration=5000&max_ad_duration=30000&gdfp_req=1&unviewed_position_start=1&output=vast&env=vp&impl=s&correlator=',
+                    adsRenderingSettings: { enablePreloading: true }
+                });
+                vjsPlayer.ima.initializeAdDisplayContainer();
+            }
+        } catch (e) {}
+    }, 800);
 
     // Save watch progress every 10s
     const movie = window.__MOVIE__;
@@ -478,8 +506,9 @@ async function loadEmbed(url) {
         });
         const d = await r.json();
         if (d.success && d.directUrl) {
-            const type = d.directUrl.toLowerCase().includes('.m3u8') ? 'application/x-mpegURL' : 'video/mp4';
-            vjsPlayer.src({ src: d.directUrl, type });
+            const safeDirectUrl = safeUrl(d.directUrl);
+            const type = safeDirectUrl.toLowerCase().includes('.m3u8') ? 'application/x-mpegURL' : 'video/mp4';
+            vjsPlayer.src({ src: safeDirectUrl, type });
             return;
         }
     } catch (e) {}
