@@ -604,7 +604,7 @@
                         const vjBadge = formatVjBadge(movie.vjName);
 
                         return `
-                            <a href="/movie/${movie.slug || movie._id}" class="trending-card" data-movie-id="${movie._id}">
+                            <a href="${movie.contentType === 'series' ? '/series-detail?id=' + (movie.slug || movie._id) : '/movie/' + (movie.slug || movie._id)}" class="trending-card" data-movie-id="${movie._id}">
                                 <div class="trending-rank ${rankClass}">${rank}</div>
                                 ${vjBadge ? `<div class="vj-badge">${vjBadge}</div>` : ''}
                                 <img src="${poster}" alt="${title}" loading="lazy" onerror="this.src='assets/images/placeholder.svg'">

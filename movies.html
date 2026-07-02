@@ -696,7 +696,7 @@
                 posterData.push({ posterId, posterUrl: tmdbResize(movie.poster, 'w342') || movie.poster || null, fallbackPoster });
 
                 const movieCard = `
-                    <a href="/movie/${movie.slug || movie._id}" class="content-card" data-movie-id="${movie._id}">
+                    <a href="${movie.contentType === 'series' ? '/series-detail?id=' + (movie.slug || movie._id) : '/movie/' + (movie.slug || movie._id)}" class="content-card" data-movie-id="${movie._id}">
                         <div class="card-poster" id="${posterId}" data-fallback-poster="${fallbackPoster}">
                             <div class="card-badges">
                                 <span class="card-badge badge-quality">${quality.toUpperCase()}</span>

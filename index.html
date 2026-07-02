@@ -1779,7 +1779,7 @@
                 }
                 
                 const movieCard = `
-                    <a href="/movie/${movie.slug || movie._id}" class="content-card" data-movie-id="${movie._id}">
+                    <a href="${movie.contentType === 'series' ? '/series-detail?id=' + (movie.slug || movie._id) : '/movie/' + (movie.slug || movie._id)}" class="content-card" data-movie-id="${movie._id}">
                         <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
                             ${vjBadge ? `<div class="card-badges"><span class="card-badge badge-vj">${vjBadge}</span></div>` : ''}
                             <div class="play-overlay">
@@ -2063,7 +2063,7 @@
                 const viewsText = views >= 1000 ? `${(views / 1000).toFixed(1)}K views` : `${views} views`;
                 html += `
                     <li>
-                        <a href="/movie/${movie.slug || movie._id}" class="nav-content">
+                        <a href="${movie.contentType === 'series' ? '/series-detail?id=' + (movie.slug || movie._id) : '/movie/' + (movie.slug || movie._id)}" class="nav-content">
                             <div>${movie.originalTitle || movie.title}</div>
                             <div class="view">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2205,7 +2205,7 @@
                 }
                 
                 const movieCard = `
-                    <a href="/movie/${movie.slug || movie._id}" class="content-card" data-movie-id="${movie._id}">
+                    <a href="${movie.contentType === 'series' ? '/series-detail?id=' + (movie.slug || movie._id) : '/movie/' + (movie.slug || movie._id)}" class="content-card" data-movie-id="${movie._id}">
                         <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
                             ${vjBadge ? `<div class="card-badges"><span class="card-badge badge-vj">${vjBadge}</span></div>` : ''}
                             <div class="play-overlay">
