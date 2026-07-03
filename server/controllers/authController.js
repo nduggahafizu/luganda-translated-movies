@@ -5,8 +5,8 @@ const crypto = require('crypto');
 const { sendEmail } = require('../utils/email');
 
 // JWT Configuration with defaults
-const JWT_SECRET = process.env.JWT_SECRET || 'unruly-movies-jwt-secret-key-2024';
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'unruly-movies-jwt-refresh-secret-2024';
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 const JWT_EXPIRE = process.env.JWT_EXPIRE || '7d';
 const JWT_REFRESH_EXPIRE = process.env.JWT_REFRESH_EXPIRE || '30d';
 

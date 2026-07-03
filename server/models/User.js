@@ -367,7 +367,9 @@ userSchema.methods.updateWatchHistory = function(contentType, contentId, progres
     return this.save();
 };
 
-// Remove sensitive data from JSON output
+// Remove sensitive data from JSON output — this runs on every API response
+// that serializes a user document (e.g. GET /api/auth/me), so anything left
+// in here goes straight to the client.
 userSchema.methods.toJSON = function() {
     const user = this.toObject();
     delete user.password;
@@ -375,6 +377,10 @@ userSchema.methods.toJSON = function() {
     delete user.emailVerificationExpire;
     delete user.resetPasswordToken;
     delete user.resetPasswordExpire;
+    delete user.refreshTokens; // raw token strings — client never needs these
+    delete user.activeDevices; // device IPs/user-agents
+    delete user.trustedDevices;
+    if (user.security) delete user.security.twoFactorSecret;
     return user;
 };
 

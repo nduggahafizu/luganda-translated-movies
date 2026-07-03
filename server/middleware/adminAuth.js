@@ -2,7 +2,7 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
 // JWT Configuration with defaults (must match auth.js and authController)
-const JWT_SECRET = process.env.JWT_SECRET || 'unruly-movies-jwt-secret-key-2024';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Middleware to check if user is admin
 const adminOnly = async (req, res, next) => {

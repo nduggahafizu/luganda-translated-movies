@@ -3,8 +3,8 @@ const User = require('../models/User');
 const TokenBlacklist = require('../models/TokenBlacklist');
 
 // JWT Configuration with defaults (must match authController)
-const JWT_SECRET = process.env.JWT_SECRET || 'unruly-movies-jwt-secret-key-2024';
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'unruly-movies-jwt-refresh-secret-2024';
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 
 // Protect routes - verify JWT token with enhanced security
 exports.protect = async (req, res, next) => {

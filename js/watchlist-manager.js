@@ -271,13 +271,13 @@ const WatchlistManager = {
         if (!token) return;
         
         try {
-            await fetch(`${API_CONFIG.BASE_URL}/api/watch-progress`, {
+            await fetch(`${API_CONFIG.BASE_URL}/api/watch-progress/update`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ movieId, progress, duration })
+                body: JSON.stringify({ movieId, currentTime: progress, duration })
             });
         } catch (error) {
             console.error('Error syncing history:', error);

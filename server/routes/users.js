@@ -418,22 +418,10 @@ router.delete('/account', auth, async (req, res) => {
 });
 
 
-// @route   GET /api/users/:id/download-permission
-// @desc    Check if user has download permission
-// @access  Public (for app to check)
-router.get('/:id/download-permission', async (req, res) => {
-    try {
-        const user = await User.findById(req.params.id).select('canDownload');
-        
-        if (!user) {
-            return res.json({ canDownload: false });
-        }
-        
-        res.json({ canDownload: user.canDownload === true });
-    } catch (error) {
-        console.error('Error checking download permission:', error);
-        res.json({ canDownload: false });
-    }
-});
+// download-permission check by arbitrary :id was removed — it was public
+// (no auth) and let anyone query any other user's download entitlement by
+// guessing/enumerating IDs (IDOR). Unused by the app and website; if this is
+// needed again, derive the user from the JWT (protect + req.user), never
+// from a client-supplied :id.
 
 module.exports = router;

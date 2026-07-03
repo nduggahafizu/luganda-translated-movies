@@ -62,7 +62,7 @@ router.post('/register-token', async (req, res) => {
             if (authHeader && authHeader.startsWith('Bearer ')) {
                 const token = authHeader.split(' ')[1];
                 const jwt = require('jsonwebtoken');
-                const JWT_SECRET = process.env.JWT_SECRET || 'unruly-movies-jwt-secret-key-2024';
+                const JWT_SECRET = process.env.JWT_SECRET;
                 const decoded = jwt.verify(token, JWT_SECRET);
                 userId = decoded.userId || decoded.id;
             }

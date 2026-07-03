@@ -1,29 +1,36 @@
 const express = require('express');
 const router = express.Router();
+const { protect } = require('../middleware/auth');
 
 // In-memory storage for watch progress (replace with database in production)
 // Structure: { userId: { movieId: { currentTime, duration, percentage, lastWatched } } }
+// NOTE: still in-memory — lost on restart/redeploy and inconsistent across
+// multiple server instances. Fine for now since it's auth-scoped, but should
+// move to the User document (like watchHistory) or a real store eventually.
 const watchProgressStore = new Map();
 
 /**
  * @route   POST /api/watch-progress/update
  * @desc    Update watch progress for a movie
- * @access  Private (requires auth) or Public with session
+ * @access  Private
  */
-router.post('/update', async (req, res) => {
+router.post('/update', protect, async (req, res) => {
     try {
         const { movieId, currentTime, duration } = req.body;
-        
+
         if (!movieId || currentTime === undefined || !duration) {
             return res.status(400).json({
                 success: false,
                 error: 'Missing required fields: movieId, currentTime, duration'
             });
         }
-        
-        // Get user ID (from auth or session)
-        const userId = req.user?.id || req.sessionID || 'anonymous';
-        
+
+        // req.sessionID was never populated (no session middleware in this app —
+        // auth is JWT-based) and silently fell back to a single shared 'anonymous'
+        // bucket, mixing every unauthenticated user's progress together. Requiring
+        // auth here doesn't remove working functionality — that path never worked.
+        const userId = req.user.id;
+
         // Calculate percentage
         const percentage = Math.round((currentTime / duration) * 100);
         
@@ -63,12 +70,12 @@ router.post('/update', async (req, res) => {
 /**
  * @route   GET /api/watch-progress/:movieId
  * @desc    Get watch progress for a specific movie
- * @access  Private or Public with session
+ * @access  Private
  */
-router.get('/:movieId', async (req, res) => {
+router.get('/:movieId', protect, async (req, res) => {
     try {
         const { movieId } = req.params;
-        const userId = req.user?.id || req.sessionID || 'anonymous';
+        const userId = req.user.id;
         
         const userProgress = watchProgressStore.get(userId);
         const progress = userProgress?.get(movieId);
@@ -97,11 +104,11 @@ router.get('/:movieId', async (req, res) => {
 /**
  * @route   GET /api/watch-progress/user/all
  * @desc    Get all watch progress for current user
- * @access  Private or Public with session
+ * @access  Private
  */
-router.get('/user/all', async (req, res) => {
+router.get('/user/all', protect, async (req, res) => {
     try {
-        const userId = req.user?.id || req.sessionID || 'anonymous';
+        const userId = req.user.id;
         const userProgress = watchProgressStore.get(userId);
         
         if (!userProgress) {
@@ -134,12 +141,12 @@ router.get('/user/all', async (req, res) => {
 /**
  * @route   DELETE /api/watch-progress/:movieId
  * @desc    Delete watch progress for a movie
- * @access  Private or Public with session
+ * @access  Private
  */
-router.delete('/:movieId', async (req, res) => {
+router.delete('/:movieId', protect, async (req, res) => {
     try {
         const { movieId } = req.params;
-        const userId = req.user?.id || req.sessionID || 'anonymous';
+        const userId = req.user.id;
         
         const userProgress = watchProgressStore.get(userId);
         if (userProgress) {
