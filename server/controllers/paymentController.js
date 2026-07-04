@@ -314,10 +314,17 @@ exports.initiatePesapalPayment = async (req, res) => {
                 }
             );
 
-            logger.info('PesaPal order response', { 
+            logger.info('PesaPal order response', {
                 status: orderResponse.status,
                 hasRedirectUrl: !!orderResponse.data?.redirect_url,
-                trackingId: orderResponse.data?.order_tracking_id
+                trackingId: orderResponse.data?.order_tracking_id,
+                // Full body logged only when redirect_url is missing — PesaPal
+                // often returns 200 with an error/message field describing why
+                // (invalid billing field, unwhitelisted callback domain, amount
+                // below minimum, etc.) instead of a non-2xx status, and the
+                // previous logging didn't capture that, making failures like
+                // this unguessable from logs alone.
+                fullResponse: orderResponse.data?.redirect_url ? undefined : orderResponse.data
             });
 
             if (orderResponse.data && orderResponse.data.redirect_url) {
@@ -336,7 +343,11 @@ exports.initiatePesapalPayment = async (req, res) => {
                     }
                 });
             } else {
-                throw new Error('No redirect URL received from PesaPal');
+                const pesapalReason =
+                    orderResponse.data?.error?.message ||
+                    orderResponse.data?.message ||
+                    JSON.stringify(orderResponse.data);
+                throw new Error(`No redirect URL received from PesaPal: ${pesapalReason}`);
             }
         } catch (pesapalError) {
             logger.error('PesaPal API error', { 
