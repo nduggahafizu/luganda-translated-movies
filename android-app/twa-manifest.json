@@ -1,6 +1,6 @@
 {
   "packageId": "com.unrulymovies.app",
-  "host": "translatedmovies.netlify.app",
+  "host": "unrulymovies.com",
   "name": "Unruly Movies",
   "launcherName": "Unruly Movies",
   "display": "standalone",
@@ -12,8 +12,8 @@
   "backgroundColor": "#0a0a0a",
   "enableNotifications": true,
   "startUrl": "/",
-  "iconUrl": "https://translatedmovies.netlify.app/assets/images/icons/icon-512x512.png",
-  "maskableIconUrl": "https://translatedmovies.netlify.app/assets/images/icons/icon-512x512.png",
+  "iconUrl": "https://unrulymovies.com/assets/images/icons/icon-512x512.png",
+  "maskableIconUrl": "https://unrulymovies.com/assets/images/icons/icon-512x512.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
     "path": "unruly-movies.keystore",
@@ -26,17 +26,17 @@
       "name": "Movies",
       "shortName": "Movies",
       "url": "/movies.html",
-      "chosenIconUrl": "https://translatedmovies.netlify.app/assets/images/icons/icon-192x192.png"
+      "chosenIconUrl": "https://unrulymovies.com/assets/images/icons/icon-192x192.png"
     },
     {
       "name": "Uganda TV",
       "shortName": "TV",
       "url": "/uganda-tv.html",
-      "chosenIconUrl": "https://translatedmovies.netlify.app/assets/images/icons/icon-192x192.png"
+      "chosenIconUrl": "https://unrulymovies.com/assets/images/icons/icon-192x192.png"
     }
   ],
   "generatorApp": "bubblewrap-cli",
-  "webManifestUrl": "https://translatedmovies.netlify.app/manifest.json",
+  "webManifestUrl": "https://unrulymovies.com/manifest.json",
   "fallbackType": "customtabs",
   "features": {
     "locationDelegation": {
@@ -52,7 +52,7 @@
   "enableSiteSettingsShortcut": true,
   "isChromeOSOnly": false,
   "isMetaQuest": false,
-  "fullScopeUrl": "https://translatedmovies.netlify.app/",
+  "fullScopeUrl": "https://unrulymovies.com/",
   "minSdkVersion": 21,
   "orientation": "any"
 }

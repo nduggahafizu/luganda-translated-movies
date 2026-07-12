@@ -3,7 +3,7 @@
   "appName": "Unruly Movies",
   "webDir": "www",
   "server": {
-    "url": "https://translatedmovies.netlify.app",
+    "url": "https://unrulymovies.com",
     "cleartext": true
   },
   "plugins": {
