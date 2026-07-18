@@ -23,6 +23,7 @@ const { refreshTokenHandler } = require('./middleware/jwtAuth');
 const swaggerSpec = require('./config/swagger');
 
 // Import routes
+const appConfigRoutes = require('./routes/app-config');
 const authRoutes = require('./routes/auth');
 const paymentRoutes = require('./routes/payments');
 const lugandaMoviesRoutes = require('./routes/luganda-movies');
@@ -255,6 +256,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 }));
 
 // API Routes
+app.use('/api/app-config', appConfigRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/luganda-movies', cache(300), lugandaMoviesRoutes); // Cache for 5 minutes
