@@ -284,10 +284,10 @@ app.use('/api/sitemap-movies', require('./routes/sitemap')); // Dynamic movie si
 // Token refresh endpoint
 app.post('/api/auth/refresh', refreshTokenHandler);
 
-// Serve app-ads.txt for AdMob verification
+// Serve app-ads.txt (AdMob + Appodeal mediation network verification)
 app.get('/app-ads.txt', (req, res) => {
   res.type('text/plain');
-  res.send('google.com, pub-1904736753681797, DIRECT, f08c47fec0942fa0');
+  res.sendFile(path.join(__dirname, '../app-ads.txt'));
 });
 
 /**
