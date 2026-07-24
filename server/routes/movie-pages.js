@@ -76,14 +76,35 @@ function renderMoviePage(movie) {
     }).replace(/<\/script>/gi, '<\\/script>');
 
     const genreDescriptions = {
-        action:   'Action films narrated in Luganda with the energy that matches every fight scene and chase.',
-        comedy:   'Comedy in Luganda — local humour replaces English jokes so the film lands as intended.',
-        drama:    'Drama narrated with emotional precision so every scene carries its full weight in Luganda.',
-        thriller: 'Thriller narration builds suspense through controlled Luganda delivery.',
-        horror:   'Horror in Luganda — the VJ\'s voice in quiet moments before a scare is part of the experience.',
-        romance:  'Romance narration bridges international filmmaking and East African audiences.',
+        action:      'Action films narrated in Luganda with the energy that matches every fight scene and chase.',
+        adventure:   'Adventure stories narrated in Luganda so the scale of every journey still comes through.',
+        comedy:      'Comedy in Luganda — local humour replaces English jokes so the film lands as intended.',
+        drama:       'Drama narrated with emotional precision so every scene carries its full weight in Luganda.',
+        thriller:    'Thriller narration builds suspense through controlled Luganda delivery.',
+        horror:      'Horror in Luganda — the VJ\'s voice in quiet moments before a scare is part of the experience.',
+        romance:     'Romance narration bridges international filmmaking and East African audiences.',
+        'sci-fi':    'Sci-fi concepts get explained in plain Luganda so the world-building stays easy to follow.',
+        fantasy:     'Fantasy worlds narrated in Luganda, with names and lore kept clear for local audiences.',
+        animation:   'Animated films narrated in Luganda, aimed at making the story easy to follow for the whole family.',
+        family:      'Family-friendly narration in Luganda, made for watching together across generations.',
+        crime:       'Crime stories narrated in Luganda with attention to the details that keep the plot tight.',
+        mystery:     'Mystery films narrated in Luganda without giving away the reveal early — the pacing stays intact.',
+        war:         'War films narrated in Luganda with the gravity the subject matter demands.',
+        history:     'Historical films narrated in Luganda, with context added where local audiences need it.',
+        music:       'Musical and music-driven films narrated in Luganda around the soundtrack, not over it.',
+        western:     'Westerns narrated in Luganda, keeping the tone of the genre intact.',
+        documentary: 'Documentary narration in Luganda, presented factually and true to the source material.',
     };
-    const genreNote = genres.map(g => genreDescriptions[g.toLowerCase()]).find(Boolean) || '';
+    const genreNotes = genres
+        .map(g => genreDescriptions[g.toLowerCase()])
+        .filter(Boolean);
+    const genreNote = genreNotes.slice(0, 2).join(' ');
+
+    const statsNote = [
+        rating ? `It holds a ${esc(String(typeof rating === 'object' ? (rating.imdb || '') : rating))} rating` : '',
+        durationText ? `runs ${esc(durationText)}` : '',
+        year ? `and was released in ${esc(String(year))}` : ''
+    ].filter(Boolean).join(', ') + (rating || durationText || year ? '.' : '');
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -365,7 +386,7 @@ a{text-decoration:none;color:inherit}
 <!-- EDITORIAL (SSR — original content for AdSense/Google) -->
 <div class="editorial">
   <h2>About this Luganda Translation</h2>
-  <p>${esc(title)} is available on Unruly Movies with a full Luganda narration track${vjLabel ? ` by ${esc(vjLabel)}` : ''}. The VJ narration delivers the complete story so viewers can follow every scene without subtitles.</p>
+  <p>${esc(title)} is available on Unruly Movies with a full Luganda narration track${vjLabel ? ` by ${esc(vjLabel)}` : ''}. The VJ narration delivers the complete story so viewers can follow every scene without subtitles.${statsNote ? ` ${statsNote}` : ''}</p>
   ${genreNote ? `<p>${genreNote}</p>` : ''}
   <p>Unruly Movies is Uganda's licensed platform for Luganda VJ-translated films. <a href="/register.html">Sign up free</a> to start watching, or <a href="/blog.html">read about VJ culture</a> to learn more.</p>
 </div>

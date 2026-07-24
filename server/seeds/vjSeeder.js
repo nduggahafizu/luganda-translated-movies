@@ -882,8 +882,8 @@ const vjs = [
         }
     },
     {
-        name: 'Vj Ulio',
-        fullName: 'Vj Ulio',
+        name: 'VJ Ulio',
+        fullName: 'VJ Ulio',
         bio: 'Known for action and adventure translations.',
         profileImage: '/assets/images/vjs/vj-ulio.jpg',
         specialties: ['action', 'adventure', 'thriller'],
