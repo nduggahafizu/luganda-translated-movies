@@ -8,7 +8,7 @@ const { sendPaymentReceipt, sendSubscriptionEmail } = require('../utils/email');
 
 // Subscription pricing
 const SUBSCRIPTION_PRICES = {
-    starter: { ugx: 1000, days: 1 },
+    starter: { ugx: 500, days: 1 },
     basic: { ugx: 5000, days: 7 },
     standard: { ugx: 12000, days: 30 },
     premium: { ugx: 30000, days: 30 },
@@ -250,7 +250,7 @@ exports.initiatePesapalPayment = async (req, res) => {
             logger.info('PesaPal token obtained', { tokenLength: token?.length });
             
             // Register IPN URL first (required by PesaPal 3.0)
-            const ipnUrl = process.env.PESAPAL_IPN_URL || `https://luganda-translated-movies-production.up.railway.app/api/payments/pesapal/ipn`;
+            const ipnUrl = process.env.PESAPAL_IPN_URL || `http://localhost:5000/api/payments/pesapal/ipn`;
             
             let ipnId;
             try {
@@ -291,7 +291,7 @@ exports.initiatePesapalPayment = async (req, res) => {
                 currency: 'UGX',
                 amount: paymentAmount,
                 description: description || `Unruly Movies ${subscriptionPlan || 'basic'} subscription (${subscriptionDuration || 'monthly'})`,
-                callback_url: `https://unrulymovies.com/payment-success.html?ref=${merchantReference}`,
+                callback_url: process.env.PESAPAL_CALLBACK_URL || `https://unrulymovies.com/payment-success.html?ref=${merchantReference}`,
                 notification_id: ipnId,
                 billing_address: {
                     email_address: userEmail,

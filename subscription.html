@@ -19,6 +19,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
     
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/payment-manager.js?v=2"></script>
@@ -40,7 +41,7 @@
             font-size: 42px;
             font-weight: 800;
             margin-bottom: 15px;
-            background: linear-gradient(135deg, #FF0000, #FF6B6B);
+            background: linear-gradient(135deg, #4ade80, #22c55e);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -217,8 +218,8 @@
         .btn-subscribe {
             width: 100%;
             padding: 12px 20px;
-            background: linear-gradient(135deg, #FF0000, #CC0000);
-            color: #fff;
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            color: #000;
             border: none;
             border-radius: 10px;
             font-size: 14px;
@@ -233,7 +234,7 @@
         
         .btn-subscribe:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(255, 0, 0, 0.4);
+            box-shadow: 0 10px 30px rgba(74, 222, 128, 0.4);
         }
         
         /* Trust Section */
@@ -267,13 +268,13 @@
         .trust-badge svg {
             width: 20px;
             height: 20px;
-            fill: #FF0000;
+            fill: #4ade80;
         }
         
         /* Login prompt */
         .login-prompt {
-            background: rgba(255, 0, 0, 0.1);
-            border: 1px solid rgba(255, 0, 0, 0.3);
+            background: rgba(74, 222, 128, 0.08);
+            border: 1px solid rgba(74, 222, 128, 0.3);
             border-radius: 12px;
             padding: 20px;
             text-align: center;
@@ -282,14 +283,42 @@
         }
         
         .login-prompt p {
-            color: #ff6b6b;
+            color: #4ade80;
             margin-bottom: 15px;
         }
         
         .login-prompt a {
-            color: #FF0000;
+            color: #4ade80;
             font-weight: 600;
             text-decoration: underline;
+        }
+
+        /* Ad slots */
+        .ad-slot {
+            max-width: 728px;
+            margin: 30px auto;
+            text-align: center;
+            min-height: 90px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .ad-slot-square {
+            max-width: 360px;
+            margin: 20px auto;
+            min-height: 280px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* Step number brand color */
+        .step-number {
+            background: linear-gradient(135deg, #4ade80, #22c55e) !important;
+            color: #000 !important;
         }
         
         /* How it works */
@@ -343,7 +372,7 @@
 </head>
 <body>
     <!-- Header -->
-    <header class="header">
+    <header class="app-header">
         <nav class="navbar">
             <div class="navbar-brand">
                 <a href="index.html">
@@ -381,18 +410,40 @@
             <a href="login.html?redirect=subscription.html">Log In</a> or <a href="register.html?redirect=subscription.html">Create Account</a>
         </div>
         
+        <!-- Top Ad Banner -->
+        <div class="ad-slot">
+            <ins class="adsbygoogle"
+                 style="display:block;width:100%;height:90px;"
+                 data-ad-client="ca-pub-1904736753681797"
+                 data-ad-slot="auto"
+                 data-ad-format="horizontal"
+                 data-full-width-responsive="true"></ins>
+        </div>
+
         <div class="subscription-header">
-            <h1>Download Access</h1>
-            <p>Subscribe to download Luganda translated movies and series for offline viewing</p>
-            <div class="airtel-badge">
+            <h1>🎬 Premium Access</h1>
+            <p>Watch & download unlimited Luganda VJ translated movies and series. Cancel anytime.</p>
+            <div class="airtel-badge" style="background:rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.3);margin-top:16px;">
                 <div style="background: linear-gradient(135deg, #4ade80, #22c55e); padding: 5px 12px; border-radius: 6px;">
                     <span style="font-weight: bold; color: #000;">PesaPal</span>
                 </div>
-                <span>MTN · Airtel · Visa · Mastercard</span>
+                <span style="color:#ccc;">MTN · Airtel · Visa · Mastercard</span>
             </div>
         </div>
         
         <div class="plans-container" style="max-width:600px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <div class="plan-card" data-plan="starter" style="--plan-color: #f59e0b;grid-column:1/-1;">
+                <div class="plan-icon" style="font-size:36px;">⚡</div>
+                <h3 class="plan-name">Test Plan</h3>
+                <div class="plan-duration">1 Day Access</div>
+                <div class="plan-price"><span class="currency">UGX</span><span class="amount">500</span></div>
+                <ul class="plan-features">
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Stream all movies</li>
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 1 day access</li>
+                </ul>
+                <button class="btn-subscribe" onclick="paymentManager.subscribe('starter')">Pay UGX 500</button>
+            </div>
+
             <div class="plan-card" data-plan="basic" style="--plan-color: #00D9FF;">
                 <div class="plan-icon" style="font-size:36px;">📥</div>
                 <h3 class="plan-name">Weekly</h3>
@@ -424,33 +475,6 @@
             </div>
         </div>
         
-        <!-- How it Works -->
-        <div class="how-it-works">
-            <h2>How to Pay</h2>
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <h4>Choose Plan</h4>
-                    <p>Select the plan that fits your needs</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <h4>Enter Number</h4>
-                    <p>Enter your Airtel Money number (070, 074, 075)</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <h4>Confirm PIN</h4>
-                    <p>Check your phone and enter your PIN</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <h4>Start Watching</h4>
-                    <p>Instant access to all movies!</p>
-                </div>
-            </div>
-        </div>
-        
         <!-- Trust Section -->
         <div class="trust-section">
             <h3>Why Choose Us?</h3>
@@ -475,28 +499,47 @@
         </div>
     </main>
 
+    <!-- Bottom Ad Before Footer -->
+    <div class="ad-slot" style="max-width:728px;margin:40px auto 0;">
+        <ins class="adsbygoogle"
+             style="display:block;width:100%;height:90px;"
+             data-ad-client="ca-pub-1904736753681797"
+             data-ad-slot="auto"
+             data-ad-format="horizontal"
+             data-full-width-responsive="true"></ins>
+    </div>
+
     <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>Unruly Movies</h4>
-                    <p>Luganda-translated movies streaming</p>
+    <footer style="background:linear-gradient(180deg,#0d0d0d 0%,#000 100%);border-top:1px solid #1a1a1a;margin-top:40px;padding:40px 20px 24px;">
+        <div style="max-width:1000px;margin:0 auto;">
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:30px;margin-bottom:30px;">
+                <div>
+                    <img src="assets/images/logo-wordmark.png" alt="Unruly Movies" style="height:36px;margin-bottom:12px;">
+                    <p style="color:#888;font-size:13px;line-height:1.7;">Uganda's #1 platform for Luganda VJ translated movies and series. Watch online or download for offline viewing.</p>
+                    <p style="color:#555;font-size:12px;margin-top:10px;">📧 support@unrulymovies.com</p>
                 </div>
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <a href="index.html">Home</a>
-                    <a href="movies.html">Movies</a>
-                    <a href="subscription.html">Subscribe</a>
+                <div>
+                    <h4 style="color:#fff;font-size:14px;font-weight:600;margin-bottom:14px;">Quick Links</h4>
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                        <a href="index.html" style="color:#888;font-size:13px;">🏠 Home</a>
+                        <a href="movies.html" style="color:#888;font-size:13px;">🎬 Movies</a>
+                        <a href="series.html" style="color:#888;font-size:13px;">📺 Series</a>
+                        <a href="vjs.html" style="color:#888;font-size:13px;">🎙️ VJ Profiles</a>
+                        <a href="uganda-tv.html" style="color:#888;font-size:13px;">📡 Uganda TV</a>
+                    </div>
                 </div>
-                <div class="footer-section">
-                    <h4>Legal</h4>
-                    <a href="privacy-policy.html">Privacy Policy</a>
-                    <a href="terms.html">Terms of Service</a>
+                <div>
+                    <h4 style="color:#fff;font-size:14px;font-weight:600;margin-bottom:14px;">Legal</h4>
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                        <a href="privacy-policy.html" style="color:#888;font-size:13px;">Privacy Policy</a>
+                        <a href="terms.html" style="color:#888;font-size:13px;">Terms of Service</a>
+                        <a href="dmca.html" style="color:#888;font-size:13px;">DMCA</a>
+                        <a href="contact.html" style="color:#888;font-size:13px;">Contact Us</a>
+                    </div>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 Unruly Movies. All rights reserved.</p>
+            <div style="border-top:1px solid #1a1a1a;padding-top:20px;text-align:center;">
+                <p style="color:#555;font-size:12px;">&copy; 2026 Unruly Movies. All rights reserved. | Payments secured by <strong style="color:#888;">PesaPal</strong></p>
             </div>
         </div>
     </footer>
@@ -541,6 +584,9 @@
         const style = document.createElement('style');
         style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
         document.head.appendChild(style);
+
+        // Init AdSense
+        try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
     </script>
 </body>
 </html>
