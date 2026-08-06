@@ -1502,6 +1502,19 @@
                                 </div>
                             </div>
 
+                            <!-- Picks for You Section - admin-curated, hidden if nothing is picked yet -->
+                            <div class="app-section movie-section" id="forYouSection" style="display: none;">
+                                <div class="section-header">
+                                    <h2>
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
+                                            <path d="M12 2l2.76 6.6L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14l-5-4.87 7.24-.67L12 2z"></path>
+                                        </svg>
+                                        Picks for You
+                                    </h2>
+                                </div>
+                                <div class="card-grid h-scroll" id="forYouMovies"></div>
+                            </div>
+
                             <!-- VJ Spotlight Section -->
 
                             <!-- Continue Watching Section (Only shows if user has watch history) -->
@@ -2069,7 +2082,10 @@
 
                     // Load trending section (based on views + recent)
                     loadTrendingMovies(allMovies);
-                    
+
+                    // Load admin-curated "Picks for You"
+                    loadForYouMovies();
+
                     // Load trending sidebar
                     loadTrendingSidebar(allMovies);
                     
@@ -2223,7 +2239,22 @@
             
             renderMoviesWithRank(scoredMovies, 'trendingMovies');
         }
-        
+
+        // Load "Picks for You" — admin-curated via the "Picks for You" checkbox
+        // in admin-movies.html. Section stays hidden until something is picked.
+        async function loadForYouMovies() {
+            try {
+                const response = await LugandaMoviesAPI.getForYou(10);
+                const movies = response.data || [];
+                if (!movies.length) return;
+
+                renderMovies(movies, 'forYouMovies');
+                document.getElementById('forYouSection').style.display = '';
+            } catch (e) {
+                console.error('Failed to load Picks for You:', e);
+            }
+        }
+
         // Render movies with trending rank badge
         function renderMoviesWithRank(movies, containerId) {
             const container = document.getElementById(containerId);

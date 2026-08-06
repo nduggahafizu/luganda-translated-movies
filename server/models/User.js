@@ -271,11 +271,11 @@ userSchema.methods.canAccessContent = function(requiredPlan) {
 // Plan capabilities
 const PLAN_CONFIG = {
     free:     { devices: 1, download: false, ads: true },
-    daily:    { devices: 1, download: false, ads: true },
+    daily:    { devices: 1, download: true,  ads: true },
     weekly:   { devices: 1, download: true,  ads: true },
     biweekly: { devices: 1, download: true,  ads: false },
     monthly:  { devices: 2, download: true,  ads: false },
-    starter:  { devices: 1, download: false, ads: true },
+    starter:  { devices: 1, download: true,  ads: true },
     basic:    { devices: 1, download: true,  ads: true },
     standard: { devices: 1, download: true,  ads: false },
     premium:  { devices: 2, download: true,  ads: false },

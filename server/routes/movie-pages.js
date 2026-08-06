@@ -612,7 +612,7 @@ async function boot() {
             const regBtn = strip.querySelector('.ls-reg');
             regBtn.textContent = 'Subscribe Now';
             regBtn.removeAttribute('href');
-            regBtn.onclick = () => showSubscribePlans();
+            regBtn.onclick = () => showSubscribePopup();
             const loginBtn = strip.querySelector('.ls-login');
             if (loginBtn) loginBtn.style.display = 'none';
             strip.classList.add('show');
@@ -623,7 +623,7 @@ async function boot() {
             freeBtn.id = 'freePlayBtn';
             freeBtn.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;background:rgba(0,0,0,0.38);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;gap:14px;';
             freeBtn.innerHTML = '<div style="width:76px;height:76px;border-radius:50%;background:rgba(74,222,128,0.92);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 14px rgba(74,222,128,0.18);"><svg width="30" height="30" viewBox="0 0 24 24" fill="#000"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><span style="color:#fff;font-size:13px;background:rgba(0,0,0,0.65);padding:5px 16px;border-radius:20px;">Subscribe to watch</span>';
-            freeBtn.onclick = () => showSubscribePlans();
+            freeBtn.onclick = () => showSubscribePopup();
             wrap.appendChild(freeBtn);
         }
         loadRelatedMovies();

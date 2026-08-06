@@ -37,6 +37,7 @@
         .badge.admin { background: rgba(74,222,128,0.15); color: #4ade80; }
         .badge.user { background: rgba(255,255,255,0.06); color: #888; }
         .badge.free { background: rgba(255,255,255,0.06); color: #888; }
+        .badge.daily, .badge.weekly, .badge.biweekly, .badge.monthly,
         .badge.basic, .badge.standard { background: rgba(0,217,255,0.15); color: #00d9ff; }
         .badge.active { background: rgba(74,222,128,0.15); color: #4ade80; }
         .badge.expired, .badge.inactive { background: rgba(255,68,68,0.15); color: #ff4444; }
@@ -93,7 +94,7 @@
         <div class="toolbar">
             <input type="text" id="search" placeholder="Search by name or email...">
             <select id="roleFilter"><option value="">All Roles</option><option value="user">User</option><option value="admin">Admin</option></select>
-            <select id="planFilter"><option value="">All Plans</option><option value="free">Free</option><option value="basic">Weekly</option><option value="standard">Monthly</option></select>
+            <select id="planFilter"><option value="">All Plans</option><option value="free">Free</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="biweekly">2 Weeks</option><option value="monthly">Monthly</option></select>
         </div>
 
         <table>
@@ -116,9 +117,9 @@
                     <div class="field"><label>Role</label><select id="frole"><option value="user">User</option><option value="admin">Admin</option></select></div>
                     <div class="field"><label>Account</label><select id="factive"><option value="true">Active</option><option value="false">Banned</option></select></div>
                 </div>
-                <h3 style="color:#4ade80;font-size:13px;margin:16px 0 12px;border-top:1px solid #222;padding-top:16px;">Download Access</h3>
+                <h3 style="color:#4ade80;font-size:13px;margin:16px 0 12px;border-top:1px solid #222;padding-top:16px;">Subscription Plan</h3>
                 <div class="field-row">
-                    <div class="field"><label>Plan</label><select id="fplan" onchange="document.getElementById('fdays').value=this.value==='standard'?30:this.value==='basic'?7:0"><option value="free">Free (No downloads)</option><option value="basic">Weekly (7 days)</option><option value="standard">Monthly (30 days)</option></select></div>
+                    <div class="field"><label>Plan</label><select id="fplan" onchange="document.getElementById('fdays').value=({free:0,daily:1,weekly:7,biweekly:14,monthly:30})[this.value]"><option value="free">Free (No downloads)</option><option value="daily">Daily (1 day)</option><option value="weekly">Weekly (7 days)</option><option value="biweekly">2 Weeks (14 days)</option><option value="monthly">Monthly (30 days)</option></select></div>
                     <div class="field"><label>Duration (days)</label><input type="number" id="fdays" value="7" min="1" max="365"></div>
                 </div>
                 <div class="sub-info" id="subInfo">-</div>
@@ -221,15 +222,16 @@
             document.getElementById('frole').value = user.role || 'user';
             document.getElementById('factive').value = user.isActive !== false ? 'true' : 'false';
 
+            const planDays = { free: 0, daily: 1, weekly: 7, biweekly: 14, monthly: 30 };
             const plan = (user.subscription && user.subscription.plan) || 'free';
             const planEl = document.getElementById('fplan');
-            planEl.value = ['free', 'basic', 'standard'].includes(plan) ? plan : 'free';
-            document.getElementById('fdays').value = plan === 'standard' ? 30 : 7;
+            planEl.value = plan in planDays ? plan : 'free';
+            document.getElementById('fdays').value = planDays[plan] || 7;
 
             const sub = user.subscription || {};
             const endDate = sub.endDate ? new Date(sub.endDate) : null;
             const isActive = sub.status === 'active' && endDate && endDate > new Date();
-            const hasDownload = ['basic', 'standard', 'premium', 'vip'].includes(plan) && isActive;
+            const hasDownload = plan !== 'free' && isActive;
             let info = '<strong>' + plan.toUpperCase() + '</strong> | ' + (sub.status || 'none');
             if (endDate) {
                 const rem = endDate.getTime() - Date.now();

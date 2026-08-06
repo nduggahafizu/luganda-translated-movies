@@ -112,6 +112,7 @@ router.post('/simple-add', async (req, res) => {
             embedUrl,
             featured,
             trending,
+            forYou,
             tmdbId,
             trailer
         } = req.body;
@@ -146,6 +147,7 @@ router.post('/simple-add', async (req, res) => {
             },
             featured: featured || false,
             trending: trending || false,
+            forYou: forYou || false,
             status: 'published',
             metaData: tmdbId ? { tmdbId: parseInt(tmdbId) } : {},
             trailer: trailer || null
@@ -1203,6 +1205,7 @@ router.put('/:id', async (req, res) => {
             embedUrl,
             featured,
             trending,
+            forYou,
             status,
             requiredPlan,
             trailer
@@ -1224,6 +1227,7 @@ router.put('/:id', async (req, res) => {
         if (genres) updateData.genres = mapGenres(genres);
         if (featured !== undefined) updateData.featured = featured;
         if (trending !== undefined) updateData.trending = trending;
+        if (forYou !== undefined) updateData.forYou = forYou;
         if (status) updateData.status = status;
         if (requiredPlan) updateData.requiredPlan = requiredPlan;
         if (trailer !== undefined) updateData.trailer = trailer;

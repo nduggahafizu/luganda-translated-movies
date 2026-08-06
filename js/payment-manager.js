@@ -8,11 +8,10 @@ class PaymentManager {
     constructor() {
         this.apiUrl = API_CONFIG.BASE_URL;
         this.plans = {
-            daily:    { name: 'Daily',    price: 1000,  duration: '1 day',   features: ['Stream all movies', '1 device'] },
-            basic:    { name: 'Weekly',   price: 5000,  duration: '7 days',  features: ['Stream all movies', 'Download access', '3 devices'] },
-            standard: { name: 'Monthly',  price: 12000, duration: '30 days', features: ['Stream all movies', 'Download access', 'No ads', '3 devices'] },
-            premium:  { name: 'Premium',  price: 30000, duration: '30 days', features: ['Stream all movies', 'Download access', 'No ads', '3 devices', 'Priority support'] },
-            vip:      { name: 'VIP',      price: 50000, duration: '90 days', features: ['Everything in Premium', '3 months access', 'Early releases'] }
+            daily:    { name: 'Daily',    price: 1000,  duration: '1 day',   features: ['Stream all movies', 'Download access', '1 device'] },
+            weekly:   { name: 'Weekly',   price: 5000,  duration: '7 days',  features: ['Stream all movies', 'Download access', '1 device'] },
+            biweekly: { name: '2 Weeks',  price: 7000,  duration: '14 days', features: ['Stream all movies', 'Download access', 'No ads', '1 device'] },
+            monthly:  { name: 'Monthly',  price: 12000, duration: '30 days', features: ['Stream all movies', 'Download access', 'No ads', '2 devices'] }
         };
         this._injectStyles();
     }

@@ -125,6 +125,11 @@ const LugandaMoviesAPI = (function() {
             return await apiCall(`/featured?limit=${limit}`);
         },
 
+        // Get admin-curated "Picks for You"
+        getForYou: async function(limit = 10) {
+            return await apiCall(`/for-you?limit=${limit}`);
+        },
+
         // Get latest translations
         getLatest: async function(limit = 10) {
             return await apiCall(`/latest?limit=${limit}`);

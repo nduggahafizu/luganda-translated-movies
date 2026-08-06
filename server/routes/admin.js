@@ -44,7 +44,7 @@ router.get('/dashboard', [auth, adminOnly], async (req, res) => {
             VJ.countDocuments(),
             Review.countDocuments(),
             Comment.countDocuments(),
-            User.countDocuments({ 'subscription.plan': { $in: ['starter', 'basic', 'standard', 'premium', 'vip'] } }),
+            User.countDocuments({ 'subscription.plan': { $ne: 'free' } }),
             User.countDocuments({ 
                 'subscription.status': 'active',
                 'subscription.plan': { $ne: 'free' }
@@ -923,8 +923,8 @@ router.get('/subscriptions', [auth, adminOnly], async (req, res) => {
         });
         
         const recentUpgrades = await User.find({
-            'subscription.plan': { $in: ['basic', 'premium', 'vip'] },
-            'subscription.startedAt': { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
+            'subscription.plan': { $ne: 'free' },
+            'subscription.startDate': { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
         }).countDocuments();
         
         res.json({
@@ -1441,9 +1441,9 @@ router.post('/notifications/send', [auth, adminOnly], async (req, res) => {
             userIds = users.map(u => u._id);
             recipientDescription = 'all users';
         } else if (recipients === 'subscribers') {
-            const users = await User.find({ 
+            const users = await User.find({
                 isActive: { $ne: false },
-                'subscription.plan': { $in: ['basic', 'premium', 'vip'] }
+                'subscription.plan': { $ne: 'free' }
             }).select('_id');
             userIds = users.map(u => u._id);
             recipientDescription = 'subscribers';

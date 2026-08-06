@@ -13,7 +13,7 @@ exports.validateAdminUserUpdate = [
         .isObject().withMessage('Subscription must be an object'),
     body('subscription.plan')
         .optional()
-        .isIn(['free', 'starter', 'basic', 'standard', 'premium', 'vip']).withMessage('Invalid subscription plan'),
+        .isIn(['free', 'daily', 'weekly', 'biweekly', 'monthly', 'starter', 'basic', 'standard', 'premium', 'vip']).withMessage('Invalid subscription plan'),
     body('subscription.status')
         .optional()
         .isIn(['active', 'inactive', 'cancelled', 'expired']).withMessage('Invalid subscription status'),
@@ -51,7 +51,7 @@ exports.validateNotificationBroadcast = [
         .isObject().withMessage('userFilter must be an object'),
     body('userFilter.plan')
         .optional()
-        .isIn(['free', 'basic', 'premium']).withMessage('Invalid userFilter plan'),
+        .isIn(['free', 'daily', 'weekly', 'biweekly', 'monthly', 'starter', 'basic', 'standard', 'premium', 'vip']).withMessage('Invalid userFilter plan'),
     body('userFilter.status')
         .optional()
         .isIn(['active', 'inactive', 'canceled']).withMessage('Invalid userFilter status'),
