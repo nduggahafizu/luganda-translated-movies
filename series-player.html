@@ -685,6 +685,11 @@
             window.location.replace('login.html?redirect=' + encodeURIComponent(currentUrl));
         }
 
+        function isBot() {
+            const ua = navigator.userAgent || '';
+            return /Googlebot|bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot|Sogou|Exabot|facebot|ia_archiver|AhrefsBot|SemrushBot|MJ12bot|DotBot|Applebot|Twitterbot|LinkedInBot|WhatsApp|Slack|Discordbot/i.test(ua);
+        }
+
         async function requireLoggedInMember() {
             const token = normalizeBearerToken(getAuthToken());
             if (!token) { redirectToLogin(); return false; }
@@ -707,6 +712,12 @@
                 if (!data.success) { redirectToLogin(); return false; }
 
                 window._seriesAccess = data.access;
+
+                // Free plan — let the page load, gate at play time
+                if (data.access && data.access.freeUser) {
+                    return true; // allow loadSeries() so episode list is visible
+                }
+
                 return true;
             } catch (error) {
                 return true;
@@ -784,6 +795,11 @@
         
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
+            // Bots/crawlers: skip auth gate so Google indexes the content
+            if (isBot()) {
+                if (seriesId) loadSeries();
+                return;
+            }
             const isAuthorized = await requireLoggedInMember();
             if (!isAuthorized) return;
 
@@ -882,6 +898,14 @@
                     <section class="player-section">
                         <div class="video-container" id="video-container">
                             ${(() => {
+                                if (window._seriesAccess && window._seriesAccess.freeUser) {
+                                    return `<div style="position:absolute;inset:0;width:100%;height:100%;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;" onclick="showSubscribePlans()">
+                                        <div style="width:76px;height:76px;border-radius:50%;background:rgba(74,222,128,0.92);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 14px rgba(74,222,128,0.18);">
+                                            <svg width="30" height="30" viewBox="0 0 24 24" fill="#000"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                        </div>
+                                        <span style="color:#fff;font-size:13px;background:rgba(0,0,0,0.65);padding:5px 16px;border-radius:20px;">Subscribe to watch</span>
+                                    </div>`;
+                                }
                                 if (!currentEp?.video?.embedUrl) {
                                     return `<div class="no-video-message">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1025,6 +1049,11 @@
         }
         
         function playEpisode(season, episodeNumber) {
+            // Free plan users see the plans popup when they click an episode
+            if (window._seriesAccess && window._seriesAccess.freeUser) {
+                showSubscribePlans();
+                return;
+            }
             currentSeason = season;
             currentEpisode = { season, episode: episodeNumber };
             renderSeries();
@@ -1088,6 +1117,32 @@
             }
         }
 
+        async function _seriesSelectPlan(plan) {
+            const token = localStorage.getItem('token') || localStorage.getItem('authToken') || '';
+            if (!token) { window.location.href = 'login.html'; return; }
+            const btn = document.querySelector(`[data-series-plan="${plan}"]`);
+            if (btn) { btn.disabled = true; btn.textContent = 'Redirecting...'; }
+            try {
+                const r = await fetch(`${API_BASE_URL}/api/payments/subscribe`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ plan, paymentMethod: 'pesapal' })
+                });
+                const d = await r.json();
+                if (d.status === 'success' && d.data && d.data.redirectUrl) {
+                    window.location.href = d.data.redirectUrl;
+                } else {
+                    alert(d.message || d.error || 'Payment error. Please try again.');
+                    if (btn) { btn.disabled = false; btn.textContent = plan.charAt(0).toUpperCase() + plan.slice(1); }
+                }
+            } catch (e) {
+                alert('Network error. Please try again.');
+                if (btn) { btn.disabled = false; }
+            }
+        }
+
+        function showSubscribePlans() { showDownloadPrompt(); }
+
         function showDownloadPrompt() {
             const existing = document.getElementById('downloadPrompt');
             if (existing) existing.remove();
@@ -1096,22 +1151,30 @@
             overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
             overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
             overlay.innerHTML = `
-                <div style="background:linear-gradient(145deg,#1a1a2e,#16213e);border:1px solid rgba(74,222,128,0.2);border-radius:20px;padding:32px;max-width:380px;width:100%;text-align:center;">
+                <div style="background:linear-gradient(145deg,#1a1a2e,#16213e);border:1px solid rgba(74,222,128,0.2);border-radius:20px;padding:32px;max-width:420px;width:100%;text-align:center;">
                     <div style="width:60px;height:60px;border-radius:50%;background:rgba(74,222,128,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     </div>
-                    <h3 style="color:#fff;font-size:18px;margin-bottom:8px;">Download for Offline</h3>
-                    <p style="color:#888;font-size:13px;line-height:1.6;margin-bottom:20px;">Save movies and series to watch without internet. Choose a download plan:</p>
+                    <h3 style="color:#fff;font-size:18px;margin-bottom:8px;">Choose a Plan</h3>
+                    <p style="color:#888;font-size:13px;line-height:1.6;margin-bottom:20px;">Unlock full access — watch &amp; download without limits.</p>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
-                        <a href="subscription.html" style="display:block;padding:16px 12px;background:rgba(0,217,255,0.08);border:1px solid rgba(0,217,255,0.25);border-radius:12px;text-decoration:none;">
+                        <button data-series-plan="daily" onclick="_seriesSelectPlan('daily')" style="padding:16px 12px;background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.25);border-radius:12px;cursor:pointer;">
+                            <div style="font-size:20px;font-weight:800;color:#ffc800;">1,000</div>
+                            <div style="font-size:11px;color:#888;margin-top:2px;">UGX / Day</div>
+                        </button>
+                        <button data-series-plan="weekly" onclick="_seriesSelectPlan('weekly')" style="padding:16px 12px;background:rgba(0,217,255,0.08);border:1px solid rgba(0,217,255,0.25);border-radius:12px;cursor:pointer;">
                             <div style="font-size:20px;font-weight:800;color:#00d9ff;">5,000</div>
                             <div style="font-size:11px;color:#888;margin-top:2px;">UGX / Week</div>
-                        </a>
-                        <a href="subscription.html" style="display:block;padding:16px 12px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:12px;text-decoration:none;position:relative;">
+                        </button>
+                        <button data-series-plan="biweekly" onclick="_seriesSelectPlan('biweekly')" style="padding:16px 12px;background:rgba(180,100,255,0.08);border:1px solid rgba(180,100,255,0.25);border-radius:12px;cursor:pointer;">
+                            <div style="font-size:20px;font-weight:800;color:#b464ff;">7,000</div>
+                            <div style="font-size:11px;color:#888;margin-top:2px;">UGX / 2 Weeks</div>
+                        </button>
+                        <button data-series-plan="monthly" onclick="_seriesSelectPlan('monthly')" style="padding:16px 12px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:12px;cursor:pointer;position:relative;">
                             <div style="position:absolute;top:-8px;right:8px;background:#4ade80;color:#000;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;">BEST</div>
                             <div style="font-size:20px;font-weight:800;color:#4ade80;">12,000</div>
                             <div style="font-size:11px;color:#888;margin-top:2px;">UGX / Month</div>
-                        </a>
+                        </button>
                     </div>
                     <button onclick="this.closest('#downloadPrompt').remove()" style="background:none;border:none;color:#666;font-size:12px;cursor:pointer;">Not now</button>
                 </div>

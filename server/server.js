@@ -279,6 +279,7 @@ app.use('/api/series', cache(300), seriesRoutes); // TV Series with 5 min cache
 app.use('/api/email', emailRoutes); // Email subscriptions and notifications
 app.use('/api/push', pushRoutes); // Web Push notifications
 app.use('/api/movie-page', moviePagesRoutes); // SSR movie pages for crawlers
+app.use('/movie', moviePagesRoutes);           // Local dev: /movie/:slug directly
 app.use('/api/sitemap-movies', require('./routes/sitemap')); // Dynamic movie sitemap
 
 // Token refresh endpoint
@@ -396,6 +397,11 @@ app.post('/api/cache/clear', async (req, res) => {
 
 // Root endpoint
 app.get('/', (req, res) => {
+    // Serve frontend for browsers; return JSON for API clients
+    const acceptsHtml = req.headers.accept && req.headers.accept.includes('text/html');
+    if (acceptsHtml) {
+        return res.sendFile(path.join(__dirname, '../index.html'));
+    }
     res.json({
         message: 'Welcome to Luganda Movies API',
         version: '1.0.0',

@@ -346,8 +346,25 @@
             loadChannel(stationId);
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            if (!requireLogin()) return;
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+            if (!token) {
+                localStorage.setItem('redirectAfterLogin', window.location.href);
+                window.location.href = 'login.html';
+                return;
+            }
+            // Check paid subscription
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/check-access`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (!data.success || (data.access && data.access.freeUser)) {
+                    window.location.replace('subscription.html?reason=free_plan&redirect=' + encodeURIComponent(window.location.href));
+                    return;
+                }
+            } catch(e) { /* allow on error */ }
+
             const params = new URLSearchParams(window.location.search);
             const stationId = params.get('station') || 'nbs-tv';
             renderChannelList(stationId);

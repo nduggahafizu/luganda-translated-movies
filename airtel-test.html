@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airtel Money Test - Unruly Movies</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #09090f;
+            color: #f1f1f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .card {
+            background: #16161f;
+            border: 1px solid #24243a;
+            border-radius: 16px;
+            padding: 36px;
+            max-width: 480px;
+            width: 100%;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+        .airtel-logo {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #e60000, #ff4444);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 900;
+            color: #fff;
+        }
+        h1 { font-size: 22px; font-weight: 700; }
+        p.sub { color: #8b8b99; font-size: 14px; margin-top: 2px; }
+
+        .plans {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .plan {
+            border: 2px solid #24243a;
+            border-radius: 10px;
+            padding: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .plan:hover, .plan.active {
+            border-color: #e60000;
+            background: rgba(230,0,0,0.07);
+        }
+        .plan .name { font-size: 13px; font-weight: 600; color: #8b8b99; }
+        .plan .price { font-size: 18px; font-weight: 800; color: #f1f1f5; margin-top: 4px; }
+        .plan .desc { font-size: 11px; color: #555; margin-top: 2px; }
+
+        label { display: block; font-size: 13px; color: #8b8b99; margin-bottom: 8px; }
+        input {
+            width: 100%;
+            background: #111118;
+            border: 1.5px solid #24243a;
+            border-radius: 10px;
+            padding: 13px 16px;
+            color: #f1f1f5;
+            font-size: 15px;
+            outline: none;
+            margin-bottom: 20px;
+            transition: border-color 0.2s;
+        }
+        input:focus { border-color: #e60000; }
+        input::placeholder { color: #555; }
+
+        button.pay-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #e60000, #cc0000);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button.pay-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(230,0,0,0.35); }
+        button.pay-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .status-box {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .status-box.pending { background: rgba(255,193,7,0.1); border: 1px solid rgba(255,193,7,0.3); }
+        .status-box.success { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); }
+        .status-box.error { background: rgba(244,67,54,0.1); border: 1px solid rgba(244,67,54,0.3); }
+        .status-box h3 { font-size: 16px; margin-bottom: 6px; }
+        .status-box p { font-size: 13px; color: #8b8b99; }
+        .spinner { width: 32px; height: 32px; border: 3px solid rgba(255,193,7,0.3); border-top-color: #ffc107; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .note { margin-top: 16px; padding: 12px; background: rgba(74,222,128,0.05); border: 1px solid rgba(74,222,128,0.15); border-radius: 8px; font-size: 12px; color: #8b8b99; }
+        .note strong { color: #4ade80; }
+
+        .auth-status { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 10px; margin-bottom: 22px; font-size: 13px; font-weight: 500; }
+        .auth-status.logged-in { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); color: #4ade80; }
+        .auth-status.logged-out { background: rgba(244,67,54,0.1); border: 1px solid rgba(244,67,54,0.3); color: #f44336; }
+        .auth-status .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .auth-status.logged-in .dot { background: #4ade80; box-shadow: 0 0 6px #4ade80; }
+        .auth-status.logged-out .dot { background: #f44336; }
+        .auth-status a { color: inherit; font-weight: 700; text-decoration: underline; }
+
+        .relogin-box { display: none; background: rgba(244,67,54,0.07); border: 1px solid rgba(244,67,54,0.25); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .relogin-box h3 { font-size: 15px; font-weight: 700; color: #f44336; margin-bottom: 14px; }
+        .relogin-box input { width: 100%; background: #0d0d16; border: 1px solid #24243a; color: #f1f1f5; padding: 11px 14px; border-radius: 8px; font-size: 14px; outline: none; margin-bottom: 10px; }
+        .relogin-box input:focus { border-color: #4ade80; }
+        .relogin-btn { width: 100%; background: linear-gradient(135deg,#4ade80,#22c55e); color: #000; font-weight: 700; font-size: 14px; padding: 12px; border: none; border-radius: 8px; cursor: pointer; }
+        .relogin-btn:hover { opacity: 0.9; }
+        .relogin-err { color: #f44336; font-size: 12px; margin-top: -4px; margin-bottom: 8px; display: none; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <div class="airtel-logo">A</div>
+        <div>
+            <h1>Airtel Money Test</h1>
+            <p class="sub">Sandbox payment testing</p>
+        </div>
+    </div>
+
+    <!-- Auth Status -->
+    <div id="authStatus" class="auth-status logged-out">
+        <span class="dot"></span>
+        <span id="authMsg">Checking login...</span>
+    </div>
+
+    <!-- Inline Re-login -->
+    <div class="relogin-box" id="reloginBox">
+        <h3>⚠️ Session expired — re-login to continue</h3>
+        <input type="email" id="rlEmail" placeholder="Email address">
+        <input type="password" id="rlPassword" placeholder="Password">
+        <p class="relogin-err" id="rlErr"></p>
+        <button class="relogin-btn" onclick="doRelogin()">Login &amp; Continue</button>
+    </div>
+
+    <!-- Plans -->
+    <label>Select Plan</label>
+    <div class="plans">
+        <div class="plan active" onclick="selectPlan(this,'starter','1,000 UGX','1 day')">
+            <div class="name">Starter</div>
+            <div class="price">1,000 UGX</div>
+            <div class="desc">1 day trial</div>
+        </div>
+        <div class="plan" onclick="selectPlan(this,'basic','5,000 UGX','7 days')">
+            <div class="name">Basic</div>
+            <div class="price">5,000 UGX</div>
+            <div class="desc">7 days</div>
+        </div>
+        <div class="plan" onclick="selectPlan(this,'standard','15,000 UGX','1 month')">
+            <div class="name">Standard</div>
+            <div class="price">15,000 UGX</div>
+            <div class="desc">1 month</div>
+        </div>
+        <div class="plan" onclick="selectPlan(this,'premium','30,000 UGX','1 month')">
+            <div class="name">Premium</div>
+            <div class="price">30,000 UGX</div>
+            <div class="desc">1 month</div>
+        </div>
+    </div>
+
+    <!-- Phone -->
+    <label>Airtel Uganda Number (070x / 074x / 075x)</label>
+    <input type="tel" id="phoneNumber" placeholder="e.g. 0701234567" maxlength="10">
+
+    <button class="pay-btn" id="payBtn" onclick="initiatePayment()">
+        Pay with Airtel Money
+    </button>
+
+    <div class="status-box" id="statusBox">
+        <div class="spinner" id="statusSpinner"></div>
+        <h3 id="statusTitle"></h3>
+        <p id="statusMsg"></p>
+    </div>
+
+    <div class="note">
+        <strong>Sandbox Mode:</strong> No real money is charged. Use any valid Airtel Uganda number format. The API will initiate a test transaction.
+    </div>
+</div>
+
+<script>
+    const API_URL = 'http://localhost:5000';
+    let selectedPlan = 'starter';
+    let pollInterval = null;
+
+    function selectPlan(el, plan) {
+        document.querySelectorAll('.plan').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+        selectedPlan = plan;
+    }
+
+    function showStatus(type, title, msg, showSpinner = false) {
+        const box = document.getElementById('statusBox');
+        const spinner = document.getElementById('statusSpinner');
+        box.className = 'status-box ' + type;
+        box.style.display = 'block';
+        spinner.style.display = showSpinner ? 'block' : 'none';
+        document.getElementById('statusTitle').textContent = title;
+        document.getElementById('statusMsg').textContent = msg;
+    }
+
+    function isTokenExpired(token) {
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            if (!payload.exp) return false; // no expiry = never expires
+            return Date.now() >= payload.exp * 1000;
+        } catch(e) { return false; }
+    }
+
+    async function refreshAccessToken() {
+        const refreshToken = localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken');
+        if (!refreshToken) return null;
+        try {
+            const res = await fetch(`${API_URL}/api/auth/refresh`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refreshToken })
+            });
+            const data = await res.json();
+            if (res.ok && data.data?.token) {
+                localStorage.setItem('token', data.data.token);
+                if (data.data.refreshToken) localStorage.setItem('refreshToken', data.data.refreshToken);
+                return data.data.token;
+            }
+        } catch(e) {}
+        return null;
+    }
+
+    function showRelogin() {
+        document.getElementById('reloginBox').style.display = 'block';
+        document.getElementById('authStatus').className = 'auth-status logged-out';
+        document.getElementById('authMsg').textContent = 'Session expired';
+        document.getElementById('statusBox').style.display = 'none';
+        document.getElementById('payBtn').disabled = false;
+        document.getElementById('payBtn').textContent = 'Pay with Airtel Money';
+    }
+
+    async function doRelogin() {
+        const email = document.getElementById('rlEmail').value.trim();
+        const pass = document.getElementById('rlPassword').value;
+        const errEl = document.getElementById('rlErr');
+        errEl.style.display = 'none';
+        if (!email || !pass) { errEl.textContent = 'Enter email and password.'; errEl.style.display = 'block'; return; }
+        try {
+            const res = await fetch(`${API_URL}/api/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password: pass })
+            });
+            const data = await res.json();
+            const token = data.data?.token || data.token;
+            if (res.ok && token) {
+                localStorage.setItem('token', token);
+                if (data.data?.refreshToken) localStorage.setItem('refreshToken', data.data.refreshToken);
+                if (data.data?.user) localStorage.setItem('user', JSON.stringify(data.data.user));
+                document.getElementById('reloginBox').style.display = 'none';
+                document.getElementById('rlPassword').value = '';
+                checkAuth();
+            } else {
+                errEl.textContent = data.message || 'Invalid credentials.';
+                errEl.style.display = 'block';
+            }
+        } catch(e) {
+            errEl.textContent = 'Network error — is the server running?';
+            errEl.style.display = 'block';
+        }
+    }
+
+    function checkAuth() {
+        const token = localStorage.getItem('token');
+        const user = localStorage.getItem('user');
+        const el = document.getElementById('authStatus');
+        const msg = document.getElementById('authMsg');
+        if (token) {
+            let name = '';
+            try { name = JSON.parse(user)?.name || JSON.parse(user)?.email || ''; } catch(e) {}
+            el.className = 'auth-status logged-in';
+            msg.textContent = name ? `Logged in as ${name}` : 'Logged in ✓';
+            document.getElementById('reloginBox').style.display = 'none';
+        } else {
+            el.className = 'auth-status logged-out';
+            msg.innerHTML = 'Not logged in — <a href="/login.html">Login here</a> first';
+        }
+    }
+    checkAuth();
+
+    async function initiatePayment() {
+        const token = localStorage.getItem('token');
+        const phone = document.getElementById('phoneNumber').value.trim();
+        const btn = document.getElementById('payBtn');
+
+        if (!token) {
+            showRelogin();
+            return;
+        }
+        if (!phone || phone.length < 10) {
+            showStatus('error', 'Invalid Number', 'Enter a valid 10-digit Airtel Uganda number.');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Initiating...';
+        showStatus('pending', 'Sending Request...', 'Contacting Airtel Money API.', true);
+
+        try {
+            const res = await fetch(`${API_URL}/api/payments/airtel/initiate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ subscriptionPlan: selectedPlan, phoneNumber: phone })
+            });
+
+            const data = await res.json();
+
+            if (res.status === 401) {
+                showRelogin();
+                return;
+            }
+            if (res.ok && data.status === 'success') {
+                const txnRef = data.data?.transactionRef;
+                showStatus('pending', 'Check Your Phone', `Payment prompt sent to ${phone}. Enter your Airtel PIN to confirm.\n\nTransaction: ${txnRef}`, true);
+                btn.textContent = 'Polling status...';
+                startPolling(txnRef, token);
+            } else {
+                showStatus('error', 'Failed', data.message || 'Payment initiation failed.');
+                btn.disabled = false;
+                btn.textContent = 'Pay with Airtel Money';
+            }
+        } catch (err) {
+            showStatus('error', 'Network Error', err.message + ' — Is the local server running on port 5000?');
+            btn.disabled = false;
+            btn.textContent = 'Pay with Airtel Money';
+        }
+    }
+
+    function startPolling(txnRef, token) {
+        let attempts = 0;
+        pollInterval = setInterval(async () => {
+            attempts++;
+            if (attempts > 20) {
+                clearInterval(pollInterval);
+                showStatus('error', 'Timeout', 'Payment not confirmed within 100 seconds. Check payment history.');
+                document.getElementById('payBtn').disabled = false;
+                document.getElementById('payBtn').textContent = 'Pay with Airtel Money';
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/api/payments/airtel/status/${txnRef}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                const status = data.data?.paymentStatus;
+
+                if (status === 'completed') {
+                    clearInterval(pollInterval);
+                    showStatus('success', '✅ Payment Successful!', 'Your subscription has been activated. Airtel Money payment confirmed.');
+                    document.getElementById('payBtn').textContent = 'Payment Complete';
+                } else if (status === 'failed') {
+                    clearInterval(pollInterval);
+                    showStatus('error', '❌ Payment Failed', data.data?.reason || 'Transaction was declined.');
+                    document.getElementById('payBtn').disabled = false;
+                    document.getElementById('payBtn').textContent = 'Try Again';
+                } else {
+                    document.getElementById('statusMsg').textContent = `Waiting for PIN confirmation... (check ${attempts}/20)`;
+                }
+            } catch (e) {
+                // keep polling on network errors
+            }
+        }, 5000);
+    }
+</script>
+</body>
+</html>

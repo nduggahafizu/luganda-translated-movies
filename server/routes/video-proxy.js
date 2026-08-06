@@ -197,8 +197,8 @@ async function resolveMovieSourceUrl(movie) {
 }
 
 function requirePlaybackAuthIfNeeded(movie, req) {
-    const requiredPlan = movie?.requiredPlan || 'free';
-    if (requiredPlan === 'free') return { requiredPlan, tokenPayload: null };
+    // All content requires at least starter plan — free users are blocked
+    const requiredPlan = movie?.requiredPlan === 'free' ? 'starter' : (movie?.requiredPlan || 'starter');
 
     const token = sanitizeUrl(req.query.token);
     if (!token) {
@@ -222,7 +222,8 @@ function requirePlaybackAuthIfNeeded(movie, req) {
 }
 
 async function assertUserCanPlay(requiredPlan, tokenPayload) {
-    if (requiredPlan === 'free') return;
+    // All content requires at least starter plan
+    const effectivePlan = requiredPlan === 'free' ? 'starter' : requiredPlan;
 
     const userId = tokenPayload?.uid;
     if (!userId) {
@@ -240,8 +241,8 @@ async function assertUserCanPlay(requiredPlan, tokenPayload) {
         throw error;
     }
 
-    if (!user.canAccessContent(requiredPlan)) {
-        const error = new Error(`This content requires a ${requiredPlan} plan or higher`);
+    if (!user.canAccessContent(effectivePlan)) {
+        const error = new Error(`This content requires a paid subscription`);
         error.code = 'SUBSCRIPTION_REQUIRED';
         error.httpStatus = 403;
         throw error;
@@ -385,7 +386,16 @@ router.get('/stream/luganda/:movieId', optionalAuth, async (req, res) => {
  * POST /api/video/extract
  * Body: { url: "https://streamtape.com/e/xxxxx" }
  */
-router.post('/extract', async (req, res) => {
+router.post('/extract', protect, async (req, res) => {
+    // Block free plan users
+    if (!req.user || req.user.subscription?.plan === 'free' || !req.user.hasActiveSubscription()) {
+        return res.status(403).json({
+            success: false,
+            code: 'SUBSCRIPTION_REQUIRED',
+            message: 'A paid subscription is required to watch videos',
+            redirectUrl: '/subscription.html'
+        });
+    }
     setCorsHeaders(req, res);
     
     try {

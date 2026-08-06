@@ -926,7 +926,7 @@
 
         function selectSuggestion(slug, contentType) {
             window.location.href = contentType === 'series'
-                ? `/series-detail?id=${slug}`
+                ? `series-player.html?id=${slug}`
                 : `/movie/${slug}`;
         }
 
@@ -1007,7 +1007,7 @@
                 const title = Sanitize.text(movie.originalTitle || movie.title || 'Unknown Movie');
                 const movieId = Sanitize.attr(movie._id);
                 const movieSlug = Sanitize.attr(movie.slug || movie._id);
-                const movieUrl = movie.contentType === 'series' ? `/series-detail?id=${movieSlug}` : `/movie/${movieSlug}`;
+                const movieUrl = movie.contentType === 'series' ? `series-player.html?id=${movieSlug}` : `/movie/${movieSlug}`;
                 const posterUrl = Sanitize.url(movie.poster) || `https://placehold.co/300x450/16161f/4ade80?text=${encodeURIComponent(title.substring(0,15))}`;
                 const rating = movie.rating?.userRating || movie.rating?.imdb || null;
                 const _vjRaw = Sanitize.text(movie.vjName || movie.vj || '');

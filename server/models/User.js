@@ -63,7 +63,7 @@ const userSchema = new mongoose.Schema({
     subscription: {
         plan: {
             type: String,
-            enum: ['free', 'starter', 'basic', 'standard', 'premium', 'vip'],
+            enum: ['free', 'daily', 'weekly', 'biweekly', 'monthly', 'starter', 'basic', 'standard', 'premium', 'vip'],
             default: 'free'
         },
         status: {
@@ -261,7 +261,7 @@ userSchema.methods.hasActiveSubscription = function() {
 
 // Check if user can access content based on subscription
 userSchema.methods.canAccessContent = function(requiredPlan) {
-    const planHierarchy = { free: 0, starter: 1, basic: 2, standard: 3, premium: 4, vip: 5 };
+    const planHierarchy = { free: 0, starter: 1, daily: 1, basic: 2, weekly: 2, biweekly: 3, standard: 3, premium: 4, monthly: 4, vip: 5 };
     const userPlanLevel = planHierarchy[this.subscription.plan] || 0;
     const requiredPlanLevel = planHierarchy[requiredPlan] || 0;
 
@@ -270,12 +270,16 @@ userSchema.methods.canAccessContent = function(requiredPlan) {
 
 // Plan capabilities
 const PLAN_CONFIG = {
-    free:     { devices: 3, download: false, ads: true },
-    starter:  { devices: 3, download: false, ads: true },
-    basic:    { devices: 3, download: true,  ads: true },
-    standard: { devices: 3, download: true,  ads: false },
-    premium:  { devices: 3, download: true,  ads: false },
-    vip:      { devices: 3, download: true,  ads: false }
+    free:     { devices: 1, download: false, ads: true },
+    daily:    { devices: 1, download: false, ads: true },
+    weekly:   { devices: 1, download: true,  ads: true },
+    biweekly: { devices: 1, download: true,  ads: false },
+    monthly:  { devices: 2, download: true,  ads: false },
+    starter:  { devices: 1, download: false, ads: true },
+    basic:    { devices: 1, download: true,  ads: true },
+    standard: { devices: 1, download: true,  ads: false },
+    premium:  { devices: 2, download: true,  ads: false },
+    vip:      { devices: 2, download: true,  ads: false }
 };
 
 userSchema.methods.getPlanConfig = function() {
@@ -303,7 +307,7 @@ userSchema.methods.shouldSeeAds = function() {
 
 userSchema.statics.PLAN_CONFIG = PLAN_CONFIG;
 
-// Register a device — tracks and reports if limit exceeded
+// Register a device — auto-evicts oldest device when limit is hit (newest wins)
 userSchema.methods.registerDevice = function(deviceId, userAgent, ip) {
     const existing = this.activeDevices.find(d => d.deviceId === deviceId);
     if (existing) {
@@ -316,8 +320,10 @@ userSchema.methods.registerDevice = function(deviceId, userAgent, ip) {
     this.activeDevices = this.activeDevices.filter(d => d.lastActive > cutoff);
 
     const maxDevices = this.getMaxDevices();
-    if (this.activeDevices.length >= maxDevices) {
-        return { allowed: false, maxDevices, activeCount: this.activeDevices.length, existingDevices: this.activeDevices };
+    // Auto-evict oldest device(s) to make room — newest device always wins
+    while (this.activeDevices.length >= maxDevices) {
+        this.activeDevices.sort((a, b) => new Date(a.lastActive) - new Date(b.lastActive));
+        this.activeDevices.shift(); // remove the least-recently-active device
     }
     this.activeDevices.push({ deviceId, userAgent, ip, lastActive: new Date() });
     return { allowed: true };

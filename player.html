@@ -2353,9 +2353,10 @@
                     const provider = (currentMovie.video?.provider || '').toLowerCase();
                     const format = (currentMovie.video?.format || '').toLowerCase();
 
-                    // Auth check — login required, watching is free for all members
+                    // Auth check — login + paid subscription required
                     const authed = await isLoggedIn();
-                    if (authed) {
+                    const hasPaidPlan = authed && window._userAccess && !window._userAccess.freeUser;
+                    if (hasPaidPlan) {
                         checkDownloadPermission(currentMovie);
                         initPlayer();
                         if (videoUrl && (isDirectVideo(videoUrl) || format === 'mp4' || format === 'm3u8' || format === 'webm')) {
@@ -2403,7 +2404,10 @@
             try {
                 const response = await fetch(`${API_BASE}/api/video/extract`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${normalizeBearerToken(getAuthToken())}`
+                    },
                     body: JSON.stringify({ url })
                 });
                 
@@ -2588,27 +2592,58 @@
             overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
 
             overlay.innerHTML = `
-                <div style="background:linear-gradient(145deg,#1a1a2e,#16213e);border:1px solid rgba(74,222,128,0.2);border-radius:20px;padding:32px;max-width:380px;width:100%;text-align:center;">
-                    <div style="width:60px;height:60px;border-radius:50%;background:rgba(74,222,128,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <div style="background:linear-gradient(145deg,#1a1a2e,#16213e);border:1px solid rgba(74,222,128,0.2);border-radius:20px;padding:28px;max-width:380px;width:100%;text-align:center;">
+                    <div style="width:54px;height:54px;border-radius:50%;background:rgba(74,222,128,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     </div>
-                    <h3 style="color:#fff;font-size:18px;margin-bottom:8px;">Download for Offline</h3>
-                    <p style="color:#888;font-size:13px;line-height:1.6;margin-bottom:20px;">Save movies and series to watch without internet. Choose a download plan:</p>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
-                        <a href="subscription.html" style="display:block;padding:16px 12px;background:rgba(0,217,255,0.08);border:1px solid rgba(0,217,255,0.25);border-radius:12px;text-decoration:none;">
-                            <div style="font-size:20px;font-weight:800;color:#00d9ff;">5,000</div>
-                            <div style="font-size:11px;color:#888;margin-top:2px;">UGX / Week</div>
-                        </a>
-                        <a href="subscription.html" style="display:block;padding:16px 12px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:12px;text-decoration:none;position:relative;">
-                            <div style="position:absolute;top:-8px;right:8px;background:#4ade80;color:#000;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;">BEST</div>
-                            <div style="font-size:20px;font-weight:800;color:#4ade80;">12,000</div>
-                            <div style="font-size:11px;color:#888;margin-top:2px;">UGX / Month</div>
-                        </a>
+                    <h3 style="color:#fff;font-size:17px;margin-bottom:6px;">Premium Access Required</h3>
+                    <p style="color:#888;font-size:12px;line-height:1.6;margin-bottom:18px;">Choose a plan to download &amp; watch offline</p>
+                    <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:16px;">
+                        <button onclick="window._playerSelectPlan('daily')" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:13px;cursor:pointer;width:100%;">
+                            <span>Daily</span><span style="color:#f59e0b;font-weight:700;">UGX 1,000 <small style="color:#888;font-weight:400;">/ 1 day</small></span>
+                        </button>
+                        <button onclick="window._playerSelectPlan('weekly')" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:13px;cursor:pointer;width:100%;">
+                            <span>Weekly</span><span style="color:#00d9ff;font-weight:700;">UGX 5,000 <small style="color:#888;font-weight:400;">/ 7 days</small></span>
+                        </button>
+                        <button onclick="window._playerSelectPlan('biweekly')" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:13px;cursor:pointer;width:100%;">
+                            <span>2 Weeks</span><span style="color:#a78bfa;font-weight:700;">UGX 7,000 <small style="color:#888;font-weight:400;">/ 14 days</small></span>
+                        </button>
+                        <button onclick="window._playerSelectPlan('monthly')" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.3);border-radius:10px;color:#fff;font-size:13px;cursor:pointer;width:100%;">
+                            <span>Monthly <span style="background:#4ade80;color:#000;font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;margin-left:6px;">BEST</span></span>
+                            <span style="color:#4ade80;font-weight:700;">UGX 12,000 <small style="color:#888;font-weight:400;">/ 30 days</small></span>
+                        </button>
                     </div>
-                    <button onclick="this.closest('#downloadPrompt').remove()" style="background:none;border:none;color:#666;font-size:12px;cursor:pointer;">Not now</button>
+                    <button onclick="document.getElementById('downloadPrompt')?.remove()" style="background:none;border:none;color:#555;font-size:12px;cursor:pointer;">Not now</button>
                 </div>
             `;
             document.body.appendChild(overlay);
+            window._playerSelectPlan = async (plan) => {
+                const token = localStorage.getItem('token') || localStorage.getItem('authToken') || '';
+                if (!token) { window.location.href = 'login.html'; return; }
+                const btn = overlay.querySelector(`button[onclick*="'${plan}'"]`);
+                if (btn) { btn.textContent = 'Processing...'; btn.disabled = true; }
+                try {
+                    const r = await fetch(`${API_BASE}/api/payments/subscribe`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        body: JSON.stringify({ plan, paymentMethod: 'pesapal' })
+                    });
+                    const d = await r.json();
+                    if (d.status === 'success' && d.data?.redirectUrl) {
+                        window.location.href = d.data.redirectUrl;
+                    } else {
+                        alert(d.message || 'Payment error. Please try again.');
+                        if (btn) { btn.disabled = false; }
+                    }
+                } catch(e) {
+                    alert('Network error. Please try again.');
+                    if (btn) { btn.disabled = false; }
+                }
+            };
+        }
+
+        function showSubscribePlans() {
+            showDownloadPrompt();
         }
 
 
@@ -3017,7 +3052,7 @@
                     <h3>${access.freeUser ? 'Subscribe to Watch' : 'Subscription Expired'}</h3>
                     <p>Get a subscription to unlock full Luganda translated movies and series.</p>
                     <div class="auth-gate-btns">
-                        <a href="subscription.html" class="auth-gate-login" style="text-decoration:none;text-align:center;">Subscribe Now</a>
+                        <button class="auth-gate-login" onclick="showSubscribePlans()" style="cursor:pointer;border:none;width:100%;">Subscribe Now</button>
                     </div>
                     <p style="margin-top:12px;font-size:13px;"><button onclick="document.getElementById('trailerBtn')?.click()" style="background:none;border:none;color:var(--accent);font-size:inherit;cursor:pointer;padding:0;text-decoration:underline;">Watch trailer instead</button></p>
                 `;

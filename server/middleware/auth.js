@@ -148,7 +148,7 @@ exports.authorize = (...roles) => {
 // Check subscription access
 exports.checkSubscription = (requiredPlan) => {
     return (req, res, next) => {
-        const planHierarchy = { free: 0, starter: 1, basic: 2, standard: 3, premium: 4, vip: 5 };
+        const planHierarchy = { free: 0, starter: 1, daily: 1, basic: 2, weekly: 2, biweekly: 3, standard: 3, premium: 4, monthly: 4, vip: 5 };
         const userPlanLevel = planHierarchy[req.user.subscription.plan] || 0;
         const requiredPlanLevel = planHierarchy[requiredPlan] || 0;
 

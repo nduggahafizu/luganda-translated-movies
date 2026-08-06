@@ -703,7 +703,7 @@ img {
 }
 
 .app-section {
-    margin-bottom: 48px;
+    margin-bottom: 16px;
     position: relative;
     animation: sectionRise 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
@@ -3564,7 +3564,7 @@ a:focus-visible {
     }
     
     .app-section {
-        margin-bottom: 24px;
+        margin-bottom: 12px;
         padding: 0 4px;
     }
 
@@ -3874,7 +3874,7 @@ a:focus-visible {
 
     /* Section spacing */
     .app-section {
-        margin-bottom: 32px;
+        margin-bottom: 14px;
     }
 
     /* Trust section mobile */

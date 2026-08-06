@@ -291,13 +291,6 @@
                                     </svg>
                                     Browse Luganda Movies
                                 </h1>
-                                <p class="page-hero-subtitle">Browse films by VJ credit, genre, release year, and streaming quality.</p>
-                            </div>
-
-                            <!-- Editorial intro — static, crawlable -->
-                            <div style="max-width:820px;margin:0 0 28px;padding:0 2px;">
-                                <p style="font-size:15px;line-height:1.8;color:rgba(255,255,255,0.6);margin-bottom:10px;">Unruly Movies hosts Uganda's largest online catalog of Luganda VJ-translated films. Every title is narrated in Luganda by a licensed Ugandan Video Jockey — including VJ Junior, VJ Ice P, VJ Emmy, VJ Ulio, and VJ Jngo. You can filter by genre, release year, VJ, and streaming quality to find exactly what you want to watch.</p>
-                                <p style="font-size:15px;line-height:1.8;color:rgba(255,255,255,0.6);margin:0;">The catalog spans action, comedy, drama, thriller, horror, romance, sci-fi, adventure, and animation. New titles are added regularly. All movies are streamed directly in your browser with no downloads required for standard viewing. Subscribers with download access can save titles for offline watching on any device.</p>
                             </div>
 
                             <!-- Filters -->
@@ -408,20 +401,8 @@
                             <div class="card-grid" id="moviesGrid">
                                 <!-- Static movie fallback for crawlers — replaced by JS -->
                                 <noscript>
-                                <div style="grid-column:1/-1;color:#aaa;line-height:1.8;">
-                                    <h3 style="color:#fff;margin-bottom:12px;">Browse Luganda Translated Movies</h3>
-                                    <p>Unruly Movies features hundreds of movies translated into Luganda by Uganda's top VJ translators. Filter by genre, VJ translator, or sort by popularity and rating.</p>
-                                    <ul style="list-style:none;padding:0;margin:16px 0;">
-                                        <li><strong>Edge of Tomorrow</strong> (2014) — Action/Sci-Fi, translated by VJ Junior</li>
-                                        <li><strong>Blade Runner 2049</strong> (2017) — Sci-Fi/Mystery, translated by Omutaka Ice P</li>
-                                        <li><strong>The Martian</strong> (2015) — Sci-Fi/Adventure, translated by VJ Emmy</li>
-                                        <li><strong>BKO: Bangkok Knockout</strong> (2010) — Action/Martial Arts, translated by VJ Shao Khan</li>
-                                        <li><strong>Crazy, Stupid, Love</strong> (2011) — Comedy/Romance, translated by VJ Kevo</li>
-                                        <li><strong>Spartacus</strong> (2010) — Action/Drama, translated by VJ Jovan</li>
-                                        <li><strong>Blades of the Guardians</strong> — Action/Period Drama, translated by VJ Jingo</li>
-                                        <li><strong>The Wandering Earth</strong> (2019) — Sci-Fi/Disaster, translated by VJ Tom</li>
-                                    </ul>
-                                    <p>View the <a href="catalog.html" style="color:#4ade80;">full catalog</a> for complete movie descriptions, or browse <a href="vjs.html" style="color:#4ade80;">VJ translators</a> to find movies by your favourite narrator.</p>
+                                <div style="grid-column:1/-1;color:#aaa;padding:16px;">
+                                    <p>Browse hundreds of Luganda-translated movies by Uganda's top VJs on Unruly Movies.</p>
                                 </div>
                                 </noscript>
                             </div>
@@ -699,12 +680,9 @@
                 posterData.push({ posterId, posterUrl: tmdbResize(movie.poster, 'w342') || movie.poster || null, fallbackPoster });
 
                 const movieCard = `
-                    <a href="${movie.contentType === 'series' ? '/series-detail?id=' + (movie.slug || movie._id) : '/movie/' + (movie.slug || movie._id)}" class="content-card" data-movie-id="${movie._id}">
+                    <a href="${movie.contentType === 'series' ? 'series-player.html?id=' + (movie.slug || movie._id) : '/movie/' + (movie.slug || movie._id)}" class="content-card" data-movie-id="${movie._id}">
                         <div class="card-poster" id="${posterId}" data-fallback-poster="${fallbackPoster}">
-                            <div class="card-badges">
-                                <span class="card-badge badge-quality">${quality.toUpperCase()}</span>
-                                ${vjBadge ? `<span class="card-badge badge-vj">${vjBadge}</span>` : ''}
-                            </div>
+                            ${vjBadge ? `<div class="card-badges"><span class="card-badge badge-vj">${vjBadge}</span></div>` : ''}
                             <div class="play-overlay">
                                 <svg viewBox="0 0 24 24" fill="currentColor">
                                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
@@ -713,10 +691,6 @@
                         </div>
                         <div class="card-info">
                             <h3 class="card-title">${title}</h3>
-                            <div class="card-meta">
-                                ${movie.year ? `<span>${movie.year}</span>` : ''}
-                                ${movie.genres && movie.genres.length > 0 ? `<span>${movie.genres[0]}</span>` : ''}
-                            </div>
                         </div>
                     </a>
                 `;

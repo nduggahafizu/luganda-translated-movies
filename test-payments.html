@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Payment Test Console (LOCAL ONLY)</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, Arial, sans-serif; background: #0a0a0a; color: #eee; max-width: 720px; margin: 0 auto; padding: 24px; }
+  h1 { font-size: 20px; }
+  .warn { background: #3a1a1a; border: 1px solid #ff5555; color: #ffb3b3; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; line-height: 1.6; }
+  .warn b { color: #ff8080; }
+  fieldset { border: 1px solid #333; border-radius: 10px; padding: 16px; margin-bottom: 20px; }
+  legend { padding: 0 8px; font-weight: 600; color: #4ade80; }
+  label { display: block; font-size: 13px; color: #aaa; margin: 10px 0 4px; }
+  input, select { width: 100%; padding: 9px 10px; border-radius: 6px; border: 1px solid #333; background: #151515; color: #eee; font-size: 14px; }
+  button { margin-top: 14px; padding: 10px 18px; border-radius: 8px; border: none; background: #4ade80; color: #000; font-weight: 700; cursor: pointer; font-size: 14px; }
+  button:disabled { background: #444; color: #888; cursor: not-allowed; }
+  button.danger { background: #e05555; color: #fff; }
+  #status { font-size: 13px; margin-top: 8px; min-height: 18px; }
+  #status.ok { color: #4ade80; }
+  #status.err { color: #ff8080; }
+  pre { background: #111; border: 1px solid #333; border-radius: 8px; padding: 12px; font-size: 12px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
+  .apibase { font-size: 12px; color: #666; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+
+<h1>Payment Test Console</h1>
+<div class="apibase">API base: <code id="apiBaseLabel"></code> — local dev only, not linked from the site, never deploy this file.</div>
+
+<div class="warn">
+  <b>Heads up:</b> <code>AIRTEL_ENVIRONMENT</code> is currently set to <b>production</b> in your local <code>.env</code>.
+  A "Send Test Request" click for Airtel is a real API call to Airtel's live system, not a sandbox — it can trigger
+  a real payment prompt to whatever phone number you enter. Use the <b>starter</b> plan (smallest amount) and your
+  own number unless you mean to test with someone else's.
+</div>
+
+<fieldset>
+  <legend>Session</legend>
+  <div id="loginStatus"></div>
+</fieldset>
+
+<fieldset>
+  <legend>Initiate Test Payment</legend>
+  <label for="provider">Provider</label>
+  <select id="provider">
+    <option value="airtel">Airtel Money</option>
+    <option value="mtn">MTN Mobile Money</option>
+    <option value="pesapal">PesaPal</option>
+  </select>
+
+  <label for="plan">Subscription Plan</label>
+  <select id="plan">
+    <option value="starter">starter — 1,000 UGX (cheapest, use this for testing)</option>
+    <option value="basic">basic — 5,000 UGX</option>
+    <option value="standard">standard</option>
+    <option value="premium">premium — 30,000 UGX</option>
+    <option value="vip">vip — 50,000 UGX</option>
+  </select>
+
+  <div id="phoneField">
+    <label for="phone">Phone number (Airtel: 070/074/075, MTN: 077/078/076/039)</label>
+    <input id="phone" type="tel" placeholder="0700000000">
+  </div>
+
+  <button id="payBtn" type="button" disabled>Login first</button>
+  <button id="confirmBtn" type="button" class="danger" style="display:none">Confirm — send real request</button>
+  <div id="status"></div>
+</fieldset>
+
+<fieldset>
+  <legend>Raw Response</legend>
+  <pre id="output">(nothing yet)</pre>
+</fieldset>
+
+<script>
+const API_BASE = 'http://localhost:5000';
+document.getElementById('apiBaseLabel').textContent = API_BASE;
+
+const loginStatus = document.getElementById('loginStatus');
+const payBtn = document.getElementById('payBtn');
+const confirmBtn = document.getElementById('confirmBtn');
+const statusEl = document.getElementById('status');
+const output = document.getElementById('output');
+
+function setStatus(el, msg, cls) {
+  el.textContent = msg;
+  el.className = cls || '';
+}
+
+// Reuse the token you're already logged in with on the site itself (same origin, same localStorage).
+const authToken = localStorage.getItem('token');
+if (authToken) {
+  setStatus(loginStatus, 'Using existing site session (token found in localStorage).', 'ok');
+  payBtn.disabled = false;
+  payBtn.textContent = 'Send Test Request';
+} else {
+  setStatus(loginStatus, 'No token found — log into the site normally in this browser first, then reload this page.', 'err');
+}
+
+function buildRequest() {
+  const provider = document.getElementById('provider').value;
+  const plan = document.getElementById('plan').value;
+  const phone = document.getElementById('phone').value.trim();
+
+  if (provider === 'airtel') {
+    return { path: '/api/payments/airtel/initiate', body: { subscriptionPlan: plan, phoneNumber: phone } };
+  }
+  if (provider === 'mtn') {
+    return { path: '/api/payments/mtn/initiate', body: { subscriptionPlan: plan, phoneNumber: phone } };
+  }
+  // pesapal
+  return { path: '/api/payments/pesapal/initiate', body: { subscriptionPlan: plan, subscriptionDuration: 'monthly', phoneNumber: phone } };
+}
+
+payBtn.addEventListener('click', () => {
+  payBtn.style.display = 'none';
+  confirmBtn.style.display = 'inline-block';
+  setStatus(statusEl, 'Click confirm to actually send this — this is not a drill.', 'err');
+});
+
+confirmBtn.addEventListener('click', async () => {
+  confirmBtn.disabled = true;
+  setStatus(statusEl, 'Sending...', '');
+  const { path, body } = buildRequest();
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    output.textContent = JSON.stringify(data, null, 2);
+    setStatus(statusEl, res.ok ? 'Request sent.' : `Failed (${res.status}).`, res.ok ? 'ok' : 'err');
+  } catch (e) {
+    output.textContent = 'Request error: ' + e.message;
+    setStatus(statusEl, 'Request failed.', 'err');
+  } finally {
+    confirmBtn.disabled = false;
+    confirmBtn.style.display = 'none';
+    payBtn.style.display = 'inline-block';
+  }
+});
+</script>
+
+</body>
+</html>

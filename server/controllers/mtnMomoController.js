@@ -402,17 +402,15 @@ async function processSuccessfulPayment(payment, mtnData) {
             // Calculate end date based on duration
             let durationDays;
             switch (payment.subscriptionDuration) {
-                case 'weekly':
-                    durationDays = 7;
-                    break;
-                case 'monthly':
-                    durationDays = 30;
-                    break;
-                case 'yearly':
-                    durationDays = 365;
-                    break;
+                case 'daily':    durationDays = 1;   break;
+                case 'weekly':   durationDays = 7;   break;
+                case 'biweekly': durationDays = 14;  break;
+                case 'monthly':  durationDays = 30;  break;
+                case 'yearly':   durationDays = 365; break;
                 default:
-                    durationDays = 30;
+                    // Fallback: look up from plan name directly
+                    const planDays = { daily:1, weekly:7, biweekly:14, monthly:30 };
+                    durationDays = planDays[payment.subscriptionPlan] || 30;
             }
             
             user.subscription.endDate = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000);

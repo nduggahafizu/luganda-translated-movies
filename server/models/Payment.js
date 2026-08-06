@@ -37,12 +37,12 @@ const paymentSchema = new mongoose.Schema({
     },
     subscriptionPlan: {
         type: String,
-        enum: ['starter', 'basic', 'standard', 'premium', 'vip'],
+        enum: ['free', 'daily', 'weekly', 'biweekly', 'monthly', 'starter', 'basic', 'standard', 'premium', 'vip'],
         required: true
     },
     subscriptionDuration: {
         type: String,
-        enum: ['daily', 'weekly', 'monthly', 'quarterly', 'yearly'],
+        enum: ['daily', 'weekly', 'biweekly', 'monthly', 'quarterly', 'yearly'],
         default: 'monthly'
     },
     paymentDetails: {

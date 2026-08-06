@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Settings — Unruly Movies V2 Preview</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#4ade80">
+
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/card-grid.css">
+    <link rel="stylesheet" href="/css/mobile-improvements.css">
+    <link rel="stylesheet" href="/css/app-shell.css">
+    <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+    <div class="v2-badge">V2 PREVIEW</div>
+    <div class="container">
+        <div class="app">
+            <div id="shellHeader"></div>
+
+            <div class="app-wrapper">
+                <div id="shellAside"></div>
+
+                <!-- Main Content -->
+                <div class="app-container flex-fill">
+                    <div class="container">
+                        <div class="app-content pt-md-3">
+
+                            <div class="fragment" data-fragment="settings">
+
+                                <div class="v2-page-header">
+                                    <h1>
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                                        Settings
+                                    </h1>
+                                    <p>Manage your account and preferences.</p>
+                                </div>
+
+                                <!-- Account -->
+                                <div class="v2-card" id="accountCard">
+                                    <h3>Account</h3>
+                                    <div id="accountContent">Loading...</div>
+                                </div>
+
+                                <!-- Preferences -->
+                                <div class="v2-card">
+                                    <h3>My Lists</h3>
+                                    <div class="v2-settings-row">
+                                        <span class="label">Watchlist</span>
+                                        <a class="v2-btn v2-btn-outline" href="/v2/watchlist.html">View Watchlist</a>
+                                    </div>
+                                    <div class="v2-settings-row">
+                                        <span class="label">Watch History</span>
+                                        <a class="v2-btn v2-btn-outline" href="/v2/history.html">View History</a>
+                                    </div>
+                                </div>
+
+                                <!-- Data & Storage -->
+                                <div class="v2-card">
+                                    <h3>Data &amp; Storage</h3>
+                                    <div class="v2-settings-row">
+                                        <span class="label">Cached movie data</span>
+                                        <button class="v2-btn v2-btn-outline" id="clearCacheBtn">Clear Cache</button>
+                                    </div>
+                                </div>
+
+                                <!-- About -->
+                                <div class="v2-card">
+                                    <h3>About</h3>
+                                    <div class="v2-settings-row">
+                                        <span class="label">Build</span>
+                                        <span class="value">V2 Preview</span>
+                                    </div>
+                                    <div class="v2-settings-row">
+                                        <span class="label">Current Site</span>
+                                        <a class="v2-btn v2-btn-outline" href="/index.html">Go to Live Site</a>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="shellFooter"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll to Top -->
+    <div class="scroll-up">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="js/shell.js"></script>
+    <script>AppShell.mount('settings');</script>
+    <script src="/js/main.js"></script>
+    <script src="/js/luganda-movies-api.js"></script>
+    <script src="js/cards.js"></script>
+    <script defer src="/js/app-shell.js"></script>
+    <script src="js/settings.js"></script>
+</body>
+</html>

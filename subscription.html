@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#4ade80">
-    <meta name="description" content="Subscribe to Unruly Movies premium plans. Choose from Daily (UGX 1,000), Weekly (UGX 5,000), or Monthly (UGX 50,000) access to unlimited Luganda VJ translated movies. Pay securely with Airtel Money.">
+    <meta name="description" content="Subscribe to Unruly Movies premium plans. Choose from Daily (UGX 1,000), Weekly (UGX 5,000), 2 Weeks (UGX 7,000) or Monthly (UGX 12,000) access to unlimited Luganda VJ translated movies. Pay securely with PesaPal — MTN, Airtel, Visa or Mastercard.">
     <meta name="robots" content="noindex, nofollow">
     <link rel="canonical" href="https://unrulymovies.com/subscription">
     <meta name="google-adsense-account" content="ca-pub-1904736753681797">
@@ -420,6 +420,10 @@
                  data-full-width-responsive="true"></ins>
         </div>
 
+        <div id="freePlanBanner" style="display:none;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);border-radius:12px;padding:14px 20px;margin-bottom:20px;text-align:center;color:#fca5a5;">
+            🔒 <strong>Subscription required</strong> — Your free account does not have access to this content. Choose a plan below to continue watching.
+        </div>
+
         <div class="subscription-header">
             <h1>🎬 Premium Access</h1>
             <p>Watch & download unlimited Luganda VJ translated movies and series. Cancel anytime.</p>
@@ -427,51 +431,60 @@
                 <div style="background: linear-gradient(135deg, #4ade80, #22c55e); padding: 5px 12px; border-radius: 6px;">
                     <span style="font-weight: bold; color: #000;">PesaPal</span>
                 </div>
-                <span style="color:#ccc;">MTN · Airtel · Visa · Mastercard</span>
+                <span style="color:#ccc;">MTN &middot; Airtel &middot; Visa &middot; Mastercard</span>
             </div>
         </div>
         
         <div class="plans-container" style="max-width:600px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-            <div class="plan-card" data-plan="starter" style="--plan-color: #f59e0b;grid-column:1/-1;">
+            <div class="plan-card" data-plan="daily" style="--plan-color: #f59e0b;">
                 <div class="plan-icon" style="font-size:36px;">⚡</div>
-                <h3 class="plan-name">Test Plan</h3>
+                <h3 class="plan-name">Daily</h3>
                 <div class="plan-duration">1 Day Access</div>
-                <div class="plan-price"><span class="currency">UGX</span><span class="amount">500</span></div>
+                <div class="plan-price"><span class="currency">UGX</span><span class="amount">1,000</span></div>
                 <ul class="plan-features">
                     <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Stream all movies</li>
                     <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 1 day access</li>
                 </ul>
-                <button class="btn-subscribe" onclick="paymentManager.subscribe('starter')">Pay UGX 500</button>
+                <button class="btn-subscribe" onclick="paymentManager.subscribe('daily')">Pay UGX 1,000</button>
             </div>
 
-            <div class="plan-card" data-plan="basic" style="--plan-color: #00D9FF;">
-                <div class="plan-icon" style="font-size:36px;">📥</div>
+            <div class="plan-card" data-plan="weekly" style="--plan-color: #00D9FF;">
+                <div class="plan-icon" style="font-size:36px;">🎬</div>
                 <h3 class="plan-name">Weekly</h3>
-                <div class="plan-duration">7 Days Download Access</div>
+                <div class="plan-duration">7 Days Access</div>
                 <div class="plan-price"><span class="currency">UGX</span><span class="amount">5,000</span></div>
                 <ul class="plan-features">
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Download any movie</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Download series episodes</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Watch offline</li>
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Stream all movies</li>
                     <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 7 days access</li>
                 </ul>
-                <button class="btn-subscribe" onclick="paymentManager.subscribe('basic')">Pay UGX 5,000</button>
+                <button class="btn-subscribe" onclick="paymentManager.subscribe('weekly')">Pay UGX 5,000</button>
             </div>
 
-            <div class="plan-card popular" data-plan="standard" style="--plan-color: #4ade80;">
+            <div class="plan-card" data-plan="biweekly" style="--plan-color: #a78bfa;">
+                <div class="plan-icon" style="font-size:36px;">🎞️</div>
+                <h3 class="plan-name">2 Weeks</h3>
+                <div class="plan-duration">14 Days Access</div>
+                <div class="plan-price"><span class="currency">UGX</span><span class="amount">7,000</span></div>
+                <ul class="plan-features">
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Stream all movies</li>
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 14 days access</li>
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Save 30% vs weekly</li>
+                </ul>
+                <button class="btn-subscribe" onclick="paymentManager.subscribe('biweekly')">Pay UGX 7,000</button>
+            </div>
+
+            <div class="plan-card popular" data-plan="monthly" style="--plan-color: #4ade80;">
                 <div class="popular-badge">Best Value</div>
-                <div class="plan-icon" style="font-size:36px;">📥</div>
+                <div class="plan-icon" style="font-size:36px;">🏆</div>
                 <h3 class="plan-name">Monthly</h3>
-                <div class="plan-duration">30 Days Download Access</div>
+                <div class="plan-duration">30 Days Access</div>
                 <div class="plan-price"><span class="currency">UGX</span><span class="amount">12,000</span></div>
                 <ul class="plan-features">
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Download any movie</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Download series episodes</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Watch offline</li>
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Stream all movies</li>
                     <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 30 days access</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Save 58% vs weekly</li>
+                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Save 57% vs weekly</li>
                 </ul>
-                <button class="btn-subscribe" onclick="paymentManager.subscribe('standard')">Pay UGX 12,000</button>
+                <button class="btn-subscribe" onclick="paymentManager.subscribe('monthly')">Pay UGX 12,000</button>
             </div>
         </div>
         
@@ -577,6 +590,11 @@
             const token = localStorage.getItem('token') || localStorage.getItem('authToken');
             if (!token) {
                 document.getElementById('loginPrompt').style.display = 'block';
+            }
+            // Show banner if redirected due to free plan
+            const reason = new URLSearchParams(window.location.search).get('reason');
+            if (reason === 'free_plan') {
+                document.getElementById('freePlanBanner').style.display = 'block';
             }
         });
         

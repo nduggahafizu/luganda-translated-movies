@@ -292,10 +292,10 @@
         
         /* Better spacing */
         .app-section {
-            margin-bottom: 3rem;
+            margin-bottom: 16px;
         }
         .section-header {
-            margin-bottom: 1.5rem;
+            margin-bottom: 8px;
         }
 
         .trust-section {
@@ -355,6 +355,397 @@
             .trust-section h2 {
                 font-size: 26px;
             }
+        }
+
+        /* ===== ADVANCED HOMEPAGE STYLES ===== */
+
+        /* Cinematic hero overlay — left-to-right gradient */
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                to right,
+                rgba(5,5,12,0.95) 0%,
+                rgba(5,5,12,0.75) 35%,
+                rgba(5,5,12,0.2) 65%,
+                transparent 100%
+            ), linear-gradient(to top, rgba(5,5,12,0.7) 0%, transparent 40%);
+            z-index: 1;
+        }
+        .hero-content {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            display: flex;
+            align-items: flex-end;
+            padding: 0 40px 40px;
+        }
+        .hero-info-panel {
+            max-width: 520px;
+            width: 100%;
+        }
+        .hero-badges {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .hero-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+        .hero-badge-vj {
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            color: #030b05;
+        }
+        .hero-badge-quality {
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(8px);
+        }
+        .hero-badge-year {
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.7);
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+        .hero-rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #fbbf24;
+        }
+        .hero-title {
+            font-size: clamp(26px, 4vw, 50px);
+            font-weight: 900;
+            color: #fff;
+            line-height: 1.1;
+            margin: 0 0 10px;
+            text-shadow: 0 4px 24px rgba(0,0,0,0.7);
+            letter-spacing: -0.5px;
+        }
+        .hero-genres {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .hero-genre-tag {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+        .hero-desc {
+            font-size: 14px;
+            color: rgba(255,255,255,0.75);
+            line-height: 1.65;
+            margin-bottom: 18px;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+        }
+        .hero-btns {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .play-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 26px;
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            color: #030b05;
+            font-weight: 800;
+            font-size: 15px;
+            border: none;
+            border-radius: 10px;
+            text-decoration: none;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(74,222,128,0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .play-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(74,222,128,0.55); color: #030b05; }
+        .info-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 22px;
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            font-weight: 600;
+            font-size: 14px;
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 10px;
+            text-decoration: none;
+            backdrop-filter: blur(12px);
+            transition: background 0.2s;
+        }
+        .info-btn:hover { background: rgba(255,255,255,0.22); color: #fff; }
+        .save-btn {
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .save-btn:hover { background: rgba(255,255,255,0.22); }
+        .save-btn.saved { background: rgba(74,222,128,0.2); border-color: #4ade80; color: #4ade80; }
+
+        @media (max-width: 600px) {
+            .hero-content { padding: 0 16px 24px; }
+            .hero-title { font-size: 22px; }
+            .hero-desc { display: none; }
+            .hero-badge-year { display: none; }
+        }
+
+        /* Stats bar */
+        .stats-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px;
+            padding: 18px 24px;
+            margin: 0 0 28px;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 28px;
+            border-right: 1px solid rgba(255,255,255,0.08);
+            flex: 1;
+            min-width: 100px;
+        }
+        .stat-item:last-child { border-right: none; }
+        .stat-number {
+            font-size: 26px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #4ade80, #00d9ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+        .stat-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.45);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-top: 4px;
+        }
+        @media (max-width: 480px) {
+            .stats-bar { gap: 12px; padding: 14px; }
+            .stat-item { padding: 0 16px; border-right: none; min-width: 70px; }
+            .stat-number { font-size: 20px; }
+        }
+
+        /* VJ Spotlight */
+        .vj-spotlight-scroll {
+            display: flex;
+            gap: 14px;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .vj-spotlight-scroll::-webkit-scrollbar { display: none; }
+        .vj-card {
+            flex-shrink: 0;
+            width: 130px;
+            text-align: center;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+        .vj-card:hover { transform: translateY(-4px); }
+        .vj-avatar-ring {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4ade80, #00d9ff);
+            padding: 3px;
+            margin: 0 auto 10px;
+        }
+        .vj-avatar-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #16161f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            font-weight: 900;
+            color: #4ade80;
+            overflow: hidden;
+        }
+        .vj-avatar-inner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .vj-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 3px;
+        }
+        .vj-count {
+            font-size: 11px;
+            color: rgba(255,255,255,0.45);
+        }
+
+        /* Subscribe CTA Banner */
+        .subscribe-cta-banner {
+            background: linear-gradient(135deg, rgba(74,222,128,0.08) 0%, rgba(0,217,255,0.06) 100%);
+            border: 1px solid rgba(74,222,128,0.2);
+            border-radius: 18px;
+            padding: 28px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 36px;
+            flex-wrap: wrap;
+        }
+        .subscribe-cta-text h3 {
+            font-size: 20px;
+            font-weight: 800;
+            color: #fff;
+            margin: 0 0 6px;
+        }
+        .subscribe-cta-text p {
+            font-size: 14px;
+            color: rgba(255,255,255,0.55);
+            margin: 0;
+        }
+        .subscribe-cta-text .plan-pills {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .plan-pill {
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.7);
+        }
+        .plan-pill.highlight {
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            color: #030b05;
+            border-color: transparent;
+        }
+        .subscribe-cta-btn {
+            flex-shrink: 0;
+            padding: 14px 30px;
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            color: #030b05;
+            font-weight: 800;
+            font-size: 15px;
+            border: none;
+            border-radius: 10px;
+            text-decoration: none;
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: 0 4px 20px rgba(74,222,128,0.35);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .subscribe-cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(74,222,128,0.5); color: #030b05; }
+        @media (max-width: 600px) {
+            .subscribe-cta-banner { padding: 20px; }
+            .subscribe-cta-btn { width: 100%; text-align: center; }
+        }
+
+        /* Enhanced genre chips */
+        .genre-strip {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        /* VJ Filter Row */
+        .vj-filter-row {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 14px 0 10px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .vj-filter-row::-webkit-scrollbar { display: none; }
+        .vj-filter-chip {
+            flex-shrink: 0;
+            padding: 7px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.06);
+            color: #ccc;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .vj-filter-chip:hover {
+            border-color: #e50914;
+            color: #fff;
+            background: rgba(229,9,20,0.15);
+        }
+        .vj-filter-chip.active {
+            background: #e50914;
+            border-color: #e50914;
+            color: #fff;
+        }
+        .genre-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px;
+            color: rgba(255,255,255,0.75);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .genre-chip:hover {
+            background: rgba(74,222,128,0.12);
+            border-color: rgba(74,222,128,0.35);
+            color: #4ade80;
+            transform: translateY(-2px);
+        }
+        .genre-chip-all {
+            background: linear-gradient(135deg, rgba(74,222,128,0.12), rgba(0,217,255,0.08));
+            border-color: rgba(74,222,128,0.25);
+            color: #4ade80;
         }
 
         /* iOS "Add to Home Screen" instruction banner */
@@ -915,11 +1306,25 @@
                                     <div class="hero-overlay"></div>
                                     <div class="hero-content">
                                         <div class="hero-info-panel">
+                                            <div class="hero-badges">
+                                                <span class="hero-badge hero-badge-vj">VJ Junior</span>
+                                                <span class="hero-badge hero-badge-quality">HD</span>
+                                                <span class="hero-badge hero-badge-year">2024</span>
+                                            </div>
                                             <h2 class="hero-title">Ugly Story</h2>
+                                            <div class="hero-genres">
+                                                <span class="hero-genre-tag">Drama</span>
+                                                <span class="hero-genre-tag">Thriller</span>
+                                            </div>
+                                            <p class="hero-desc">A gripping story of betrayal, love, and survival — narrated in Luganda by VJ Junior for an authentic Ugandan experience.</p>
                                             <div class="hero-btns">
                                                 <a href="player.html?id=6a3a8e461b50122619d6bee4" class="play-btn">
                                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                                                     Play Now
+                                                </a>
+                                                <a href="movie.html?id=6a3a8e461b50122619d6bee4" class="info-btn">
+                                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                                    More Info
                                                 </a>
                                             </div>
                                         </div>
@@ -1032,8 +1437,26 @@
                                 </div>
                             </section>
 
+                            <!-- VJ Filter Chips Row -->
+                            <div class="vj-filter-row" id="vjFilterRow">
+                                <button class="vj-filter-chip active" data-vj="all" onclick="filterByVJ(this, 'all')">All</button>
+                                <button class="vj-filter-chip" data-vj="Junior" onclick="filterByVJ(this, 'Junior')">VJ Junior</button>
+                                <button class="vj-filter-chip" data-vj="IceP" onclick="filterByVJ(this, 'IceP')">VJ Ice P</button>
+                                <button class="vj-filter-chip" data-vj="Emmy" onclick="filterByVJ(this, 'Emmy')">VJ Emmy</button>
+                                <button class="vj-filter-chip" data-vj="Jingo" onclick="filterByVJ(this, 'Jingo')">VJ Jingo</button>
+                                <button class="vj-filter-chip" data-vj="Tom" onclick="filterByVJ(this, 'Tom')">VJ Tom</button>
+                                <button class="vj-filter-chip" data-vj="Jovan" onclick="filterByVJ(this, 'Jovan')">VJ Jovan</button>
+                                <button class="vj-filter-chip" data-vj="Ulio" onclick="filterByVJ(this, 'Ulio')">VJ Ulio</button>
+                                <button class="vj-filter-chip" data-vj="Soul" onclick="filterByVJ(this, 'Soul')">VJ Soul</button>
+                                <button class="vj-filter-chip" data-vj="Freddy" onclick="filterByVJ(this, 'Freddy')">VJ Freddy</button>
+                                <button class="vj-filter-chip" data-vj="Ham" onclick="filterByVJ(this, 'Ham')">VJ Ham</button>
+                                <button class="vj-filter-chip" data-vj="Neil" onclick="filterByVJ(this, 'Neil')">VJ Neil</button>
+                                <button class="vj-filter-chip" data-vj="Kin" onclick="filterByVJ(this, 'Kin')">VJ Kin</button>
+                                <button class="vj-filter-chip" data-vj="Eddy" onclick="filterByVJ(this, 'Eddy')">VJ Eddy</button>
+                            </div>
+
                             <!-- Trending Now Section - Immediately after slider -->
-                            <div class="app-section movie-section" style="margin-top: 25px;">
+                            <div class="app-section movie-section" style="margin-top: 8px;">
                                 <div class="section-header">
                                     <h2>
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" stroke-width="2">
@@ -1078,6 +1501,8 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- VJ Spotlight Section -->
 
                             <!-- Continue Watching Section (Only shows if user has watch history) -->
                             <div class="app-section" id="continueWatchingSection" style="display: none;">
@@ -1144,6 +1569,7 @@
                                     </div>
                                 </div>
                             </div>
+
 
                             <!-- New TV Series Section -->
                             <div class="app-section movie-section">
@@ -1240,7 +1666,8 @@
                                     <a href="movies.html?genre=romance" class="genre-chip">Romance</a>
                                     <a href="movies.html?genre=thriller" class="genre-chip">Thriller</a>
                                     <a href="movies.html?genre=sci-fi" class="genre-chip">Sci-Fi</a>
-                                    <a href="genres.html" class="genre-chip genre-chip-all">All Genres →</a>
+                                    <a href="movies.html?genre=animation" class="genre-chip">Animation</a>
+                                    <a href="genres.html" class="genre-chip genre-chip-all">View All Genres →</a>
                                 </div>
                             </div>
 
@@ -1363,6 +1790,49 @@
     </div>
 
     <!-- JavaScript -->
+    <!-- Advanced homepage: hide subscribe banner for paid users, update stats -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide subscribe banner if user has active paid plan
+            const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+            if (token) {
+                fetch((window.API_CONFIG && API_CONFIG.BASE_URL ? API_CONFIG.BASE_URL : 'https://luganda-translated-movies-production.up.railway.app') + '/api/auth/check-access', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                }).then(r => r.json()).then(d => {
+                    const plan = d.access && d.access.plan;
+                    if (plan && plan !== 'free') {
+                        const banner = document.getElementById('subscribeCTABanner');
+                        if (banner) banner.style.display = 'none';
+                    }
+                }).catch(() => {});
+            }
+
+            // Animate stats counter
+            const el = document.getElementById('statMovies');
+            if (el) {
+                fetch((window.API_CONFIG && API_CONFIG.BASE_URL ? API_CONFIG.BASE_URL : 'https://luganda-translated-movies-production.up.railway.app') + '/api/luganda-movies?limit=1')
+                    .then(r => r.json())
+                    .then(d => {
+                        const total = d.pagination && d.pagination.total;
+                        if (total && total > 0) el.textContent = total + '+';
+                    }).catch(() => {});
+            }
+        });
+    </script>
+
+    <!-- VJ Filter Function -->
+    <script>
+        function filterByVJ(btn, vj) {
+            document.querySelectorAll('.vj-filter-chip').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            if (vj === 'all') {
+                window.location.href = 'movies.html';
+            } else {
+                window.location.href = 'movies.html?vj=' + encodeURIComponent(vj);
+            }
+        }
+    </script>
+
     <!-- Scroll Position Fix for Back Navigation -->
     <script>
         // Disable browser's automatic scroll restoration
@@ -1782,7 +2252,7 @@
                 }
                 
                 const movieCard = `
-                    <a href="${movie.contentType === 'series' ? '/series-detail?id=' + (movie.slug || movie._id) : '/movie/' + (movie.slug || movie._id)}" class="content-card" data-movie-id="${movie._id}">
+                    <a href="${movie.contentType === 'series' ? 'series-player.html?id=' + (movie.slug || movie._id) : '/movie/' + (movie.slug || movie._id)}" class="content-card" data-movie-id="${movie._id}">
                         <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
                             ${vjBadge ? `<div class="card-badges"><span class="card-badge badge-vj">${vjBadge}</span></div>` : ''}
                             <div class="play-overlay">
@@ -2066,7 +2536,7 @@
                 const viewsText = views >= 1000 ? `${(views / 1000).toFixed(1)}K views` : `${views} views`;
                 html += `
                     <li>
-                        <a href="${movie.contentType === 'series' ? '/series-detail?id=' + (movie.slug || movie._id) : '/movie/' + (movie.slug || movie._id)}" class="nav-content">
+                        <a href="${movie.contentType === 'series' ? 'series-player.html?id=' + (movie.slug || movie._id) : '/movie/' + (movie.slug || movie._id)}" class="nav-content">
                             <div>${movie.originalTitle || movie.title}</div>
                             <div class="view">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2123,14 +2593,26 @@
                         <div class="hero-overlay"></div>
                         <div class="hero-content">
                             <div class="hero-info-panel">
+                                <div class="hero-badges">
+                                    ${vjBadge ? `<span class="hero-badge hero-badge-vj">VJ ${vjBadge}</span>` : ''}
+                                    ${quality ? `<span class="hero-badge hero-badge-quality">${quality}</span>` : ''}
+                                    ${year ? `<span class="hero-badge hero-badge-year">${year}</span>` : ''}
+                                    ${movie.rating ? `<span class="hero-rating"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fbbf24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>${parseFloat(movie.rating).toFixed(1)}</span>` : ''}
+                                </div>
                                 <h2 class="hero-title">${title}</h2>
+                                ${movie.genre ? `<div class="hero-genres">${(Array.isArray(movie.genre) ? movie.genre : movie.genre.split(',').map(g=>g.trim())).slice(0,3).map(g=>`<span class="hero-genre-tag">${g}</span>`).join('')}</div>` : ''}
+                                ${overview ? `<p class="hero-desc">${overview.substring(0, 140)}${overview.length > 140 ? '…' : ''}</p>` : ''}
                                 <div class="hero-btns">
                                     <a href="player.html?id=${movieId}" class="play-btn">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                                         Play Now
                                     </a>
+                                    <a href="movie.html?id=${movieId}" class="info-btn">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                        More Info
+                                    </a>
                                     <button class="save-btn" onclick="addToWatchlist('${movieId}'); this.classList.toggle('saved')" aria-label="Save to watchlist">
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+                                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
                                     </button>
                                 </div>
                             </div>
@@ -2208,7 +2690,7 @@
                 }
                 
                 const movieCard = `
-                    <a href="${movie.contentType === 'series' ? '/series-detail?id=' + (movie.slug || movie._id) : '/movie/' + (movie.slug || movie._id)}" class="content-card" data-movie-id="${movie._id}">
+                    <a href="${movie.contentType === 'series' ? 'series-player.html?id=' + (movie.slug || movie._id) : '/movie/' + (movie.slug || movie._id)}" class="content-card" data-movie-id="${movie._id}">
                         <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
                             ${vjBadge ? `<div class="card-badges"><span class="card-badge badge-vj">${vjBadge}</span></div>` : ''}
                             <div class="play-overlay">
@@ -2311,7 +2793,7 @@
                 }
                 
                 const seriesCard = `
-                    <a href="series-detail.html?id=${series._id}" class="content-card">
+                    <a href="series-player.html?id=${series._id}" class="content-card">
                         <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
                             <div class="card-badges">
                                 <span class="badge-quality" style="background: linear-gradient(135deg, #A855F7, #7C3AED);">

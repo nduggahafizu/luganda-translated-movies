@@ -10,18 +10,14 @@ const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 const JWT_EXPIRE = process.env.JWT_EXPIRE || '7d';
 const JWT_REFRESH_EXPIRE = process.env.JWT_REFRESH_EXPIRE || '30d';
 
-// Generate JWT Token
+// Generate JWT Token (no expiry — persistent login)
 const generateToken = (id) => {
-    return jwt.sign({ id }, JWT_SECRET, {
-        expiresIn: JWT_EXPIRE
-    });
+    return jwt.sign({ id }, JWT_SECRET);
 };
 
-// Generate Refresh Token
+// Generate Refresh Token (no expiry)
 const generateRefreshToken = (id) => {
-    return jwt.sign({ id }, JWT_REFRESH_SECRET, {
-        expiresIn: JWT_REFRESH_EXPIRE
-    });
+    return jwt.sign({ id }, JWT_REFRESH_SECRET || JWT_SECRET);
 };
 
 const { registerUser } = require('../services/userService');

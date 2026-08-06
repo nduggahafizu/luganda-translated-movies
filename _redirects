@@ -36,6 +36,9 @@ http://unrulymovies.com/* https://unrulymovies.com/:splat 301!
 /profile          /profile.html          200
 /subscribe        /subscribe.html        200
 /subscription     /subscription.html     200
+/payment-success  /payment-success.html  200
+/payment-pending  /payment-pending.html  200
+/payment-failed   /payment-failed.html   200
 /uganda-tv        /uganda-tv.html        200
 /tv-stations      /tv-stations.html      200
 /vjs              /vjs.html              200

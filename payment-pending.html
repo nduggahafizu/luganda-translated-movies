@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Payment Processing — Unruly Movies</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#ffd700">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { background: #09090f; }
+        .ps-wrap {
+            max-width: 520px;
+            margin: 80px auto;
+            padding: 24px;
+            text-align: center;
+        }
+        .ps-icon {
+            width: 88px; height: 88px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 24px;
+            background: rgba(255,215,0,0.12);
+        }
+        .ps-icon svg { width: 44px; height: 44px; }
+        .ps-spinner {
+            width: 44px; height: 44px; border-radius: 50%;
+            border: 3px solid rgba(255,215,0,0.2);
+            border-top-color: #ffd700;
+            animation: psSpin 0.9s linear infinite;
+        }
+        .ps-title { font-size: 26px; font-weight: 800; color: #fff; margin: 0 0 10px; }
+        .ps-subtitle { font-size: 14px; color: #888; margin: 0 0 28px; line-height: 1.6; }
+        .ps-card {
+            background: #13131f;
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px; padding: 20px; margin-bottom: 24px; text-align: left;
+        }
+        .ps-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px;
+        }
+        .ps-row:last-child { border-bottom: none; }
+        .ps-row-label { color: #666; }
+        .ps-row-value { color: #fff; font-weight: 600; }
+        .ps-btn {
+            display: inline-block; padding: 13px 36px; border-radius: 50px;
+            font-weight: 700; font-size: 15px; text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s; border: none; cursor: pointer;
+        }
+        .ps-btn:hover { transform: translateY(-2px); }
+        .ps-btn.primary { background: #ffd700; color: #000; }
+        .ps-btn.secondary {
+            background: transparent; border: 1px solid rgba(255,255,255,0.15);
+            color: #aaa; margin-top: 10px; display: block;
+        }
+        .ps-progress {
+            height: 4px; background: rgba(255,215,0,0.15); border-radius: 2px;
+            margin-bottom: 28px; overflow: hidden;
+        }
+        .ps-progress-bar {
+            height: 100%; width: 40%; background: #ffd700; border-radius: 2px;
+            animation: psProgress 2s ease-in-out infinite alternate;
+        }
+        @keyframes psSpin { to { transform: rotate(360deg); } }
+        @keyframes psProgress { from { width: 20%; } to { width: 85%; } }
+    </style>
+</head>
+<body>
+    <nav class="nav" style="position:fixed;top:0;width:100%;z-index:100;">
+        <a href="/" class="nav-logo"><img src="assets/images/logo-wordmark.png" alt="Unruly Movies" style="height:32px;"></a>
+    </nav>
+
+    <div class="ps-wrap" id="psWrap">
+        <div class="ps-icon">
+            <div class="ps-spinner"></div>
+        </div>
+        <h1 class="ps-title">Payment Processing</h1>
+        <p class="ps-subtitle">Your payment is being verified. This may take up to 2 minutes.<br>Please do not close this page.</p>
+        <div class="ps-progress"><div class="ps-progress-bar"></div></div>
+        <div class="ps-card">
+            <div class="ps-row">
+                <span class="ps-row-label">Reference</span>
+                <span class="ps-row-value" id="psRef">—</span>
+            </div>
+            <div class="ps-row">
+                <span class="ps-row-label">Status</span>
+                <span class="ps-row-value" style="color:#ffd700;" id="psStatus">Awaiting confirmation</span>
+            </div>
+            <div class="ps-row">
+                <span class="ps-row-label">Date</span>
+                <span class="ps-row-value" id="psDate">—</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const ref = urlParams.get('ref');
+        document.getElementById('psRef').textContent = ref || '—';
+        document.getElementById('psDate').textContent = new Date().toLocaleDateString('en-UG', {
+            year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+
+        let attempts = 0;
+        const maxAttempts = 24; // 2 minutes at 5-second intervals
+
+        async function checkStatus() {
+            if (!ref) return;
+            const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+            if (!token) return;
+            try {
+                const res = await fetch(`${API_CONFIG.BASE_URL}/api/payments/pesapal/verify/${ref}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.status === 'success') {
+                    // Payment confirmed — redirect to success page
+                    window.location.replace(`payment-success.html?ref=${encodeURIComponent(ref)}`);
+                } else if (data.status === 'failed') {
+                    window.location.replace('payment-failed.html');
+                } else {
+                    attempts++;
+                    document.getElementById('psStatus').textContent = `Checking… (${attempts}/${maxAttempts})`;
+                    if (attempts < maxAttempts) {
+                        setTimeout(checkStatus, 5000);
+                    } else {
+                        // Timed out — let user know
+                        document.querySelector('.ps-title').textContent = 'Still Processing';
+                        document.querySelector('.ps-subtitle').innerHTML =
+                            'Your payment is taking longer than expected. If you paid, your subscription will activate automatically within a few minutes.<br><br>Check your dashboard or contact support if it doesn\'t appear.';
+                        document.getElementById('psStatus').textContent = 'Pending — check back soon';
+                        document.querySelector('.ps-progress').style.display = 'none';
+                        const act = document.createElement('div');
+                        act.innerHTML = `
+                            <a href="dashboard.html" class="ps-btn primary">Go to Dashboard</a>
+                            <a href="mailto:support@unrulymovies.com" class="ps-btn secondary">Contact Support</a>
+                        `;
+                        document.getElementById('psWrap').appendChild(act);
+                    }
+                }
+            } catch (e) {
+                attempts++;
+                if (attempts < maxAttempts) setTimeout(checkStatus, 5000);
+            }
+        }
+
+        // Start checking after 5 seconds
+        if (ref) setTimeout(checkStatus, 5000);
+    </script>
+</body>
+</html>

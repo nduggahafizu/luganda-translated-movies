@@ -8,7 +8,7 @@ class PaymentManager {
     constructor() {
         this.apiUrl = API_CONFIG.BASE_URL;
         this.plans = {
-            starter:  { name: 'Starter',  price: 500,  duration: '1 day',   features: ['Stream all movies', '1 device'] },
+            daily:    { name: 'Daily',    price: 1000,  duration: '1 day',   features: ['Stream all movies', '1 device'] },
             basic:    { name: 'Weekly',   price: 5000,  duration: '7 days',  features: ['Stream all movies', 'Download access', '3 devices'] },
             standard: { name: 'Monthly',  price: 12000, duration: '30 days', features: ['Stream all movies', 'Download access', 'No ads', '3 devices'] },
             premium:  { name: 'Premium',  price: 30000, duration: '30 days', features: ['Stream all movies', 'Download access', 'No ads', '3 devices', 'Priority support'] },

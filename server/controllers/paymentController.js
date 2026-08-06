@@ -8,11 +8,10 @@ const { sendPaymentReceipt, sendSubscriptionEmail } = require('../utils/email');
 
 // Subscription pricing
 const SUBSCRIPTION_PRICES = {
-    starter: { ugx: 500, days: 1 },
-    basic: { ugx: 5000, days: 7 },
-    standard: { ugx: 12000, days: 30 },
-    premium: { ugx: 30000, days: 30 },
-    vip: { ugx: 50000, days: 90 }
+    daily:    { ugx: 1000,  days: 1 },
+    weekly:   { ugx: 5000,  days: 7 },
+    biweekly: { ugx: 7000,  days: 14 },
+    monthly:  { ugx: 12000, days: 30 }
 };
 
 // @desc    Create Stripe payment intent
@@ -699,4 +698,84 @@ exports.getPayment = async (req, res) => {
             requestId: req.requestId
         });
     }
+};
+
+// @desc    Unified subscribe endpoint (web + mobile app)
+// @route   POST /api/payments/subscribe
+// @access  Private
+// Body: { plan, paymentMethod, phoneNumber }
+// Returns: { redirectUrl } for card/pesapal, or { status } for mobile money
+exports.subscribe = async (req, res) => {
+    const { plan, paymentMethod = 'pesapal', phoneNumber } = req.body;
+
+    if (!plan || !SUBSCRIPTION_PRICES[plan]) {
+        return res.status(400).json({
+            status: 'error',
+            message: `Invalid plan. Valid plans: ${Object.keys(SUBSCRIPTION_PRICES).join(', ')}`
+        });
+    }
+
+    const planConfig = SUBSCRIPTION_PRICES[plan];
+
+    // Build a fake req.body to reuse existing controllers
+    req.body = {
+        subscriptionPlan: plan,
+        subscriptionDuration: plan,  // same as plan name (daily/weekly/biweekly/monthly)
+        phoneNumber: phoneNumber || '',
+        amount: planConfig.ugx,
+        currency: 'UGX',
+        description: `Unruly Movies ${plan} subscription - ${planConfig.days} day(s)`
+    };
+
+    // Route to correct payment provider — only PesaPal supported
+    switch (paymentMethod) {
+        case 'pesapal':
+        case 'card':
+        case 'mtn':
+        case 'airtel':
+            // All payment methods go through PesaPal (handles MTN, Airtel, Visa, Mastercard)
+            return exports.initiatePesapalPayment(req, res);
+        default:
+            return res.status(400).json({
+                status: 'error',
+                message: 'Unsupported payment method. Please use PesaPal.'
+            });
+    }
+};
+
+// @desc    Check if current user has active paid subscription
+// @route   GET /api/payments/check-access
+// @access  Private
+exports.checkAccess = async (req, res) => {
+    const plan = req.user?.subscription?.plan || 'free';
+    const hasAccess = plan !== 'free' && req.user.hasActiveSubscription();
+    res.json({
+        status: 'success',
+        data: {
+            hasAccess,
+            plan,
+            endDate: req.user?.subscription?.endDate || null,
+            message: hasAccess ? 'Access granted' : 'Subscription required'
+        }
+    });
+};
+
+// @desc    Get available subscription plans
+// @route   GET /api/payments/plans
+// @access  Public
+exports.getPlans = (req, res) => {
+    res.json({
+        status: 'success',
+        data: {
+            plans: Object.entries(SUBSCRIPTION_PRICES).map(([key, val]) => ({
+                id: key,
+                name: key.charAt(0).toUpperCase() + key.slice(1),
+                price: val.ugx,
+                currency: 'UGX',
+                days: val.days,
+                description: `${val.days} day${val.days > 1 ? 's' : ''} access`
+            })),
+            paymentMethods: ['pesapal']
+        }
+    });
 };

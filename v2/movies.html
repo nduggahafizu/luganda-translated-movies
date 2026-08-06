@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Movies — Unruly Movies V2 Preview</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#4ade80">
+
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/card-grid.css">
+    <link rel="stylesheet" href="/css/mobile-improvements.css">
+    <link rel="stylesheet" href="/css/app-shell.css">
+    <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+    <div class="v2-badge">V2 PREVIEW</div>
+    <div class="container">
+        <div class="app">
+            <div id="shellHeader"></div>
+
+            <div class="app-wrapper">
+                <div id="shellAside"></div>
+
+                <!-- Main Content -->
+                <div class="app-container flex-fill">
+                    <div class="container">
+                        <div class="app-content pt-md-3">
+
+                            <div class="fragment" data-fragment="movies">
+
+                                <div class="v2-page-header">
+                                    <h1>
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                                            <line x1="7" y1="2" x2="7" y2="22"></line>
+                                            <line x1="17" y1="2" x2="17" y2="22"></line>
+                                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                                            <line x1="2" y1="7" x2="7" y2="7"></line>
+                                            <line x1="2" y1="17" x2="7" y2="17"></line>
+                                            <line x1="17" y1="17" x2="22" y2="17"></line>
+                                            <line x1="17" y1="7" x2="22" y2="7"></line>
+                                        </svg>
+                                        Movies
+                                    </h1>
+                                    <p>Browse Luganda translated movies by genre, year, VJ translator and more.</p>
+                                </div>
+
+                                <!-- Filters -->
+                                <div class="filter-section">
+                                    <div class="filter-row">
+                                        <div class="filter-group">
+                                            <label class="filter-label" for="genreFilter">Genre</label>
+                                            <select class="filter-select" id="genreFilter">
+                                                <option value="">All Genres</option>
+                                                <option value="action">Action</option>
+                                                <option value="comedy">Comedy</option>
+                                                <option value="drama">Drama</option>
+                                                <option value="horror">Horror</option>
+                                                <option value="sci-fi">Sci-Fi</option>
+                                                <option value="romance">Romance</option>
+                                                <option value="thriller">Thriller</option>
+                                                <option value="animation">Animation</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="filter-group">
+                                            <label class="filter-label" for="yearFilter">Year</label>
+                                            <select class="filter-select" id="yearFilter">
+                                                <option value="">All Years</option>
+                                                <option value="2026">2026</option>
+                                                <option value="2025">2025</option>
+                                                <option value="2024">2024</option>
+                                                <option value="2023">2023</option>
+                                                <option value="2022">2022</option>
+                                                <option value="2021">2021</option>
+                                                <option value="2020">2020</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="filter-group">
+                                            <label class="filter-label" for="vjFilter">VJ Translator</label>
+                                            <select class="filter-select" id="vjFilter">
+                                                <option value="">All VJs</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="filter-group">
+                                            <label class="filter-label" for="sortFilter">Sort By</label>
+                                            <select class="filter-select" id="sortFilter">
+                                                <option value="latest">Latest Translation</option>
+                                                <option value="popular">Most Popular</option>
+                                                <option value="rating">Best Translation</option>
+                                                <option value="title">Title A-Z</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <p class="v2-result-count" id="resultCount"></p>
+
+                                <div class="card-grid muno-style" id="moviesGrid">
+                                    <div class="loading-spinner">Loading...</div>
+                                </div>
+
+                                <div class="pagination" id="moviesPagination"></div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="shellFooter"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll to Top -->
+    <div class="scroll-up">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="js/shell.js"></script>
+    <script>AppShell.mount('movies');</script>
+    <script src="/js/main.js"></script>
+    <script src="/js/luganda-movies-api.js"></script>
+    <script src="js/cards.js"></script>
+    <script defer src="/js/app-shell.js"></script>
+    <script src="js/movies.js"></script>
+</body>
+</html>

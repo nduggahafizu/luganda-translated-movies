@@ -202,13 +202,6 @@
                                     </svg>
                                     Browse TV Series
                                 </h1>
-                                <p class="page-hero-subtitle">Stream your favorite TV shows with Luganda translations</p>
-                            </div>
-
-                            <!-- Editorial intro — static, crawlable -->
-                            <div style="max-width:820px;margin:0 0 28px;padding:0 2px;">
-                                <p style="font-size:15px;line-height:1.8;color:rgba(255,255,255,0.6);margin-bottom:10px;">Unruly Movies carries a growing library of Luganda-translated TV series — multi-season dramas, action serials, and thriller shows narrated in Luganda by Uganda's most recognised Video Jockeys. Each series is browseable by genre, VJ translator, and release year, with individual episodes clearly labelled and accessible from the series detail page.</p>
-                                <p style="font-size:15px;line-height:1.8;color:rgba(255,255,255,0.6);margin:0;">VJ-translated series have a dedicated audience in Uganda and among the diaspora because they allow viewers to follow complex multi-episode storylines entirely in Luganda. Character arcs, dialogue-heavy scenes, and dramatic cliffhangers all land more powerfully when narrated in a language the audience knows instinctively rather than reads from a subtitle bar.</p>
                             </div>
 
                             <!-- Filters -->
@@ -414,19 +407,9 @@
                 const year = show.startYear || show.year || '';
                 
                 return `
-                    <a href="series-detail.html?id=${show._id || show.slug}" class="content-card">
+                    <a href="series-player.html?id=${show._id || show.slug}" class="content-card">
                         <div class="card-poster" style="background-image: url('${poster}');">
-                            <div class="card-badges">
-                                <span class="card-badge badge-quality">${seasonCount} Season${seasonCount !== 1 ? 's' : ''}</span>
-                                ${show.status === 'ongoing' ? '<span class="card-badge badge-year">NEW</span>' : ''}
-                                ${vjName !== 'VJ' ? `<span class="card-badge badge-vj">${vjName}</span>` : ''}
-                            </div>
-                            <div class="card-rating">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                </svg>
-                                ${rating.toFixed(1)}
-                            </div>
+                            ${vjName !== 'VJ' ? `<div class="card-badges"><span class="card-badge badge-vj">${vjName}</span></div>` : ''}
                             <div class="play-overlay">
                                 <div class="play-button">
                                     <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
@@ -437,10 +420,6 @@
                         </div>
                         <div class="card-info">
                             <h3 class="card-title">${title}</h3>
-                            <div class="card-meta">
-                                ${year ? `<span>${year}</span>` : ''}
-                                <span>${genre}</span>
-                            </div>
                         </div>
                     </a>
                 `;

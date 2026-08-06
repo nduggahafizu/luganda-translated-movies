@@ -7,19 +7,8 @@
 const API_URL = API_CONFIG.API_ENDPOINTS.AUTH;
 const GOOGLE_CLIENT_ID = API_CONFIG.GOOGLE_CLIENT_ID;
 
-// Initialize Google Sign-In with retry logic
-let googleInitRetries = 0;
-const MAX_GOOGLE_RETRIES = 5; // Reduced from 10
-
+// Initialize Google Sign-In silently (no button rendering — button is hardcoded in HTML)
 function initGoogleSignIn() {
-    const googleBtnDiv = document.getElementById('google-signin-btn');
-    
-    // Only try to init Google Sign-In if the button container exists
-    if (!googleBtnDiv) {
-        return; // No Google button on this page, skip silently
-    }
-    
-    // Check if Google API is loaded
     if (typeof google !== 'undefined' && google.accounts) {
         try {
             google.accounts.id.initialize({
@@ -28,61 +17,51 @@ function initGoogleSignIn() {
                 auto_select: false,
                 cancel_on_tap_outside: true
             });
-            
-            // Render Google button
-            googleBtnDiv.innerHTML = ''; // Clear any existing content
-            google.accounts.id.renderButton(
-                googleBtnDiv,
-                {
-                    theme: 'filled_black',
-                    size: 'large',
-                    width: googleBtnDiv.offsetWidth || 280,
-                    text: 'continue_with',
-                    shape: 'rectangular'
+            window._googleReady = true;
+        } catch (e) {
+            console.warn('Google Sign-In init error:', e);
+        }
+    }
+}
+
+// Called when user clicks the custom Google button
+function triggerGoogleSignIn(btn) {
+    const origHTML = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span style="display:flex;align-items:center;gap:8px;color:#3c4043"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4285f4" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Connecting...</span>'; }
+
+    const attempt = () => {
+        if (typeof google !== 'undefined' && google.accounts) {
+            try {
+                google.accounts.id.initialize({
+                    client_id: GOOGLE_CLIENT_ID,
+                    callback: handleGoogleSignIn,
+                    auto_select: false,
+                    cancel_on_tap_outside: true
+                });
+                google.accounts.id.prompt((notification) => {
+                    if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                        // One Tap blocked — fall back to redirect flow
+                        window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(window.location.origin + '/login.html')}&response_type=id_token&scope=email%20profile&nonce=${Math.random().toString(36).slice(2)}`;
+                    }
+                    if (btn) { btn.disabled = false; btn.innerHTML = origHTML; }
+                });
+            } catch(e) {
+                if (btn) { btn.disabled = false; btn.innerHTML = origHTML; }
+                showNotification('Google Sign-In unavailable. Please use email login.', 'error');
+            }
+        } else {
+            // GSI script not loaded yet — wait briefly then retry once
+            setTimeout(() => {
+                if (typeof google !== 'undefined' && google.accounts) {
+                    attempt();
+                } else {
+                    if (btn) { btn.disabled = false; btn.innerHTML = origHTML; }
+                    showNotification('Google Sign-In failed to load. Check your connection and try again.', 'error');
                 }
-            );
-            console.log('Google Sign-In initialized successfully');
-        } catch (error) {
-            console.error('Google Sign-In init error:', error);
-            showGoogleFallback(googleBtnDiv);
+            }, 2000);
         }
-    } else {
-        // Google API not loaded yet, retry
-        retryGoogleInit();
-    }
-}
-
-function retryGoogleInit() {
-    const googleBtnDiv = document.getElementById('google-signin-btn');
-    if (!googleBtnDiv) return; // No button, skip
-    
-    googleInitRetries++;
-    if (googleInitRetries < MAX_GOOGLE_RETRIES) {
-        // Only log every 2nd retry to reduce console noise
-        if (googleInitRetries % 2 === 0) {
-            console.log(`Google API loading... (${googleInitRetries}/${MAX_GOOGLE_RETRIES})`);
-        }
-        setTimeout(initGoogleSignIn, 500);
-    } else {
-        console.warn('Google Sign-In unavailable - using fallback');
-        showGoogleFallback(googleBtnDiv);
-    }
-}
-
-function showGoogleFallback(container) {
-    if (!container) return;
-    container.innerHTML = `
-        <button type="button" class="social-btn google-fallback" onclick="location.reload()" 
-            style="width:100%;padding:12px;background:#4285f4;color:#fff;border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
-            <svg style="width:20px;height:20px" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-            </svg>
-            Retry Google Sign-In
-        </button>
-    `;
+    };
+    attempt();
 }
 
 // Handle Google Sign-In
