@@ -744,8 +744,13 @@ async function handleDownload() {
     }
 
     const fileName = (m.title || 'movie').replace(/[^a-zA-Z0-9 _-]/g, '').trim() + '.mp4';
+    // Route through the backend proxy so the response carries
+    // Content-Disposition: attachment — a direct cross-origin CDN link
+    // makes Chrome/Safari just play the video instead of saving it, since
+    // the download attribute is ignored cross-origin without that header.
+    const proxyDownload = API_BASE + '/api/video/stream-proxy?url=' + encodeURIComponent(result.directUrl) + '&download=' + encodeURIComponent(fileName);
     const a = document.createElement('a');
-    a.href = result.directUrl;
+    a.href = proxyDownload;
     a.download = fileName;
     document.body.appendChild(a);
     a.click();
