@@ -249,13 +249,14 @@ async function resolveMovieSourceUrl(movie) {
     return null;
 }
 
-// A movie's `requiredPlan` field defaults to 'free' for ~90% of the catalog
-// (an old per-movie tiering field, separate from the site-wide "free accounts
-// can't watch anything" policy) — taken literally, canAccessContent('free')
-// is true for every account including unpaid ones, so 'free' here always
-// means "starter", never "no subscription required at all".
+// A movie's `requiredPlan` field ('free'/'basic'/'premium') is unused
+// leftover data from an old tiering scheme that doesn't match the real
+// plan lineup (daily/weekly/biweekly/monthly) — no UI ever set it
+// deliberately, it isn't shown to users anywhere, and enforcing it
+// silently blocked paying customers from titles they'd already paid for.
+// Any active paid plan, including the cheapest (daily), unlocks any movie.
 function effectiveRequiredPlan(movie) {
-    return movie?.requiredPlan === 'free' ? 'starter' : (movie?.requiredPlan || 'starter');
+    return 'daily';
 }
 
 function requirePlaybackAuthIfNeeded(movie, req) {
@@ -283,8 +284,8 @@ function requirePlaybackAuthIfNeeded(movie, req) {
 }
 
 async function assertUserCanPlay(requiredPlan, tokenPayload) {
-    // All content requires at least starter plan
-    const effectivePlan = requiredPlan === 'free' ? 'starter' : requiredPlan;
+    // All content requires at least the cheapest paid plan (daily)
+    const effectivePlan = requiredPlan === 'free' ? 'daily' : requiredPlan;
 
     const userId = tokenPayload?.uid;
     if (!userId) {
