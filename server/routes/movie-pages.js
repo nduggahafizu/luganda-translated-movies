@@ -35,7 +35,7 @@ function renderMoviePage(movie) {
     const movieId  = String(movie._id);
     const slug     = movie.slug || movieId;
     const pageUrl  = `${SITE_URL}/movie/${slug}`;
-    const videoUrl = movie.video?.embedUrl || movie.embedUrl || movie.video?.url || '';
+    const hasVideo = !!(movie.video?.embedUrl || movie.embedUrl || movie.video?.url);
     const provider = (movie.video?.provider || '').toLowerCase();
     const format   = (movie.video?.format || '').toLowerCase();
 
@@ -64,12 +64,15 @@ function renderMoviePage(movie) {
         offers: { '@type': 'Offer', availability: 'https://schema.org/OnlineOnly', price: '0', priceCurrency: 'UGX', url: pageUrl }
     });
 
-    // Safe JSON for embedding in <script>
+    // Safe JSON for embedding in <script>. The real playable URL is never
+    // embedded here — it's resolved client-side via POST /api/video/playback-token
+    // + GET /api/video/resolve/luganda/:id, which check subscription entitlement
+    // server-side before returning anything.
     const movieJson = JSON.stringify({
         id: movieId,
         title,
         poster,
-        videoUrl,
+        hasVideo,
         provider,
         format,
         slug
@@ -443,11 +446,6 @@ async function checkAuth() {
     }
 }
 
-function isDirectUrl(url) {
-    if (!url) return false;
-    const u = url.toLowerCase();
-    return ['.mp4','.m3u8','.webm','.mkv','.m4v','pearlpix.xyz','b-cdn.net','r2.dev','archive.org','cloudflare'].some(x => u.includes(x));
-}
 // Upgrade http:// → https:// so the browser never loads mixed content on our HTTPS page
 function safeUrl(url) {
     if (!url) return url;
@@ -486,7 +484,31 @@ function showGate() {
 }
 function showPlaying()  { playingStrip.classList.add('show'); }
 
-function initVjs(videoUrl) {
+// The public page/API never contains the real playable URL — it's stripped
+// server-side. This is the only way to get one: a short-lived,
+// subscription-checked playback token, then a server-side resolve (which
+// also extracts embed-page providers like Streamtape when needed).
+async function resolvePlayableUrl(movieId) {
+    try {
+        const token = cleanToken(getToken());
+        const tokenResp = await fetch(API_BASE + '/api/video/playback-token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify({ movieId })
+        });
+        const tokenData = await tokenResp.json();
+        if (!tokenData.success || !tokenData.token) {
+            return { success: false, message: tokenData.message };
+        }
+
+        const resolveResp = await fetch(API_BASE + '/api/video/resolve/luganda/' + movieId + '?token=' + encodeURIComponent(tokenData.token));
+        return await resolveResp.json();
+    } catch (e) {
+        return { success: false, message: 'Network error' };
+    }
+}
+
+function initVjs(movieId) {
     posterBg.style.display = 'none';
     vjsPlayer = videojs('moviePlayer', {
         controls: true,
@@ -502,14 +524,21 @@ function initVjs(videoUrl) {
         }
     });
 
-    vjsPlayer.ready(() => {
+    vjsPlayer.ready(async () => {
+        const result = await resolvePlayableUrl(movieId);
         hideLoading();
-        const playUrl = safeUrl(videoUrl);
-        if (isDirectUrl(playUrl)) {
+        if (result.success && result.directUrl) {
+            const playUrl = safeUrl(result.directUrl);
             const type = playUrl.toLowerCase().includes('.m3u8') ? 'application/x-mpegURL' : 'video/mp4';
             vjsPlayer.src({ src: playUrl, type });
         } else {
-            loadEmbed(playUrl);
+            console.error('Playback resolve failed:', result.message);
+            playerLoading.innerHTML = '';
+            const msg = document.createElement('p');
+            msg.style.cssText = 'color:#fff;font-size:13px;text-align:center;padding:0 20px;';
+            msg.textContent = result.message || 'This video is currently unavailable.';
+            playerLoading.appendChild(msg);
+            playerLoading.classList.remove('hide');
         }
     });
 
@@ -542,31 +571,13 @@ function initVjs(videoUrl) {
             last = now;
             const token = cleanToken(getToken());
             if (!token) return;
-            fetch(API_BASE + '/api/watch-progress', {
+            fetch(API_BASE + '/api/watch-progress/update', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                body: JSON.stringify({ movieId: movie.id, progress: vjsPlayer.currentTime(), duration: vjsPlayer.duration() })
+                body: JSON.stringify({ movieId: movie.id, currentTime: vjsPlayer.currentTime(), duration: vjsPlayer.duration() })
             }).catch(() => {});
         };
     })());
-}
-
-async function loadEmbed(url) {
-    try {
-        const r = await fetch(API_BASE + '/api/video/extract', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url })
-        });
-        const d = await r.json();
-        if (d.success && d.directUrl) {
-            const safeDirectUrl = safeUrl(d.directUrl);
-            const type = safeDirectUrl.toLowerCase().includes('.m3u8') ? 'application/x-mpegURL' : 'video/mp4';
-            vjsPlayer.src({ src: safeDirectUrl, type });
-            return;
-        }
-    } catch (e) {}
-    hideLoading();
 }
 
 async function boot() {
@@ -630,18 +641,17 @@ async function boot() {
         return;
     }
 
-    if (!m.videoUrl) {
-        try {
-            const token = cleanToken(getToken());
-            const r = await fetch(API_BASE + '/api/luganda-movies/' + m.id, {
-                headers: { 'Authorization': 'Bearer ' + token }
-            });
-            const d = await r.json();
-            if (d.data?.video?.embedUrl) m.videoUrl = d.data.video.embedUrl;
-        } catch (e) {}
+    if (m.hasVideo === false) {
+        playerLoading.innerHTML = '';
+        const msg = document.createElement('p');
+        msg.style.cssText = 'color:#fff;font-size:13px;text-align:center;padding:0 20px;';
+        msg.textContent = 'Video not available for this movie.';
+        playerLoading.appendChild(msg);
+        loadRelatedMovies();
+        return;
     }
 
-    initVjs(m.videoUrl || '');
+    initVjs(m.id);
     loadRelatedMovies();
     fetch(API_BASE + '/api/luganda-movies/' + m.id + '/view', { method: 'POST' }).catch(() => {});
 }
@@ -720,17 +730,22 @@ function showDownloadPrompt() {
     };
 }
 
-function handleDownload() {
+// Links straight to the resolved CDN URL — no Railway byte-proxying. The
+// real URL isn't in window.__MOVIE__ (stripped from the page source), so
+// this resolves it the same authenticated way playback does.
+async function handleDownload() {
     const m = window.__MOVIE__;
-    const videoUrl = m.videoUrl;
-    if (!videoUrl) return;
+    if (m.hasVideo === false) return;
+
+    const result = await resolvePlayableUrl(m.id);
+    if (!result.success || !result.directUrl) {
+        console.error('Download resolve failed:', result.message);
+        return;
+    }
+
     const fileName = (m.title || 'movie').replace(/[^a-zA-Z0-9 _-]/g, '').trim() + '.mp4';
-    // All platforms (including iOS) go through the backend proxy.
-    // The proxy sends Content-Disposition: attachment which triggers iOS Safari's
-    // Downloads manager (iOS 13+) instead of opening the native video player.
-    const proxy = API_BASE + '/api/video/stream-proxy?url=' + encodeURIComponent(videoUrl) + '&download=' + encodeURIComponent(fileName);
     const a = document.createElement('a');
-    a.href = proxy;
+    a.href = result.directUrl;
     a.download = fileName;
     document.body.appendChild(a);
     a.click();

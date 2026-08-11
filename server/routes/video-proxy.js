@@ -61,6 +61,59 @@ function isArchiveUrl(url) {
     return u.includes('archive.org/') || /ia\d+\.us\.archive\.org/i.test(u);
 }
 
+// Real catalog check turned up movies tagged provider:'streamtape' whose URL
+// literally ends in ".mp4" (e.g. streamtape.com/e/xxx/Movie_Name.mp4) — that's
+// still a Streamtape embed page requiring extraction, not a playable file;
+// the ".mp4"-looking suffix is just a display name. So known embed-host
+// domains must be checked BEFORE the extension guess, not after — an embed
+// host is never "direct" no matter what its URL path looks like.
+const EMBED_HOST_PATTERNS = [
+    /streamtape\.com/i,
+    /streamtape\.to/i,
+    /doodstream\.com/i,
+    /dood\.(to|ws|watch|pm|wf|la|re|so)/i,
+    /filemoon\.(to|sx)/i
+];
+
+function isEmbedHostUrl(url) {
+    const u = sanitizeUrl(url);
+    if (!u) return false;
+    return EMBED_HOST_PATTERNS.some(p => p.test(u));
+}
+
+// Cloudflare Stream's player page (".../watch") isn't a raw file — it needs
+// an iframe or its HLS manifest. The manifest URL is a predictable rewrite
+// of the same video ID, so this needs no scraping, unlike Streamtape/Doodstream.
+function isCloudflareStreamWatchUrl(url) {
+    const u = sanitizeUrl(url);
+    if (!u) return false;
+    return /cloudflarestream\.com\/[a-f0-9]+\/watch/i.test(u);
+}
+
+function cloudflareStreamWatchToManifest(url) {
+    return sanitizeUrl(url).replace(/\/watch(\?.*)?$/i, '/manifest/video.m3u8');
+}
+
+// Mirrors isDirectVideo() in player.html/movie-pages.js — the DB's `provider`
+// label isn't always accurate (movies get tagged 'streamtape' from an older
+// bulk-import regardless of actual host), so URL shape is the reliable signal
+// for whether a file is already directly playable vs. an embed page needing extraction.
+// Embed-host domains are checked first — see isEmbedHostUrl above.
+function isDirectVideoUrl(url) {
+    const u = sanitizeUrl(url);
+    if (!u) return false;
+    if (isEmbedHostUrl(u) || isCloudflareStreamWatchUrl(u)) return false;
+    const lower = u.toLowerCase();
+    const extensions = ['.mp4', '.webm', '.mkv', '.m3u8', '.m4v'];
+    return extensions.some(ext => lower.includes(ext)) ||
+        lower.includes('archive.org') ||
+        lower.includes('cloudflare') ||
+        lower.includes('r2.dev') ||
+        lower.includes('b-cdn.net') ||
+        lower.includes('bunnycdn') ||
+        lower.includes('pearlpix.xyz');
+}
+
 function extractArchiveItemId(url) {
     const u = sanitizeUrl(url);
     if (!u) return null;
@@ -196,9 +249,17 @@ async function resolveMovieSourceUrl(movie) {
     return null;
 }
 
+// A movie's `requiredPlan` field defaults to 'free' for ~90% of the catalog
+// (an old per-movie tiering field, separate from the site-wide "free accounts
+// can't watch anything" policy) — taken literally, canAccessContent('free')
+// is true for every account including unpaid ones, so 'free' here always
+// means "starter", never "no subscription required at all".
+function effectiveRequiredPlan(movie) {
+    return movie?.requiredPlan === 'free' ? 'starter' : (movie?.requiredPlan || 'starter');
+}
+
 function requirePlaybackAuthIfNeeded(movie, req) {
-    // All content requires at least starter plan — free users are blocked
-    const requiredPlan = movie?.requiredPlan === 'free' ? 'starter' : (movie?.requiredPlan || 'starter');
+    const requiredPlan = effectiveRequiredPlan(movie);
 
     const token = sanitizeUrl(req.query.token);
     if (!token) {
@@ -255,11 +316,21 @@ async function assertUserCanPlay(requiredPlan, tokenPayload) {
  * POST /api/video/playback-token
  * Body: { movieId: "..." }
  */
+// Season 1 Episode 1 is free to watch for any logged-in account regardless
+// of plan (a preview episode), but never for download — callers pass
+// forDownload:true to force the real entitlement check even on S1E1.
+function isFreeEpisode(season, episode) {
+    return Number(season) === 1 && Number(episode) === 1;
+}
+
 router.post('/playback-token', protect, async (req, res) => {
     setCorsHeaders(req, res);
 
     try {
         const movieId = req.body?.movieId;
+        const season = req.body?.season;
+        const episode = req.body?.episode;
+        const forDownload = !!req.body?.forDownload;
         if (!movieId) {
             return res.status(400).json({
                 success: false,
@@ -275,21 +346,35 @@ router.post('/playback-token', protect, async (req, res) => {
             });
         }
 
-        const requiredPlan = movie.requiredPlan || 'free';
-        if (!req.user.canAccessContent(requiredPlan)) {
-            return res.status(403).json({
-                success: false,
-                message: `This content requires a ${requiredPlan} subscription or higher`,
-                requiredPlan,
-                currentPlan: req.user.subscription?.plan
-            });
+        const isEpisodeRequest = season != null && episode != null;
+        if (isEpisodeRequest) {
+            const seasonDoc = (movie.seasons || []).find(s => s.seasonNumber === Number(season));
+            const episodeDoc = seasonDoc?.episodes?.find(e => e.episodeNumber === Number(episode));
+            if (!episodeDoc) {
+                return res.status(404).json({ success: false, message: 'Episode not found' });
+            }
+        }
+
+        const freeEpisode = isEpisodeRequest && !forDownload && isFreeEpisode(season, episode);
+        if (!freeEpisode) {
+            const requiredPlan = effectiveRequiredPlan(movie);
+            if (!req.user.canAccessContent(requiredPlan)) {
+                return res.status(403).json({
+                    success: false,
+                    message: `This content requires a ${requiredPlan} subscription or higher`,
+                    requiredPlan,
+                    currentPlan: req.user.subscription?.plan
+                });
+            }
         }
 
         const token = jwt.sign(
             {
                 type: 'playback',
                 uid: req.user.id,
-                movieId: String(movieId)
+                movieId: String(movieId),
+                season: isEpisodeRequest ? Number(season) : null,
+                episode: isEpisodeRequest ? Number(episode) : null
             },
             PLAYBACK_TOKEN_SECRET,
             {
@@ -377,6 +462,148 @@ router.get('/stream/luganda/:movieId', optionalAuth, async (req, res) => {
             success: false,
             code,
             message: error.message || 'Streaming error'
+        });
+    }
+});
+
+/**
+ * Resolve the direct playable URL for a movie, by ID, after verifying the
+ * short-lived playback token + subscription entitlement (same check as the
+ * Archive.org stream proxy above). Unlike /extract below, the caller never
+ * needs to already possess the raw source URL — this is what closes the gap
+ * where GET /api/luganda-movies/:id (public, unauthenticated) used to hand
+ * out the real CDN/embed URL to anyone regardless of subscription.
+ * GET /api/video/resolve/luganda/:movieId?token=...
+ */
+// Route by actual URL shape, not the DB's `provider` label — a real catalog
+// check found ~227 of 229 movies tagged provider:'streamtape' are really
+// Cloudflare Stream or plain CDN/S3 files from an old bulk import, so the
+// label can't be trusted for routing.
+async function resolveUrlForDelivery(sourceUrl, fallbackProvider, fallbackFormat) {
+    if (isCloudflareStreamWatchUrl(sourceUrl)) {
+        return {
+            success: true,
+            directUrl: cloudflareStreamWatchToManifest(sourceUrl),
+            provider: 'cloudflare-stream',
+            format: 'm3u8'
+        };
+    }
+
+    if (isEmbedHostUrl(sourceUrl)) {
+        if (/streamtape/i.test(sourceUrl)) {
+            return await extractStreamtape(sourceUrl);
+        } else if (/dood\./i.test(sourceUrl) || /doodstream/i.test(sourceUrl)) {
+            return await extractDoodstream(sourceUrl);
+        } else if (/filemoon/i.test(sourceUrl)) {
+            return await extractFilemoon(sourceUrl);
+        }
+    }
+
+    // Already a direct file/CDN/Archive.org URL — safe to return as-is.
+    return {
+        success: true,
+        directUrl: sourceUrl,
+        provider: fallbackProvider || 'unknown',
+        format: fallbackFormat || 'mp4'
+    };
+}
+
+router.get('/resolve/luganda/:movieId', async (req, res) => {
+    setCorsHeaders(req, res);
+
+    try {
+        const { movieId } = req.params;
+        const { season, episode } = req.query;
+        const movie = await LugandaMovie.findById(movieId).lean();
+
+        if (!movie) {
+            return res.status(404).json({
+                success: false,
+                message: 'Movie not found'
+            });
+        }
+
+        const isEpisodeRequest = season != null && episode != null;
+
+        if (isEpisodeRequest) {
+            // Token must have been issued for this exact episode — a token
+            // for the free S1E1 preview can't be replayed against any other
+            // (paid) episode just by changing the query string.
+            const token = sanitizeUrl(req.query.token);
+            if (!token) {
+                const error = new Error('Playback token required');
+                error.code = 'PLAYBACK_TOKEN_REQUIRED';
+                error.httpStatus = 401;
+                throw error;
+            }
+            let payload;
+            try {
+                payload = jwt.verify(token, PLAYBACK_TOKEN_SECRET, { issuer: 'unruly-movies' });
+            } catch (e) {
+                const error = new Error('Invalid or expired playback token');
+                error.code = 'INVALID_PLAYBACK_TOKEN';
+                error.httpStatus = 401;
+                throw error;
+            }
+            if (String(payload.movieId) !== String(movieId) ||
+                Number(payload.season) !== Number(season) ||
+                Number(payload.episode) !== Number(episode)) {
+                const error = new Error('Token does not match requested episode');
+                error.code = 'TOKEN_MISMATCH';
+                error.httpStatus = 401;
+                throw error;
+            }
+
+            // Re-verify entitlement, same defense-in-depth the movie path
+            // uses — catches a subscription expiring inside the token's
+            // 10-minute window. Skipped only for a genuine free-episode token.
+            if (!isFreeEpisode(season, episode)) {
+                const requiredPlan = effectiveRequiredPlan(movie);
+                await assertUserCanPlay(requiredPlan, payload);
+            } else {
+                const user = await User.findById(payload.uid);
+                if (!user) {
+                    const error = new Error('User not found');
+                    error.code = 'USER_NOT_FOUND';
+                    error.httpStatus = 401;
+                    throw error;
+                }
+            }
+
+            const seasonDoc = (movie.seasons || []).find(s => s.seasonNumber === Number(season));
+            const episodeDoc = seasonDoc?.episodes?.find(e => e.episodeNumber === Number(episode));
+            if (!episodeDoc) {
+                return res.status(404).json({ success: false, message: 'Episode not found' });
+            }
+
+            const sourceUrl = sanitizeUrl(episodeDoc.video?.embedUrl || episodeDoc.video?.archiveUrl);
+            if (!sourceUrl) {
+                return res.status(400).json({ success: false, message: 'Missing video URL for this episode' });
+            }
+
+            const result = await resolveUrlForDelivery(sourceUrl, episodeDoc.video?.provider, 'mp4');
+            return res.json(result);
+        }
+
+        const { requiredPlan, tokenPayload } = requirePlaybackAuthIfNeeded(movie, req);
+        await assertUserCanPlay(requiredPlan, tokenPayload);
+
+        const sourceUrl = await resolveMovieSourceUrl(movie);
+        if (!sourceUrl) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing video URL for this movie'
+            });
+        }
+
+        const result = await resolveUrlForDelivery(sourceUrl, movie.video?.provider, movie.video?.format);
+        return res.json(result);
+    } catch (error) {
+        const httpStatus = error.httpStatus || 500;
+        return res.status(httpStatus).json({
+            success: false,
+            code: error.code,
+            message: error.message || 'Failed to resolve video URL'
         });
     }
 });

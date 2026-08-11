@@ -67,10 +67,40 @@ const generateSlug = (title) => {
         .replace(/(^-|-$)/g, '');
 };
 
-// Helper: sanitize movie objects for public responses.
+// Helper: sanitize movie objects for public responses. Strips the real
+// playable URL — list/browse endpoints only need metadata (poster, title,
+// provider/quality for badges). Real subscribers resolve the actual URL via
+// POST /api/video/playback-token + GET /api/video/resolve/luganda/:id, which
+// check subscription entitlement server-side before returning anything.
 const sanitizeMovieForPublic = (movie) => {
     if (!movie) return movie;
     const movieObj = typeof movie.toObject === 'function' ? movie.toObject() : { ...movie };
+
+    delete movieObj.embedUrl;
+    if (movieObj.video) {
+        const hasVideo = !!(movieObj.video.embedUrl || movieObj.video.originalVideoPath || movieObj.video.url);
+        delete movieObj.video.embedUrl;
+        delete movieObj.video.originalVideoPath;
+        delete movieObj.video.lugandaVideoPath;
+        delete movieObj.video.lugandaAudioPath;
+        delete movieObj.video.streamtapeId;
+        delete movieObj.video.url;
+        movieObj.video.hasVideo = hasVideo;
+    }
+
+    if (Array.isArray(movieObj.seasons)) {
+        movieObj.seasons = movieObj.seasons.map(season => ({
+            ...season,
+            episodes: Array.isArray(season.episodes) ? season.episodes.map(ep => {
+                const cleanEp = { ...ep };
+                if (cleanEp.video) {
+                    cleanEp.video = { provider: cleanEp.video.provider, hasVideo: !!cleanEp.video.embedUrl };
+                }
+                return cleanEp;
+            }) : season.episodes
+        }));
+    }
+
     return movieObj;
 };
 
@@ -998,7 +1028,10 @@ router.get('/:id', async (req, res) => {
         // Increment view count
         await movie.incrementViews();
 
-        // Build a response-safe object (avoid leaking Archive.org direct URLs)
+        // Build a response-safe object — the real playable URL is never sent
+        // here regardless of who's asking. Real subscribers resolve it
+        // server-side via POST /api/video/playback-token + GET /api/video/resolve/luganda/:id,
+        // which check subscription entitlement before returning anything.
         const movieObj = movie.toObject();
 
         const clean = (v) => (typeof v === 'string' ? v.trim().replace(/\s+/g, '') : v);
@@ -1027,21 +1060,23 @@ router.get('/:id', async (req, res) => {
             return null;
         };
 
+        if (!movieObj.video) movieObj.video = {};
+        movieObj.video.hasVideo = urlCandidates.length > 0;
         if (isArchiveSource) {
-            if (!movieObj.video) movieObj.video = {};
             movieObj.video.provider = 'archive';
             movieObj.video.secureStreamPath = `/api/video/stream/luganda/${movieObj._id}`;
             movieObj.video.archiveItemId = extractArchiveItemId(urlCandidates[0] || '') || null;
-
-            // Strip raw Archive URLs from the public response
-            delete movieObj.embedUrl;
-            if (movieObj.video) {
-                delete movieObj.video.originalVideoPath;
-                delete movieObj.video.embedUrl;
-                delete movieObj.video.url;
-            }
         }
-        
+
+        // Strip raw source URLs from the public response, regardless of provider.
+        delete movieObj.embedUrl;
+        delete movieObj.video.originalVideoPath;
+        delete movieObj.video.embedUrl;
+        delete movieObj.video.url;
+        delete movieObj.video.lugandaVideoPath;
+        delete movieObj.video.lugandaAudioPath;
+        delete movieObj.video.streamtapeId;
+
         res.json({
             success: true,
             data: movieObj

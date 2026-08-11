@@ -2347,11 +2347,7 @@
                     // Load related movies (public)
                     loadRelatedMovies();
 
-                    // Get video URL
-                    const rawVideoUrl = currentMovie.video?.embedUrl || currentMovie.embedUrl || currentMovie.video?.url;
-                    const videoUrl = typeof rawVideoUrl === 'string' ? rawVideoUrl.trim() : rawVideoUrl;
-                    const provider = (currentMovie.video?.provider || '').toLowerCase();
-                    const format = (currentMovie.video?.format || '').toLowerCase();
+                    const hasVideo = currentMovie.video?.hasVideo !== false;
 
                     // Auth check — login + paid subscription required
                     const authed = await isLoggedIn();
@@ -2359,17 +2355,13 @@
                     if (hasPaidPlan) {
                         checkDownloadPermission(currentMovie);
                         initPlayer();
-                        if (videoUrl && (isDirectVideo(videoUrl) || format === 'mp4' || format === 'm3u8' || format === 'webm')) {
-                            loadVideo(videoUrl);
-                        } else if (videoUrl && provider !== 'streamtape') {
-                            await loadEmbedVideo(videoUrl);
-                        } else if (videoUrl) {
-                            loadVideo(videoUrl);
+                        if (hasVideo) {
+                            await loadEntitledVideo(currentMovie._id);
                         } else {
                             showError('Video not available for this movie');
                         }
                     } else {
-                        showAuthGate(videoUrl, provider, format, currentMovie);
+                        showAuthGate(currentMovie);
                     }
                     
                 } else {
@@ -2381,52 +2373,40 @@
             }
         }
         
-        // ========== CHECK IF DIRECT VIDEO URL ==========
-        function isDirectVideo(url) {
-            const extensions = ['.mp4', '.webm', '.mkv', '.m3u8', '.m4v'];
-            const normalizedUrl = typeof url === 'string' ? url.trim() : '';
-            const urlLower = normalizedUrl.toLowerCase();
-            return extensions.some(ext => urlLower.includes(ext)) ||
-                   urlLower.includes('archive.org') ||
-                   urlLower.includes('cloudflare') ||
-                   urlLower.includes('r2.dev') ||
-                   urlLower.includes('b-cdn.net') ||
-                   urlLower.includes('bunnycdn') ||
-                   urlLower.includes('pearlpix.xyz') ||
-                   urlLower.includes('munotech.b-cdn.net') ||
-                   urlLower.includes('jimmy.pearlpix.xyz');
-        }
-        
-        // ========== LOAD EMBED VIDEO ==========
-        async function loadEmbedVideo(url) {
-            console.log('🎬 Attempting to extract direct URL from:', url);
-            
+        // ========== LOAD VIDEO FOR ENTITLED USER ==========
+        // The public movie fetch never contains the raw playable URL — it's
+        // stripped server-side. This is the only path that can produce one:
+        // get a short-lived, subscription-checked playback token, then have
+        // the backend resolve (and extract, if needed) the real URL.
+        async function loadEntitledVideo(id) {
             try {
-                const response = await fetch(`${API_BASE}/api/video/extract`, {
+                const authToken = normalizeBearerToken(getAuthToken());
+                const tokenResponse = await fetch(`${API_BASE}/api/video/playback-token`, {
                     method: 'POST',
-                    headers: { 
+                    headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${normalizeBearerToken(getAuthToken())}`
+                        'Authorization': `Bearer ${authToken}`
                     },
-                    body: JSON.stringify({ url })
+                    body: JSON.stringify({ movieId: id })
                 });
-                
-                const data = await response.json();
-                
-                if (data.success && data.directUrl) {
-                    console.log('✅ Direct URL extracted');
-                    loadVideo(data.directUrl);
+                const tokenData = await tokenResponse.json();
+                if (!tokenData.success || !tokenData.token) {
+                    showError(tokenData.message || 'Unable to start playback');
                     return;
                 }
-            } catch (e) {
-                console.warn('Extraction failed:', e);
+
+                const resolveResponse = await fetch(`${API_BASE}/api/video/resolve/luganda/${id}?token=${encodeURIComponent(tokenData.token)}`);
+                const resolveData = await resolveResponse.json();
+
+                if (resolveData.success && resolveData.directUrl) {
+                    loadVideo(resolveData.directUrl);
+                } else {
+                    showError(resolveData.message || 'This video is currently unavailable.');
+                }
+            } catch (error) {
+                console.error('Playback resolve error:', error);
+                showError('Failed to load video. Please try again.');
             }
-            
-            // Fallback to iframe
-            showError('This video requires an external player. Opening in new tab...');
-            setTimeout(() => {
-                window.open(url, '_blank');
-            }, 2000);
         }
         
         // ========== STRUCTURED DATA (JSON-LD) ==========
@@ -2654,16 +2634,35 @@
 
 
 
-        // Route download through backend proxy — Content-Disposition: attachment forces
-        // a save dialog on all platforms including iOS Safari 13+ (Downloads manager).
-        function handleDownload(movie) {
-            const videoUrl = movie.video?.embedUrl || movie.embedUrl;
-            if (!videoUrl) return;
+        // Link straight to the resolved CDN URL — no Railway byte-proxying for
+        // downloads. The real URL isn't in `movie` anymore (stripped from the
+        // public fetch), so this resolves it the same authenticated way
+        // playback does. Note: without a Content-Disposition header from a
+        // proxy, some browsers (notably iOS Safari) may open/play the file
+        // instead of showing a save prompt.
+        async function handleDownload(movie) {
+            const authToken = normalizeBearerToken(getAuthToken());
+            const tokenResponse = await fetch(`${API_BASE}/api/video/playback-token`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+                body: JSON.stringify({ movieId: movie._id })
+            });
+            const tokenData = await tokenResponse.json();
+            if (!tokenData.success || !tokenData.token) {
+                showNotification(tokenData.message || 'Unable to start download');
+                return;
+            }
+
+            const resolveResponse = await fetch(`${API_BASE}/api/video/resolve/luganda/${movie._id}?token=${encodeURIComponent(tokenData.token)}`);
+            const resolveData = await resolveResponse.json();
+            if (!resolveData.success || !resolveData.directUrl) {
+                showNotification(resolveData.message || 'Download unavailable for this movie');
+                return;
+            }
 
             const fileName = `${(movie.originalTitle || movie.lugandaTitle || 'movie').replace(/[^a-zA-Z0-9 _-]/g, '').trim()}.mp4`;
-            const proxyDownload = `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(videoUrl)}&download=${encodeURIComponent(fileName)}`;
             const link = document.createElement('a');
-            link.href = proxyDownload;
+            link.href = resolveData.directUrl;
             link.download = fileName;
             document.body.appendChild(link);
             link.click();
@@ -3030,13 +3029,7 @@
         }
 
         // ========== AUTH GATE ==========
-        let _pendingVideoUrl = null, _pendingVideoProvider = null, _pendingVideoFormat = null;
-
-        function showAuthGate(videoUrl, provider, format, movie) {
-            _pendingVideoUrl = videoUrl;
-            _pendingVideoProvider = provider;
-            _pendingVideoFormat = format;
-
+        function showAuthGate(movie) {
             const access = window._userAccess;
             const hasToken = !!(localStorage.getItem('token') || localStorage.getItem('authToken') || sessionStorage.getItem('token') || sessionStorage.getItem('authToken'));
             const isLoggedInUser = !!access || hasToken;
@@ -3084,19 +3077,12 @@
             document.getElementById('authGateOverlay').classList.remove('visible');
             initPlayer();
 
-            const url = _pendingVideoUrl;
-            const provider = _pendingVideoProvider;
-            const format = _pendingVideoFormat;
-
-            if (!url) { showError('Video not available for this movie'); return; }
-
-            if (isDirectVideo(url) || format === 'mp4' || format === 'm3u8' || format === 'webm') {
-                loadVideo(url);
-            } else if (provider !== 'streamtape') {
-                await loadEmbedVideo(url);
-            } else {
-                loadVideo(url);
+            if (!currentMovie || currentMovie.video?.hasVideo === false) {
+                showError('Video not available for this movie');
+                return;
             }
+
+            await loadEntitledVideo(currentMovie._id);
         }
 
         // ========== INITIALIZE ==========

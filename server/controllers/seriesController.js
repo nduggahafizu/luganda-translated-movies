@@ -8,12 +8,31 @@ try {
     console.warn('Push service unavailable:', e.message);
 }
 
+// Strip real playable URLs from episodes before they leave the server —
+// GET /api/series/:id has no auth on it at all, so this ships to anyone.
+// Real playback URLs are resolved separately via the authenticated
+// POST /api/video/playback-token + GET /api/video/resolve/luganda/:id flow,
+// same as movies.
+const sanitizeSeasonsForPublic = (seasons) => {
+    if (!Array.isArray(seasons)) return [];
+    return seasons.map(season => ({
+        ...season,
+        episodes: Array.isArray(season.episodes) ? season.episodes.map(ep => {
+            const { video, ...rest } = ep;
+            return {
+                ...rest,
+                video: { provider: video?.provider, hasVideo: !!(video?.embedUrl || video?.archiveUrl) }
+            };
+        }) : season.episodes
+    }));
+};
+
 // Helper function to transform LugandaMovie to series format for frontend compatibility
 const transformToSeriesFormat = (movie) => {
     if (!movie) return null;
-    
+
     const data = movie.toObject ? movie.toObject() : movie;
-    
+
     return {
         _id: data._id,
         slug: data.slug,
@@ -32,7 +51,7 @@ const transformToSeriesFormat = (movie) => {
             name: data.vjName || 'Unknown VJ'
         },
         vjName: data.vjName,
-        seasons: data.seasons || [],
+        seasons: sanitizeSeasonsForPublic(data.seasons),
         totalSeasons: data.totalSeasons || 0,
         totalEpisodes: data.totalEpisodes || 0,
         cast: data.cast || [],

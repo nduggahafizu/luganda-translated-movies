@@ -846,7 +846,7 @@
             
             // Find first available episode
             if (!currentEpisode && seasonData?.episodes?.length > 0) {
-                const availableEpisode = seasonData.episodes.find(ep => ep.video?.embedUrl);
+                const availableEpisode = seasonData.episodes.find(ep => ep.video?.hasVideo);
                 if (availableEpisode) {
                     currentEpisode = {
                         season: currentSeason,
@@ -898,7 +898,8 @@
                     <section class="player-section">
                         <div class="video-container" id="video-container">
                             ${(() => {
-                                if (window._seriesAccess && window._seriesAccess.freeUser) {
+                                const isFreeEpisode = currentEpisode && Number(currentEpisode.season) === 1 && Number(currentEpisode.episode) === 1;
+                                if (window._seriesAccess && window._seriesAccess.freeUser && !isFreeEpisode) {
                                     return `<div style="position:absolute;inset:0;width:100%;height:100%;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;" onclick="showSubscribePlans()">
                                         <div style="width:76px;height:76px;border-radius:50%;background:rgba(74,222,128,0.92);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 14px rgba(74,222,128,0.18);">
                                             <svg width="30" height="30" viewBox="0 0 24 24" fill="#000"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -906,7 +907,7 @@
                                         <span style="color:#fff;font-size:13px;background:rgba(0,0,0,0.65);padding:5px 16px;border-radius:20px;">Subscribe to watch</span>
                                     </div>`;
                                 }
-                                if (!currentEp?.video?.embedUrl) {
+                                if (!currentEp?.video?.hasVideo) {
                                     return `<div class="no-video-message">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <polygon points="5 3 19 12 5 21 5 3"></polygon>
@@ -915,51 +916,30 @@
                                         <p>Choose an episode from the list below to start watching</p>
                                     </div>`;
                                 }
-                                const embedUrl = currentEp.video.embedUrl || currentEp.video.originalVideoPath || '';
-                                const isDirectVid = embedUrl.match(/\.(mp4|mkv|webm|avi|mov)(\?|$)/i);
-                                const isMkv = embedUrl.toLowerCase().includes('.mkv');
-                                const needsCdnProxy = isMkv;
-
-                                if (isDirectVid) {
-                                    const videoSrc = needsCdnProxy
-                                        ? `${API_BASE_URL}/api/video/stream-proxy?url=${encodeURIComponent(embedUrl)}`
-                                        : embedUrl;
-                                    return `
-                                        <div id="ad-container"></div>
-                                        <div class="video-loading-overlay" id="video-loading">
-                                            <div class="spinner"></div>
-                                            <p>${isMkv ? 'Processing MKV video...' : 'Loading video...'}</p>
-                                        </div>
-                                        <button class="embed-fullscreen-btn" type="button" aria-label="Fullscreen" onclick="requestVideoContainerFullscreen(event)">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M8 3H5a2 2 0 0 0-2 2v3" />
-                                                <path d="M16 3h3a2 2 0 0 1 2 2v3" />
-                                                <path d="M8 21H5a2 2 0 0 1-2-2v-3" />
-                                                <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
-                                            </svg>
-                                        </button>
-                                        <video id="series-video" controls controlslist="nodownload noplaybackrate" disablepictureinpicture
-                                               autoplay preload="auto" playsinline
-                                               style="position:absolute;top:0;left:0;width:100%;height:100%;background:#000;"
-                                               oncontextmenu="return false"
-                                               oncanplay="hideVideoLoading(); if(!this._adPlayed){this._adPlayed=true;playPreRollAd();setupMidRolls();}"
-                                               onerror="handleVideoError(this, '${embedUrl}')">
-                                            <source src="${videoSrc}" type="video/mp4">
-                                        </video>
-                                    `;
-                                } else {
-                                    return `
-                                        <button class="embed-fullscreen-btn" type="button" aria-label="Fullscreen" onclick="requestVideoContainerFullscreen(event)">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M8 3H5a2 2 0 0 0-2 2v3" />
-                                                <path d="M16 3h3a2 2 0 0 1 2 2v3" />
-                                                <path d="M8 21H5a2 2 0 0 1-2-2v-3" />
-                                                <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
-                                            </svg>
-                                        </button>
-                                        <iframe src="${embedUrl}" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" loading="lazy" allowfullscreen></iframe>
-                                    `;
-                                }
+                                // Real URL isn't in the page — resolved after render via
+                                // loadCurrentEpisodeVideo(), the same authenticated,
+                                // entitlement-checked flow movies use.
+                                return `
+                                    <div id="ad-container"></div>
+                                    <div class="video-loading-overlay" id="video-loading">
+                                        <div class="spinner"></div>
+                                        <p>Loading video...</p>
+                                    </div>
+                                    <button class="embed-fullscreen-btn" type="button" aria-label="Fullscreen" onclick="requestVideoContainerFullscreen(event)">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+                                            <path d="M16 3h3a2 2 0 0 1 2 2v3" />
+                                            <path d="M8 21H5a2 2 0 0 1-2-2v-3" />
+                                            <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+                                        </svg>
+                                    </button>
+                                    <video id="series-video" controls controlslist="nodownload noplaybackrate" disablepictureinpicture
+                                           autoplay preload="auto" playsinline
+                                           style="position:absolute;top:0;left:0;width:100%;height:100%;background:#000;"
+                                           oncontextmenu="return false"
+                                           oncanplay="hideVideoLoading(); if(!this._adPlayed){this._adPlayed=true;playPreRollAd();setupMidRolls();}">
+                                    </video>
+                                `;
                             })()}
                         </div>
                         ${currentEp ? `
@@ -993,8 +973,8 @@
                             </div>
                             <div class="episodes-grid">
                                 ${(seasonData?.episodes || []).map(episode => `
-                                    <div class="episode-card ${!episode.video?.embedUrl ? 'unavailable' : ''} ${currentEpisode?.episode === episode.episodeNumber && currentEpisode?.season === currentSeason ? 'active' : ''}"
-                                         onclick="${episode.video?.embedUrl ? `playEpisode(${currentSeason}, ${episode.episodeNumber})` : ''}">
+                                    <div class="episode-card ${!episode.video?.hasVideo ? 'unavailable' : ''} ${currentEpisode?.episode === episode.episodeNumber && currentEpisode?.season === currentSeason ? 'active' : ''}"
+                                         onclick="${episode.video?.hasVideo ? `playEpisode(${currentSeason}, ${episode.episodeNumber})` : ''}">
                                         <img src="${episode.stillPath || '/assets/images/placeholder.svg'}" 
                                              alt="${episode.name}" class="episode-thumbnail"
                                              onerror="this.src='/assets/images/placeholder.svg'">
@@ -1007,7 +987,7 @@
                                             </div>
                                             <p class="episode-overview">${episode.overview || 'No description available.'}</p>
                                             <div class="episode-status ${episode.isTranslated ? 'translated' : 'not-translated'}">
-                                                ${episode.video?.embedUrl
+                                                ${episode.video?.hasVideo
                                                     ? `<span>▶️ Available ${episode.vjName ? '(VJ ' + episode.vjName + ')' : ''}</span>`
                                                     : '<span>🔒 Coming Soon</span>'
                                                 }
@@ -1039,8 +1019,69 @@
                 </div>
             `;
 
+            loadCurrentEpisodeVideo();
         }
 
+        // Real episode URL isn't in the page — resolve it via the same
+        // authenticated, entitlement-checked flow as movies (S1E1 is allowed
+        // through for any logged-in user; every other episode needs a paid plan).
+        async function loadCurrentEpisodeVideo() {
+            const videoEl = document.getElementById('series-video');
+            if (!videoEl || !currentEpisode) return;
+
+            const seasonData = seriesData.seasons?.find(s => s.seasonNumber === currentEpisode.season);
+            const ep = seasonData?.episodes?.find(e => e.episodeNumber === currentEpisode.episode);
+            if (!ep?.video?.hasVideo) return;
+
+            try {
+                const authToken = normalizeBearerToken(getAuthToken());
+                const tokenResp = await fetch(`${API_BASE_URL}/api/video/playback-token`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
+                    body: JSON.stringify({ movieId: seriesData._id, season: currentEpisode.season, episode: currentEpisode.episode })
+                });
+                const tokenData = await tokenResp.json();
+                if (!tokenData.success || !tokenData.token) {
+                    showVideoLoadError(tokenData.message || 'Unable to start playback');
+                    return;
+                }
+
+                const resolveResp = await fetch(`${API_BASE_URL}/api/video/resolve/luganda/${seriesData._id}?season=${currentEpisode.season}&episode=${currentEpisode.episode}&token=${encodeURIComponent(tokenData.token)}`);
+                const resolveData = await resolveResp.json();
+                if (!resolveData.success || !resolveData.directUrl) {
+                    showVideoLoadError(resolveData.message || 'This video is currently unavailable.');
+                    return;
+                }
+
+                // MKV / hotlink-protected CDNs need backend proxying to play at all
+                const lower = resolveData.directUrl.toLowerCase();
+                const needsProxy = lower.includes('.mkv') || lower.includes('b-cdn.net') || lower.includes('bunnycdn');
+                const videoSrc = needsProxy
+                    ? `${API_BASE_URL}/api/video/stream-proxy?url=${encodeURIComponent(resolveData.directUrl)}`
+                    : resolveData.directUrl;
+
+                videoEl.onerror = () => handleVideoError(videoEl, resolveData.directUrl);
+                videoEl.src = videoSrc;
+                videoEl.load();
+            } catch (e) {
+                console.error('Episode resolve error:', e);
+                showVideoLoadError('Failed to load video. Please try again.');
+            }
+        }
+
+        function showVideoLoadError(message) {
+            const loading = document.getElementById('video-loading');
+            if (loading) {
+                loading.innerHTML = `
+                    <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2" style="margin-bottom: 15px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <p style="color: #fff; margin-bottom: 10px;">${message}</p>
+                `;
+            }
+        }
 
         function switchSeason(seasonNumber) {
             currentSeason = seasonNumber;
@@ -1049,8 +1090,9 @@
         }
         
         function playEpisode(season, episodeNumber) {
-            // Free plan users see the plans popup when they click an episode
-            if (window._seriesAccess && window._seriesAccess.freeUser) {
+            // Free plan users can watch S1E1 (a preview episode) but nothing else
+            const isFreeEpisode = Number(season) === 1 && Number(episodeNumber) === 1;
+            if (window._seriesAccess && window._seriesAccess.freeUser && !isFreeEpisode) {
                 showSubscribePlans();
                 return;
             }
@@ -1187,11 +1229,34 @@
                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         }
 
-        function downloadEpisode() {
+        async function downloadEpisode() {
+            if (!currentEpisode) return;
             const seasonData = seriesData.seasons?.find(s => s.seasonNumber === currentSeason);
             const ep = seasonData?.episodes?.find(e => e.episodeNumber === currentEpisode?.episode);
-            const url = ep?.video?.embedUrl || ep?.video?.originalVideoPath;
-            if (!url) return;
+            if (!ep?.video?.hasVideo) return;
+
+            // forDownload:true forces the real paid-plan check server-side even
+            // for the free S1E1 preview episode.
+            const authToken = normalizeBearerToken(getAuthToken());
+            const tokenResp = await fetch(`${API_BASE_URL}/api/video/playback-token`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
+                body: JSON.stringify({ movieId: seriesData._id, season: currentEpisode.season, episode: currentEpisode.episode, forDownload: true })
+            });
+            const tokenData = await tokenResp.json();
+            if (!tokenData.success || !tokenData.token) {
+                showNotificationToast(tokenData.message || 'Unable to start download');
+                return;
+            }
+
+            const resolveResp = await fetch(`${API_BASE_URL}/api/video/resolve/luganda/${seriesData._id}?season=${currentEpisode.season}&episode=${currentEpisode.episode}&token=${encodeURIComponent(tokenData.token)}`);
+            const resolveData = await resolveResp.json();
+            if (!resolveData.success || !resolveData.directUrl) {
+                showNotificationToast(resolveData.message || 'Download unavailable for this episode');
+                return;
+            }
+
+            const url = resolveData.directUrl;
             const title = `${seriesData.originalTitle || 'Series'} S${currentEpisode.season}E${currentEpisode.episode}`;
 
             if (isIOS()) {
@@ -1200,18 +1265,13 @@
             }
 
             const fileName = `${title.replace(/[^a-zA-Z0-9 _-]/g, '').trim()}.mp4`;
-            if (url.match(/\.(mp4|mkv|webm|m4v)/i)) {
-                const proxyDownload = `${API_BASE_URL}/api/video/stream-proxy?url=${encodeURIComponent(url)}&download=${encodeURIComponent(fileName)}`;
-                const link = document.createElement('a');
-                link.href = proxyDownload;
-                link.download = fileName;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                showNotificationToast('Download started!');
-            } else {
-                window.open(url, '_blank');
-            }
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showNotificationToast('Download started!');
         }
 
         function showNotificationToast(message) {
