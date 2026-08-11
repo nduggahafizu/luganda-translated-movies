@@ -1077,6 +1077,23 @@ router.get('/:id', async (req, res) => {
         delete movieObj.video.lugandaAudioPath;
         delete movieObj.video.streamtapeId;
 
+        // Same stripping for series episodes — this endpoint is what the
+        // mobile app uses for series detail too, and episodes were leaking
+        // their raw embedUrl here while also never getting hasVideo set
+        // (so every episode looked locked even when it had a real stream).
+        if (Array.isArray(movieObj.seasons)) {
+            movieObj.seasons = movieObj.seasons.map(season => ({
+                ...season,
+                episodes: Array.isArray(season.episodes) ? season.episodes.map(ep => {
+                    const cleanEp = { ...ep };
+                    if (cleanEp.video) {
+                        cleanEp.video = { provider: cleanEp.video.provider, hasVideo: !!cleanEp.video.embedUrl };
+                    }
+                    return cleanEp;
+                }) : season.episodes
+            }));
+        }
+
         res.json({
             success: true,
             data: movieObj
