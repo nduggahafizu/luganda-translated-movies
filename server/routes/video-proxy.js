@@ -1036,7 +1036,12 @@ router.get('/stream-proxy', async (req, res) => {
             url: fetchUrl,
             responseType: 'stream',
             headers,
-            timeout: 60000,
+            // Hosts that ignore Range (see the 200-vs-206 handling below) make
+            // us receive-and-discard everything before the requested offset
+            // ourselves — on a late-file resume that can be most of a
+            // multi-GB file, so this needs more headroom than a normal
+            // range-respecting request would.
+            timeout: 120000,
             maxRedirects: 5,
             validateStatus: () => true
         });
@@ -1050,6 +1055,70 @@ router.get('/stream-proxy', async (req, res) => {
         // Determine content type - use video/mp4 even for MKV (browser will try to play)
         const contentType = response.headers['content-type'] || 'video/mp4';
         res.setHeader('Content-Type', contentType);
+
+        // Some hosts (confirmed: pearlpix.xyz — advertises Accept-Ranges but
+        // silently ignores the Range header and returns the whole file with
+        // 200) don't actually honor range requests. A resumable download
+        // client asking to continue from a byte offset and getting a full
+        // 200 response back instead of 206 treats that mismatch as a failed
+        // resume — this is the "network error after pause/resume" users hit
+        // on the 74% of the catalog hosted there. Emulate a real 206 by
+        // discarding bytes ourselves up to the requested start.
+        const requestedRangeMatch = headers['Range'] && headers['Range'].match(/^bytes=(\d+)-(\d*)$/i);
+        if (requestedRangeMatch && response.status === 200) {
+            const start = parseInt(requestedRangeMatch[1], 10);
+            const endStr = requestedRangeMatch[2];
+            const totalSize = parseInt(response.headers['content-length'], 10) || null;
+            const end = endStr ? parseInt(endStr, 10) : (totalSize ? totalSize - 1 : null);
+
+            console.warn('🎬 Upstream ignored Range header — emulating partial content locally', { start, end, totalSize, url: fetchUrl.substring(0, 100) });
+
+            res.status(206);
+            if (totalSize) {
+                res.setHeader('Content-Range', `bytes ${start}-${end != null ? end : ''}/${totalSize}`);
+            }
+            if (end != null) {
+                res.setHeader('Content-Length', String(end - start + 1));
+            }
+            res.setHeader('Accept-Ranges', 'bytes');
+            res.setHeader('Cache-Control', 'public, max-age=3600');
+            res.setHeader('Access-Control-Expose-Headers', 'Content-Length, Content-Range, Accept-Ranges');
+            if (req.query.download) {
+                const filename = String(req.query.download).replace(/[^a-zA-Z0-9._\- ]/g, '') || 'movie.mp4';
+                res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+            }
+
+            let bytesSeen = 0;
+            let bytesSent = 0;
+            const wantedLength = end != null ? (end - start + 1) : Infinity;
+
+            response.data.on('data', (chunk) => {
+                if (bytesSent >= wantedLength) return; // already satisfied — draining until destroy() takes effect
+                const chunkStart = bytesSeen;
+                bytesSeen += chunk.length;
+                if (bytesSeen <= start) return; // entirely before the wanted window
+
+                const sliceStart = Math.max(0, start - chunkStart);
+                let sliceEnd = chunk.length;
+                if (end != null) {
+                    sliceEnd = Math.min(chunk.length, sliceStart + (wantedLength - bytesSent));
+                }
+                if (sliceStart >= sliceEnd) return;
+
+                const slice = chunk.subarray(sliceStart, sliceEnd);
+                bytesSent += slice.length;
+                res.write(slice);
+
+                if (bytesSent >= wantedLength) {
+                    res.end();
+                    try { response.data.destroy(); } catch (e) {}
+                }
+            });
+            response.data.on('end', () => { if (!res.writableEnded) res.end(); });
+            response.data.on('error', () => { if (!res.writableEnded) res.end(); });
+            req.on('close', () => { try { response.data.destroy(); } catch (e) {} });
+            return;
+        }
 
         if (response.headers['content-length']) {
             res.setHeader('Content-Length', response.headers['content-length']);
