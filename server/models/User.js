@@ -322,10 +322,19 @@ const PLAN_CONFIG = {
 };
 
 userSchema.methods.getPlanConfig = function() {
+    // A real active paid plan always wins over trial status — trialEndsAt is
+    // only set once, at account creation (or by a one-off backfill), and is
+    // never cleared on purchase. Checking trial first would silently
+    // downgrade a paying customer (e.g. daily/download:true) to trial-level
+    // access (download:false) for as long as their old trial window happens
+    // to still be running. Trial is a fallback for free accounts only.
+    if (this.subscription.plan !== 'free' && this.hasActiveSubscription()) {
+        return PLAN_CONFIG[this.subscription.plan] || PLAN_CONFIG.free;
+    }
     // Trial gets full streaming access (2 devices, no ads) but NOT
     // downloads — downloads stay a paid-only perk even during the trial.
     if (this.isInTrialPeriod()) return PLAN_CONFIG.trial;
-    return PLAN_CONFIG[this.subscription.plan] || PLAN_CONFIG.free;
+    return PLAN_CONFIG.free;
 };
 
 // Get max allowed devices for this user
