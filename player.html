@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#0a0a0a">
+    <!-- No outgoing Referer from this page — BunnyCDN's hotlink protection
+         allows referrer-less requests (treats them as direct access) but
+         blocks a cross-site Referer, which is exactly what the browser would
+         otherwise send when this page's <video> fetches a b-cdn.net URL. -->
+    <meta name="referrer" content="no-referrer">
     <title>Watch - Unruly Movies</title>
 
     <link rel="icon" type="image/png" href="assets/images/favicon.png">
@@ -19,13 +24,6 @@
 
     <!-- HLS Support -->
     <script src="/vendor/video-js/videojs-http-streaming.min.js"></script>
-
-    <!-- Google IMA SDK + Video.js IMA plugin (pre-roll ads) -->
-    <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-ads@7/dist/videojs.ads.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/videojs-ima@2/dist/videojs.ima.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/videojs-contrib-ads@7/dist/videojs.ads.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/videojs-ima@2/dist/videojs.ima.css" rel="stylesheet">
 
     <!-- Config -->
     <script src="js/config.js"></script>
@@ -1882,21 +1880,6 @@
                 try {
                     player.playbackRate(1.0);
                 } catch (e) {}
-
-                // Pre-roll ad via Google IMA
-                if (typeof player.ima === 'function') {
-                    try {
-                        player.ima({
-                            adTagUrl: 'https://pubads.g.doubleclick.net/gampad/live/ads?iu=/23358450278/video-preroll&description_url=https%3A%2F%2Funrulymovies.com&tfcd=0&npa=0&sz=640x480&min_ad_duration=5000&max_ad_duration=30000&gdfp_req=1&unviewed_position_start=1&output=vast&env=vp&impl=s&correlator=',
-                            adsRenderingSettings: {
-                                enablePreloading: true
-                            }
-                        });
-                        player.ima.initializeAdDisplayContainer();
-                    } catch (e) {
-                        console.warn('Ad setup skipped:', e.message);
-                    }
-                }
             });
 
             // Custom event handlers
@@ -1942,64 +1925,6 @@
                 }
             });
 
-            // ========== MID-ROLL ADS (every 30 minutes, non-blocking) ==========
-            const MID_ROLL_INTERVAL = 30 * 60;
-            let nextMidRollTime = MID_ROLL_INTERVAL;
-            let midRollBusy = false;
-
-            function tryMidRoll() {
-                if (midRollBusy || typeof google === 'undefined' || !google.ima) return;
-                midRollBusy = true;
-
-                const videoEl = player.el().querySelector('video');
-                const wrapper = player.el();
-                let adContainer = document.getElementById('midroll-ad-container');
-                if (!adContainer) {
-                    adContainer = document.createElement('div');
-                    adContainer.id = 'midroll-ad-container';
-                    adContainer.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:50;display:none;';
-                    wrapper.appendChild(adContainer);
-                }
-
-                try {
-                    const adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, videoEl);
-                    adDisplayContainer.initialize();
-                    const adsLoader = new google.ima.AdsLoader(adDisplayContainer);
-
-                    const resume = () => {
-                        adContainer.style.display = 'none';
-                        midRollBusy = false;
-                        player.play();
-                    };
-
-                    adsLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, (e) => {
-                        const savedTime = player.currentTime();
-                        const mgr = e.getAdsManager(videoEl);
-                        mgr.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, resume);
-                        mgr.addEventListener(google.ima.AdEvent.Type.COMPLETE, resume);
-                        mgr.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, resume);
-                        try {
-                            player.pause();
-                            adContainer.style.display = 'block';
-                            mgr.init(adContainer.offsetWidth, adContainer.offsetHeight, google.ima.ViewMode.NORMAL);
-                            mgr.start();
-                        } catch (err) { resume(); }
-                    }, false);
-
-                    adsLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, () => {
-                        midRollBusy = false;
-                    }, false);
-
-                    const req = new google.ima.AdsRequest();
-                    req.adTagUrl = 'https://pubads.g.doubleclick.net/gampad/live/ads?iu=/23358450278/video-preroll&description_url=https%3A%2F%2Funrulymovies.com&tfcd=0&npa=0&sz=640x480&min_ad_duration=5000&max_ad_duration=30000&gdfp_req=1&unviewed_position_start=1&output=vast&env=vp&impl=s&correlator=';
-                    req.linearAdSlotWidth = adContainer.offsetWidth;
-                    req.linearAdSlotHeight = adContainer.offsetHeight;
-                    adsLoader.requestAds(req);
-                } catch (e) {
-                    midRollBusy = false;
-                }
-            }
-
             // ========== PROGRESS TRACKING + SKIP BUTTONS ==========
             player.on('timeupdate', () => {
                 const now = Date.now();
@@ -2008,12 +1933,6 @@
                     saveProgress();
                 }
                 updateSkipButtons();
-
-                const ct = player.currentTime();
-                if (ct >= nextMidRollTime && !midRollBusy) {
-                    nextMidRollTime = ct + MID_ROLL_INTERVAL;
-                    tryMidRoll();
-                }
             });
 
             // ========== NEXT-MOVIE AUTOPLAY ==========
@@ -2393,27 +2312,17 @@
             // of proxying.
             const alreadyProxied = urlLower.includes('/api/video/stream-proxy');
 
-            // Proxy MKV files (need remuxing) and BunnyCDN URLs (hotlink protection
-            // blocks direct browser requests — stream-proxy bypasses it server-side)
-            const needsProxy = !alreadyProxied && (
-                               urlLower.includes('.mkv') ||
-                               urlLower.includes('b-cdn.net') ||
-                               urlLower.includes('bunnycdn'));
-
-            // Save raw URL BEFORE proxying so the error-retry handler never double-proxies
+            // Every source plays directly from origin first, regardless of
+            // host or container (.mkv included) — this page sends no
+            // Referer (see the <meta name="referrer"> tag above), which is
+            // what actually let BunnyCDN's hotlink protection through; other
+            // hosts never needed proxying in the first place. The CODE:4
+            // handler below is the only thing that still reaches for the
+            // proxy, and only for whichever specific source turns out to
+            // need it.
             const rawUrl = url;
 
-            if (needsProxy) {
-                console.log('🎬 CDN detected - using stream proxy');
-                url = `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(rawUrl)}`;
-                if (urlLower.includes('.mkv')) {
-                    type = 'video/mp4';
-                } else if (urlLower.includes('.webm')) {
-                    type = 'video/webm';
-                } else if (urlLower.includes('.m3u8')) {
-                    type = 'application/x-mpegURL';
-                }
-            } else if (urlLower.includes('.m3u8')) {
+            if (urlLower.includes('.m3u8')) {
                 type = 'application/x-mpegURL';
             } else if (urlLower.includes('.webm')) {
                 type = 'video/webm';
@@ -2448,7 +2357,7 @@
                 // proxied — retrying an already-proxied URL by wrapping
                 // rawUrl in another stream-proxy call just nests it a
                 // second time, a guaranteed failure, not a retry.
-                if (err && err.code === 4 && !alreadyProxied && !needsProxy) {
+                if (err && err.code === 4 && !alreadyProxied) {
                     console.warn('⚠️ Retrying playback for CODE:4 with stream proxy');
                     const proxyUrl = `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(rawUrl)}`;
 
@@ -2543,11 +2452,19 @@
                 return;
             }
 
-            // Logged in — always attempt playback now. Whether this turns
-            // into full access or a paywall is decided server-side in
-            // loadEntitledVideo/playback-token (includes the free 6-hour
-            // trial window for new accounts), not pre-empted here by the
-            // client's cached _userAccess.freeUser flag.
+            // A free user with no active trial: check-access already told us
+            // canWatch is false, so show the paywall immediately instead of
+            // making a second round-trip to playback-token just to be told
+            // the same thing. Anyone else (paid, or in the trial window)
+            // still goes through loadEntitledVideo/playback-token as the
+            // real, server-side entitlement check.
+            const access = window._userAccess;
+            if (access && access.canWatch === false) {
+                hideLoading();
+                showAuthGate(currentMovie);
+                return;
+            }
+
             checkDownloadPermission(currentMovie);
             initPlayer();
             await loadEntitledVideo(currentMovie._id);
@@ -2860,18 +2777,12 @@
 
 
 
-        // Link straight to the resolved CDN URL — no Railway byte-proxying for
-        // downloads. The real URL isn't in `movie` anymore (stripped from the
-        // public fetch), so this resolves it the same authenticated way
-        // playback does. Note: without a Content-Disposition header from a
-        // proxy, some browsers (notably iOS Safari) may open/play the file
-        // instead of showing a save prompt.
         async function handleDownload(movie) {
             const authToken = normalizeBearerToken(getAuthToken());
             const tokenResponse = await fetch(`${API_BASE}/api/video/playback-token`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
-                body: JSON.stringify({ movieId: movie._id })
+                body: JSON.stringify({ movieId: movie._id, forDownload: true })
             });
             const tokenData = await tokenResponse.json();
             if (!tokenData.success || !tokenData.token) {
@@ -2891,7 +2802,10 @@
             // Content-Disposition: attachment — a direct cross-origin CDN
             // link makes Chrome/Safari just play the video instead of
             // saving it, since the `download` attribute is ignored
-            // cross-origin without that header.
+            // cross-origin without that header. Going through our own
+            // server also means this shows up as a real download in the
+            // browser's native download UI (tray/history), unlike a
+            // JS-driven fetch.
             const proxyDownload = `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(resolveData.directUrl)}&download=${encodeURIComponent(fileName)}`;
             const link = document.createElement('a');
             link.href = proxyDownload;

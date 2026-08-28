@@ -18,19 +18,6 @@
     <!-- IndexNow for instant Bing/Yandex indexing -->
     <meta name="indexnow-key" content="unrulymovies2026">
     
-    <!-- Google Publisher Tag (Ad Manager display ads) -->
-    <script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
-    <script>
-        window.googletag = window.googletag || {cmd: []};
-        googletag.cmd.push(function() {
-            googletag.defineSlot('/23358450278/anchor-banner', [[320,50],[728,90]], 'div-anchor-banner').addService(googletag.pubads());
-            googletag.defineSlot('/23358450278/in-feed', 'fluid', 'div-in-feed').addService(googletag.pubads());
-            googletag.defineOutOfPageSlot('/23358450278/interstitial', googletag.enums.OutOfPageFormat.INTERSTITIAL)?.addService(googletag.pubads());
-            googletag.enableServices();
-            googletag.setConfig({singleRequest: true});
-        });
-    </script>
-
     <!-- DNS Prefetch and Preconnect for faster loading -->
     <link rel="preconnect" href="https://luganda-translated-movies-production.up.railway.app" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
@@ -160,7 +147,6 @@
     <!-- Non-critical CSS loaded asynchronously to unblock render -->
     <link rel="stylesheet" href="css/trailer-player.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="css/professional-enhancements.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/adsense-styles.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="css/content-guide.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="css/payment-modal.css" media="print" onload="this.media='all'">
 
@@ -1310,7 +1296,7 @@
                                 </div>
                             </div>
 
-                            <!-- Static Featured Movies — crawlable by AdSense/Googlebot, hidden from UI -->
+                            <!-- Static Featured Movies — crawlable by Googlebot, hidden from UI -->
                             <section class="app-section movie-section" style="display:none;" aria-label="Featured Luganda Movies">
                                 <div class="section-header">
                                     <h2>Featured Luganda Movies</h2>
@@ -1568,11 +1554,6 @@
                                     <div class="content-card"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-meta"></div></div>
                                     <div class="content-card"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-meta"></div></div>
                                 </div>
-                            </div>
-
-                            <!-- In-feed Ad (Ad Manager) -->
-                            <div id="div-in-feed" style="margin: 20px auto; max-width: 728px; text-align: center; min-height: 90px;">
-                                <script>googletag.cmd.push(function() { googletag.display('div-in-feed'); });</script>
                             </div>
 
                             <!-- Horror Section -->
@@ -3062,9 +3043,5 @@
     </script>
     <script defer src="js/app-shell.js"></script>
 
-    <!-- Sticky Anchor Banner -->
-    <div id="div-anchor-banner" style="position:fixed;bottom:0;left:0;width:100%;z-index:1500;text-align:center;background:rgba(0,0,0,0.85);padding:4px 0;">
-        <script>googletag.cmd.push(function() { googletag.display('div-anchor-banner'); });</script>
-    </div>
 </body>
 </html>

@@ -1,6 +1,6 @@
 /**
  * Cookie Consent Banner
- * GDPR & AdSense Compliant
+ * GDPR compliant
  * Add this script to all pages
  */
 
@@ -207,7 +207,7 @@
         disableTracking();
     }
     
-    // Initialize tracking (GA4, AdSense)
+    // Initialize tracking (GA4)
     function initializeTracking() {
         // Google Analytics will already be loaded, just ensure it's active
         if (typeof gtag === 'function') {

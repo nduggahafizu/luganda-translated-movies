@@ -3734,23 +3734,6 @@ a:focus-visible {
     gap: 10px;
 }
 
-/* Ad container styles */
-.ad-container {
-    margin: 30px auto;
-    max-width: 728px;
-    text-align: center;
-}
-
-.ad-container ins.adsbygoogle {
-    display: block;
-}
-
-.ad-container-search {
-    margin: 20px auto;
-    max-width: 728px;
-    text-align: center;
-}
-
 /* Data transparency section styles */
 .data-transparency-section {
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);

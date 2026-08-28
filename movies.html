@@ -59,18 +59,6 @@
     <link rel="stylesheet" href="css/app-shell.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     
-
-    <!-- Google Publisher Tag (Ad Manager) -->
-    <script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
-    <script>
-        window.googletag = window.googletag || {cmd: []};
-        googletag.cmd.push(function() {
-            googletag.defineSlot('/23358450278/anchor-banner', [[320,50],[728,90]], 'div-anchor-banner').addService(googletag.pubads());
-            googletag.defineSlot('/23358450278/in-feed', 'fluid', 'div-in-feed').addService(googletag.pubads());
-            googletag.enableServices();
-            googletag.setConfig({singleRequest: true});
-        });
-    </script>
     <style>
         .editorial-panel {
             margin: 0 0 28px;
@@ -379,11 +367,6 @@
                                     </div>
 
                                 </div>
-                            </div>
-
-                            <!-- In-feed Ad (Ad Manager) -->
-                            <div id="div-in-feed" style="margin: 16px auto; max-width: 728px; text-align: center; min-height: 90px;">
-                                <script>googletag.cmd.push(function() { googletag.display('div-in-feed'); });</script>
                             </div>
 
                             <!-- Movies Grid -->
@@ -837,10 +820,5 @@
     <!-- Web Push Notifications -->
     <script src="js/push-notifications.js"></script>
     <script defer src="js/app-shell.js"></script>
-
-    <!-- Sticky Anchor Banner -->
-    <div id="div-anchor-banner" style="position:fixed;bottom:0;left:0;width:100%;z-index:1500;text-align:center;background:rgba(0,0,0,0.85);padding:4px 0;">
-        <script>googletag.cmd.push(function() { googletag.display('div-anchor-banner'); });</script>
-    </div>
 </body>
 </html>

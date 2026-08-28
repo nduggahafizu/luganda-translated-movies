@@ -7,17 +7,18 @@
     <meta name="description" content="Watch Luganda translated TV series with all seasons and episodes on Unruly Movies.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#4ade80">
-    <meta name="robots" content="noindex">    
+    <meta name="robots" content="noindex">
+    <!-- No outgoing Referer from this page — BunnyCDN's hotlink protection
+         allows referrer-less requests (treats them as direct access) but
+         blocks a cross-site Referer, which is exactly what the browser would
+         otherwise send when this page's <video> fetches a b-cdn.net URL. -->
+    <meta name="referrer" content="no-referrer">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
     <link rel="shortcut icon" type="image/png" href="/assets/images/favicon.png">
     <link rel="apple-touch-icon" href="/assets/images/logo.png">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/mobile-improvements.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-    
-
-    <!-- Google IMA SDK (pre-roll ads) -->
-    <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
 
     <style>
         :root {
@@ -488,16 +489,6 @@
             background: #000;
         }
 
-        #ad-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 20;
-            display: none;
-        }
-        
         .video-container iframe {
             position: absolute;
             top: 0;
@@ -1440,7 +1431,6 @@
                                 // loadCurrentEpisodeVideo(), the same authenticated,
                                 // entitlement-checked flow movies use.
                                 return `
-                                    <div id="ad-container"></div>
                                     <div class="video-loading-overlay" id="video-loading">
                                         <div class="spinner"></div>
                                         <p>Loading video...</p>
@@ -1458,7 +1448,7 @@
                                            onloadedmetadata="updateSeriesProgress()"
                                            onwebkitbeginfullscreen="updateFullscreenIcon(true)"
                                            onwebkitendfullscreen="updateFullscreenIcon(false)"
-                                           oncanplay="hideVideoLoading(); if(!this._adPlayed){this._adPlayed=true;playPreRollAd();setupMidRolls();}">
+                                           oncanplay="hideVideoLoading()">
                                     </video>
 
                                     <button class="cc-center-play" id="ccCenterPlay" type="button" aria-label="Play" onclick="toggleSeriesPlay()">${CC_CENTER_PLAY_ICON}</button>
@@ -1592,15 +1582,15 @@
                     return;
                 }
 
-                // MKV / hotlink-protected CDNs need backend proxying to play at all
-                const lower = resolveData.directUrl.toLowerCase();
-                const needsProxy = lower.includes('.mkv') || lower.includes('b-cdn.net') || lower.includes('bunnycdn');
-                const videoSrc = needsProxy
-                    ? `${API_BASE_URL}/api/video/stream-proxy?url=${encodeURIComponent(resolveData.directUrl)}`
-                    : resolveData.directUrl;
-
-                videoEl.onerror = () => handleVideoError(videoEl, resolveData.directUrl);
-                videoEl.src = videoSrc;
+                // Every source plays directly from origin first, regardless
+                // of host or container (.mkv included) — this page sends no
+                // Referer (see the <meta name="referrer"> tag above), which
+                // is what actually let BunnyCDN's hotlink protection
+                // through. handleVideoError below is the only thing that
+                // still reaches for the proxy, and only for whichever
+                // specific source turns out to need it.
+                videoEl.onerror = () => handleVideoError(videoEl, resolveData.directUrl, false);
+                videoEl.src = resolveData.directUrl;
                 videoEl.load();
             } catch (e) {
                 console.error('Episode resolve error:', e);
@@ -1664,8 +1654,22 @@
             if (loading) loading.style.display = 'none';
         }
 
-        function handleVideoError(videoElement, originalUrl) {
+        function handleVideoError(videoElement, originalUrl, alreadyProxied) {
             console.error('Video error:', videoElement.error);
+
+            // First failure on a direct (non-proxied) source: retry once
+            // through the backend proxy before giving up — covers any CDN
+            // whose direct fetch fails for a reason other than the
+            // BunnyCDN Referer case (e.g. CORS on a source we didn't expect).
+            if (!alreadyProxied) {
+                console.warn('Retrying playback via stream proxy after direct-source error');
+                const proxyUrl = `${API_BASE_URL}/api/video/stream-proxy?url=${encodeURIComponent(originalUrl)}`;
+                videoElement.onerror = () => handleVideoError(videoElement, originalUrl, true);
+                videoElement.src = proxyUrl;
+                videoElement.load();
+                return;
+            }
+
             const loading = document.getElementById('video-loading');
             if (loading) {
                 loading.innerHTML = `
@@ -1918,14 +1922,11 @@
 
             const url = resolveData.directUrl;
             const title = `${seriesData.originalTitle || 'Series'} S${currentEpisode.season}E${currentEpisode.episode}`;
-
             const fileName = `${title.replace(/[^a-zA-Z0-9 _-]/g, '').trim()}.mp4`;
             // Always route through the backend proxy — never hand out the raw
-            // CDN URL. On desktop this also gets Content-Disposition: attachment
-            // so Chrome saves instead of just playing the video; on iOS Safari
-            // (which won't auto-download either way) it at least keeps the
-            // video appearing to come from Unruly Movies instead of the
-            // underlying host.
+            // CDN URL. This also gets Content-Disposition: attachment so
+            // Chrome saves instead of just playing the video, and shows up
+            // as a real download in the browser's native download UI.
             const proxyDownload = `${API_BASE_URL}/api/video/stream-proxy?url=${encodeURIComponent(url)}&download=${encodeURIComponent(fileName)}`;
 
             if (isIOS()) {
@@ -1974,124 +1975,6 @@
             document.body.appendChild(overlay);
         }
 
-        const VAST_TAG = 'https://pubads.g.doubleclick.net/gampad/live/ads?iu=/23358450278/video-preroll&description_url=https%3A%2F%2Funrulymovies.com&tfcd=0&npa=0&sz=640x480&min_ad_duration=5000&max_ad_duration=30000&gdfp_req=1&unviewed_position_start=1&output=vast&env=vp&impl=s&correlator=';
-        const MID_ROLL_INTERVAL = 30 * 60;
-        let nextMidRollTime = MID_ROLL_INTERVAL;
-        let midRollBusy = false;
-
-        function setupMidRolls() {
-            const video = document.getElementById('series-video');
-            if (!video) return;
-            nextMidRollTime = MID_ROLL_INTERVAL;
-            midRollBusy = false;
-            video.addEventListener('timeupdate', () => {
-                if (midRollBusy) return;
-                if (video.currentTime >= nextMidRollTime) {
-                    nextMidRollTime = video.currentTime + MID_ROLL_INTERVAL;
-                    trySeriesMidRoll();
-                }
-            });
-        }
-
-        function trySeriesMidRoll() {
-            const video = document.getElementById('series-video');
-            const adContainer = document.getElementById('ad-container');
-            if (!video || !adContainer || typeof google === 'undefined' || !google.ima) {
-                midRollBusy = false;
-                return;
-            }
-            midRollBusy = true;
-
-            try {
-                const adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, video);
-                adDisplayContainer.initialize();
-                const adsLoader = new google.ima.AdsLoader(adDisplayContainer);
-
-                const resume = () => { adContainer.style.display = 'none'; midRollBusy = false; video.play(); };
-
-                adsLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, (e) => {
-                    const mgr = e.getAdsManager(video);
-                    mgr.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, resume);
-                    mgr.addEventListener(google.ima.AdEvent.Type.COMPLETE, resume);
-                    mgr.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, resume);
-                    try {
-                        video.pause();
-                        adContainer.style.display = 'block';
-                        mgr.init(adContainer.offsetWidth, adContainer.offsetHeight, google.ima.ViewMode.NORMAL);
-                        mgr.start();
-                    } catch (err) { resume(); }
-                }, false);
-
-                adsLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, () => {
-                    midRollBusy = false;
-                }, false);
-
-                const req = new google.ima.AdsRequest();
-                req.adTagUrl = VAST_TAG;
-                req.linearAdSlotWidth = adContainer.offsetWidth;
-                req.linearAdSlotHeight = adContainer.offsetHeight;
-                adsLoader.requestAds(req);
-            } catch (e) {
-                midRollBusy = false;
-            }
-        }
-
-        function playPreRollAd() {
-            const video = document.getElementById('series-video');
-            const adContainer = document.getElementById('ad-container');
-            console.log('🎬 Pre-roll: video=', !!video, 'adContainer=', !!adContainer, 'IMA=', typeof google !== 'undefined' && !!google?.ima);
-            if (!video || !adContainer || typeof google === 'undefined' || !google.ima) {
-                console.warn('🎬 Pre-roll skipped: missing dependencies');
-                return;
-            }
-
-            try {
-                video.pause();
-                adContainer.style.display = 'block';
-
-                const adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, video);
-                adDisplayContainer.initialize();
-
-                const adsLoader = new google.ima.AdsLoader(adDisplayContainer);
-
-                adsLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, (e) => {
-                    const adsManager = e.getAdsManager(video);
-                    adsManager.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, () => {
-                        adContainer.style.display = 'none';
-                        video.play();
-                    });
-                    adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE, () => {
-                        adContainer.style.display = 'none';
-                        video.play();
-                    });
-                    adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, () => {
-                        adContainer.style.display = 'none';
-                        video.play();
-                    });
-                    try {
-                        adsManager.init(adContainer.offsetWidth, adContainer.offsetHeight, google.ima.ViewMode.NORMAL);
-                        adsManager.start();
-                    } catch (err) {
-                        adContainer.style.display = 'none';
-                        video.play();
-                    }
-                }, false);
-
-                adsLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, () => {
-                    adContainer.style.display = 'none';
-                    video.play();
-                }, false);
-
-                const adsRequest = new google.ima.AdsRequest();
-                adsRequest.adTagUrl = VAST_TAG;
-                adsRequest.linearAdSlotWidth = adContainer.offsetWidth;
-                adsRequest.linearAdSlotHeight = adContainer.offsetHeight;
-                adsLoader.requestAds(adsRequest);
-            } catch (e) {
-                adContainer.style.display = 'none';
-                if (video) video.play();
-            }
-        }
     </script>
     
     <!-- Back Button Handler - Prevent app close on Android -->
