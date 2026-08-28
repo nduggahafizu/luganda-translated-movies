@@ -2649,19 +2649,19 @@
         }
         
         // ========== DOWNLOAD PERMISSION ==========
+        // Always attempt the download and let the server's real entitlement
+        // check (playback-token with forDownload:true) decide — the same
+        // pattern series-player.html already uses. Gating this on the
+        // client's cached window._userAccess used to fail for a paying user
+        // who clicks Download without clicking Play first: _userAccess is
+        // only populated as a side effect of attemptPlay(), so it was still
+        // undefined at that point and they'd get bounced to the upsell
+        // prompt despite already being subscribed.
         async function checkDownloadPermission(movie) {
             const downloadBtn = document.getElementById('downloadBtn');
             if (!downloadBtn) return;
             downloadBtn.style.display = 'inline-flex';
-
-            downloadBtn.onclick = () => {
-                const access = window._userAccess;
-                if (access && (access.canDownload || access.isAdmin)) {
-                    handleDownload(movie);
-                } else {
-                    showDownloadPrompt();
-                }
-            };
+            downloadBtn.onclick = () => handleDownload(movie);
         }
         
         function showDownloadPrompt() {
