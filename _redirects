@@ -16,8 +16,11 @@ http://unrulymovies.com/* https://unrulymovies.com/:splat 301!
 # API proxy
 /api/* https://luganda-translated-movies-production.up.railway.app/api/:splat 200
 
-# SSR movie pages — Railway renders full HTML per movie, no build step needed
-/movie/* https://luganda-translated-movies-production.up.railway.app/api/movie-page/:splat 200
+# Movie/series slug resolver — Railway resolves the slug and redirects to player.html/series-player.html
+/movie/* https://luganda-translated-movies-production.up.railway.app/movie/:splat 200
+
+# Password reset — Railway resolves the token and redirects to reset-password.html
+/reset-password/* https://luganda-translated-movies-production.up.railway.app/reset-password/:splat 200
 
 # Dynamic movie sitemap — served from Railway, updates automatically on upload
 /sitemap-movies.xml https://luganda-translated-movies-production.up.railway.app/api/sitemap-movies 200
@@ -32,6 +35,7 @@ http://unrulymovies.com/* https://unrulymovies.com/:splat 301!
 /search           /search.html           200
 /login            /login.html            200
 /register         /register.html         200
+/forgot-password  /forgot-password.html  200
 /dashboard        /dashboard.html        200
 /profile          /profile.html          200
 /subscribe        /subscribe.html        200

@@ -703,7 +703,7 @@ img {
 }
 
 .app-section {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     position: relative;
     animation: sectionRise 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
@@ -731,9 +731,7 @@ img {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 14px;
-    border-bottom: 1px solid rgba(74, 222, 128, 0.12);
+    margin-bottom: 10px;
 }
 
 .section-header h2 {
@@ -995,12 +993,13 @@ img {
         margin-top: 12px;
         gap: 8px;
     }
-    .carousel-control { padding: 0 8px; }
+    /* Keep the arrows clear of the bottom-anchored info panel on short mobile heroes */
+    .carousel-control { padding: 0 8px; top: 20px; transform: none; }
     .control-prev, .control-next { width: 36px; height: 36px; }
     .control-prev svg, .control-next svg { width: 24px; height: 24px; }
-    .carousel-indicators { bottom: 12px; padding: 6px 12px; gap: 6px; }
-    .carousel-indicators li { width: 20px; height: 3px; }
-    .carousel-indicators li.active { width: 36px; }
+    .carousel-indicators { right: 14px; gap: 7px; }
+    .carousel-indicators li { width: 6px; height: 6px; }
+    .carousel-indicators li.active { height: 20px; }
 }
 
 .slide-header {
@@ -1160,31 +1159,31 @@ img {
     box-shadow: 0 8px 30px rgba(74, 222, 128, 0.4);
 }
 
-/* Carousel Indicators - Modern Pill Style */
+/* Carousel Indicators - vertical dot column, right-aligned */
 .carousel-indicators {
     position: absolute;
-    bottom: 28px;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 50%;
+    right: 28px;
+    left: auto;
+    bottom: auto;
+    transform: translateY(-50%);
     display: flex;
+    flex-direction: column;
     gap: 10px;
     list-style: none;
     margin: 0;
-    padding: 12px 20px;
+    padding: 0;
     z-index: 10;
-    background: rgba(0, 0, 0, 0.4);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    border-radius: 30px;
+    background: none;
 }
 
 .carousel-indicators li {
-    width: 32px;
-    height: 5px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
     background: rgba(255, 255, 255, 0.35);
-    border-radius: 3px;
     cursor: pointer;
-    transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1), height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .carousel-indicators li:hover {
@@ -1192,9 +1191,10 @@ img {
 }
 
 .carousel-indicators li.active {
-    background: linear-gradient(90deg, #4ade80 0%, #22c55e 100%);
-    width: 56px;
-    box-shadow: 0 0 15px rgba(74, 222, 128, 0.5);
+    background: linear-gradient(180deg, #4ade80 0%, #22c55e 100%);
+    height: 26px;
+    border-radius: 4px;
+    box-shadow: 0 0 12px rgba(74, 222, 128, 0.5);
 }
 
 /* ===================================
@@ -3569,8 +3569,7 @@ a:focus-visible {
     }
 
     .section-header {
-        margin-bottom: 14px;
-        padding-bottom: 12px;
+        margin-bottom: 8px;
     }
 
     .section-header h2 {
@@ -3655,20 +3654,19 @@ a:focus-visible {
     }
     
     .carousel-indicators {
-        bottom: 16px;
-        padding: 8px 14px;
+        right: 20px;
         gap: 8px;
     }
-    
+
     .carousel-indicators li {
-        width: 24px;
-        height: 4px;
+        width: 7px;
+        height: 7px;
     }
-    
+
     .carousel-indicators li.active {
-        width: 40px;
+        height: 22px;
     }
-    
+
     .app-heading h2 {
         font-size: 18px;
     }
@@ -3923,8 +3921,7 @@ a:focus-visible {
     }
 
     .section-header {
-        margin-bottom: 10px;
-        padding-bottom: 10px;
+        margin-bottom: 8px;
     }
 }
 

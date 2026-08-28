@@ -93,8 +93,6 @@ function moviePageHtml(movie) {
     <meta name="author" content="Unruly Movies">
     <link rel="canonical" href="${pageUrl}">
 
-    <meta name="google-adsense-account" content="ca-pub-1904736753681797">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
 
     <meta property="og:type" content="video.movie">
     <meta property="og:title" content="${esc(title)}${year ? ` (${year})` : ''} — Luganda VJ Translation | Unruly Movies">

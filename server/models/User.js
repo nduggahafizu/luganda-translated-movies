@@ -14,7 +14,17 @@ const userSchema = new mongoose.Schema({
         unique: true,
         lowercase: true,
         trim: true,
-        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email']
+        // Nested quantifiers over overlapping character classes here used to
+        // cause catastrophic backtracking (confirmed: ~34s to reject a single
+        // ~45-char input, growing exponentially with length) — a crafted or
+        // even accidental email could hang the entire single-threaded Node
+        // process for every user on one registration request. This pattern
+        // has no such ambiguity: each quantified segment is a single
+        // character class, and every dot-separated group is unambiguously
+        // bounded by a literal '.', so there's exactly one way to parse any
+        // input — linear time. It also fixes a real rejection bug: TLDs
+        // longer than 3 characters (.info, .technology) were wrongly rejected.
+        match: [/^[\w.-]+@[\w-]+(\.[\w-]+)+$/, 'Please provide a valid email']
     },
     password: {
         type: String,
@@ -133,6 +143,17 @@ const userSchema = new mongoose.Schema({
             default: null
         }
     }],
+    // Every new account gets 6 hours of full access from creation, no plan
+    // restrictions (see isInTrialPeriod/canAccessContent below). Set by the
+    // pre('save') hook below, guarded on isNew — NOT a plain schema
+    // `default`, which would backfill onto any EXISTING account too the
+    // next time literally anything calls .save() on it for an unrelated
+    // reason (a last-active touch, a profile edit, anything), silently
+    // granting a retroactive trial to the entire existing free user base.
+    trialEndsAt: {
+        type: Date,
+        default: null
+    },
     preferences: {
         language: {
             type: String,
@@ -246,6 +267,16 @@ userSchema.pre('save', async function(next) {
     next();
 });
 
+// Grant the 6-hour full-access trial exactly once, on genuine first
+// creation — isNew is only true before a document's first successful save,
+// so this can't fire again on a later save of an already-existing account.
+userSchema.pre('save', function(next) {
+    if (this.isNew && !this.trialEndsAt) {
+        this.trialEndsAt = new Date(Date.now() + 6 * 60 * 60 * 1000);
+    }
+    next();
+});
+
 // Compare password method
 userSchema.methods.comparePassword = async function(candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
@@ -259,8 +290,15 @@ userSchema.methods.hasActiveSubscription = function() {
            (!this.subscription.endDate || this.subscription.endDate > Date.now());
 };
 
+// Still within the free 6-hour full-access window granted at account creation?
+userSchema.methods.isInTrialPeriod = function() {
+    return !!this.trialEndsAt && this.trialEndsAt > Date.now();
+};
+
 // Check if user can access content based on subscription
 userSchema.methods.canAccessContent = function(requiredPlan) {
+    if (this.isInTrialPeriod()) return true;
+
     const planHierarchy = { free: 0, starter: 1, daily: 1, basic: 2, weekly: 2, biweekly: 3, standard: 3, premium: 4, monthly: 4, vip: 5 };
     const userPlanLevel = planHierarchy[this.subscription.plan] || 0;
     const requiredPlanLevel = planHierarchy[requiredPlan] || 0;
@@ -271,6 +309,7 @@ userSchema.methods.canAccessContent = function(requiredPlan) {
 // Plan capabilities
 const PLAN_CONFIG = {
     free:     { devices: 1, download: false, ads: true },
+    trial:    { devices: 2, download: false, ads: false },
     daily:    { devices: 1, download: true,  ads: true },
     weekly:   { devices: 1, download: true,  ads: true },
     biweekly: { devices: 1, download: true,  ads: false },
@@ -283,6 +322,9 @@ const PLAN_CONFIG = {
 };
 
 userSchema.methods.getPlanConfig = function() {
+    // Trial gets full streaming access (2 devices, no ads) but NOT
+    // downloads — downloads stay a paid-only perk even during the trial.
+    if (this.isInTrialPeriod()) return PLAN_CONFIG.trial;
     return PLAN_CONFIG[this.subscription.plan] || PLAN_CONFIG.free;
 };
 

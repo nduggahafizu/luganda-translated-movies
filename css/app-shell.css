@@ -112,7 +112,10 @@
     .carousel-item.active .slide-poster-img { animation: none; }
 }
 
-/* Floating glass info panel — distinct from flat gradient-text overlays */
+/* Plain gradient-text overlay — no glass-card chrome, sits directly on
+   .hero-overlay's gradient like the reference design (a floating blurred
+   card was here before and was winning the cascade over index.html's own
+   plain version due to this file's deferred media="print" load timing). */
 .hero-info-panel {
     position: relative;
     z-index: 2;
@@ -121,14 +124,6 @@
     align-items: flex-start;
     max-width: 420px;
     width: fit-content;
-    padding: 16px 20px;
-    background: rgba(9, 9, 15, 0.45);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-left: 3px solid var(--primary-color, #4ade80);
-    border-radius: 4px 16px 16px 4px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
 }
 
 .hero-title {
@@ -139,9 +134,6 @@
     letter-spacing: -0.3px;
     margin: 0 0 12px;
     color: #fff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     max-width: 100%;
 }
 
@@ -202,31 +194,42 @@
     gap: 12px;
 }
 
-.play-btn {
-    background: linear-gradient(45deg, var(--primary-dark, #22c55e), var(--primary-color, #4ade80));
-    box-shadow: 0 8px 20px var(--primary-glow, rgba(74, 222, 128, 0.4));
-    color: #06240f;
-    padding: 12px 28px;
-    border-radius: 30px;
-    font-weight: 800;
-    text-decoration: none;
+.hero-watch-now {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.3s, box-shadow 0.3s;
+    gap: 14px;
+    text-decoration: none;
 }
 
-.play-btn:hover {
-    transform: translateY(-2px);
+.hero-play-circle {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--primary-color, #4ade80);
+    color: #06240f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px var(--primary-glow, rgba(74, 222, 128, 0.4));
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.hero-play-circle svg { margin-left: 3px; }
+
+.hero-watch-now:hover .hero-play-circle {
+    transform: scale(1.06);
     box-shadow: 0 12px 28px var(--primary-glow, rgba(74, 222, 128, 0.5));
-    filter: brightness(1.08);
+}
+.hero-watch-now:active .hero-play-circle {
+    transform: scale(0.95);
 }
 
-.play-btn:active {
-    transform: scale(0.95);
+.hero-watch-label {
+    color: #fff;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
 }
 
 .save-btn {
@@ -266,7 +269,6 @@
 
     .hero-info-panel {
         padding: 12px 14px;
-        border-radius: 3px 12px 12px 3px;
         max-width: 100%;
     }
 
@@ -276,9 +278,13 @@
         -webkit-line-clamp: 2;
     }
 
-    .play-btn {
-        padding: 9px 20px;
-        font-size: 12px;
+    .hero-play-circle {
+        width: 46px;
+        height: 46px;
+    }
+
+    .hero-watch-label {
+        font-size: 13px;
     }
 
     .save-btn {
@@ -437,7 +443,7 @@
 .h-scroll {
     display: flex !important;
     grid-template-columns: none !important;
-    gap: 12px !important;
+    gap: 8px !important;
     overflow-x: auto;
     overflow-y: hidden;
     -ms-overflow-style: none;
@@ -468,6 +474,38 @@
         flex: 0 0 200px !important;
         width: 200px !important;
         max-width: 200px !important;
+    }
+}
+
+/* ---------- Persistent Sidebar (desktop) — pearlpix-style always-on nav ----------
+   Below 1024px the drawer keeps its existing off-canvas/hamburger behavior
+   (defined in style.css) untouched; this only changes the desktop layout. */
+@media (min-width: 1024px) {
+    .app-aside {
+        transform: translateX(0) !important;
+        top: 70px;
+        height: calc(100vh - 70px);
+        box-shadow: none;
+    }
+
+    .app-aside .modal-close {
+        display: none !important;
+    }
+
+    .sidebar-backdrop {
+        display: none !important;
+    }
+
+    .app-container {
+        margin-left: 280px;
+        /* .app-aside is position:fixed (removed from flex flow), so flex:1
+           alone sizes this to the full viewport width — margin-left then
+           pushes it 280px past the right edge instead of narrowing it. */
+        width: calc(100% - 280px);
+    }
+
+    #menuToggle {
+        display: none !important;
     }
 }
 

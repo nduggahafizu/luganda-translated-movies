@@ -230,10 +230,6 @@
                 'ad_personalization': 'denied'
             });
         }
-        
-        // Disable AdSense personalization
-        window['adsbygoogle'] = window['adsbygoogle'] || [];
-        window['adsbygoogle'].requestNonPersonalizedAds = 1;
     }
     
     // Slide down animation

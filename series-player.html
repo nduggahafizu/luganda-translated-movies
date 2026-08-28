@@ -1,22 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- AdCash (gated for paid subscribers) -->
-    <script src="js/ad-gate.js"></script>
-    <!-- Ezoic Privacy & Ad Scripts -->
-    <script data-cfasync="false" src="https://cmp.gatekeeperconsent.com/min.js"></script>
-    <script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js"></script>
-    <script async src="//www.ezojs.com/ezoic/sa.min.js"></script>
-    <script>window.ezstandalone=window.ezstandalone||{};ezstandalone.cmd=ezstandalone.cmd||[];</script>
     <title>Watch TV Series - Unruly Movies</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="Watch Luganda translated TV series with all seasons and episodes on Unruly Movies.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#4ade80">
-    <meta name="robots" content="noindex">
-    <meta name="google-adsense-account" content="ca-pub-1904736753681797">
-    
+    <meta name="robots" content="noindex">    
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
     <link rel="shortcut icon" type="image/png" href="/assets/images/favicon.png">
     <link rel="apple-touch-icon" href="/assets/images/logo.png">
@@ -24,8 +15,6 @@
     <link rel="stylesheet" href="css/mobile-improvements.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
 
     <!-- Google IMA SDK (pre-roll ads) -->
     <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
@@ -103,29 +92,139 @@
             overflow: hidden;
         }
 
-        .embed-fullscreen-btn {
+        /* Custom control bar (raw <video> has no library — this replaces
+           native browser controls, which look and behave inconsistently
+           across browsers/devices, with one consistent branded bar). */
+        .cc-center-play {
             position: absolute;
-            top: 12px;
-            right: 12px;
-            z-index: 50;
-            width: 42px;
-            height: 42px;
-            border-radius: 10px;
-            border: 1px solid rgba(74, 222, 128, 0.65);
-            background: rgba(0, 0, 0, 0.7);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 46;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             color: #fff;
-            display: inline-flex;
+            display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            -webkit-backdrop-filter: blur(6px);
-            backdrop-filter: blur(6px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s, background 0.15s, transform 0.15s;
+        }
+        .video-container:not(.cc-playing) .cc-center-play {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .cc-center-play:hover {
+            background: rgba(74, 222, 128, 0.25);
+            border-color: rgba(74, 222, 128, 0.6);
+        }
+        .cc-center-play svg { margin-left: 4px; }
+
+        .cc-bar {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 47;
+            padding: 26px 12px 8px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.88) 70%);
+            opacity: 0;
+            transform: translateY(8px);
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .video-container:not(.cc-playing) .cc-bar,
+        .video-container.cc-active .cc-bar {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
         }
 
-        .embed-fullscreen-btn:hover {
-            background: rgba(74, 222, 128, 0.18);
-            color: var(--primary-color);
+        .cc-progress {
+            position: relative;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 4px;
         }
+        .cc-progress::before {
+            content: '';
+            position: absolute;
+            left: 0; right: 0;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.25);
+        }
+        .cc-progress-buffered,
+        .cc-progress-played {
+            position: absolute;
+            left: 0;
+            height: 4px;
+            border-radius: 2px;
+            width: 0%;
+        }
+        .cc-progress-buffered { background: rgba(255,255,255,0.4); }
+        .cc-progress-played { background: var(--primary-color, #4ade80); }
+        .cc-progress-handle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary-color, #4ade80);
+            box-shadow: 0 0 0 3px rgba(74,222,128,0.25);
+            left: 0%;
+            transform: translateX(-50%);
+        }
+
+        .cc-row {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .cc-btn {
+            width: 34px;
+            height: 34px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 6px;
+            opacity: 0.9;
+            transition: opacity 0.15s, background 0.15s, color 0.15s;
+        }
+        .cc-btn:hover {
+            opacity: 1;
+            background: rgba(255,255,255,0.1);
+            color: var(--primary-color, #4ade80);
+        }
+        .cc-btn.forward svg { transform: scaleX(-1); }
+        .cc-btn .seek-label {
+            font-size: 8px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .cc-time {
+            font-size: 12px;
+            color: rgba(255,255,255,0.85);
+            font-variant-numeric: tabular-nums;
+            margin-left: 6px;
+            white-space: nowrap;
+        }
+        .cc-spacer { flex: 1; }
         
         .series-backdrop {
             position: absolute;
@@ -210,7 +309,166 @@
             line-height: 1.7;
             max-width: 700px;
         }
-        
+
+        .sp-eyebrow {
+            color: var(--primary-color);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .sp-rating-badge {
+            background: rgba(74, 222, 128, 0.12);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color) !important;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .sp-actions {
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: minmax(76px, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+            max-width: 460px;
+        }
+
+        .sp-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 6px;
+            color: var(--text-primary);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .sp-action-btn:hover {
+            border-color: var(--primary-color);
+            background: rgba(74, 222, 128, 0.1);
+        }
+
+        .sp-action-btn.is-disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* Request modal */
+        .sp-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 100000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .sp-modal {
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 26px;
+            width: 100%;
+            max-width: 420px;
+            position: relative;
+        }
+
+        .sp-modal-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+        }
+
+        .sp-modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        .sp-modal h3 {
+            color: var(--text-primary);
+            margin: 0 0 6px;
+            font-size: 19px;
+        }
+
+        .sp-modal-sub {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin: 0 0 18px;
+        }
+
+        .sp-modal label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .sp-modal input,
+        .sp-modal textarea {
+            width: 100%;
+            margin-top: 6px;
+            background: var(--background-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        .sp-modal input:focus,
+        .sp-modal textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .sp-modal-submit {
+            width: 100%;
+            background: var(--primary-color);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 4px;
+        }
+
+        .sp-modal-submit:disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        .sp-modal-status {
+            text-align: center;
+            font-size: 13px;
+            margin: 10px 0 0;
+            min-height: 16px;
+            color: var(--text-secondary);
+        }
+
         /* Video Player Section */
         .player-section {
             background: var(--background-light);
@@ -389,75 +647,121 @@
         }
         
         .episodes-grid {
-            display: grid;
-            gap: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
-        
+
         .episode-card {
             display: flex;
-            gap: 15px;
-            padding: 15px;
-            background: var(--background-dark);
+            align-items: center;
+            gap: 14px;
+            padding: 10px;
             border-radius: 12px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: border-color 0.2s ease, background 0.2s ease;
             border: 2px solid transparent;
+            background: var(--background-dark);
         }
-        
+
         .episode-card:hover {
+            border-color: var(--primary-color);
             background: rgba(74, 222, 128, 0.05);
-            border-color: var(--primary-color);
         }
-        
+
         .episode-card.active {
-            background: rgba(74, 222, 128, 0.1);
             border-color: var(--primary-color);
+            background: rgba(74, 222, 128, 0.1);
         }
-        
+
         .episode-card.unavailable {
             opacity: 0.5;
             cursor: not-allowed;
         }
-        
+
         .episode-card.unavailable:hover {
-            background: var(--background-dark);
             border-color: transparent;
+            background: var(--background-dark);
         }
-        
-        .episode-thumbnail {
-            width: 160px;
-            height: 90px;
-            border-radius: 8px;
-            object-fit: cover;
+
+        .episode-thumb-wrap {
+            position: relative;
             flex-shrink: 0;
+            width: 160px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .episode-thumb-wrap::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, transparent 55%);
+        }
+
+        .episode-thumbnail {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            object-fit: cover;
+            display: block;
             background: #333;
         }
-        
+
+        .episode-num-badge {
+            position: absolute;
+            left: 8px;
+            bottom: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.75);
+            border: 1.5px solid var(--primary-color);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .episode-lock-badge {
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.75);
+            color: #ff6b6b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            font-size: 11px;
+        }
+
         .episode-info {
             flex: 1;
+            min-width: 0;
         }
-        
-        .episode-number {
-            color: var(--primary-color);
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-        
+
         .episode-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
-            margin-bottom: 5px;
+            color: var(--text-primary);
+            margin-bottom: 4px;
         }
-        
+
         .episode-meta {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             font-size: 12px;
             color: var(--text-secondary);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
-        
+
         .episode-overview {
             font-size: 13px;
             color: var(--text-secondary);
@@ -466,21 +770,6 @@
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-        }
-        
-        .episode-status {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 12px;
-        }
-        
-        .episode-status.translated {
-            color: var(--primary-color);
-        }
-        
-        .episode-status.not-translated {
-            color: #ff6b6b;
         }
         
         /* Loading State */
@@ -618,14 +907,29 @@
             .series-genres {
                 justify-content: center;
             }
-            
-            .episode-card {
-                flex-direction: column;
+
+            .sp-actions {
+                grid-auto-columns: minmax(64px, 1fr);
+                max-width: 100%;
+                margin-left: auto;
+                margin-right: auto;
             }
-            
-            .episode-thumbnail {
-                width: 100%;
-                height: 150px;
+
+            .episode-card {
+                gap: 10px;
+                padding: 8px;
+            }
+
+            .episode-thumb-wrap {
+                width: 110px;
+            }
+
+            .episode-title {
+                font-size: 13px;
+            }
+
+            .episode-overview {
+                -webkit-line-clamp: 1;
             }
         }
     </style>
@@ -653,7 +957,35 @@
         </div>
     </main>
 
+    <!-- Request modal -->
+    <div class="sp-modal-overlay" id="spRequestOverlay" onclick="if (event.target === this) closeSeriesRequestModal();">
+        <div class="sp-modal">
+            <button class="sp-modal-close" onclick="closeSeriesRequestModal()" aria-label="Close">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <h3>Request this Series</h3>
+            <p class="sp-modal-sub">Missing episodes, wrong VJ, or something else — let us know.</p>
+            <form id="spRequestForm" onsubmit="submitSeriesRequest(event)">
+                <label>Name
+                    <input type="text" id="spReqName" required>
+                </label>
+                <label>Email
+                    <input type="email" id="spReqEmail" required>
+                </label>
+                <label>Message
+                    <textarea id="spReqMessage" rows="4" required></textarea>
+                </label>
+                <button type="submit" class="sp-modal-submit">Send Request</button>
+            </form>
+            <p class="sp-modal-status" id="spRequestStatus"></p>
+        </div>
+    </div>
+
     <script src="js/config.js?v=20260124"></script>
+    <script src="js/pesapal-checkout.js"></script>
 
     <script>
         // API Configuration - always use production API in production
@@ -737,12 +1069,165 @@
             : null;
         let seriesFullscreenRotation = false;
 
-        function requestVideoContainerFullscreen(event) {
+        const FULLSCREEN_ENTER_ICON = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+            <path d="M16 3h3a2 2 0 0 1 2 2v3" />
+            <path d="M8 21H5a2 2 0 0 1-2-2v-3" />
+            <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+        </svg>`;
+        const FULLSCREEN_EXIT_ICON = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 3v3a2 2 0 0 1-2 2H4" />
+            <path d="M15 3v3a2 2 0 0 0 2 2h3" />
+            <path d="M9 21v-3a2 2 0 0 0-2-2H4" />
+            <path d="M15 21v-3a2 2 0 0 1 2-2h3" />
+        </svg>`;
+        const CC_PLAY_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>`;
+        const CC_PAUSE_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>`;
+        const CC_CENTER_PLAY_ICON = `<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>`;
+        const CC_SEEK_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a8 8 0 1 1-8 8"></path><polyline points="12 1 12 4 9 4"></polyline></svg><span class="seek-label">10</span>`;
+        const CC_VOLUME_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 9 7 9 12 4 12 20 7 15 3 15 3 9" fill="currentColor" stroke="none"></polygon><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18 6a9 9 0 0 1 0 12"></path></svg>`;
+        const CC_MUTED_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 9 7 9 12 4 12 20 7 15 3 15 3 9" fill="currentColor" stroke="none"></polygon><line x1="16" y1="9" x2="22" y2="15"></line><line x1="22" y1="9" x2="16" y2="15"></line></svg>`;
+
+        let seriesControlsHideTimer = null;
+        function markSeriesControlsActive() {
+            const container = document.getElementById('video-container');
+            if (!container) return;
+            container.classList.add('cc-active');
+            clearTimeout(seriesControlsHideTimer);
+            seriesControlsHideTimer = setTimeout(() => container.classList.remove('cc-active'), 2800);
+        }
+
+        function toggleSeriesPlay() {
+            const video = document.getElementById('series-video');
+            if (!video) return;
+            if (video.paused) video.play().catch(() => {});
+            else video.pause();
+            markSeriesControlsActive();
+        }
+
+        function updateSeriesPlayState(isPlaying) {
+            const container = document.getElementById('video-container');
+            if (container) container.classList.toggle('cc-playing', isPlaying);
+            const btn = document.getElementById('ccPlayBtn');
+            if (btn) btn.innerHTML = isPlaying ? CC_PAUSE_ICON : CC_PLAY_ICON;
+        }
+
+        function formatSeriesTime(seconds) {
+            if (!isFinite(seconds) || seconds < 0) return '0:00';
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = Math.floor(seconds % 60);
+            const mm = h > 0 ? String(m).padStart(2, '0') : String(m);
+            const ss = String(s).padStart(2, '0');
+            return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
+        }
+
+        function updateSeriesProgress() {
+            const video = document.getElementById('series-video');
+            if (!video || !isFinite(video.duration) || video.duration <= 0) return;
+            const pct = Math.min(100, Math.max(0, (video.currentTime / video.duration) * 100));
+            const played = document.getElementById('ccPlayed');
+            const handle = document.getElementById('ccHandle');
+            if (played) played.style.width = pct + '%';
+            if (handle) handle.style.left = pct + '%';
+            const timeEl = document.getElementById('ccTime');
+            if (timeEl) timeEl.textContent = `${formatSeriesTime(video.currentTime)} / ${formatSeriesTime(video.duration)}`;
+        }
+
+        function updateSeriesBuffered() {
+            const video = document.getElementById('series-video');
+            if (!video || !video.buffered || video.buffered.length === 0 || !isFinite(video.duration) || video.duration <= 0) return;
+            try {
+                const end = video.buffered.end(video.buffered.length - 1);
+                const pct = Math.min(100, Math.max(0, (end / video.duration) * 100));
+                const buffered = document.getElementById('ccBuffered');
+                if (buffered) buffered.style.width = pct + '%';
+            } catch (e) {}
+        }
+
+        let seriesProgressDragging = false;
+        function seekFromClientX(clientX) {
+            const video = document.getElementById('series-video');
+            const bar = document.getElementById('ccProgress');
+            if (!video || !bar || !isFinite(video.duration) || video.duration <= 0) return;
+            const rect = bar.getBoundingClientRect();
+            const pct = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+            video.currentTime = pct * video.duration;
+            updateSeriesProgress();
+        }
+
+        function seekFromProgressClick(event) {
+            seekFromClientX(event.clientX);
+            markSeriesControlsActive();
+        }
+
+        function startProgressDrag(event) {
+            event.preventDefault();
+            seriesProgressDragging = true;
+            const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+            seekFromClientX(clientX);
+            markSeriesControlsActive();
+
+            function onMove(e) {
+                if (!seriesProgressDragging) return;
+                const cx = e.touches ? e.touches[0].clientX : e.clientX;
+                seekFromClientX(cx);
+            }
+            function onUp() {
+                seriesProgressDragging = false;
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onUp);
+                document.removeEventListener('touchmove', onMove);
+                document.removeEventListener('touchend', onUp);
+            }
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
+            document.addEventListener('touchmove', onMove, { passive: false });
+            document.addEventListener('touchend', onUp);
+        }
+
+        function toggleSeriesMute() {
+            const video = document.getElementById('series-video');
+            if (!video) return;
+            video.muted = !video.muted;
+            const btn = document.getElementById('ccMuteBtn');
+            if (btn) btn.innerHTML = video.muted ? CC_MUTED_ICON : CC_VOLUME_ICON;
+            markSeriesControlsActive();
+        }
+
+        function updateFullscreenIcon(isFullscreen) {
+            const btn = document.getElementById('embedFullscreenBtn');
+            if (!btn) return;
+            btn.innerHTML = isFullscreen ? FULLSCREEN_EXIT_ICON : FULLSCREEN_ENTER_ICON;
+            btn.setAttribute('aria-label', isFullscreen ? 'Exit fullscreen' : 'Fullscreen');
+        }
+
+        function toggleVideoContainerFullscreen(event) {
             if (event) event.preventDefault();
             const container = document.querySelector('.video-container');
+            const video = document.getElementById('series-video');
             if (!container) return;
+
+            const fsElement = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+            if (fsElement) {
+                const exit = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+                if (exit) exit.call(document);
+                return;
+            }
+
             const req = container.requestFullscreen || container.webkitRequestFullscreen || container.msRequestFullscreen;
-            if (req) req.call(container);
+            if (req) {
+                req.call(container);
+            } else if (video && video.webkitEnterFullscreen) {
+                // iOS Safari: arbitrary containers can't go fullscreen, only <video> elements can.
+                video.webkitEnterFullscreen();
+            }
+        }
+
+        function seekSeriesVideo(deltaSeconds) {
+            const video = document.getElementById('series-video');
+            if (!video || !isFinite(video.duration)) return;
+            video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime + deltaSeconds));
         }
 
         function isMobileSeriesViewport() {
@@ -782,16 +1267,20 @@
             seriesFullscreenRotation = false;
         }
 
-        document.addEventListener('fullscreenchange', () => {
-            const isFullscreen = Boolean(document.fullscreenElement);
+        function handleSeriesFullscreenChange() {
+            const isFullscreen = Boolean(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
             document.body.classList.toggle('fullscreen-active', isFullscreen);
+            updateFullscreenIcon(isFullscreen);
 
             if (isFullscreen) {
                 lockSeriesLandscape();
             } else {
                 unlockSeriesLandscape();
             }
-        });
+        }
+        document.addEventListener('fullscreenchange', handleSeriesFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleSeriesFullscreenChange);
+        document.addEventListener('msfullscreenchange', handleSeriesFullscreenChange);
         
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
@@ -873,12 +1362,13 @@
                                  alt="${seriesData.originalTitle}" class="series-poster"
                                  onerror="this.src='/assets/images/placeholder.svg'">
                             <div class="series-info">
+                                <div class="sp-eyebrow">Series</div>
                                 <h1>${seriesData.lugandaTitle || seriesData.originalTitle}</h1>
-                                ${seriesData.lugandaTitle && seriesData.lugandaTitle !== seriesData.originalTitle 
-                                    ? `<p style="color: var(--text-secondary); margin-bottom: 10px;">${seriesData.originalTitle}</p>` 
+                                ${seriesData.lugandaTitle && seriesData.lugandaTitle !== seriesData.originalTitle
+                                    ? `<p style="color: var(--text-secondary); margin-bottom: 10px;">${seriesData.originalTitle}</p>`
                                     : ''}
                                 <div class="series-meta">
-                                    <span class="series-rating">⭐ ${(seriesData.rating?.imdb || 0).toFixed(1)}</span>
+                                    <span class="sp-rating-badge">★ ${(seriesData.rating?.imdb || 0).toFixed(1)}</span>
                                     <span>📅 ${seriesData.year || 'Unknown'}</span>
                                     <span>📺 ${seriesData.totalSeasons || 0} Season${seriesData.totalSeasons !== 1 ? 's' : ''}</span>
                                     <span>🎬 ${seriesData.totalEpisodes || 0} Episodes</span>
@@ -886,6 +1376,36 @@
                                 </div>
                                 <div class="series-genres">
                                     ${(seriesData.genres || []).map(g => `<span class="genre-tag">${g}</span>`).join('')}
+                                </div>
+                                <div class="sp-actions">
+                                    <a class="sp-action-btn ${seriesData.trailer ? '' : 'is-disabled'}" ${seriesData.trailer ? `href="${seriesData.trailer}" target="_blank" rel="noopener"` : 'href="javascript:void(0)"'}>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                                            <path d="M10 9l5 3-5 3z" fill="currentColor" stroke="none"></path>
+                                        </svg>
+                                        <span>Trailer</span>
+                                    </a>
+                                    <button class="sp-action-btn" onclick="addToWatchlistSeries()">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                        </svg>
+                                        <span>My List</span>
+                                    </button>
+                                    <button class="sp-action-btn" onclick="handleSeriesDownload()">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="7 10 12 15 17 10"></polyline>
+                                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                                        </svg>
+                                        <span>Download</span>
+                                    </button>
+                                    <button class="sp-action-btn" onclick="openSeriesRequestModal()">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                        </svg>
+                                        <span>Request</span>
+                                    </button>
                                 </div>
                                 <p class="series-overview">${seriesData.description || 'No description available.'}</p>
                             </div>
@@ -896,7 +1416,7 @@
                 <div class="series-container">
                     <!-- Player Section -->
                     <section class="player-section">
-                        <div class="video-container" id="video-container">
+                        <div class="video-container" id="video-container" onmousemove="markSeriesControlsActive()" onclick="markSeriesControlsActive()" ontouchstart="markSeriesControlsActive()">
                             ${(() => {
                                 const isFreeEpisode = currentEpisode && Number(currentEpisode.season) === 1 && Number(currentEpisode.episode) === 1;
                                 if (window._seriesAccess && window._seriesAccess.freeUser && !isFreeEpisode) {
@@ -925,20 +1445,40 @@
                                         <div class="spinner"></div>
                                         <p>Loading video...</p>
                                     </div>
-                                    <button class="embed-fullscreen-btn" type="button" aria-label="Fullscreen" onclick="requestVideoContainerFullscreen(event)">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M8 3H5a2 2 0 0 0-2 2v3" />
-                                            <path d="M16 3h3a2 2 0 0 1 2 2v3" />
-                                            <path d="M8 21H5a2 2 0 0 1-2-2v-3" />
-                                            <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
-                                        </svg>
-                                    </button>
-                                    <video id="series-video" controls controlslist="nodownload noplaybackrate" disablepictureinpicture
+                                    <video id="series-video" controlslist="nodownload noplaybackrate" disablepictureinpicture
                                            autoplay preload="auto" playsinline
                                            style="position:absolute;top:0;left:0;width:100%;height:100%;background:#000;"
                                            oncontextmenu="return false"
+                                           onclick="toggleSeriesPlay()"
+                                           onplay="updateSeriesPlayState(true)"
+                                           onpause="updateSeriesPlayState(false)"
+                                           onended="updateSeriesPlayState(false)"
+                                           ontimeupdate="updateSeriesProgress()"
+                                           onprogress="updateSeriesBuffered()"
+                                           onloadedmetadata="updateSeriesProgress()"
+                                           onwebkitbeginfullscreen="updateFullscreenIcon(true)"
+                                           onwebkitendfullscreen="updateFullscreenIcon(false)"
                                            oncanplay="hideVideoLoading(); if(!this._adPlayed){this._adPlayed=true;playPreRollAd();setupMidRolls();}">
                                     </video>
+
+                                    <button class="cc-center-play" id="ccCenterPlay" type="button" aria-label="Play" onclick="toggleSeriesPlay()">${CC_CENTER_PLAY_ICON}</button>
+
+                                    <div class="cc-bar" id="ccBar">
+                                        <div class="cc-progress" id="ccProgress" onclick="seekFromProgressClick(event)" onmousedown="startProgressDrag(event)" ontouchstart="startProgressDrag(event)">
+                                            <div class="cc-progress-buffered" id="ccBuffered"></div>
+                                            <div class="cc-progress-played" id="ccPlayed"></div>
+                                            <div class="cc-progress-handle" id="ccHandle"></div>
+                                        </div>
+                                        <div class="cc-row">
+                                            <button class="cc-btn" id="ccPlayBtn" type="button" aria-label="Play/Pause" onclick="toggleSeriesPlay()">${CC_PLAY_ICON}</button>
+                                            <button class="cc-btn" type="button" aria-label="Rewind 10 seconds" onclick="seekSeriesVideo(-10)">${CC_SEEK_ICON}</button>
+                                            <button class="cc-btn forward" type="button" aria-label="Forward 10 seconds" onclick="seekSeriesVideo(10)">${CC_SEEK_ICON}</button>
+                                            <button class="cc-btn" id="ccMuteBtn" type="button" aria-label="Mute" onclick="toggleSeriesMute()">${CC_VOLUME_ICON}</button>
+                                            <span class="cc-time" id="ccTime">0:00 / 0:00</span>
+                                            <div class="cc-spacer"></div>
+                                            <button class="cc-btn" id="embedFullscreenBtn" type="button" aria-label="Fullscreen" onclick="toggleVideoContainerFullscreen(event)">${FULLSCREEN_ENTER_ICON}</button>
+                                        </div>
+                                    </div>
                                 `;
                             })()}
                         </div>
@@ -974,24 +1514,23 @@
                             <div class="episodes-grid">
                                 ${(seasonData?.episodes || []).map(episode => `
                                     <div class="episode-card ${!episode.video?.hasVideo ? 'unavailable' : ''} ${currentEpisode?.episode === episode.episodeNumber && currentEpisode?.season === currentSeason ? 'active' : ''}"
+                                         title="${episode.video?.hasVideo ? (episode.overview || episode.name || '') : 'Coming soon'}"
                                          onclick="${episode.video?.hasVideo ? `playEpisode(${currentSeason}, ${episode.episodeNumber})` : ''}">
-                                        <img src="${episode.stillPath || '/assets/images/placeholder.svg'}" 
-                                             alt="${episode.name}" class="episode-thumbnail"
-                                             onerror="this.src='/assets/images/placeholder.svg'">
+                                        <div class="episode-thumb-wrap">
+                                            <img src="${episode.stillPath || '/assets/images/placeholder.svg'}"
+                                                 alt="${episode.name}" class="episode-thumbnail"
+                                                 onerror="this.src='/assets/images/placeholder.svg'">
+                                            <span class="episode-num-badge">${episode.episodeNumber}</span>
+                                            ${!episode.video?.hasVideo ? '<span class="episode-lock-badge">🔒</span>' : ''}
+                                        </div>
                                         <div class="episode-info">
-                                            <div class="episode-number">Episode ${episode.episodeNumber}</div>
-                                            <div class="episode-title">${episode.name || 'Episode ' + episode.episodeNumber}</div>
+                                            <div class="episode-title">${episode.episodeNumber}. ${episode.name || 'Episode ' + episode.episodeNumber}</div>
+                                            ${episode.runtime || episode.airDate ? `
                                             <div class="episode-meta">
                                                 ${episode.runtime ? `<span>⏱️ ${episode.runtime} min</span>` : ''}
                                                 ${episode.airDate ? `<span>📅 ${new Date(episode.airDate).toLocaleDateString()}</span>` : ''}
-                                            </div>
-                                            <p class="episode-overview">${episode.overview || 'No description available.'}</p>
-                                            <div class="episode-status ${episode.isTranslated ? 'translated' : 'not-translated'}">
-                                                ${episode.video?.hasVideo
-                                                    ? `<span>▶️ Available ${episode.vjName ? '(VJ ' + episode.vjName + ')' : ''}</span>`
-                                                    : '<span>🔒 Coming Soon</span>'
-                                                }
-                                            </div>
+                                            </div>` : ''}
+                                            <p class="episode-overview">${episode.video?.hasVideo ? (episode.overview || 'No description available.') : 'Coming soon'}</p>
                                         </div>
                                     </div>
                                 `).join('')}
@@ -1159,11 +1698,95 @@
             }
         }
 
+        function addToWatchlistSeries() {
+            const token = getAuthToken();
+            if (!token) {
+                alert('Please login to add to your watchlist');
+                redirectToLogin();
+                return;
+            }
+
+            // TODO: Implement watchlist API call
+            alert('Added to watchlist!');
+        }
+
+        function openSeriesRequestModal() {
+            const overlay = document.getElementById('spRequestOverlay');
+            if (!overlay) return;
+            try {
+                const user = JSON.parse(localStorage.getItem('user') || 'null');
+                if (user) {
+                    document.getElementById('spReqName').value = user.name || '';
+                    document.getElementById('spReqEmail').value = user.email || '';
+                }
+            } catch (e) { /* ignore malformed stored user */ }
+            document.getElementById('spReqMessage').value = seriesData ? `Regarding "${seriesData.originalTitle || seriesData.lugandaTitle}": ` : '';
+            document.getElementById('spRequestStatus').textContent = '';
+            overlay.style.display = 'flex';
+        }
+
+        function closeSeriesRequestModal() {
+            const overlay = document.getElementById('spRequestOverlay');
+            if (overlay) overlay.style.display = 'none';
+        }
+
+        async function submitSeriesRequest(evt) {
+            evt.preventDefault();
+            const statusEl = document.getElementById('spRequestStatus');
+            const submitBtn = evt.target.querySelector('.sp-modal-submit');
+            const payload = {
+                name: document.getElementById('spReqName').value.trim(),
+                email: document.getElementById('spReqEmail').value.trim(),
+                subject: 'movie_request',
+                message: document.getElementById('spReqMessage').value.trim(),
+                movieDetails: seriesData ? { title: seriesData.originalTitle || seriesData.lugandaTitle, year: seriesData.year } : undefined
+            };
+
+            submitBtn.disabled = true;
+            statusEl.style.color = 'var(--text-secondary)';
+            statusEl.textContent = 'Sending...';
+
+            try {
+                const authToken = normalizeBearerToken(getAuthToken());
+                const res = await fetch(`${API_BASE_URL}/api/requests`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {})
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    statusEl.style.color = 'var(--primary-color)';
+                    statusEl.textContent = data.message || 'Request sent!';
+                    setTimeout(closeSeriesRequestModal, 1500);
+                } else {
+                    throw new Error(data.message || 'Failed to send request');
+                }
+            } catch (err) {
+                statusEl.style.color = '#ff6b6b';
+                statusEl.textContent = err.message || 'Failed to send request. Try again.';
+            } finally {
+                submitBtn.disabled = false;
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeSeriesRequestModal();
+        });
+
         async function _seriesSelectPlan(plan) {
             const token = localStorage.getItem('token') || localStorage.getItem('authToken') || '';
             if (!token) { window.location.href = 'login.html'; return; }
             const btn = document.querySelector(`[data-series-plan="${plan}"]`);
-            if (btn) { btn.disabled = true; btn.textContent = 'Redirecting...'; }
+            const origText = btn ? btn.textContent : '';
+            if (btn) { btn.disabled = true; btn.textContent = 'Processing...'; }
+
+            // Open synchronously, inside the click gesture, so it isn't popup-blocked.
+            const popup = window.PesapalCheckout?.openBlankPopup();
+
             try {
                 const r = await fetch(`${API_BASE_URL}/api/payments/subscribe`, {
                     method: 'POST',
@@ -1172,14 +1795,37 @@
                 });
                 const d = await r.json();
                 if (d.status === 'success' && d.data && d.data.redirectUrl) {
-                    window.location.href = d.data.redirectUrl;
+                    document.getElementById('downloadPrompt')?.remove();
+
+                    if (window.PesapalCheckout && popup) {
+                        window.PesapalCheckout.runCheckout(popup, d.data.redirectUrl, {
+                            ref: d.data.merchantReference,
+                            token,
+                            apiBase: API_BASE_URL,
+                            onSuccess: () => {
+                                window.dispatchEvent(new CustomEvent('pesapal-payment-success', { detail: { plan } }));
+                                window.location.reload();
+                            },
+                            onFailure: (status) => {
+                                if (status === 'cancelled') return;
+                                alert(status === 'timeout'
+                                    ? 'Still waiting on confirmation — check back in a moment.'
+                                    : 'Payment failed. Please try again.');
+                            }
+                        });
+                    } else {
+                        // Popup blocked or helper unavailable — fall back to same-tab redirect.
+                        window.location.href = d.data.redirectUrl;
+                    }
                 } else {
+                    if (popup && !popup.closed) popup.close();
                     alert(d.message || d.error || 'Payment error. Please try again.');
-                    if (btn) { btn.disabled = false; btn.textContent = plan.charAt(0).toUpperCase() + plan.slice(1); }
+                    if (btn) { btn.disabled = false; btn.textContent = origText; }
                 }
             } catch (e) {
+                if (popup && !popup.closed) popup.close();
                 alert('Network error. Please try again.');
-                if (btn) { btn.disabled = false; }
+                if (btn) { btn.disabled = false; btn.textContent = origText; }
             }
         }
 
@@ -1197,8 +1843,22 @@
                     <div style="width:60px;height:60px;border-radius:50%;background:rgba(74,222,128,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     </div>
-                    <h3 style="color:#fff;font-size:18px;margin-bottom:8px;">Choose a Plan</h3>
-                    <p style="color:#888;font-size:13px;line-height:1.6;margin-bottom:20px;">Unlock full access — watch &amp; download without limits.</p>
+                    <h3 style="color:#fff;font-size:18px;margin-bottom:8px;">Unlock Full Access</h3>
+                    <p style="color:#888;font-size:13px;line-height:1.6;margin-bottom:16px;">Watch every episode, ad-light, with download included — on any plan below.</p>
+                    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;text-align:left;">
+                        <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(255,255,255,0.75);">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Every season, every VJ translation
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(255,255,255,0.75);">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Download for offline viewing
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(255,255,255,0.75);">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Cancel anytime, no contract
+                        </div>
+                    </div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
                         <button data-series-plan="daily" onclick="_seriesSelectPlan('daily')" style="padding:16px 12px;background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.25);border-radius:12px;cursor:pointer;">
                             <div style="font-size:20px;font-weight:800;color:#ffc800;">1,000</div>
@@ -1259,18 +1919,20 @@
             const url = resolveData.directUrl;
             const title = `${seriesData.originalTitle || 'Series'} S${currentEpisode.season}E${currentEpisode.episode}`;
 
+            const fileName = `${title.replace(/[^a-zA-Z0-9 _-]/g, '').trim()}.mp4`;
+            // Always route through the backend proxy — never hand out the raw
+            // CDN URL. On desktop this also gets Content-Disposition: attachment
+            // so Chrome saves instead of just playing the video; on iOS Safari
+            // (which won't auto-download either way) it at least keeps the
+            // video appearing to come from Unruly Movies instead of the
+            // underlying host.
+            const proxyDownload = `${API_BASE_URL}/api/video/stream-proxy?url=${encodeURIComponent(url)}&download=${encodeURIComponent(fileName)}`;
+
             if (isIOS()) {
-                showIOSDownloadInstructions(url);
+                showIOSDownloadInstructions(proxyDownload);
                 return;
             }
 
-            const fileName = `${title.replace(/[^a-zA-Z0-9 _-]/g, '').trim()}.mp4`;
-            // Route through the backend proxy so the response carries
-            // Content-Disposition: attachment — a direct cross-origin CDN
-            // link makes Chrome just play the video instead of saving it,
-            // since the `download` attribute is ignored cross-origin
-            // without that header.
-            const proxyDownload = `${API_BASE_URL}/api/video/stream-proxy?url=${encodeURIComponent(url)}&download=${encodeURIComponent(fileName)}`;
             const link = document.createElement('a');
             link.href = proxyDownload;
             link.download = fileName;

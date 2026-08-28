@@ -1,13 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const EmailSubscription = require('../models/EmailSubscription');
+const User = require('../models/User');
 const nodemailer = require('nodemailer');
+const jwt = require('jsonwebtoken');
 const { protect, admin } = require('../middleware/auth');
+const { logger } = require('../middleware/logger');
 
 // Email transporter configuration
 const createTransporter = () => {
     // Use environment variables for email config
-    // Supports Gmail, SendGrid, Mailgun, etc.
+    // Supports Gmail, SendGrid, Mailgun, or generic SMTP.
     if (process.env.EMAIL_SERVICE === 'sendgrid') {
         return nodemailer.createTransport({
             host: 'smtp.sendgrid.net',
@@ -26,17 +29,42 @@ const createTransporter = () => {
                 pass: process.env.MAILGUN_PASS
             }
         });
-    } else {
-        // Default: Gmail (for testing)
+    } else if (process.env.EMAIL_SERVICE === 'gmail') {
         return nodemailer.createTransport({
             service: 'gmail',
             auth: {
                 user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
+                pass: process.env.EMAIL_PASSWORD || process.env.EMAIL_PASS
+            }
+        });
+    } else {
+        // Generic SMTP by default — the exact same EMAIL_HOST/EMAIL_PORT/
+        // EMAIL_USER/EMAIL_PASSWORD vars server/utils/email.js already
+        // reads, so one set of provider credentials makes every email path
+        // in this app work, not just this file's. (EMAIL_PASS still
+        // accepted as a fallback for anything already relying on it.)
+        return nodemailer.createTransport({
+            host: process.env.EMAIL_HOST,
+            port: process.env.EMAIL_PORT || 587,
+            secure: process.env.EMAIL_PORT === '465',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASSWORD || process.env.EMAIL_PASS
             }
         });
     }
 };
+
+// True only when there's actually enough config to build a working
+// transporter — mirrors server/utils/email.js's isEmailConfigured() so both
+// systems agree on whether sending is possible right now.
+function isEmailConfigured() {
+    if (process.env.EMAIL_SERVICE === 'sendgrid') return !!process.env.SENDGRID_API_KEY;
+    if (process.env.EMAIL_SERVICE === 'mailgun') return !!(process.env.MAILGUN_USER && process.env.MAILGUN_PASS);
+    const pass = process.env.EMAIL_PASSWORD || process.env.EMAIL_PASS;
+    if (process.env.EMAIL_SERVICE === 'gmail') return !!(process.env.EMAIL_USER && pass);
+    return !!(process.env.EMAIL_HOST && process.env.EMAIL_USER && pass);
+}
 
 // Subscribe to email notifications
 router.post('/subscribe', async (req, res) => {
@@ -377,24 +405,274 @@ router.post('/notify/weekly-digest', protect, admin, async (req, res) => {
     }
 });
 
+// Escape user-authored text before it goes into HTML — this content is
+// written by an admin, but it still ends up in an email sent to real
+// people, so it gets the same treatment as any other untrusted input.
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// Admin: send a free-form email — subject + plain-text message — to real
+// registered accounts (not the separate, largely-unused EmailSubscription
+// newsletter list). Every send respects preferences.notifications.email;
+// every email carries a real one-click unsubscribe link that flips that
+// flag without requiring login (see /unsubscribe-user/:token below).
+const KNOWN_PLANS = ['free', 'daily', 'weekly', 'biweekly', 'monthly'];
+
+// Resolves an audience selection to the actual list of recipients. Every
+// audience still respects preferences.notifications.email — this tool is
+// for announcements, not a way to force a message past someone who opted
+// out, even when targeting them individually by email.
+async function resolveRecipients(audience, targetEmail, recentLimit) {
+    const filter = { 'preferences.notifications.email': { $ne: false } };
+    const projection = '_id email fullName';
+
+    if (audience === 'specific') {
+        const email = String(targetEmail || '').toLowerCase().trim();
+        if (!email) {
+            const err = new Error('targetEmail is required when audience is "specific"');
+            err.httpStatus = 400;
+            throw err;
+        }
+        filter.email = email;
+        return User.find(filter, projection);
+    }
+
+    if (audience === 'recent_free') {
+        let limit = parseInt(recentLimit, 10);
+        if (!Number.isFinite(limit) || limit <= 0) limit = 200;
+        limit = Math.min(limit, 5000); // guard against an accidental huge/unbounded send
+        filter['subscription.plan'] = 'free';
+        return User.find(filter, projection).sort({ createdAt: -1 }).limit(limit);
+    }
+
+    if (audience === 'paid') {
+        filter['subscription.plan'] = { $ne: 'free' };
+    } else if (audience && audience !== 'all') {
+        if (!KNOWN_PLANS.includes(audience)) {
+            const err = new Error(`Unknown audience "${audience}"`);
+            err.httpStatus = 400;
+            throw err;
+        }
+        filter['subscription.plan'] = audience;
+    }
+    // audience === 'all' (or omitted) — no extra filter beyond the opt-out check.
+
+    return User.find(filter, projection);
+}
+
+router.post('/notify/custom', protect, admin, async (req, res) => {
+    try {
+        const { subject, message, testOnly, audience, targetEmail, recentLimit } = req.body;
+
+        if (!subject || !message) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'subject and message are required'
+            });
+        }
+
+        if (!isEmailConfigured()) {
+            return res.status(503).json({
+                status: 'error',
+                message: 'No email provider is configured yet (EMAIL_HOST/EMAIL_USER/EMAIL_PASSWORD, or EMAIL_SERVICE=sendgrid/mailgun/gmail with the matching credentials). Nothing can be sent until that\'s set up.'
+            });
+        }
+
+        const transporter = createTransporter();
+        const siteUrl = process.env.SITE_URL || 'https://unrulymovies.com';
+        const apiUrl = process.env.API_URL || 'https://luganda-translated-movies-production.up.railway.app';
+
+        // Test send — just the admin's own inbox, awaited, so they can see
+        // exactly what real recipients would get before committing to a
+        // full broadcast.
+        if (testOnly) {
+            const unsubscribeUrl = buildUnsubscribeUrl(apiUrl, req.user._id);
+            await transporter.sendMail({
+                from: `"Unruly Movies" <${process.env.EMAIL_USER || 'noreply@unrulymovies.com'}>`,
+                to: req.user.email,
+                subject: `[TEST] ${subject}`,
+                html: generateCustomEmail({ subject, message, siteUrl, unsubscribeUrl })
+            });
+            return res.json({
+                status: 'success',
+                message: `Test email sent to ${req.user.email}`
+            });
+        }
+
+        const recipients = await resolveRecipients(audience, targetEmail, recentLimit);
+
+        if (recipients.length === 0) {
+            return res.json({
+                status: 'success',
+                message: audience === 'specific'
+                    ? 'No matching recipient (no account with that email, or they\'ve opted out of email notifications)'
+                    : 'No recipients match that audience',
+                data: { recipientCount: 0 }
+            });
+        }
+
+        // Respond immediately — sending to hundreds of recipients one at a
+        // time (matching this file's existing pattern) can take minutes,
+        // long past any reasonable HTTP timeout. The actual send continues
+        // in the background after the response goes out.
+        res.json({
+            status: 'success',
+            message: `Broadcast started — sending to ${recipients.length} users`,
+            data: { recipientCount: recipients.length }
+        });
+
+        (async () => {
+            let sent = 0;
+            let failed = 0;
+            for (const recipient of recipients) {
+                try {
+                    const unsubscribeUrl = buildUnsubscribeUrl(apiUrl, recipient._id);
+                    await transporter.sendMail({
+                        from: `"Unruly Movies" <${process.env.EMAIL_USER || 'noreply@unrulymovies.com'}>`,
+                        to: recipient.email,
+                        subject,
+                        html: generateCustomEmail({ subject, message, siteUrl, unsubscribeUrl, fullName: recipient.fullName })
+                    });
+                    sent++;
+                } catch (emailError) {
+                    failed++;
+                    logger.error('Custom broadcast: failed to send to one recipient', { email: recipient.email, error: emailError.message });
+                }
+                // A small pace between sends — avoids tripping provider
+                // rate limits on a few-hundred-recipient blast.
+                await new Promise(r => setTimeout(r, 200));
+            }
+            logger.info('Custom broadcast complete', { subject, sent, failed, total: recipients.length });
+        })().catch(err => logger.error('Custom broadcast crashed', { error: err.message }));
+
+    } catch (error) {
+        logger.error('Custom broadcast error', { error: error.message });
+        res.status(error.httpStatus || 500).json({
+            status: 'error',
+            message: error.httpStatus ? error.message : 'Failed to start broadcast'
+        });
+    }
+});
+
+function buildUnsubscribeUrl(apiUrl, userId) {
+    const token = jwt.sign({ uid: String(userId), purpose: 'email-unsubscribe' }, process.env.JWT_SECRET, { expiresIn: '90d' });
+    return `${apiUrl}/api/email/unsubscribe-user/${token}`;
+}
+
+// One-click unsubscribe for real accounts — no login required (the JWT
+// itself is the credential, scoped to exactly this purpose, expiring in
+// 90 days so an old email doesn't carry a permanently-valid link).
+router.get('/unsubscribe-user/:token', async (req, res) => {
+    try {
+        const payload = jwt.verify(req.params.token, process.env.JWT_SECRET);
+        if (payload.purpose !== 'email-unsubscribe') throw new Error('wrong token purpose');
+
+        await User.updateOne(
+            { _id: payload.uid },
+            { $set: { 'preferences.notifications.email': false } }
+        );
+
+        res.send(`
+            <!DOCTYPE html>
+            <html>
+            <head><title>Unsubscribed</title></head>
+            <body style="font-family: Arial; text-align: center; padding: 50px; background: #0d0d14; color: #fff;">
+                <h1>You've been unsubscribed</h1>
+                <p>You won't receive email announcements from Unruly Movies anymore.</p>
+                <p style="color: #888;">You can turn this back on anytime from your profile settings.</p>
+                <a href="/" style="color: #66BB6A;">Go to Homepage</a>
+            </body>
+            </html>
+        `);
+    } catch (error) {
+        res.status(400).send(`
+            <!DOCTYPE html>
+            <html>
+            <head><title>Invalid Link</title></head>
+            <body style="font-family: Arial; text-align: center; padding: 50px; background: #0d0d14; color: #fff;">
+                <h1>Invalid or expired link</h1>
+                <a href="/" style="color: #66BB6A;">Go to Homepage</a>
+            </body>
+            </html>
+        `);
+    }
+});
+
+// Helper: Generate a branded email around an admin-authored subject/message
+function generateCustomEmail({ subject, message, siteUrl, unsubscribeUrl, fullName }) {
+    const paragraphs = String(message)
+        .split(/\n{2,}/)
+        .map(p => `<p style="color: #ddd; line-height: 1.7; margin: 0 0 16px;">${escapeHtml(p).replace(/\n/g, '<br>')}</p>`)
+        .join('');
+
+    return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #0d0d14; font-family: Arial, sans-serif;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #66BB6A; margin: 0;">🎬 Unruly Movies</h1>
+                </div>
+                <div style="background: #1a1a2e; border-radius: 16px; padding: 30px;">
+                    ${fullName ? `<p style="color: #888; margin: 0 0 20px;">Hi ${escapeHtml(fullName)},</p>` : ''}
+                    <h2 style="color: #fff; margin: 0 0 20px;">${escapeHtml(subject)}</h2>
+                    ${paragraphs}
+                    <div style="text-align: center; margin-top: 30px;">
+                        <a href="${siteUrl}" style="display: inline-block; padding: 14px 30px; background: linear-gradient(135deg, #66BB6A, #4CAF50); color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold;">Visit Unruly Movies</a>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 30px;">
+                    <p style="color: #666; font-size: 12px;">
+                        <a href="${unsubscribeUrl}" style="color: #666;">Unsubscribe</a> from email announcements
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
+}
+
 // Admin: Get subscriber stats
 router.get('/stats', protect, admin, async (req, res) => {
     try {
         const total = await EmailSubscription.countDocuments();
         const active = await EmailSubscription.countDocuments({ isActive: true, verified: true });
         const unverified = await EmailSubscription.countDocuments({ verified: false });
-        
+        const registeredUserRecipients = await User.countDocuments({ 'preferences.notifications.email': { $ne: false } });
+
+        // Recipient count per audience option the broadcast tool offers —
+        // lets the UI show a real number for whichever one is selected
+        // without a round-trip per change.
+        const optedIn = { 'preferences.notifications.email': { $ne: false } };
+        const recipientsByAudience = { all: registeredUserRecipients };
+        recipientsByAudience.paid = await User.countDocuments({ ...optedIn, 'subscription.plan': { $ne: 'free' } });
+        for (const plan of KNOWN_PLANS) {
+            recipientsByAudience[plan] = await User.countDocuments({ ...optedIn, 'subscription.plan': plan });
+        }
+
         const bySource = await EmailSubscription.aggregate([
             { $match: { isActive: true } },
             { $group: { _id: '$source', count: { $sum: 1 } } }
         ]);
-        
+
         res.json({
             status: 'success',
             data: {
                 total,
                 active,
                 unverified,
+                registeredUserRecipients,
+                recipientsByAudience,
                 bySource: bySource.reduce((acc, item) => {
                     acc[item._id] = item.count;
                     return acc;

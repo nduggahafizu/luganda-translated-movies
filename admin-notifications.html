@@ -595,6 +595,68 @@
                         Send Weekly Digest
                     </button>
                 </div>
+
+                <!-- Custom Broadcast -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">✉️ Send Custom Email</h2>
+                    </div>
+
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                        Write anything and send it to whichever audience you pick below. Every email includes a real one-click unsubscribe link, and everyone who's opted out of email notifications is skipped automatically.
+                    </p>
+
+                    <form id="customEmailForm" onsubmit="return false;">
+                        <div class="form-group">
+                            <label for="broadcastAudience">Send to</label>
+                            <select id="broadcastAudience" onchange="onAudienceChange()">
+                                <option value="all">All users</option>
+                                <option value="paid">Paid users (any plan)</option>
+                                <option value="free">Free plan users</option>
+                                <option value="recent_free">Most recently registered free users</option>
+                                <option value="daily">Daily plan users</option>
+                                <option value="weekly">Weekly plan users</option>
+                                <option value="biweekly">2-Weeks plan users</option>
+                                <option value="monthly">Monthly plan users</option>
+                                <option value="specific">Specific user (by email)</option>
+                            </select>
+                            <p style="color: var(--text-secondary); font-size: 13px; margin: 8px 0 0;" id="broadcastAudienceCount">Recipients: -</p>
+                        </div>
+
+                        <div class="form-group" id="broadcastTargetEmailGroup" style="display:none;">
+                            <label for="broadcastTargetEmail">User's email</label>
+                            <input type="email" id="broadcastTargetEmail" placeholder="user@example.com">
+                        </div>
+
+                        <div class="form-group" id="broadcastRecentLimitGroup" style="display:none;">
+                            <label for="broadcastRecentLimit">How many (most recent first)</label>
+                            <input type="number" id="broadcastRecentLimit" value="200" min="1" max="5000" oninput="onAudienceChange()">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="broadcastSubject">Subject</label>
+                            <input type="text" id="broadcastSubject" placeholder="What's this email about?" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="broadcastMessage">Message</label>
+                            <textarea id="broadcastMessage" placeholder="Write your message here. Leave a blank line between paragraphs." rows="6" required></textarea>
+                        </div>
+
+                        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                            <button type="button" class="btn-admin secondary" id="sendTestEmailBtn" onclick="sendTestEmail()">
+                                Send Test to Myself
+                            </button>
+                            <button type="button" class="btn-admin" id="sendBroadcastBtn" onclick="sendBroadcastEmail()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                    <polyline points="22,6 12,13 2,6"></polyline>
+                                </svg>
+                                Send to All Users
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </main>
     </div>
@@ -846,9 +908,38 @@
                     document.getElementById('emailTotal').textContent = data.data.total || 0;
                     document.getElementById('emailActive').textContent = data.data.active || 0;
                     document.getElementById('emailUnverified').textContent = data.data.unverified || 0;
+                    window.recipientsByAudience = data.data.recipientsByAudience || {};
+                    onAudienceChange();
                 }
             } catch (error) {
                 console.error('Error loading email stats:', error);
+            }
+        }
+
+        const AUDIENCE_LABELS = {
+            all: 'all users', paid: 'paid users (any plan)', free: 'free plan users',
+            recent_free: 'the most recently registered free users',
+            daily: 'daily plan users', weekly: 'weekly plan users',
+            biweekly: '2-weeks plan users', monthly: 'monthly plan users',
+            specific: 'that one user'
+        };
+
+        function onAudienceChange() {
+            const audience = document.getElementById('broadcastAudience').value;
+            document.getElementById('broadcastTargetEmailGroup').style.display = audience === 'specific' ? 'block' : 'none';
+            document.getElementById('broadcastRecentLimitGroup').style.display = audience === 'recent_free' ? 'block' : 'none';
+
+            const countEl = document.getElementById('broadcastAudienceCount');
+            if (audience === 'specific') {
+                countEl.textContent = 'Sends to exactly the account with that email (if they have email notifications on).';
+            } else if (audience === 'recent_free') {
+                const requested = parseInt(document.getElementById('broadcastRecentLimit').value, 10) || 200;
+                const freeTotal = window.recipientsByAudience?.free;
+                const actual = freeTotal != null ? Math.min(requested, freeTotal) : requested;
+                countEl.textContent = `Recipients: ${actual} (newest signups first${freeTotal != null ? `, out of ${freeTotal} free users total` : ''})`;
+            } else {
+                const count = window.recipientsByAudience?.[audience];
+                countEl.textContent = `Recipients: ${count ?? '-'}`;
             }
         }
         
@@ -990,6 +1081,114 @@
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Send Weekly Digest`;
+            }
+        }
+
+        // Custom broadcast — subject/message validation shared by both the
+        // test-send and the real broadcast.
+        function readBroadcastForm() {
+            const subject = document.getElementById('broadcastSubject').value.trim();
+            const message = document.getElementById('broadcastMessage').value.trim();
+            if (!subject || !message) {
+                showToast('Subject and message are both required', 'error');
+                return null;
+            }
+            const audience = document.getElementById('broadcastAudience').value;
+            const fields = { subject, message, audience };
+            if (audience === 'specific') {
+                const targetEmail = document.getElementById('broadcastTargetEmail').value.trim();
+                if (!targetEmail) {
+                    showToast('Enter the user\'s email address', 'error');
+                    return null;
+                }
+                fields.targetEmail = targetEmail;
+            } else if (audience === 'recent_free') {
+                const recentLimit = parseInt(document.getElementById('broadcastRecentLimit').value, 10);
+                if (!recentLimit || recentLimit <= 0) {
+                    showToast('Enter how many recent users to include', 'error');
+                    return null;
+                }
+                fields.recentLimit = recentLimit;
+            }
+            return fields;
+        }
+
+        async function sendTestEmail() {
+            const fields = readBroadcastForm();
+            if (!fields) return;
+
+            const btn = document.getElementById('sendTestEmailBtn');
+            btn.disabled = true;
+            const originalText = btn.textContent;
+            btn.textContent = 'Sending test...';
+
+            try {
+                const response = await fetch(`${API_URL}/email/notify/custom`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({ ...fields, testOnly: true })
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    showToast(data.message, 'success');
+                } else {
+                    showToast(data.message || 'Failed to send test email', 'error');
+                }
+            } catch (error) {
+                console.error('Error sending test email:', error);
+                showToast('Failed to send test email', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        }
+
+        async function sendBroadcastEmail() {
+            const fields = readBroadcastForm();
+            if (!fields) return;
+
+            const audienceLabel = AUDIENCE_LABELS[fields.audience] || fields.audience;
+            let count = null;
+            if (fields.audience === 'recent_free') {
+                const freeTotal = window.recipientsByAudience?.free;
+                count = freeTotal != null ? Math.min(fields.recentLimit, freeTotal) : fields.recentLimit;
+            } else if (fields.audience !== 'specific') {
+                count = window.recipientsByAudience?.[fields.audience];
+            }
+            const confirmed = confirm(
+                `This sends "${fields.subject}" to ${fields.audience === 'specific' ? fields.targetEmail : audienceLabel}` +
+                (count != null ? ` (${count} people)` : '') +
+                `.\n\nThis can't be undone once sending starts. Have you sent yourself a test first? Continue?`
+            );
+            if (!confirmed) return;
+
+            const btn = document.getElementById('sendBroadcastBtn');
+            btn.disabled = true;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '⏳ Starting...';
+
+            try {
+                const response = await fetch(`${API_URL}/email/notify/custom`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(fields)
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    showToast(data.message, 'success');
+                    if (data.data?.recipientCount) {
+                        document.getElementById('customEmailForm').reset();
+                        onAudienceChange();
+                    }
+                } else {
+                    showToast(data.message || 'Failed to start broadcast', 'error');
+                }
+            } catch (error) {
+                console.error('Error sending broadcast:', error);
+                showToast('Failed to start broadcast', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
             }
         }
     </script>

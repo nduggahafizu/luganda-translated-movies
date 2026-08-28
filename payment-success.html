@@ -109,7 +109,14 @@
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const ref = urlParams.get('ref');
-        const inIframe = window !== window.top;
+        const isPopup = !!window.opener;
+
+        function notifyOpener(status, extra) {
+            if (!isPopup) return;
+            try {
+                window.opener.postMessage(Object.assign({ type: 'pesapal-payment-complete', status, ref }, extra || {}), window.location.origin);
+            } catch (e) {}
+        }
 
         document.getElementById('psRef').textContent = ref || '—';
         document.getElementById('psDate').textContent = new Date().toLocaleDateString('en-UG', {
@@ -159,8 +166,10 @@
                 const data = await res.json();
 
                 if (data.status === 'success') {
-                    if (inIframe) {
-                        showState('success', 'Payment Confirmed!', 'Closing payment window…', null);
+                    notifyOpener('success', { plan: data.plan });
+                    if (isPopup) {
+                        showState('success', 'Payment Confirmed!', 'You can close this window.', null);
+                        setTimeout(() => { try { window.close(); } catch (_) {} }, 1200);
                     } else {
                         showState('success', 'Payment Successful!',
                             `Your <strong style="color:#fff">${data.plan || ''}</strong> plan is now active. Enjoy Unruly Movies!`,
@@ -180,12 +189,18 @@
                     setTimeout(verifyPayment, 5000);
 
                 } else {
-                    showState('failed', 'Payment Failed',
-                        (data.message || 'Your payment could not be completed.') +
-                        '<br><br>No money has been taken from your account. Please try again.',
-                        `<a href="subscription.html" class="ps-btn primary">Try Again</a>
-                         <br><a href="index.html" class="ps-btn secondary">Back to Home</a>`
-                    );
+                    notifyOpener('failed', { message: data.message });
+                    if (isPopup) {
+                        showState('failed', 'Payment Failed', 'You can close this window and try again.', null);
+                        setTimeout(() => { try { window.close(); } catch (_) {} }, 1800);
+                    } else {
+                        showState('failed', 'Payment Failed',
+                            (data.message || 'Your payment could not be completed.') +
+                            '<br><br>No money has been taken from your account. Please try again.',
+                            `<a href="subscription.html" class="ps-btn primary">Try Again</a>
+                             <br><a href="index.html" class="ps-btn secondary">Back to Home</a>`
+                        );
+                    }
                 }
 
             } catch (e) {

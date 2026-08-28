@@ -1,13 +1,6 @@
 <!DOCTYPE html>  
 <html lang="en">
 <head>
-    <!-- AdCash (gated for paid subscribers) -->
-    <script src="js/ad-gate.js"></script>
-    <!-- Ezoic Privacy & Ad Scripts -->
-    <script data-cfasync="false" src="https://cmp.gatekeeperconsent.com/min.js"></script>
-    <script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js"></script>
-    <script async src="//www.ezojs.com/ezoic/sa.min.js"></script>
-    <script>window.ezstandalone=window.ezstandalone||{};ezstandalone.cmd=ezstandalone.cmd||[];</script>
     <title>Unruly Movies - Luganda Translated Movies by Uganda's Licensed VJs | By Nduga Hafizu</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -19,9 +12,7 @@
     <meta http-equiv="cleartype" content="on">
     <meta name="author" content="Nduga Hafizu">
     <meta name="keywords" content="Luganda movies, VJ translations, Uganda entertainment, Nduga Hafizu, licensed VJ, Luganda translation platform">
-    <link rel="canonical" href="https://unrulymovies.com/">
-    <meta name="google-adsense-account" content="ca-pub-1904736753681797">
-    <meta name="google-site-verification" content="ZETgIS2RUYfcmNN7z0_OCZ7CjNP4LbfPI-F1MD7uiyY">
+    <link rel="canonical" href="https://unrulymovies.com/">    <meta name="google-site-verification" content="ZETgIS2RUYfcmNN7z0_OCZ7CjNP4LbfPI-F1MD7uiyY">
     <meta name="google-site-verification" content="LhqhmhY1yPoQxVg8znDH4aKifHlXtc8S8m-UMHtBrXY">
     
     <!-- IndexNow for instant Bing/Yandex indexing -->
@@ -40,9 +31,6 @@
         });
     </script>
 
-    <!-- LCP preload — hero image starts downloading before CSS/JS -->
-    <link rel="preload" as="image" href="https://image.tmdb.org/t/p/w1280/2GSsbdvlKfZo2yMpVxMAJyQPA0Z.jpg" imagesrcset="https://image.tmdb.org/t/p/w780/2GSsbdvlKfZo2yMpVxMAJyQPA0Z.jpg 780w, https://image.tmdb.org/t/p/w1280/2GSsbdvlKfZo2yMpVxMAJyQPA0Z.jpg 1280w" imagesizes="100vw" fetchpriority="high">
-
     <!-- DNS Prefetch and Preconnect for faster loading -->
     <link rel="preconnect" href="https://luganda-translated-movies-production.up.railway.app" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
@@ -50,9 +38,6 @@
     <link rel="dns-prefetch" href="//image.tmdb.org">
     <link rel="dns-prefetch" href="//archive.org">
     <link rel="dns-prefetch" href="//api.dicebear.com">
-    <link rel="dns-prefetch" href="//www.ezojs.com">
-    <link rel="dns-prefetch" href="//cmp.gatekeeperconsent.com">
-    <link rel="dns-prefetch" href="//the.gatekeeperconsent.com">
     
     <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-HMF82HVT9G"></script>
@@ -292,7 +277,7 @@
         
         /* Better spacing */
         .app-section {
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
         .section-header {
             margin-bottom: 8px;
@@ -483,17 +468,16 @@
             align-items: center;
             gap: 8px;
             padding: 12px 22px;
-            background: rgba(255,255,255,0.12);
+            background: transparent;
             color: #fff;
             font-weight: 600;
             font-size: 14px;
-            border: 1px solid rgba(255,255,255,0.25);
+            border: 1px solid rgba(255,255,255,0.35);
             border-radius: 10px;
             text-decoration: none;
-            backdrop-filter: blur(12px);
-            transition: background 0.2s;
+            transition: background 0.2s, border-color 0.2s;
         }
-        .info-btn:hover { background: rgba(255,255,255,0.22); color: #fff; }
+        .info-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5); color: #fff; }
         .save-btn {
             width: 44px;
             height: 44px;
@@ -817,8 +801,6 @@
         }
     </style>
 
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
 
     <!-- Global JS Vars -->
     <script type="text/javascript">
@@ -1285,8 +1267,9 @@
                     <div class="container">
                         <div class="app-content pt-md-3">
                             
-                            <!-- Page heading — visible and indexable -->
-                            <h1 style="font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--primary-color,#4ade80);margin:0 0 10px 4px;opacity:0.85;">Luganda Translated Movies — Uganda's Licensed VJ Platform</h1>
+                            <!-- Page heading — kept for SEO (every page should have one clear H1)
+                                 but hidden visually per request; still readable by search engines/screen readers -->
+                            <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Luganda Translated Movies — Uganda's Licensed VJ Platform</h1>
 
                             <!-- Hero Slider -->
                             <div class="app-section">
@@ -1301,35 +1284,7 @@
                                             
                             <!-- Hero slides will be dynamically populated -->
                             <div class="carousel-item active" id="heroSlide1">
-                                <div class="slide poster-slide">
-                                    <img src="https://image.tmdb.org/t/p/w1280/2GSsbdvlKfZo2yMpVxMAJyQPA0Z.jpg" srcset="https://image.tmdb.org/t/p/w780/2GSsbdvlKfZo2yMpVxMAJyQPA0Z.jpg 780w, https://image.tmdb.org/t/p/w1280/2GSsbdvlKfZo2yMpVxMAJyQPA0Z.jpg 1280w" sizes="100vw" alt="Ugly Story — Luganda translated movie" class="slide-poster-img" loading="eager" fetchpriority="high">
-                                    <div class="hero-overlay"></div>
-                                    <div class="hero-content">
-                                        <div class="hero-info-panel">
-                                            <div class="hero-badges">
-                                                <span class="hero-badge hero-badge-vj">VJ Junior</span>
-                                                <span class="hero-badge hero-badge-quality">HD</span>
-                                                <span class="hero-badge hero-badge-year">2024</span>
-                                            </div>
-                                            <h2 class="hero-title">Ugly Story</h2>
-                                            <div class="hero-genres">
-                                                <span class="hero-genre-tag">Drama</span>
-                                                <span class="hero-genre-tag">Thriller</span>
-                                            </div>
-                                            <p class="hero-desc">A gripping story of betrayal, love, and survival — narrated in Luganda by VJ Junior for an authentic Ugandan experience.</p>
-                                            <div class="hero-btns">
-                                                <a href="player.html?id=6a3a8e461b50122619d6bee4" class="play-btn">
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                                                    Play Now
-                                                </a>
-                                                <a href="movie.html?id=6a3a8e461b50122619d6bee4" class="info-btn">
-                                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                                                    More Info
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <div class="slide media media-slide skeleton" style="min-height: 400px;"></div>
                             </div>
                             <div class="carousel-item" id="heroSlide2">
                                 <div class="slide media media-slide skeleton" style="min-height: 400px;"></div>
@@ -1455,6 +1410,55 @@
                                 <button class="vj-filter-chip" data-vj="Eddy" onclick="filterByVJ(this, 'Eddy')">VJ Eddy</button>
                             </div>
 
+                            <!-- Latest on Unruly Movies - first section after the slider -->
+                            <div class="app-section movie-section" style="margin-top: 8px;">
+                                <div class="section-header">
+                                    <h2>
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2">
+                                            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                                            <line x1="7" y1="2" x2="7" y2="22"></line>
+                                            <line x1="17" y1="2" x2="17" y2="22"></line>
+                                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                                        </svg>
+                                        Latest on Unruly Movies
+                                    </h2>
+                                    <a href="movies.html" class="view-all">
+                                        View All
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="9 18 15 12 9 6"></polyline>
+                                        </svg>
+                                    </a>
+                                </div>
+                                <div class="card-grid h-scroll muno-style" id="allMovies">
+                                    <!-- Skeleton loaders -->
+                                    <div class="content-card">
+                                        <div class="skeleton skeleton-card"></div>
+                                        <div class="skeleton skeleton-title"></div>
+                                        <div class="skeleton skeleton-meta"></div>
+                                    </div>
+                                    <div class="content-card">
+                                        <div class="skeleton skeleton-card"></div>
+                                        <div class="skeleton skeleton-title"></div>
+                                        <div class="skeleton skeleton-meta"></div>
+                                    </div>
+                                    <div class="content-card">
+                                        <div class="skeleton skeleton-card"></div>
+                                        <div class="skeleton skeleton-title"></div>
+                                        <div class="skeleton skeleton-meta"></div>
+                                    </div>
+                                    <div class="content-card">
+                                        <div class="skeleton skeleton-card"></div>
+                                        <div class="skeleton skeleton-title"></div>
+                                        <div class="skeleton skeleton-meta"></div>
+                                    </div>
+                                    <div class="content-card">
+                                        <div class="skeleton skeleton-card"></div>
+                                        <div class="skeleton skeleton-title"></div>
+                                        <div class="skeleton skeleton-meta"></div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Trending Now Section - Immediately after slider -->
                             <div class="app-section movie-section" style="margin-top: 8px;">
                                 <div class="section-header">
@@ -1472,7 +1476,7 @@
                                         </svg>
                                     </a>
                                 </div>
-                                <div class="card-grid h-scroll" id="trendingMovies">
+                                <div class="card-grid h-scroll muno-style" id="trendingMovies">
                                     <!-- Skeleton loaders -->
                                     <div class="content-card">
                                         <div class="skeleton skeleton-card"></div>
@@ -1512,7 +1516,7 @@
                                         Picks for You
                                     </h2>
                                 </div>
-                                <div class="card-grid h-scroll" id="forYouMovies"></div>
+                                <div class="card-grid h-scroll muno-style" id="forYouMovies"></div>
                             </div>
 
                             <!-- VJ Spotlight Section -->
@@ -1534,56 +1538,6 @@
                                 </div>
                             </div>
 
-                            <!-- All Movies Section (Newest First) -->
-                            <div class="app-section movie-section">
-                                <div class="section-header">
-                                    <h2>
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2">
-                                            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
-                                            <line x1="7" y1="2" x2="7" y2="22"></line>
-                                            <line x1="17" y1="2" x2="17" y2="22"></line>
-                                            <line x1="2" y1="12" x2="22" y2="12"></line>
-                                        </svg>
-                                        Latest Releases
-                                    </h2>
-                                    <a href="movies.html" class="view-all">
-                                        View All
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="9 18 15 12 9 6"></polyline>
-                                        </svg>
-                                    </a>
-                                </div>
-                                <div class="card-grid h-scroll" id="allMovies">
-                                    <!-- Skeleton loaders -->
-                                    <div class="content-card">
-                                        <div class="skeleton skeleton-card"></div>
-                                        <div class="skeleton skeleton-title"></div>
-                                        <div class="skeleton skeleton-meta"></div>
-                                    </div>
-                                    <div class="content-card">
-                                        <div class="skeleton skeleton-card"></div>
-                                        <div class="skeleton skeleton-title"></div>
-                                        <div class="skeleton skeleton-meta"></div>
-                                    </div>
-                                    <div class="content-card">
-                                        <div class="skeleton skeleton-card"></div>
-                                        <div class="skeleton skeleton-title"></div>
-                                        <div class="skeleton skeleton-meta"></div>
-                                    </div>
-                                    <div class="content-card">
-                                        <div class="skeleton skeleton-card"></div>
-                                        <div class="skeleton skeleton-title"></div>
-                                        <div class="skeleton skeleton-meta"></div>
-                                    </div>
-                                    <div class="content-card">
-                                        <div class="skeleton skeleton-card"></div>
-                                        <div class="skeleton skeleton-title"></div>
-                                        <div class="skeleton skeleton-meta"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-
                             <!-- New TV Series Section -->
                             <div class="app-section movie-section">
                                 <div class="section-header">
@@ -1601,7 +1555,7 @@
                                         </svg>
                                     </a>
                                 </div>
-                                <div class="card-grid h-scroll" id="newSeries">
+                                <div class="card-grid h-scroll muno-style" id="newSeries">
                                     <!-- Static series fallback for crawlers — replaced by JS when loaded -->
                                     <noscript>
                                     <div style="color:#aaa;padding:16px;">
@@ -1635,7 +1589,7 @@
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                     </a>
                                 </div>
-                                <div class="card-grid h-scroll" id="horrorMovies"></div>
+                                <div class="card-grid h-scroll muno-style" id="horrorMovies"></div>
                             </div>
 
                             <!-- Sci-Fi Section -->
@@ -1653,7 +1607,7 @@
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                     </a>
                                 </div>
-                                <div class="card-grid h-scroll" id="scifiMovies"></div>
+                                <div class="card-grid h-scroll muno-style" id="scifiMovies"></div>
                             </div>
 
                             <!-- Per-VJ Sections (each VJ's movies in their own row) -->
@@ -1698,20 +1652,6 @@
                                 </div>
                             </div>
 
-                        </div>
-                    </div>
-
-                    <!-- Static editorial section — crawlable without JS -->
-                    <div style="max-width:900px;margin:56px auto 0;padding:0 20px 64px;">
-                        <h2 style="font-size:22px;font-weight:800;color:#fff;margin-bottom:16px;">What Is Unruly Movies?</h2>
-                        <p style="font-size:15px;line-height:1.9;color:rgba(255,255,255,.6);margin-bottom:16px;">Unruly Movies is Uganda's licensed platform for Luganda VJ-translated films. Every movie in our catalog has been narrated in real-time Luganda by a professional Video Jockey — a tradition that began in Kampala's video halls in the 1990s and is now available online for the first time in a legal, high-quality format.</p>
-                        <p style="font-size:15px;line-height:1.9;color:rgba(255,255,255,.6);margin-bottom:16px;">A Video Jockey (VJ) sits beside the screen and translates the dialogue, sound effects, and mood of a film into Luganda in real time. The result is a deeply personal experience — the VJ becomes part of the film, adding local context, Ugandan humour, and cultural references that subtitles never capture. Our platform hosts translations by Uganda's most respected VJs including <a href="/vjs.html" style="color:#4ade80;text-decoration:none;">VJ Junior, VJ Ice P, VJ Emmy, VJ Jingo, and VJ Ulio</a>.</p>
-                        <p style="font-size:15px;line-height:1.9;color:rgba(255,255,255,.6);margin-bottom:28px;">Our catalog covers action, drama, comedy, horror, thriller, romance, and sci-fi — all narrated in Luganda. New movies are added every week. <a href="/register.html" style="color:#4ade80;text-decoration:none;">Sign up free</a> to start watching, or <a href="/blog.html" style="color:#4ade80;text-decoration:none;">read our blog</a> to learn more about Uganda's VJ culture.</p>
-                        <div style="display:flex;flex-wrap:wrap;gap:10px;">
-                            <a href="/movies.html" style="padding:9px 20px;border-radius:8px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);color:#4ade80;font-size:13px;font-weight:600;text-decoration:none;">Browse All Movies</a>
-                            <a href="/genres.html" style="padding:9px 20px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.65);font-size:13px;font-weight:600;text-decoration:none;">Browse by Genre</a>
-                            <a href="/vjs.html" style="padding:9px 20px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.65);font-size:13px;font-weight:600;text-decoration:none;">Meet the VJs</a>
-                            <a href="/blog.html" style="padding:9px 20px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.65);font-size:13px;font-weight:600;text-decoration:none;">VJ Culture Blog</a>
                         </div>
                     </div>
 
@@ -1867,6 +1807,7 @@
     <script defer src="js/myvj-features.js"></script>
     <script defer src="js/trailer-player.js"></script>
     <script defer src="js/notifications.js"></script>
+    <script defer src="js/pesapal-checkout.js"></script>
     <script defer src="js/payment-manager.js"></script>
     <script defer src="js/main.js"></script>
     
@@ -2079,6 +2020,7 @@
                     
                     // Update hero slider with first 3 movies
                     updateHeroSlider(allMovies.slice(0, 3));
+                    initHeroCarousel();
 
                     // Load trending section (based on views + recent)
                     loadTrendingMovies(allMovies);
@@ -2285,7 +2227,10 @@
                 const movieCard = `
                     <a href="${movie.contentType === 'series' ? 'series-player.html?id=' + (movie.slug || movie._id) : '/movie/' + (movie.slug || movie._id)}" class="content-card" data-movie-id="${movie._id}">
                         <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
-                            ${vjBadge ? `<div class="card-badges"><span class="card-badge badge-vj">${vjBadge}</span></div>` : ''}
+                            ${(vjBadge || contentNeedsLockBadge()) ? `<div class="card-badges">
+                                ${contentNeedsLockBadge() ? `<span class="card-badge badge-lock" title="Requires subscription">${LOCK_BADGE_SVG}</span>` : '<span></span>'}
+                                ${vjBadge ? `<span class="card-badge badge-vj">${vjBadge}</span>` : ''}
+                            </div>` : ''}
                             <div class="play-overlay">
                                 <svg viewBox="0 0 24 24" fill="currentColor">
                                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
@@ -2328,6 +2273,24 @@
 
         function getStoredUserJson() {
             return localStorage.getItem('user') || sessionStorage.getItem('user');
+        }
+
+        const LOCK_BADGE_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>';
+
+        // Cards show a lock badge when the browsing user doesn't have an
+        // active paid plan — full playback is subscription-gated (free users
+        // only get a timed preview), so this sets that expectation up front.
+        function contentNeedsLockBadge() {
+            try {
+                const userJson = getStoredUserJson();
+                if (!userJson) return true;
+                const user = JSON.parse(userJson);
+                const plan = user?.subscription?.plan;
+                const status = user?.subscription?.status;
+                return !plan || plan === 'free' || status !== 'active';
+            } catch (e) {
+                return true;
+            }
         }
 
         // Check user login state and update UI
@@ -2606,6 +2569,8 @@
                 const quality = movie.video?.quality || 'HD';
                 const overview = movie.description || movie.plot || '';
                 const vjBadge = formatVjBadge(movie.vjName);
+                const ratingValue = movie.rating?.translationRating || movie.rating?.userRating || movie.rating?.imdb || 0;
+                const genres = movie.genres || [];
                 const isFirst = index === 0;
 
                 // Inject preload hint for LCP image as early as possible
@@ -2625,18 +2590,20 @@
                         <div class="hero-content">
                             <div class="hero-info-panel">
                                 <div class="hero-badges">
-                                    ${vjBadge ? `<span class="hero-badge hero-badge-vj">VJ ${vjBadge}</span>` : ''}
+                                    ${vjBadge ? `<span class="hero-badge hero-badge-vj">${vjBadge}</span>` : ''}
                                     ${quality ? `<span class="hero-badge hero-badge-quality">${quality}</span>` : ''}
                                     ${year ? `<span class="hero-badge hero-badge-year">${year}</span>` : ''}
-                                    ${movie.rating ? `<span class="hero-rating"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fbbf24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>${parseFloat(movie.rating).toFixed(1)}</span>` : ''}
+                                    ${ratingValue ? `<span class="hero-rating"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fbbf24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>${ratingValue.toFixed(1)}</span>` : ''}
                                 </div>
                                 <h2 class="hero-title">${title}</h2>
-                                ${movie.genre ? `<div class="hero-genres">${(Array.isArray(movie.genre) ? movie.genre : movie.genre.split(',').map(g=>g.trim())).slice(0,3).map(g=>`<span class="hero-genre-tag">${g}</span>`).join('')}</div>` : ''}
+                                ${genres.length > 0 ? `<div class="hero-genres">${genres.slice(0,3).map(g=>`<span class="hero-genre-tag">${g}</span>`).join('')}</div>` : ''}
                                 ${overview ? `<p class="hero-desc">${overview.substring(0, 140)}${overview.length > 140 ? '…' : ''}</p>` : ''}
                                 <div class="hero-btns">
-                                    <a href="player.html?id=${movieId}" class="play-btn">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                                        Play Now
+                                    <a href="player.html?id=${movieId}" class="hero-watch-now">
+                                        <span class="hero-play-circle" aria-hidden="true">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                        </span>
+                                        <span class="hero-watch-label">Watch Now</span>
                                     </a>
                                     <a href="movie.html?id=${movieId}" class="info-btn">
                                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -2653,6 +2620,56 @@
             });
         }
         
+        // ===== Hero carousel controls =====
+        // The markup (indicator dots, prev/next arrows, data-ride="carousel")
+        // is Bootstrap-carousel-shaped, but Bootstrap's JS was never actually
+        // loaded — so none of it did anything. This wires up real rotation.
+        let heroCarouselTimer = null;
+        let heroCarouselIndex = 0;
+        const HERO_SLIDE_COUNT = 3;
+
+        function setHeroSlide(index) {
+            heroCarouselIndex = ((index % HERO_SLIDE_COUNT) + HERO_SLIDE_COUNT) % HERO_SLIDE_COUNT;
+            for (let i = 0; i < HERO_SLIDE_COUNT; i++) {
+                const slide = document.getElementById(`heroSlide${i + 1}`);
+                if (slide) slide.classList.toggle('active', i === heroCarouselIndex);
+            }
+            document.querySelectorAll('.carousel-indicators li').forEach((li, i) => {
+                li.classList.toggle('active', i === heroCarouselIndex);
+            });
+        }
+
+        function restartHeroAutoAdvance() {
+            clearInterval(heroCarouselTimer);
+            heroCarouselTimer = setInterval(() => setHeroSlide(heroCarouselIndex + 1), 6000);
+        }
+
+        function advanceHeroSlide(step) {
+            setHeroSlide(heroCarouselIndex + step);
+            restartHeroAutoAdvance();
+        }
+
+        let heroCarouselInitialized = false;
+        function initHeroCarousel() {
+            if (heroCarouselInitialized) { setHeroSlide(0); restartHeroAutoAdvance(); return; }
+            heroCarouselInitialized = true;
+
+            document.querySelectorAll('.carousel-indicators li[data-slide-to]').forEach(li => {
+                li.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    setHeroSlide(parseInt(li.dataset.slideTo, 10) || 0);
+                    restartHeroAutoAdvance();
+                });
+            });
+            const prevBtn = document.querySelector('.control-prev');
+            const nextBtn = document.querySelector('.control-next');
+            if (prevBtn) prevBtn.addEventListener('click', (e) => { e.preventDefault(); advanceHeroSlide(-1); });
+            if (nextBtn) nextBtn.addEventListener('click', (e) => { e.preventDefault(); advanceHeroSlide(1); });
+
+            setHeroSlide(0);
+            restartHeroAutoAdvance();
+        }
+
         // Helper function to generate placeholder poster URL based on movie title
         function getPlaceholderPoster(title, year) {
             const displayTitle = (title || 'Movie').substring(0, 20);
@@ -2723,7 +2740,10 @@
                 const movieCard = `
                     <a href="${movie.contentType === 'series' ? 'series-player.html?id=' + (movie.slug || movie._id) : '/movie/' + (movie.slug || movie._id)}" class="content-card" data-movie-id="${movie._id}">
                         <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
-                            ${vjBadge ? `<div class="card-badges"><span class="card-badge badge-vj">${vjBadge}</span></div>` : ''}
+                            ${(vjBadge || contentNeedsLockBadge()) ? `<div class="card-badges">
+                                ${contentNeedsLockBadge() ? `<span class="card-badge badge-lock" title="Requires subscription">${LOCK_BADGE_SVG}</span>` : '<span></span>'}
+                                ${vjBadge ? `<span class="card-badge badge-vj">${vjBadge}</span>` : ''}
+                            </div>` : ''}
                             <div class="play-overlay">
                                 <svg viewBox="0 0 24 24" fill="currentColor">
                                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
@@ -2827,13 +2847,16 @@
                     <a href="series-player.html?id=${series._id}" class="content-card">
                         <div class="card-poster" id="${posterId}" style="background-image: url('${fallbackPoster}');">
                             <div class="card-badges">
-                                <span class="badge-quality" style="background: linear-gradient(135deg, #A855F7, #7C3AED);">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 4px;">
-                                        <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
-                                        <polyline points="17 2 12 7 7 2" fill="none" stroke="currentColor" stroke-width="2"></polyline>
-                                    </svg>
-                                    SERIES
-                                </span>
+                                <div style="display:flex;align-items:center;gap:6px;">
+                                    ${contentNeedsLockBadge() ? `<span class="card-badge badge-lock" title="Requires subscription">${LOCK_BADGE_SVG}</span>` : ''}
+                                    <span class="badge-quality" style="background: linear-gradient(135deg, #A855F7, #7C3AED);">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 4px;">
+                                            <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                                            <polyline points="17 2 12 7 7 2" fill="none" stroke="currentColor" stroke-width="2"></polyline>
+                                        </svg>
+                                        SERIES
+                                    </span>
+                                </div>
                                 ${vjBadge ? `<span class="card-badge badge-vj">${vjBadge}</span>` : ''}
                             </div>
                             <div class="play-overlay">
@@ -2921,7 +2944,7 @@
                                     </svg>
                                 </a>
                             </div>
-                            <div class="card-grid h-scroll" id="${containerId}"></div>
+                            <div class="card-grid h-scroll muno-style" id="${containerId}"></div>
                         </div>
                     `;
                 });

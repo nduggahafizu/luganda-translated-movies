@@ -4,6 +4,7 @@ const axios = require('axios');
 const crypto = require('crypto');
 const Payment = require('../models/Payment');
 const User = require('../models/User');
+const UnmatchedPayment = require('../models/UnmatchedPayment');
 const { sendPaymentReceipt, sendSubscriptionEmail } = require('../utils/email');
 
 // Subscription pricing
@@ -467,13 +468,106 @@ async function processSuccessfulPesapalPayment(payment, transactionData) {
     }
 }
 
+// Uganda mobile numbers vary in stored format (+256..., 256..., 07..., 7...).
+// Compare only the last 9 digits (the subscriber number without country/trunk prefix).
+function phoneSuffix(phone) {
+    if (!phone) return null;
+    const digits = String(phone).replace(/\D/g, '');
+    return digits.length >= 9 ? digits.slice(-9) : null;
+}
+
+// A PesaPal transaction came back completed but has no local Payment record
+// (checkout initiated outside our own /pesapal/initiate flow — a payment
+// link, USSD push, etc.). Best-effort match it to a real user by the payer's
+// mobile money number and the paid amount; if not confidently matched, log
+// it for manual admin review instead of silently dropping it.
+async function reconcileUnmatchedPesapalTransaction(statusData) {
+    const trackingId = statusData.order_tracking_id;
+    const merchantRef = statusData.merchant_reference;
+
+    const existingLog = await UnmatchedPayment.findOne({ orderTrackingId: trackingId });
+    if (existingLog) return; // already logged/handled on a previous IPN retry
+
+    const suffix = phoneSuffix(statusData.payment_account);
+    let candidateUser = null;
+    if (suffix) {
+        const matches = await User.find({ phone: { $regex: suffix + '$' } }).limit(2);
+        if (matches.length === 1) candidateUser = matches[0];
+    }
+
+    // Only auto-activate when the phone match is unambiguous AND the amount
+    // maps exactly to one known plan price — anything less certain gets
+    // logged for a human to reconcile rather than guessed.
+    const matchingPlan = Object.entries(SUBSCRIPTION_PRICES).find(
+        ([, cfg]) => cfg.ugx === statusData.amount
+    );
+
+    if (candidateUser && matchingPlan) {
+        const [planKey, planCfg] = matchingPlan;
+        try {
+            const payment = await Payment.create({
+                user: candidateUser._id,
+                transactionId: merchantRef || trackingId,
+                amount: statusData.amount,
+                currency: statusData.currency || 'UGX',
+                paymentMethod: 'pesapal',
+                paymentProvider: 'pesapal',
+                status: 'pending',
+                subscriptionPlan: planKey,
+                subscriptionDuration: planKey,
+                paymentDetails: {
+                    pesapalMerchantReference: merchantRef,
+                    pesapalOrderTrackingId: trackingId,
+                    phoneNumber: statusData.payment_account || '',
+                    payerEmail: candidateUser.email || '',
+                    payerName: candidateUser.fullName || ''
+                },
+                description: 'Reconciled: paid outside site checkout flow'
+            });
+            await processSuccessfulPesapalPayment(payment, statusData);
+            logger.info('Auto-reconciled external PesaPal payment to user', {
+                trackingId, merchantRef, userId: candidateUser._id, plan: planKey
+            });
+            return;
+        } catch (createError) {
+            logger.error('Failed to create reconciled Payment record', { error: createError.message, trackingId });
+            // fall through to logging as unmatched so it's not lost
+        }
+    }
+
+    try {
+        await UnmatchedPayment.create({
+            orderTrackingId: trackingId,
+            merchantReference: merchantRef,
+            amount: statusData.amount,
+            currency: statusData.currency,
+            paymentAccount: statusData.payment_account,
+            paymentMethod: statusData.payment_method,
+            confirmationCode: statusData.confirmation_code,
+            rawStatusData: statusData,
+            candidateUser: candidateUser ? candidateUser._id : null,
+            reason: !suffix ? 'no phone on transaction'
+                : !candidateUser ? 'no unique user match for phone'
+                : 'amount did not match a known plan price'
+        });
+        logger.warn('Completed PesaPal payment could not be auto-matched — logged for manual review', {
+            trackingId, merchantRef, amount: statusData.amount, paymentAccount: statusData.payment_account
+        });
+    } catch (logError) {
+        // Duplicate key on orderTrackingId (a concurrent IPN retry got there first) is fine to ignore.
+        if (logError.code !== 11000) {
+            logger.error('Failed to log unmatched PesaPal payment', { error: logError.message, trackingId });
+        }
+    }
+}
+
 // @desc    Pesapal IPN (Instant Payment Notification) - PesaPal 3.0
 // @route   POST /api/payments/pesapal/ipn
 // @access  Public
 exports.pesapalIPN = async (req, res) => {
     try {
         const { OrderTrackingId, OrderMerchantReference, OrderNotificationType } = req.body;
-        
+
         logger.info('PesaPal IPN received', { OrderTrackingId, OrderMerchantReference, OrderNotificationType });
 
         // Find payment
@@ -485,20 +579,38 @@ exports.pesapalIPN = async (req, res) => {
             ]
         });
 
+        const ack = () => res.json({
+            orderNotificationType: OrderNotificationType,
+            orderTrackingId: OrderTrackingId,
+            orderMerchantReference: OrderMerchantReference,
+            status: 200
+        });
+
         if (!payment) {
-            logger.warn('Payment not found for IPN', { OrderTrackingId, OrderMerchantReference });
-            return res.json({ 
-                orderNotificationType: OrderNotificationType,
-                orderTrackingId: OrderTrackingId,
-                orderMerchantReference: OrderMerchantReference,
-                status: 200
-            });
+            // No local record — this may be a payment made outside our own checkout
+            // flow. Don't just drop it: check PesaPal directly and try to reconcile
+            // it to a real user before acknowledging.
+            logger.warn('Payment not found for IPN — attempting reconciliation', { OrderTrackingId, OrderMerchantReference });
+            try {
+                const token = await getPesapalToken();
+                const statusResponse = await axios.get(
+                    `${PESAPAL_CONFIG.baseUrl}/api/Transactions/GetTransactionStatus?orderTrackingId=${OrderTrackingId}`,
+                    { headers: { 'Authorization': `Bearer ${token}` } }
+                );
+                if (statusResponse.data?.status_code === 1) {
+                    await reconcileUnmatchedPesapalTransaction(statusResponse.data);
+                }
+            } catch (reconcileError) {
+                logger.error('Reconciliation check failed for unmatched IPN', { error: reconcileError.message, OrderTrackingId });
+                return res.status(503).json({ status: 'error', message: 'Temporarily unable to verify transaction' });
+            }
+            return ack();
         }
 
         // Get token and check transaction status
         try {
             const token = await getPesapalToken();
-            
+
             const statusResponse = await axios.get(
                 `${PESAPAL_CONFIG.baseUrl}/api/Transactions/GetTransactionStatus?orderTrackingId=${OrderTrackingId}`,
                 {
@@ -519,20 +631,79 @@ exports.pesapalIPN = async (req, res) => {
                 logger.info('Payment failed via IPN', { OrderMerchantReference });
             }
         } catch (statusError) {
-            logger.error('IPN status check error', { error: statusError.message });
+            // Don't falsely acknowledge — if we couldn't actually verify the
+            // transaction, respond non-200 so PesaPal retries the IPN later
+            // instead of considering it delivered.
+            logger.error('IPN status check error — not acknowledging so PesaPal retries', { error: statusError.message, OrderMerchantReference });
+            return res.status(503).json({ status: 'error', message: 'Temporarily unable to verify transaction' });
         }
 
-        // Always respond with success to acknowledge receipt
-        res.json({ 
-            orderNotificationType: OrderNotificationType,
-            orderTrackingId: OrderTrackingId,
-            orderMerchantReference: OrderMerchantReference,
-            status: 200
-        });
+        // Acknowledge receipt now that the transaction was actually checked
+        ack();
     } catch (error) {
         logger.error('PesapalIPN error', { error: error.message });
         res.status(500).json({ status: 'error' });
     }
+};
+
+// Re-checks Payment records stuck in "pending" against PesaPal's live status
+// and activates any that actually completed. Runs on a short interval (see
+// server.js) so activation happens within about a minute regardless of
+// whether IPN was delivered or the browser ever made it back to a redirect —
+// this is the primary safety net, not a slow last-resort fallback.
+exports.reconcilePendingPesapalPayments = async function reconcilePendingPesapalPayments() {
+    const now = Date.now();
+    const olderThan = new Date(now - 20 * 1000);            // let the order actually reach PesaPal first
+    const newerThan = new Date(now - 48 * 60 * 60 * 1000);  // don't keep re-checking week-old abandoned carts
+
+    const stuck = await Payment.find({
+        status: 'pending',
+        paymentMethod: 'pesapal',
+        'paymentDetails.pesapalOrderTrackingId': { $exists: true, $ne: null },
+        createdAt: { $lte: olderThan, $gte: newerThan }
+    }).limit(50);
+
+    if (stuck.length === 0) return { checked: 0, activated: 0 };
+
+    let activated = 0;
+    let token;
+    try {
+        token = await getPesapalToken();
+    } catch (e) {
+        logger.error('Reconciliation sweep: could not get PesaPal token', { error: e.message });
+        return { checked: 0, activated: 0 };
+    }
+
+    for (const payment of stuck) {
+        try {
+            const statusResponse = await axios.get(
+                `${PESAPAL_CONFIG.baseUrl}/api/Transactions/GetTransactionStatus?orderTrackingId=${payment.paymentDetails.pesapalOrderTrackingId}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            const statusCode = statusResponse.data?.status_code;
+            if (statusCode === 1) {
+                await processSuccessfulPesapalPayment(payment, statusResponse.data);
+                activated++;
+                logger.info('Reconciliation sweep activated a stuck payment', {
+                    transactionId: payment.transactionId, user: payment.user
+                });
+            } else if (statusCode === 2) {
+                payment.status = 'failed';
+                payment.paymentDetails.failureReason = statusResponse.data?.message || 'Payment failed';
+                await payment.save();
+            }
+        } catch (e) {
+            logger.error('Reconciliation sweep: status check failed for one payment', {
+                transactionId: payment.transactionId, error: e.message
+            });
+        }
+        await new Promise(r => setTimeout(r, 200)); // be gentle with PesaPal's API
+    }
+
+    if (activated > 0) {
+        logger.info('Reconciliation sweep complete', { checked: stuck.length, activated });
+    }
+    return { checked: stuck.length, activated };
 };
 
 // @desc    Verify PesaPal payment (client-side check after redirect)

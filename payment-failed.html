@@ -159,12 +159,32 @@
         const urlParams = new URLSearchParams(window.location.search);
         const reason = urlParams.get('reason');
         const code = urlParams.get('code');
-        
+        const ref = urlParams.get('ref');
+
         if (code) {
             document.getElementById('errorCode').textContent = `Error Code: ${code}`;
         }
         if (reason) {
             document.getElementById('errorReason').textContent = decodeURIComponent(reason);
+        }
+
+        // If PesaPal opened us inside the checkout popup, report back and
+        // close instead of showing the full-page failure screen.
+        if (window.opener) {
+            try {
+                window.opener.postMessage({ type: 'pesapal-payment-complete', status: 'failed', ref, message: reason ? decodeURIComponent(reason) : null }, window.location.origin);
+            } catch (e) {}
+            document.querySelector('.failed-container').innerHTML = `
+                <div class="failed-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </div>
+                <h1 class="failed-title">Payment Failed</h1>
+                <p class="failed-message">You can close this window and try again.</p>
+            `;
+            setTimeout(() => { try { window.close(); } catch (_) {} }, 1800);
         }
     </script>
 </body>

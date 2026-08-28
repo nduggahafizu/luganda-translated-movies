@@ -208,7 +208,7 @@ router.get('/check-access', protect, enforceDeviceLimit, (req, res) => {
             plan,
             isActive,
             isAdmin,
-            canWatch: isActive && plan !== 'free',
+            canWatch: (isActive && plan !== 'free') || user.isInTrialPeriod(),
             canDownload: user.hasDownloadAccess(),
             showAds: user.shouldSeeAds(),
             freeUser: plan === 'free',

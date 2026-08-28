@@ -179,6 +179,10 @@ class PaymentManager {
             payBtn.classList.add('loading');
             document.getElementById('pm-btn-text').textContent = 'Preparing payment…';
 
+            // Open the popup synchronously, inside the click gesture, so
+            // browsers don't treat it as an unrequested popup.
+            const popup = window.PesapalCheckout?.openBlankPopup();
+
             try {
                 const response = await fetch(`${this.apiUrl}/api/payments/pesapal/initiate`, {
                     method: 'POST',
@@ -197,14 +201,34 @@ class PaymentManager {
                 const data = await response.json();
 
                 if (data.status === 'success' && data.data?.redirectUrl) {
-                    document.getElementById('pm-btn-text').textContent = 'Redirecting…';
                     this.closeModal();
-                    // Same-tab redirect — PesaPal returns user to payment-success.html
-                    window.location.href = data.data.redirectUrl;
+
+                    if (window.PesapalCheckout && popup) {
+                        this.showToast('Complete your payment in the popup window…', 'info');
+                        window.PesapalCheckout.runCheckout(popup, data.data.redirectUrl, {
+                            ref: data.data.merchantReference,
+                            token,
+                            apiBase: this.apiUrl,
+                            onSuccess: (result) => {
+                                this.showToast(`Payment confirmed! Your ${plan.name} plan is now active.`, 'success');
+                                window.dispatchEvent(new CustomEvent('pesapal-payment-success', { detail: { plan: planKey, result } }));
+                                setTimeout(() => window.location.reload(), 1200);
+                            },
+                            onFailure: (status) => {
+                                if (status === 'cancelled') return;
+                                this.showToast(status === 'timeout' ? 'Still waiting on confirmation — check your dashboard shortly.' : 'Payment failed. Please try again.', status === 'timeout' ? 'info' : 'error');
+                            }
+                        });
+                    } else {
+                        // Popup blocked or helper unavailable — fall back to same-tab redirect.
+                        window.location.href = data.data.redirectUrl;
+                    }
                 } else {
+                    if (popup && !popup.closed) popup.close();
                     throw new Error(data.message || 'Payment initiation failed');
                 }
             } catch (err) {
+                if (popup && !popup.closed) popup.close();
                 this.closeModal();
                 this.showToast(err.message || 'Something went wrong. Please try again.', 'error');
             }

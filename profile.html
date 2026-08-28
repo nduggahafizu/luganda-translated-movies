@@ -7,9 +7,7 @@
     <meta name="description" content="Manage your Unruly Movies profile and subscription">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow">
-    <meta name="theme-color" content="#4ade80">
-    <meta name="google-adsense-account" content="ca-pub-1904736753681797">
-    
+    <meta name="theme-color" content="#4ade80">    
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
     <link rel="shortcut icon" type="image/png" href="/assets/images/favicon.png">
     <link rel="apple-touch-icon" href="/assets/images/logo.png">
@@ -129,6 +127,7 @@
         }
         
         .plan-badge.free { background: rgba(150, 150, 150, 0.2); color: #aaa; }
+        .plan-badge.trial { background: rgba(0, 217, 255, 0.2); color: #00d9ff; }
         .plan-badge.starter { background: rgba(150, 150, 150, 0.2); color: #ccc; }
         .plan-badge.daily { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
         .plan-badge.weekly { background: rgba(0, 217, 255, 0.2); color: #00d9ff; }
@@ -170,47 +169,6 @@
         
         .detail-value.expired {
             color: #ff4444;
-        }
-        
-        .subscription-features {
-            margin-bottom: 25px;
-        }
-        
-        .features-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-        
-        .features-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-        }
-        
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-        }
-        
-        .feature-item svg {
-            width: 18px;
-            height: 18px;
-            flex-shrink: 0;
-        }
-        
-        .feature-item.included svg {
-            color: var(--primary-color);
-        }
-        
-        .feature-item.excluded {
-            color: var(--text-secondary);
-        }
-        
-        .feature-item.excluded svg {
-            color: #666;
         }
         
         .upgrade-btn {
@@ -673,7 +631,11 @@
                     
                     <div class="subscription-details">
                         <div class="detail-item">
-                            <div class="detail-label">Watch Access</div>
+                            <div class="detail-label">Streaming</div>
+                            <div class="detail-value" id="streamAccess">No</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Downloads</div>
                             <div class="detail-value" id="downloadAccess">No</div>
                         </div>
                         <div class="detail-item">
@@ -691,7 +653,7 @@
                     </div>
 
                     <div id="timeRemainingBox" style="display:none;margin-bottom:16px;padding:14px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);border-radius:10px;text-align:center;">
-                        <div style="font-size:12px;color:#888;margin-bottom:4px;">Time Remaining</div>
+                        <div id="timeRemainingLabel" style="font-size:12px;color:#888;margin-bottom:4px;">Time Remaining</div>
                         <div id="timeRemaining" style="font-size:22px;font-weight:800;color:#4ade80;">-</div>
                     </div>
 
@@ -727,26 +689,31 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="form-label" for="fullName">Full Name</label>
-                                <input type="text" class="form-control" id="fullName" placeholder="—" readonly style="cursor:default;opacity:0.7;">
+                                <input type="text" class="form-control" id="fullName" placeholder="Your full name">
                             </div>
                             <div class="form-group">
                                 <label class="form-label" for="email">Email Address</label>
                                 <input type="email" class="form-control" id="email" placeholder="—" disabled>
                             </div>
                         </div>
-                        
+
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="form-label" for="phone">Phone Number</label>
-                                <input type="tel" class="form-control" id="phone" placeholder="—" readonly style="cursor:default;opacity:0.7;">
+                                <input type="tel" class="form-control" id="phone" placeholder="e.g. 07XXXXXXXX">
                             </div>
                             <div class="form-group">
                                 <label class="form-label" for="language">Preferred Language</label>
-                                <select class="form-control" id="language" disabled style="opacity:0.7;cursor:default;">
+                                <select class="form-control" id="language">
                                     <option value="en">English</option>
                                     <option value="lg">Luganda</option>
                                 </select>
                             </div>
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary" id="saveProfileBtn">Save Changes</button>
+                            <button type="button" class="btn btn-secondary" onclick="resetForm()">Cancel</button>
                         </div>
                     </form>
                     
@@ -799,14 +766,6 @@
                             <p>Get a copy of your account data including watch history</p>
                         </div>
                         <button class="btn btn-secondary" onclick="downloadData()">Download</button>
-                    </div>
-                    
-                    <div class="action-item">
-                        <div class="action-info">
-                            <h4>Active Sessions</h4>
-                            <p>Manage devices where you're currently logged in</p>
-                        </div>
-                        <button class="btn btn-secondary" onclick="showActiveSessions()">View Devices</button>
                     </div>
                     
                     <div class="action-item">
@@ -926,7 +885,7 @@
             document.getElementById('language').value = user.preferences?.language || 'en';
             
             // Subscription
-            renderSubscription(user.subscription);
+            renderSubscription(user.subscription, user.trialEndsAt);
 
             // Load active devices from sessions endpoint
             loadDevices();
@@ -941,12 +900,16 @@
             }
         }
 
-        function renderSubscription(subscription) {
+        function renderSubscription(subscription, trialEndsAt) {
             const plan = subscription?.plan || 'free';
             const status = subscription?.status || 'active';
             const PAID_PLANS = ['daily', 'weekly', 'biweekly', 'monthly', 'starter', 'basic', 'standard', 'premium', 'vip'];
             const isPaid = PAID_PLANS.includes(plan);
             const isActive = isPaid && status === 'active';
+            const trialEnd = trialEndsAt ? new Date(trialEndsAt) : null;
+            const trialRemaining = trialEnd ? trialEnd.getTime() - Date.now() : -1;
+            const isInTrial = trialRemaining > 0;
+            const canStream = isActive || isInTrial;
             const dateOpts = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
 
             // Plan badge
@@ -954,12 +917,25 @@
             if (isActive) {
                 planBadge.textContent = plan.toUpperCase();
                 planBadge.className = 'plan-badge ' + plan;
+            } else if (isInTrial) {
+                planBadge.textContent = 'FREE TRIAL';
+                planBadge.className = 'plan-badge trial';
             } else {
                 planBadge.textContent = 'FREE';
                 planBadge.className = 'plan-badge free';
             }
 
-            // Download / stream access
+            // Streaming access (paid plan OR still within the 6-hour trial)
+            const streamEl = document.getElementById('streamAccess');
+            if (canStream) {
+                streamEl.textContent = 'Active';
+                streamEl.className = 'detail-value active';
+            } else {
+                streamEl.textContent = 'No';
+                streamEl.className = 'detail-value expired';
+            }
+
+            // Download access — trial never includes downloads, only a paid plan does
             const dlEl = document.getElementById('downloadAccess');
             if (isActive) {
                 dlEl.textContent = 'Active';
@@ -976,27 +952,38 @@
                 biweekly: '2 Weeks (14 days)', monthly: 'Monthly (30 days)',
                 basic: 'Basic', standard: 'Standard', premium: 'Premium', vip: 'VIP'
             };
-            document.getElementById('currentPlan').textContent = planNames[plan] || plan.charAt(0).toUpperCase() + plan.slice(1);
+            document.getElementById('currentPlan').textContent = isInTrial && !isActive
+                ? 'Free Trial'
+                : (planNames[plan] || plan.charAt(0).toUpperCase() + plan.slice(1));
 
             // Status
             const statusEl = document.getElementById('subStatus');
-            if (plan === 'free') {
+            if (isActive) {
+                statusEl.textContent = 'Active ✓';
+                statusEl.className = 'detail-value active';
+            } else if (isInTrial) {
+                statusEl.textContent = 'Trial — Streaming Unlocked';
+                statusEl.className = 'detail-value active';
+            } else if (plan === 'free') {
                 statusEl.textContent = 'No active plan';
                 statusEl.className = 'detail-value';
             } else {
-                statusEl.textContent = status === 'active' ? 'Active ✓' : 'Expired';
-                statusEl.className = `detail-value ${status === 'active' ? 'active' : 'expired'}`;
+                statusEl.textContent = 'Expired';
+                statusEl.className = 'detail-value expired';
             }
 
+            const box = document.getElementById('timeRemainingBox');
+            const timeEl = document.getElementById('timeRemaining');
+            const timeLabelEl = document.getElementById('timeRemainingLabel');
+
             // Expiry + time remaining
-            if (subscription?.endDate && plan !== 'free') {
+            if (subscription?.endDate && isActive) {
                 const endDate = new Date(subscription.endDate);
                 document.getElementById('subEndDate').textContent = endDate.toLocaleDateString('en-UG', dateOpts);
 
                 const remaining = endDate.getTime() - Date.now();
-                const box = document.getElementById('timeRemainingBox');
-                const timeEl = document.getElementById('timeRemaining');
                 box.style.display = 'block';
+                timeLabelEl.textContent = 'Time Remaining';
 
                 if (remaining > 0) {
                     const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
@@ -1008,46 +995,29 @@
                     timeEl.textContent = 'Expired';
                     timeEl.style.color = '#ff4444';
                 }
+            } else if (isInTrial) {
+                document.getElementById('subEndDate').textContent = '-';
+                box.style.display = 'block';
+                timeLabelEl.textContent = 'Trial Ends In';
+
+                const hours = Math.floor(trialRemaining / (1000 * 60 * 60));
+                const mins = Math.floor((trialRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                timeEl.textContent = `${hours}h ${mins}m`;
+                timeEl.style.color = trialRemaining < 60 * 60 * 1000 ? '#ff4444' : '#00d9ff';
             } else {
                 document.getElementById('subEndDate').textContent = '-';
+                box.style.display = 'none';
             }
 
             // Button
             const upgradeBtn = document.getElementById('upgradeBtn');
             if (isActive) {
                 upgradeBtn.textContent = 'Renew / Upgrade Plan';
+            } else if (isInTrial) {
+                upgradeBtn.textContent = 'Upgrade for Downloads — from UGX 1,000';
             } else {
                 upgradeBtn.textContent = 'Subscribe Now — from UGX 1,000';
             }
-        }
-
-        function renderPlanFeatures(plan) {
-            const PAID = ['daily', 'weekly', 'biweekly', 'monthly', 'basic', 'standard', 'premium', 'vip'];
-            const LONG_PAID = ['biweekly', 'monthly', 'standard', 'premium', 'vip'];
-            const isPaid = PAID.includes(plan);
-            const isLong = LONG_PAID.includes(plan);
-
-            const features = [
-                { name: 'Stream all Luganda movies & series', included: isPaid },
-                { name: 'HD Video Quality',                   included: isPaid },
-                { name: 'No Ads',                             included: isLong },
-                { name: 'Download for offline',               included: isLong },
-                { name: 'All VJ profiles',                    included: isPaid },
-                { name: 'Uganda TV live streams',             included: isPaid },
-                { name: 'Priority support',                   included: isLong },
-            ];
-
-            const featuresList = document.getElementById('featuresList');
-            featuresList.innerHTML = features.map(f => `
-                <div class="feature-item ${f.included ? 'included' : 'excluded'}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        ${f.included
-                            ? '<polyline points="20 6 9 17 4 12"></polyline>'
-                            : '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>'}
-                    </svg>
-                    ${f.name}
-                </div>
-            `).join('');
         }
 
         async function loadDevices() {
@@ -1292,69 +1262,6 @@
             }
         }
 
-        async function showActiveSessions() {
-            try {
-                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-                if (!token) {
-                    window.location.href = 'login.html';
-                    return;
-                }
-                
-                const apiUrl = (typeof API_CONFIG !== 'undefined' && API_CONFIG.BASE_URL)
-                    ? API_CONFIG.BASE_URL
-                    : 'https://luganda-translated-movies-production.up.railway.app';
-                
-                const response = await fetch(`${apiUrl}/api/auth/sessions`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                
-                const data = await response.json();
-                
-                if (data.status === 'success') {
-                    const devices = data.data.devices || [];
-                    const lastLogin = data.data.lastLogin ? new Date(data.data.lastLogin).toLocaleString() : 'Never';
-                    
-                    let devicesHTML = devices.length > 0 
-                        ? devices.map((device, index) => `
-                            <div style="padding: 15px; background: var(--background-dark); border-radius: 8px; margin-bottom: 10px;">
-                                <div style="display: flex; justify-content: space-between; align-items: start;">
-                                    <div>
-                                        <div style="font-weight: 600; margin-bottom: 4px;">${device.deviceName || 'Unknown Device'}</div>
-                                        <div style="font-size: 13px; color: var(--text-secondary);">${device.browser || 'Unknown Browser'} • ${device.os || 'Unknown OS'}</div>
-                                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">Last active: ${device.lastActive ? new Date(device.lastActive).toLocaleString() : 'Unknown'}</div>
-                                    </div>
-                                    <button onclick="removeDevice(${index})" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;">Remove</button>
-                                </div>
-                            </div>
-                        `).join('')
-                        : '<p style="text-align: center; color: var(--text-secondary);">No active devices found</p>';
-                    
-                    const modal = document.createElement('div');
-                    modal.innerHTML = `
-                        <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;" onclick="this.remove()">
-                            <div style="background: var(--background-light); border-radius: 16px; max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto; padding: 30px;" onclick="event.stopPropagation();">
-                                <h2 style="margin-bottom: 8px;">Active Devices & Sessions</h2>
-                                <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 14px;">Last login: ${lastLogin}</p>
-                                <div>${devicesHTML}</div>
-                                <button onclick="this.closest('div[style*=\'position: fixed\']').remove()" class="btn btn-secondary" style="width: 100%; margin-top: 15px;">Close</button>
-                            </div>
-                        </div>
-                    `;
-                    document.body.appendChild(modal);
-                } else {
-                    showError('Failed to load active sessions');
-                }
-            } catch (error) {
-                console.error('Error loading sessions:', error);
-                showError('Error loading active sessions');
-            }
-        }
-        
-        function removeDevice(index) {
-            // Note: Backend implementation needed for individual device removal
-            showError('Device removal feature coming soon. Use "Sign Out All" to remove all devices.');
-        }
-        
         function signOutEverywhere() {
             if (confirm('Are you sure you want to sign out of all devices?')) {
                 // Call backend logout-all endpoint

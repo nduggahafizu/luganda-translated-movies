@@ -20,7 +20,7 @@ const generateRefreshToken = (id) => {
     return jwt.sign({ id }, JWT_REFRESH_SECRET || JWT_SECRET);
 };
 
-const { registerUser } = require('../services/userService');
+const { registerUser, forgotPassword, resetPassword } = require('../services/userService');
 // @desc    Register user
 // @route   POST /api/auth/register
 // @access  Public
@@ -137,7 +137,7 @@ exports.forgotPassword = async (req, res) => {
             message: 'Password reset email sent'
         });
     } catch (error) {
-        logger.error('ForgotPassword error', { error, requestId: req.requestId });
+        logger.error('ForgotPassword error', { error: error.message, stack: error.stack, requestId: req.requestId });
         res.status(500).json({
             status: 'error',
             message: 'Something went wrong',

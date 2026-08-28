@@ -16,7 +16,7 @@
         {
             href: 'series.html',
             label: 'Series',
-            match: ['/series.html', '/series-detail.html'],
+            match: ['/series.html', '/series-player.html'],
             icon: '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M7 7V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v3"/>'
         },
         {

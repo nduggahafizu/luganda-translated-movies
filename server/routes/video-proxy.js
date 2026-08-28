@@ -94,7 +94,7 @@ function cloudflareStreamWatchToManifest(url) {
     return sanitizeUrl(url).replace(/\/watch(\?.*)?$/i, '/manifest/video.m3u8');
 }
 
-// Mirrors isDirectVideo() in player.html/movie-pages.js — the DB's `provider`
+// Mirrors isDirectVideo() in player.html — the DB's `provider`
 // label isn't always accurate (movies get tagged 'streamtape' from an older
 // bulk-import regardless of actual host), so URL shape is the reliable signal
 // for whether a file is already directly playable vs. an embed page needing extraction.
@@ -280,6 +280,15 @@ function requirePlaybackAuthIfNeeded(movie, req) {
         throw error;
     }
 
+    // Token must have been issued for this exact movie — otherwise a token
+    // for one movie could be replayed against any other movieId in the URL.
+    if (String(payload.movieId) !== String(movie._id)) {
+        const error = new Error('Token does not match requested movie');
+        error.code = 'TOKEN_MISMATCH';
+        error.httpStatus = 401;
+        throw error;
+    }
+
     return { requiredPlan, tokenPayload: payload };
 }
 
@@ -357,6 +366,7 @@ router.post('/playback-token', protect, async (req, res) => {
         }
 
         const freeEpisode = isEpisodeRequest && !forDownload && isFreeEpisode(season, episode);
+
         if (!freeEpisode) {
             const requiredPlan = effectiveRequiredPlan(movie);
             if (!req.user.canAccessContent(requiredPlan)) {
@@ -367,6 +377,18 @@ router.post('/playback-token', protect, async (req, res) => {
                     currentPlan: req.user.subscription?.plan
                 });
             }
+        }
+
+        // canAccessContent grants full access during the trial window, but
+        // downloads are deliberately not part of the trial — check that
+        // separately so a trial user can't get a download-flagged token just
+        // because streaming access already passed above.
+        if (forDownload && !req.user.hasDownloadAccess()) {
+            return res.status(403).json({
+                success: false,
+                message: 'Downloads require a paid subscription',
+                code: 'DOWNLOAD_REQUIRES_SUBSCRIPTION'
+            });
         }
 
         const token = jwt.sign(
@@ -557,18 +579,10 @@ router.get('/resolve/luganda/:movieId', async (req, res) => {
 
             // Re-verify entitlement, same defense-in-depth the movie path
             // uses — catches a subscription expiring inside the token's
-            // 10-minute window. Skipped only for a genuine free-episode token.
+            // 10-minute window. Skipped for a genuine free episode.
             if (!isFreeEpisode(season, episode)) {
                 const requiredPlan = effectiveRequiredPlan(movie);
                 await assertUserCanPlay(requiredPlan, payload);
-            } else {
-                const user = await User.findById(payload.uid);
-                if (!user) {
-                    const error = new Error('User not found');
-                    error.code = 'USER_NOT_FOUND';
-                    error.httpStatus = 401;
-                    throw error;
-                }
             }
 
             const seasonDoc = (movie.seasons || []).find(s => s.seasonNumber === Number(season));
@@ -983,7 +997,7 @@ router.get('/stream-proxy', async (req, res) => {
 
     // Encode spaces for HTTP requests
     const fetchUrl = decodedUrl.replace(/ /g, '%20');
-    console.log('🎬 Proxying video:', decodedUrl.substring(0, 100) + '...');
+    console.log('🎬 Proxying video:', decodedUrl.substring(0, 100) + '...', '| incoming Range:', req.headers.range || '(none)');
 
     try {
         const range = req.headers.range;
@@ -1003,10 +1017,20 @@ router.get('/stream-proxy', async (req, res) => {
             headers['Origin'] = 'https://pearlpix.net';
         }
         
-        if (range) {
+        // "bytes=0-" (open-ended, from the very start) is what browsers send
+        // as their first request for a <video> element — but forwarding it
+        // upstream as-is causes some CDNs (confirmed with this app's b-cdn.net
+        // host, on large files) to hang for the full file's worth of range
+        // computation before responding at all. A plain unranged GET gets an
+        // instant 200 with the same bytes, streamed the same way — and
+        // Accept-Ranges: bytes is still set below, so seeking (bounded
+        // ranges) still works for every request after this first one.
+        const isOpenEndedFromStart = range && /^bytes=0-$/i.test(range.trim());
+        if (range && !isOpenEndedFromStart) {
             headers['Range'] = range;
         }
 
+        const upstreamStart = Date.now();
         const response = await axios({
             method: 'GET',
             url: fetchUrl,
@@ -1016,6 +1040,7 @@ router.get('/stream-proxy', async (req, res) => {
             maxRedirects: 5,
             validateStatus: () => true
         });
+        console.log('🎬 Upstream responded:', response.status, `(${Date.now() - upstreamStart}ms)`, '| forwarded Range:', headers['Range'] || '(none)');
 
         if (response.status >= 400) {
             console.error('🎬 Upstream error:', response.status, 'for URL:', fetchUrl.substring(0, 100));

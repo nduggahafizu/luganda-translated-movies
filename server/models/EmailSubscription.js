@@ -7,7 +7,10 @@ const emailSubscriptionSchema = new mongoose.Schema({
         unique: true,
         lowercase: true,
         trim: true,
-        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email']
+        // See server/models/User.js for why this shape (not the old nested
+        // \w+([\.-]?\w+)* pattern) — that one had confirmed catastrophic
+        // backtracking, ~34s to reject a single crafted ~45-char input.
+        match: [/^[\w.-]+@[\w-]+(\.[\w-]+)+$/, 'Please provide a valid email']
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,

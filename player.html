@@ -1,21 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- AdCash (gated for paid subscribers) -->
-    <script src="js/ad-gate.js"></script>
-    <!-- Ezoic Privacy & Ad Scripts -->
-    <script data-cfasync="false" src="https://cmp.gatekeeperconsent.com/min.js"></script>
-    <script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js"></script>
-    <script async src="//www.ezojs.com/ezoic/sa.min.js"></script>
-    <script>window.ezstandalone=window.ezstandalone||{};ezstandalone.cmd=ezstandalone.cmd||[];</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#0a0a0a">
     <title>Watch - Unruly Movies</title>
-
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
 
     <link rel="icon" type="image/png" href="assets/images/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,6 +29,7 @@
 
     <!-- Config -->
     <script src="js/config.js"></script>
+    <script src="js/pesapal-checkout.js"></script>
     <script src="js/watchlist-manager.js"></script>
     
     <style>
@@ -403,6 +394,31 @@
             object-fit: cover !important;
         }
 
+        /* Rewind/forward — real control-bar components (order:1, same as
+           playToggle, so they sit right after it in source order), not
+           floating overlays, so they look and behave like the rest of the bar. */
+        .video-js .vjs-seek-back-button,
+        .video-js .vjs-seek-forward-button {
+            order: 1;
+            cursor: pointer;
+        }
+        .video-js .vjs-seek-back-button .vjs-icon-placeholder,
+        .video-js .vjs-seek-forward-button .vjs-icon-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            gap: 1px;
+        }
+        .video-js .vjs-seek-forward-button svg { transform: scaleX(-1); }
+        .video-js .vjs-seek-back-button .seek-label,
+        .video-js .vjs-seek-forward-button .seek-label {
+            font-size: 8px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
         /* Make the wrapper itself a full-viewport overlay in fullscreen so it never
            clips/constrains the fullscreen video.js element on any screen size */
         body.fullscreen-active .player-wrapper {
@@ -689,7 +705,64 @@
             font-size: 14px;
             font-weight: 500;
         }
-        
+
+        /* Play Gate — poster + play button shown before any auth/entitlement
+           check runs; the check only happens once this is clicked. */
+        .play-gate-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 45;
+            display: none;
+            background-size: cover;
+            background-position: center;
+            background-color: #0a0a0a;
+        }
+
+        .play-gate-overlay.visible {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .play-gate-overlay::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(0deg, rgba(10,10,10,0.9) 0%, rgba(10,10,10,0.25) 45%, rgba(10,10,10,0.55) 100%);
+        }
+
+        .play-gate-btn {
+            position: relative;
+            z-index: 1;
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            background: rgba(74, 222, 128, 0.94);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 10px 34px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .play-gate-btn:hover {
+            transform: scale(1.06);
+            background: var(--accent);
+        }
+
+        .play-gate-btn svg {
+            margin-left: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .play-gate-btn {
+                width: 60px;
+                height: 60px;
+            }
+        }
+
         /* ========== ERROR OVERLAY ========== */
         .error-overlay {
             position: absolute;
@@ -884,58 +957,59 @@
         
         /* Action Buttons */
         .action-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: minmax(76px, 1fr);
+            gap: 10px;
             margin-top: 20px;
             padding-top: 20px;
             border-top: 1px solid var(--border);
+            max-width: 460px;
         }
-        
+
         .action-btn {
-            display: inline-flex;
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 8px;
-            padding: 12px 20px;
-            border-radius: 10px;
+            gap: 6px;
+            padding: 12px 6px;
+            border-radius: 12px;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 11px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
-        }
-        
-        .action-btn svg {
-            width: 18px;
-            height: 18px;
-        }
-        
-        .action-btn.primary {
-            background: var(--accent);
-            color: #000;
-        }
-        
-        .action-btn.primary:hover {
-            background: var(--accent-hover);
-        }
-        
-        .action-btn.secondary {
-            background: rgba(255,255,255,0.1);
+            transition: border-color 0.2s ease, background 0.2s ease;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.04);
             color: var(--text-primary);
         }
-        
-        .action-btn.secondary:hover {
-            background: rgba(255,255,255,0.2);
+
+        .action-btn svg {
+            width: 20px;
+            height: 20px;
         }
-        
+
+        .action-btn.primary,
         .action-btn.active {
-            background: var(--accent);
-            color: #000;
+            border-color: var(--accent);
+            background: rgba(74, 222, 128, 0.12);
+            color: var(--accent);
+        }
+
+        .action-btn:hover {
+            border-color: var(--accent);
+            background: rgba(74, 222, 128, 0.1);
         }
 
         .action-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .action-buttons {
+                grid-auto-columns: minmax(64px, 1fr);
+                max-width: 100%;
+            }
         }
         
         /* ========== YOU MAY ALSO LIKE ========== */
@@ -1445,7 +1519,15 @@
                 <div class="spinner"></div>
                 <div class="loading-text">Loading video...</div>
             </div>
-            
+
+            <!-- Play Gate — shown once movie info has loaded; the auth/entitlement
+                 check only runs when this play button is clicked. -->
+            <div class="play-gate-overlay" id="playGateOverlay">
+                <button class="play-gate-btn" id="playGateBtn" type="button" aria-label="Play">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="#06170d"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
+                </button>
+            </div>
+
             <!-- Error Overlay -->
             <div class="error-overlay" id="errorOverlay">
                 <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1545,19 +1627,19 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polygon points="5 3 19 12 5 21 5 3"></polygon>
                     </svg>
-                    Watch Trailer
+                    <span>Trailer</span>
                 </button>
-                <button class="action-btn primary" id="watchlistBtn">
+                <button class="action-btn secondary" id="watchlistBtn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
                     </svg>
-                    Add to Watchlist
+                    <span>Watchlist</span>
                 </button>
                 <button class="action-btn secondary" id="likeBtn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
                     </svg>
-                    Like
+                    <span>Like</span>
                 </button>
                 <button class="action-btn secondary" id="downloadBtn" style="display: none;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1565,7 +1647,7 @@
                         <polyline points="7 10 12 15 17 10"></polyline>
                         <line x1="12" y1="15" x2="12" y2="3"></line>
                     </svg>
-                    Download
+                    <span>Download</span>
                 </button>
             </div>
         </div>
@@ -1705,6 +1787,62 @@
             }
         }
         
+        // ========== CUSTOM CONTROL-BAR SEEK BUTTONS ==========
+        // Video.js ships no skip/seek buttons and no such plugin is loaded here,
+        // so without this there is no on-screen way to skip at all (only an
+        // unreachable-on-touch keyboard hotkey). Registered as real Button
+        // components (not floating overlays) so they inherit the control bar's
+        // sizing/hover/fullscreen behavior automatically.
+        if (typeof videojs !== 'undefined' && !videojs.getComponent('SeekBackButton')) {
+            const Button = videojs.getComponent('Button');
+            const SEEK_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a8 8 0 1 1-8 8"></path><polyline points="12 1 12 4 9 4"></polyline></svg><span class="seek-label">10</span>';
+
+            class SeekBackButton extends Button {
+                constructor(playerInst, options) {
+                    super(playerInst, options);
+                    this.controlText('Rewind 10 seconds');
+                }
+                buildCSSClass() {
+                    return `vjs-seek-back-button ${super.buildCSSClass()}`;
+                }
+                handleClick() {
+                    const p = this.player();
+                    p.currentTime(Math.max(0, p.currentTime() - 10));
+                }
+                createEl() {
+                    const el = super.createEl();
+                    const placeholder = el.querySelector('.vjs-icon-placeholder');
+                    if (placeholder) placeholder.innerHTML = SEEK_ICON;
+                    return el;
+                }
+            }
+
+            class SeekForwardButton extends Button {
+                constructor(playerInst, options) {
+                    super(playerInst, options);
+                    this.controlText('Forward 10 seconds');
+                }
+                buildCSSClass() {
+                    return `vjs-seek-forward-button ${super.buildCSSClass()}`;
+                }
+                handleClick() {
+                    const p = this.player();
+                    const dur = p.duration();
+                    const next = p.currentTime() + 10;
+                    p.currentTime(isFinite(dur) ? Math.min(dur, next) : next);
+                }
+                createEl() {
+                    const el = super.createEl();
+                    const placeholder = el.querySelector('.vjs-icon-placeholder');
+                    if (placeholder) placeholder.innerHTML = SEEK_ICON;
+                    return el;
+                }
+            }
+
+            videojs.registerComponent('SeekBackButton', SeekBackButton);
+            videojs.registerComponent('SeekForwardButton', SeekForwardButton);
+        }
+
         // ========== INITIALIZE VIDEO.JS ==========
         function initPlayer() {
             if (player) return; // already initialised
@@ -1718,6 +1856,8 @@
                 controlBar: {
                     children: [
                         'playToggle',
+                        'SeekBackButton',
+                        'SeekForwardButton',
                         'volumePanel',
                         'currentTimeDisplay',
                         'timeDivider',
@@ -2228,8 +2368,13 @@
             // Clear any previous error state
             hideError();
             
-            // Fix mixed content - convert http to https
-            if (url.startsWith('http://')) {
+            // Fix mixed content - convert http to https, but only when the
+            // page itself is on https (localhost dev serves plain http on
+            // both the page and our own /api/video/stream-proxy — upgrading
+            // that to https unconditionally pointed it at a TLS port nothing
+            // listens on, failing with ERR_SSL_PROTOCOL_ERROR before any
+            // request ever reached the server).
+            if (window.location.protocol === 'https:' && url.startsWith('http://')) {
                 url = url.replace('http://', 'https://');
             }
 
@@ -2243,11 +2388,17 @@
             let type = 'video/mp4';
             const urlLower = url.toLowerCase();
             
+            // A URL from resolve/luganda may already be our own stream-proxy
+            // call — never re-wrap an already-proxied URL in another layer
+            // of proxying.
+            const alreadyProxied = urlLower.includes('/api/video/stream-proxy');
+
             // Proxy MKV files (need remuxing) and BunnyCDN URLs (hotlink protection
             // blocks direct browser requests — stream-proxy bypasses it server-side)
-            const needsProxy = urlLower.includes('.mkv') ||
+            const needsProxy = !alreadyProxied && (
+                               urlLower.includes('.mkv') ||
                                urlLower.includes('b-cdn.net') ||
-                               urlLower.includes('bunnycdn');
+                               urlLower.includes('bunnycdn'));
 
             // Save raw URL BEFORE proxying so the error-retry handler never double-proxies
             const rawUrl = url;
@@ -2293,8 +2444,11 @@
                 const err = player.error();
                 console.error('⚠️ Player error event:', err);
 
-                if (err && err.code === 4) {
-                    // Retry with stream proxy for CODE:4 — use rawUrl to avoid double-proxying
+                // Only retry-via-proxy when this attempt was NOT already
+                // proxied — retrying an already-proxied URL by wrapping
+                // rawUrl in another stream-proxy call just nests it a
+                // second time, a guaranteed failure, not a retry.
+                if (err && err.code === 4 && !alreadyProxied && !needsProxy) {
                     console.warn('⚠️ Retrying playback for CODE:4 with stream proxy');
                     const proxyUrl = `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(rawUrl)}`;
 
@@ -2347,23 +2501,12 @@
                     // Load related movies (public)
                     loadRelatedMovies();
 
-                    const hasVideo = currentMovie.video?.hasVideo !== false;
+                    // Don't auto-play or auto-gate on load — show the poster
+                    // with a play button; the auth/entitlement check (and any
+                    // login or pay-plan prompt) only runs once it's clicked.
+                    hideLoading();
+                    showPlayGate(currentMovie);
 
-                    // Auth check — login + paid subscription required
-                    const authed = await isLoggedIn();
-                    const hasPaidPlan = authed && window._userAccess && !window._userAccess.freeUser;
-                    if (hasPaidPlan) {
-                        checkDownloadPermission(currentMovie);
-                        initPlayer();
-                        if (hasVideo) {
-                            await loadEntitledVideo(currentMovie._id);
-                        } else {
-                            showError('Video not available for this movie');
-                        }
-                    } else {
-                        showAuthGate(currentMovie);
-                    }
-                    
                 } else {
                     showError('Movie not found');
                 }
@@ -2373,6 +2516,45 @@
             }
         }
         
+        // ========== PLAY GATE ==========
+        function showPlayGate(movie) {
+            const gate = document.getElementById('playGateOverlay');
+            const posterUrl = movie?.backdrop || movie?.poster;
+            if (posterUrl) {
+                gate.style.backgroundImage = `url('${posterUrl}')`;
+            }
+            gate.classList.add('visible');
+        }
+
+        async function attemptPlay() {
+            document.getElementById('playGateOverlay').classList.remove('visible');
+            loadingOverlay.classList.remove('hidden');
+
+            const hasVideo = currentMovie.video?.hasVideo !== false;
+            if (!hasVideo) {
+                showError('Video not available for this movie');
+                return;
+            }
+
+            const authed = await isLoggedIn();
+            if (!authed) {
+                hideLoading();
+                showAuthGate(currentMovie);
+                return;
+            }
+
+            // Logged in — always attempt playback now. Whether this turns
+            // into full access or a paywall is decided server-side in
+            // loadEntitledVideo/playback-token (includes the free 6-hour
+            // trial window for new accounts), not pre-empted here by the
+            // client's cached _userAccess.freeUser flag.
+            checkDownloadPermission(currentMovie);
+            initPlayer();
+            await loadEntitledVideo(currentMovie._id);
+        }
+
+        document.getElementById('playGateBtn').addEventListener('click', attemptPlay);
+
         // ========== LOAD VIDEO FOR ENTITLED USER ==========
         // The public movie fetch never contains the raw playable URL — it's
         // stripped server-side. This is the only path that can produce one:
@@ -2391,7 +2573,10 @@
                 });
                 const tokenData = await tokenResponse.json();
                 if (!tokenData.success || !tokenData.token) {
-                    showError(tokenData.message || 'Unable to start playback');
+                    // No token issued — genuinely not entitled. Go to the
+                    // paywall, not a generic error.
+                    hideLoading();
+                    showAuthGate(currentMovie);
                     return;
                 }
 
@@ -2408,7 +2593,7 @@
                 showError('Failed to load video. Please try again.');
             }
         }
-        
+
         // ========== STRUCTURED DATA (JSON-LD) ==========
         function injectMovieStructuredData(movie) {
             const existing = document.getElementById('movie-jsonld');
@@ -2576,8 +2761,22 @@
                     <div style="width:54px;height:54px;border-radius:50%;background:rgba(74,222,128,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
                         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     </div>
-                    <h3 style="color:#fff;font-size:17px;margin-bottom:6px;">Unlock Full Movie</h3>
-                    <p style="color:#888;font-size:12px;line-height:1.6;margin-bottom:18px;">Choose a plan to watch unlimited Luganda movies</p>
+                    <h3 style="color:#fff;font-size:17px;margin-bottom:6px;">Unlock Full Access</h3>
+                    <p style="color:#888;font-size:12px;line-height:1.6;margin-bottom:14px;">Watch every movie, ad-light, with download included — on any plan below.</p>
+                    <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:16px;text-align:left;">
+                        <div style="display:flex;align-items:center;gap:9px;font-size:11px;color:rgba(255,255,255,0.7);">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Full catalog — every VJ, every title
+                        </div>
+                        <div style="display:flex;align-items:center;gap:9px;font-size:11px;color:rgba(255,255,255,0.7);">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Download for offline viewing
+                        </div>
+                        <div style="display:flex;align-items:center;gap:9px;font-size:11px;color:rgba(255,255,255,0.7);">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Cancel anytime, no contract
+                        </div>
+                    </div>
                     <div id="planError" style="display:none;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);border-radius:8px;padding:10px;margin-bottom:14px;color:#f87171;font-size:12px;"></div>
                     <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:16px;">
                         <button onclick="window._playerSelectPlan('daily')" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:13px;cursor:pointer;width:100%;">
@@ -2607,6 +2806,10 @@
                 const errorBox = document.getElementById('planError');
                 if (errorBox) { errorBox.style.display = 'none'; errorBox.textContent = ''; }
                 if (btn) { btn.innerHTML = '<span style="opacity:0.7">Processing...</span>'; btn.disabled = true; }
+
+                // Open synchronously, inside the click gesture, so it isn't popup-blocked.
+                const popup = window.PesapalCheckout?.openBlankPopup();
+
                 try {
                     const r = await fetch(`${API_BASE}/api/payments/subscribe`, {
                         method: 'POST',
@@ -2615,13 +2818,36 @@
                     });
                     const d = await r.json();
                     if (d.status === 'success' && d.data?.redirectUrl) {
-                        window.location.href = d.data.redirectUrl;
+                        overlay.remove();
+
+                        if (window.PesapalCheckout && popup) {
+                            window.PesapalCheckout.runCheckout(popup, d.data.redirectUrl, {
+                                ref: d.data.merchantReference,
+                                token,
+                                apiBase: API_BASE,
+                                onSuccess: () => {
+                                    window.dispatchEvent(new CustomEvent('pesapal-payment-success', { detail: { plan } }));
+                                    window.location.reload();
+                                },
+                                onFailure: (status) => {
+                                    if (status === 'cancelled') return;
+                                    alert(status === 'timeout'
+                                        ? 'Still waiting on confirmation — check back in a moment.'
+                                        : 'Payment failed. Please try again.');
+                                }
+                            });
+                        } else {
+                            // Popup blocked or helper unavailable — fall back to same-tab redirect.
+                            window.location.href = d.data.redirectUrl;
+                        }
                     } else {
+                        if (popup && !popup.closed) popup.close();
                         const msg = d.message || d.error || 'Payment could not be initiated. Please try again.';
                         if (errorBox) { errorBox.textContent = msg; errorBox.style.display = 'block'; }
                         if (btn) { btn.innerHTML = origHTML; btn.disabled = false; }
                     }
                 } catch(e) {
+                    if (popup && !popup.closed) popup.close();
                     if (errorBox) { errorBox.textContent = 'Network error. Check your connection and try again.'; errorBox.style.display = 'block'; }
                     if (btn) { btn.innerHTML = origHTML; btn.disabled = false; }
                 }
@@ -2676,50 +2902,6 @@
             showNotification('Download started!');
         }
 
-        function showIOSDownloadInstructions(downloadUrl) {
-            // Kept for legacy call sites — now unused since proxy handles iOS directly
-            const existing = document.getElementById('iosDownloadPrompt');
-            if (existing) existing.remove();
-
-            const overlay = document.createElement('div');
-            overlay.id = 'iosDownloadPrompt';
-            overlay.style.cssText = `
-                position: fixed; inset: 0; z-index: 99999;
-                background: rgba(0,0,0,0.8); backdrop-filter: blur(6px);
-                display: flex; align-items: center; justify-content: center; padding: 20px;
-            `;
-            overlay.innerHTML = `
-                <div style="background:#13131f;border:1px solid rgba(74,222,128,0.2);border-radius:20px;
-                            max-width:380px;width:100%;padding:28px 24px;text-align:center;">
-                    <div style="width:56px;height:56px;border-radius:50%;background:rgba(74,222,128,0.12);
-                                display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
-                    </div>
-                    <h3 style="color:#fff;font-size:18px;margin:0 0 10px;">Saving on iPhone/iPad</h3>
-                    <p style="color:#999;font-size:14px;line-height:1.6;margin:0 0 20px;">
-                        Safari can't auto-download videos. Tap <strong style="color:#fff">Open Video</strong> below,
-                        then tap and hold the video and choose <strong style="color:#fff">"Download Video"</strong> or
-                        use the Share button to save it.
-                    </p>
-                    <a href="${downloadUrl}" target="_blank"
-                       style="display:block;background:#4ade80;color:#000;font-weight:700;
-                              padding:13px;border-radius:12px;text-decoration:none;font-size:15px;margin-bottom:10px;">
-                        Open Video
-                    </a>
-                    <button onclick="document.getElementById('iosDownloadPrompt').remove()"
-                            style="background:none;border:none;color:#666;font-size:13px;cursor:pointer;padding:8px;">
-                        Cancel
-                    </button>
-                </div>
-            `;
-            document.body.appendChild(overlay);
-            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
-        }
-        
         // ========== RELATED MOVIES ==========
         async function loadRelatedMovies() {
             if (!currentMovie) return;
@@ -2909,8 +3091,8 @@
 
         function getWatchlistButtonContent(active) {
             return active
-                ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path><polyline points="9 11 12 14 16 10"></polyline></svg><span>In Watchlist</span>`
-                : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg><span>Add to Watchlist</span>`;
+                ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path><polyline points="9 11 12 14 16 10"></polyline></svg><span>In List</span>`
+                : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg><span>Watchlist</span>`;
         }
 
         function updateLikeButton() {

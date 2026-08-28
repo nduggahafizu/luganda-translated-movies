@@ -185,11 +185,20 @@ app.use('/vendor', express.static(path.join(__dirname, '../vendor'), {
     immutable: true,
 }));
 
-// Other frontend static assets (CSS, JS, images) — 1 day cache
+// Other frontend static assets (CSS, JS, images) — 1 day cache.
+// HTML pages are excluded from that: they have no cache-busting filename
+// scheme, so a 1-day cache means edits silently don't show up on a normal
+// reload for up to 24h. no-cache still lets the browser reuse a cached copy
+// once revalidated via ETag — just never blindly, without asking first.
 app.use(express.static(path.join(__dirname, '..'), {
     maxAge: '1d',
     etag: true,
     index: false, // don't auto-serve index.html from here; let the SPA handle routing
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.html')) {
+            res.setHeader('Cache-Control', 'no-cache');
+        }
+    }
 }));
 
 // Database connection
@@ -278,8 +287,12 @@ app.use('/api/requests', requestsRoutes); // User requests/contact form
 app.use('/api/series', cache(300), seriesRoutes); // TV Series with 5 min cache
 app.use('/api/email', emailRoutes); // Email subscriptions and notifications
 app.use('/api/push', pushRoutes); // Web Push notifications
-app.use('/api/movie-page', moviePagesRoutes); // SSR movie pages for crawlers
-app.use('/movie', moviePagesRoutes);           // Local dev: /movie/:slug directly
+app.use('/movie', moviePagesRoutes); // /movie/:slug — resolves and redirects to player.html/series-player.html
+app.get('/reset-password/:token', (req, res) => {
+    // Password reset emails link here (CLIENT_URL + this path). Redirect to
+    // the real static page, same pattern as /movie/:slug above.
+    res.redirect(302, `/reset-password.html?token=${encodeURIComponent(req.params.token)}`);
+});
 app.use('/api/sitemap-movies', require('./routes/sitemap')); // Dynamic movie sitemap
 
 // Token refresh endpoint
@@ -538,6 +551,19 @@ app.listen(PORT, () => {
     checkSubscriptionExpiry();
     setInterval(checkSubscriptionExpiry, 10 * 60 * 1000);
     console.log('⏰ Subscription expiry checker enabled (every 10 min)');
+
+    // PesaPal reconciliation sweep — catches payments that completed on
+    // PesaPal's side but never got activated locally (missed/failed IPN,
+    // browser never made it back from a redirect, past callback/IPN URL
+    // misconfigurations, etc). Runs every minute so activation is near-instant
+    // and doesn't depend on any redirect actually reaching us.
+    const { reconcilePendingPesapalPayments } = require('./controllers/paymentController');
+    setInterval(() => {
+        reconcilePendingPesapalPayments().catch(err => {
+            console.error('PesaPal reconciliation sweep error:', err.message);
+        });
+    }, 60 * 1000);
+    console.log('🔄 PesaPal reconciliation sweep enabled (every 60s)');
 });
 
 // Handle unhandled promise rejections
