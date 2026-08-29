@@ -1589,7 +1589,7 @@
         <!-- Movie Card -->
         <div class="movie-card">
             <div class="movie-header">
-                <img src="assets/images/placeholder-poster.jpg" alt="" class="movie-poster" id="moviePoster">
+                <img src="assets/images/placeholder.svg" alt="" class="movie-poster" id="moviePoster">
                 <div class="movie-info">
                     <h1 class="movie-title" id="movieTitle">Loading...</h1>
                     
@@ -2348,8 +2348,17 @@
                 }
             }, 100);
 
-            // Turn on additional error tracking
-            player.one('error', () => {
+            // Turn on additional error tracking. Persistent (not .one()) so a
+            // retry that itself hits a transient error can retry again, up
+            // to a limit — a dropped/reset connection mid-stream is real and
+            // confirmed (net::ERR_CONNECTION_RESET seen live on a direct CDN
+            // play), and the player should recover from that the way a
+            // browser's own video/download handling silently would, not
+            // leave playback dead after one blip.
+            let networkRetries = 0;
+            const MAX_NETWORK_RETRIES = 3;
+            player.off('error');
+            player.on('error', () => {
                 const err = player.error();
                 console.error('⚠️ Player error event:', err);
 
@@ -2367,6 +2376,30 @@
                         console.error('Proxy play failed:', playErr);
                         showError('Video not supported. Try refreshing the page.');
                     });
+                    return;
+                }
+
+                // CODE 2 (network) / CODE 3 (decode — often the same root
+                // cause, a truncated stream from a dropped connection).
+                // Reload the same source and resume from where playback was,
+                // with a short backoff, before giving up.
+                if (err && (err.code === 2 || err.code === 3) && networkRetries < MAX_NETWORK_RETRIES) {
+                    networkRetries++;
+                    const resumeAt = player.currentTime() || 0;
+                    console.warn(`⚠️ Network error (code ${err.code}) — retry ${networkRetries}/${MAX_NETWORK_RETRIES}, resuming at ${resumeAt}s`);
+                    setTimeout(() => {
+                        player.src({ src: url, type: type });
+                        player.load();
+                        player.one('loadedmetadata', () => {
+                            if (resumeAt > 0) player.currentTime(resumeAt);
+                        });
+                        player.play().catch(() => {});
+                    }, networkRetries * 1000);
+                    return;
+                }
+
+                if (err && (err.code === 2 || err.code === 3)) {
+                    showError('Connection interrupted. Please check your network and try again.');
                 }
             });
 
@@ -2590,7 +2623,7 @@
             document.getElementById('movieDescription').textContent = movie.plot || movie.description || 'No description available.';
             
             const poster = document.getElementById('moviePoster');
-            poster.src = movie.poster || 'assets/images/placeholder-poster.jpg';
+            poster.src = movie.poster || 'assets/images/placeholder.svg';
             poster.alt = movie.originalTitle || movie.title;
             
             // Meta info
@@ -2851,14 +2884,14 @@
                 const quality = movie.video?.quality || 'HD';
                 const rating = movie.rating?.translationRating || movie.rating?.userRating || 4.0;
                 const genre = movie.genres?.[0] || '';
-                const poster = movie.poster || 'assets/images/placeholder-poster.jpg';
+                const poster = movie.poster || 'assets/images/placeholder.svg';
                 const tmdbId = movie.tmdbId || '';
                 const safeTitle = title.replace(/'/g, "\\'");
                 
                 return `
                     <a href="player.html?id=${movie._id}" class="related-card">
                         <div class="related-poster-wrapper">
-                            <img src="${poster}" alt="${title}" class="related-poster" loading="lazy" onerror="this.src='assets/images/placeholder-poster.jpg'">
+                            <img src="${poster}" alt="${title}" class="related-poster" loading="lazy" onerror="this.src='assets/images/placeholder.svg'">
                             <div class="related-badges">
                                 <span class="related-badge quality">${quality}</span>
                                 <span class="related-badge rating">

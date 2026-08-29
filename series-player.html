@@ -1589,6 +1589,7 @@
                 // through. handleVideoError below is the only thing that
                 // still reaches for the proxy, and only for whichever
                 // specific source turns out to need it.
+                seriesNetworkRetries = 0; // fresh source — don't inherit a previous episode's exhausted retry count
                 videoEl.onerror = () => handleVideoError(videoEl, resolveData.directUrl, false);
                 videoEl.src = resolveData.directUrl;
                 videoEl.load();
@@ -1654,7 +1655,11 @@
             if (loading) loading.style.display = 'none';
         }
 
+        let seriesNetworkRetries = 0;
+        const MAX_SERIES_NETWORK_RETRIES = 3;
+
         function handleVideoError(videoElement, originalUrl, alreadyProxied) {
+            const errCode = videoElement.error?.code;
             console.error('Video error:', videoElement.error);
 
             // First failure on a direct (non-proxied) source: retry once
@@ -1667,6 +1672,34 @@
                 videoElement.onerror = () => handleVideoError(videoElement, originalUrl, true);
                 videoElement.src = proxyUrl;
                 videoElement.load();
+                return;
+            }
+
+            // CODE 2 (network) / CODE 3 (decode — often the same root cause,
+            // a truncated stream from a dropped connection). Reload the same
+            // source and resume from where playback was, with a short
+            // backoff, before falling back to the manual-retry UI below —
+            // a browser's own video/download handling would recover from a
+            // dropped connection silently rather than dead-end on one blip.
+            if ((errCode === 2 || errCode === 3) && seriesNetworkRetries < MAX_SERIES_NETWORK_RETRIES) {
+                seriesNetworkRetries++;
+                const resumeAt = videoElement.currentTime || 0;
+                // currentSrc, not originalUrl — originalUrl is always the raw
+                // pre-proxy URL here (it's only carried along as a flag-ish
+                // param so the first-failure branch above knows what to
+                // proxy), while currentSrc is whatever's actually loaded
+                // right now, proxied or not.
+                const retrySrc = videoElement.currentSrc || originalUrl;
+                console.warn(`Network error (code ${errCode}) — retry ${seriesNetworkRetries}/${MAX_SERIES_NETWORK_RETRIES}, resuming at ${resumeAt}s`);
+                setTimeout(() => {
+                    videoElement.onerror = () => handleVideoError(videoElement, originalUrl, true);
+                    videoElement.src = retrySrc;
+                    videoElement.load();
+                    videoElement.addEventListener('loadedmetadata', () => {
+                        if (resumeAt > 0) videoElement.currentTime = resumeAt;
+                        videoElement.play().catch(() => {});
+                    }, { once: true });
+                }, seriesNetworkRetries * 1000);
                 return;
             }
 
