@@ -131,7 +131,7 @@ async function notifyNewMovie(movie) {
 
         const notification = {
             title: '🎬 New Movie Added!',
-            body: `${movie.lugandaTitle || movie.title}${movie.vjName ? ` - Translated by VJ ${movie.vjName}` : ''}`,
+            body: `${movie.lugandaTitle || movie.title}${movie.vjName ? ` - Translated by ${movie.vjName.startsWith('VJ') ? movie.vjName : `VJ ${movie.vjName}`}` : ''}`,
             image: movie.poster || movie.posterUrl || null, // For rich notification display
             data: {
                 type: 'new_movie',

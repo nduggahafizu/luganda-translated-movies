@@ -387,7 +387,7 @@ router.post('/movies', [auth, adminOnly, validateMovie], async (req, res) => {
         await Notification.createForAllUsers({
             type: 'new_movie',
             title: 'New Movie Added!',
-            message: `${movie.originalTitle} is now available with VJ ${movie.vjName}`,
+            message: `${movie.originalTitle} is now available with ${movie.vjName?.startsWith('VJ') ? movie.vjName : `VJ ${movie.vjName}`}`,
             link: `/player.html?id=${movie._id}`,
             image: movie.poster
         });
