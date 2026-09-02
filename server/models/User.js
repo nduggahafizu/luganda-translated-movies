@@ -143,7 +143,7 @@ const userSchema = new mongoose.Schema({
             default: null
         }
     }],
-    // Every new account gets 6 hours of full access from creation, no plan
+    // Every new account gets 1 hour of full access from creation, no plan
     // restrictions (see isInTrialPeriod/canAccessContent below). Set by the
     // pre('save') hook below, guarded on isNew — NOT a plain schema
     // `default`, which would backfill onto any EXISTING account too the
@@ -267,12 +267,12 @@ userSchema.pre('save', async function(next) {
     next();
 });
 
-// Grant the 6-hour full-access trial exactly once, on genuine first
+// Grant the 1-hour full-access trial exactly once, on genuine first
 // creation — isNew is only true before a document's first successful save,
 // so this can't fire again on a later save of an already-existing account.
 userSchema.pre('save', function(next) {
     if (this.isNew && !this.trialEndsAt) {
-        this.trialEndsAt = new Date(Date.now() + 6 * 60 * 60 * 1000);
+        this.trialEndsAt = new Date(Date.now() + 1 * 60 * 60 * 1000);
     }
     next();
 });
@@ -290,7 +290,7 @@ userSchema.methods.hasActiveSubscription = function() {
            (!this.subscription.endDate || this.subscription.endDate > Date.now());
 };
 
-// Still within the free 6-hour full-access window granted at account creation?
+// Still within the free 1-hour full-access window granted at account creation?
 userSchema.methods.isInTrialPeriod = function() {
     return !!this.trialEndsAt && this.trialEndsAt > Date.now();
 };
