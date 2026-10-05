@@ -481,10 +481,16 @@
         .save-btn.saved { background: rgba(74,222,128,0.2); border-color: #4ade80; color: #4ade80; }
 
         @media (max-width: 600px) {
-            .hero-content { padding: 0 16px 24px; }
+            /* Bottom padding leaves room for the slide dots row */
+            .hero-content { padding: 0 16px 28px; }
             .hero-title { font-size: 22px; }
             .hero-desc { display: none; }
             .hero-badge-year { display: none; }
+            /* Keep Watch Now / More Info / Save on one row — the bookmark
+               button was wrapping onto its own line on phones. */
+            .hero-btns { flex-wrap: nowrap; gap: 8px; }
+            .info-btn { padding: 9px 14px; font-size: 13px; gap: 6px; white-space: nowrap; }
+            .hero-watch-now { gap: 10px; }
         }
 
         /* Stats bar */
@@ -681,15 +687,18 @@
             transition: all 0.2s;
             white-space: nowrap;
         }
+        /* Selected/hover filter states use the brand green like every other
+           active control on the site (sidebar, bottom nav). Red is kept only
+           for the VJ badge ribbons on posters. */
         .vj-filter-chip:hover {
-            border-color: #e50914;
+            border-color: #4ade80;
             color: #fff;
-            background: rgba(229,9,20,0.15);
+            background: rgba(74,222,128,0.12);
         }
         .vj-filter-chip.active {
-            background: #e50914;
-            border-color: #e50914;
-            color: #fff;
+            background: #4ade80;
+            border-color: #4ade80;
+            color: #06240f;
         }
         .genre-chip {
             display: inline-flex;
@@ -901,29 +910,9 @@
                         </div>
                     </form>
                     
+                    <!-- Movies/VJs links removed from here — both are already in the
+                         sidebar right below, and the duplicates squeezed the search box. -->
                     <ul class="navbar-nav navbar-user ml-auto align-items-center text-nowrap">
-                        <li class="nav-item">
-                            <a class="nav-link" href="movies.html" aria-label="Browse Movies">
-                                <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
-                                    <line x1="7" y1="2" x2="7" y2="22"></line>
-                                    <line x1="17" y1="2" x2="17" y2="22"></line>
-                                    <line x1="2" y1="12" x2="22" y2="12"></line>
-                                </svg>
-                                <span class="d-none d-lg-inline">Movies</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="vjs.html" aria-label="VJ Translators">
-                                <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="9" cy="7" r="4"></circle>
-                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                </svg>
-                                <span class="d-none d-lg-inline">VJs</span>
-                            </a>
-                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="https://play.google.com/store/apps/details?id=com.unruly.movies" target="_blank" aria-label="Get App on Google Play" style="color: #7cfc00; background: rgba(124,252,0,0.15); padding: 8px 12px; border-radius: 20px;">
                                 <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1017,7 +1006,10 @@
 
             <div class="app-wrapper">
                 <!-- Sidebar -->
-                <div class="app-aside nav-aside" id="aside">
+                <!-- data-canonical-sidebar: this hand-written sidebar is the
+                     reference copy; js/app-shell.js rebuilds every other app
+                     page's sidebar to match it (keep the two lists in sync). -->
+                <div class="app-aside nav-aside" id="aside" data-canonical-sidebar>
                     <button class="modal-close" data-dismiss="modal" aria-label="Close menu" title="Close menu">
                         <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -2647,6 +2639,26 @@
             if (prevBtn) prevBtn.addEventListener('click', (e) => { e.preventDefault(); advanceHeroSlide(-1); });
             if (nextBtn) nextBtn.addEventListener('click', (e) => { e.preventDefault(); advanceHeroSlide(1); });
 
+            // Swipe left/right on the hero — the arrows are hidden on phones
+            // (they sat on top of the Watch Now button), so this is how phone
+            // users move between slides. Only a clearly horizontal swipe
+            // counts, so vertical page scrolling is never hijacked.
+            const heroEl = prevBtn?.closest('.carousel') || document.querySelector('.carousel');
+            if (heroEl) {
+                let startX = 0, startY = 0;
+                heroEl.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                }, { passive: true });
+                heroEl.addEventListener('touchend', (e) => {
+                    const dx = e.changedTouches[0].clientX - startX;
+                    const dy = e.changedTouches[0].clientY - startY;
+                    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+                        advanceHeroSlide(dx < 0 ? 1 : -1);
+                    }
+                }, { passive: true });
+            }
+
             setHeroSlide(0);
             restartHeroAutoAdvance();
         }
@@ -2983,9 +2995,6 @@
 
     <!-- Native App Notifications (native-notifications.js guards itself with window.Capacitor check) -->
     <script defer src="js/native-notifications.js"></script>
-
-    <!-- User Engagement Scripts -->
-    <script defer src="js/live-chat-widget.js"></script>
 
     <!-- Web Push Notifications -->
     <script defer src="js/push-notifications.js"></script>

@@ -29,7 +29,6 @@
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
-                <span class="chat-badge">1</span>
             </button>
             
             <!-- Chat Window -->
@@ -425,20 +424,22 @@
             }
             
             @media (max-width: 768px) {
+                /* Sit above the fixed bottom nav bar (~70px + phone safe
+                   area) — at bottom:15px it covered the nav's last tab. */
                 #chat-widget {
-                    bottom: 15px;
-                    right: 15px;
+                    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+                    right: 14px;
                 }
-                
+
                 .chat-window {
-                    width: calc(100vw - 30px);
-                    height: 450px;
-                    bottom: 75px;
+                    width: calc(100vw - 28px);
+                    height: min(450px, calc(100vh - 180px));
+                    bottom: 60px;
                 }
-                
+
                 .chat-toggle-btn {
-                    width: 55px;
-                    height: 55px;
+                    width: 48px;
+                    height: 48px;
                 }
             }
         `;

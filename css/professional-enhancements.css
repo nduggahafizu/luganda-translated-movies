@@ -163,18 +163,11 @@ h1, h2, h3, h4, h5, h6 {
     color: #ffffff;
 }
 
-/* Professional Spacing */
-.container {
-    margin-top: 30px !important;
-    margin-bottom: 30px !important;
-}
-
-@media (min-width: 768px) {
-    .container {
-        margin-top: 40px !important;
-        margin-bottom: 40px !important;
-    }
-}
+/* (Removed: a forced `.container { margin-top: 30px/40px !important }`.
+   .container is the root that wraps the whole app shell — sticky header
+   included — so this pushed the home page's header down 40px while the
+   fixed sidebar stayed at top:70px, making the sidebar overlap the header
+   and cover part of the logo. No other page loads this file.) */
 
 /* Movie Section Spacing */
 .movie-section {

@@ -13,6 +13,13 @@ http://www.unrulymovies.com/* https://unrulymovies.com/:splat 301!
 
 http://unrulymovies.com/* https://unrulymovies.com/:splat 301!
 
+# Never serve backend/tooling source as static files. Netlify publishes the
+# whole repo folder, so without these /server/server.js etc. were publicly
+# downloadable. The "!" forces the 404 even though the files exist.
+/server/*      /index.html  404!
+/scripts/*     /index.html  404!
+/native-app/*  /index.html  404!
+
 # API proxy
 /api/* https://luganda-translated-movies-production.up.railway.app/api/:splat 200
 

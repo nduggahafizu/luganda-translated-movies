@@ -20,7 +20,18 @@ const generateRefreshToken = (id) => {
     return jwt.sign({ id }, JWT_REFRESH_SECRET || JWT_SECRET);
 };
 
-const { registerUser, forgotPassword, resetPassword } = require('../services/userService');
+// Every service function a handler below calls must be imported here —
+// updatePassword, verifyEmail, updateProfile and refreshTokenService were
+// all missing, so their routes threw a ReferenceError (500) on every call.
+const {
+    registerUser,
+    forgotPassword,
+    resetPassword,
+    updateProfile,
+    verifyEmail,
+    updatePassword,
+    refreshTokenService
+} = require('../services/userService');
 // @desc    Register user
 // @route   POST /api/auth/register
 // @access  Public
@@ -36,7 +47,7 @@ exports.register = async (req, res) => {
         }
         res.status(201).json({
             status: 'success',
-            message: 'Registration successful. Please check your email to verify your account.',
+            message: 'Registration successful.',
             data: result
         });
     } catch (error) {

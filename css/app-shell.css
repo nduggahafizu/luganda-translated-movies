@@ -492,6 +492,14 @@
         display: none !important;
     }
 
+    /* The header logo is right above the always-open sidebar on desktop, so
+       the sidebar's own "Unruly Movies" title just repeated the brand. It
+       still shows in the phone slide-out drawer, where there's no header
+       logo next to it. */
+    .app-aside .drawer-logo {
+        display: none;
+    }
+
     .sidebar-backdrop {
         display: none !important;
     }

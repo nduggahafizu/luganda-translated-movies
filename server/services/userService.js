@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const { sendEmail } = require('../utils/email');
+const { sendEmail, sendWelcomeEmail } = require('../utils/email');
 const { sendWelcomeNotification } = require('../utils/notificationService');
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -23,32 +23,21 @@ async function registerUser({ fullName, email, password, clientUrl }) {
     if (userExists) {
         return { error: 'User already exists with this email' };
     }
-    // Create user
+    // Create user. No email verification step: nothing ever required a
+    // verified email to log in or watch, and the old verification link
+    // pointed at a /verify-email page the site doesn't have.
     const user = await User.create({ fullName, email, password });
-    // Generate email verification token
-    const verificationToken = crypto.randomBytes(32).toString('hex');
-    user.emailVerificationToken = crypto.createHash('sha256').update(verificationToken).digest('hex');
-    user.emailVerificationExpire = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
-    await user.save();
-    
-    // Send welcome notification
+
+    // Send welcome notification (in-app)
     try {
         await sendWelcomeNotification(user._id, user.fullName);
     } catch (err) {
         console.error('Failed to send welcome notification:', err);
     }
-    
-    // Send verification email
-    const verificationUrl = `${clientUrl}/verify-email/${verificationToken}`;
-    try {
-        await sendEmail({
-            to: user.email,
-            subject: 'Verify Your Email - Unruly Movies',
-            html: `<h1>Welcome to Unruly Movies!</h1><p>Please verify your email by clicking the link below:</p><a href="${verificationUrl}">Verify Email</a><p>This link expires in 24 hours.</p>`
-        });
-    } catch (error) {
-        // Email send error is not fatal for registration
-    }
+
+    // Welcome email — fire-and-forget so a slow or failing mail server
+    // never delays or breaks sign-up.
+    sendWelcomeEmail(user).catch(err => console.error('Welcome email failed:', err.message));
     // Generate tokens
     const token = generateToken(user._id);
     const refreshToken = generateRefreshToken(user._id);

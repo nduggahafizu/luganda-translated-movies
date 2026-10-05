@@ -1595,12 +1595,7 @@
                     
                     <div class="movie-meta" id="movieMeta">
                         <span class="meta-badge quality" id="movieQuality">HD</span>
-                        <span class="meta-badge rating" id="movieRating">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                            </svg>
-                            <span>8.5</span>
-                        </span>
+                        <span class="meta-badge rating" id="movieRating" style="display:none"></span>
                         <span class="meta-badge" id="movieYear">2024</span>
                         <span class="meta-badge" id="movieDuration">2h 15m</span>
                     </div>
@@ -1678,7 +1673,14 @@
         // Video.js Player Instance
         let player = null;
         let currentMovie = null;
+        // Paid playback token for the current movie — stream-proxy refuses any
+        // request without one, so the proxy fallback has to carry it.
+        let currentPlaybackToken = null;
         let fullscreenRotateApplied = false;
+
+        function proxyUrlFor(rawUrl, token, extraQuery = '') {
+            return `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(rawUrl)}&token=${encodeURIComponent(token || '')}${extraQuery}`;
+        }
 
         // ========== SUPER PLAYER STATE ==========
         const playerWrapper = document.getElementById('playerWrapper');
@@ -1894,7 +1896,21 @@
                 hideLoading();
                 hideError();
             });
-            
+
+            // Many catalogue files are HEVC/H.265 (10-bit) MKVs. Browsers that
+            // can't decode HEVC don't raise an error — they play the audio over a
+            // black screen (videoWidth stays 0), so the proxy fallback never
+            // triggers and would not help anyway (it doesn't change the codec).
+            // Tell the viewer plainly instead of leaving them with sound only.
+            player.on('loadeddata', () => {
+                const el = player.tech && player.tech(true) && player.tech(true).el();
+                const w = el ? el.videoWidth : player.videoWidth();
+                if (!w && player.duration() > 0) {
+                    player.pause();
+                    showError('This movie uses the HEVC (H.265) video format, which this browser can\'t display — you\'d only hear sound. It plays in the Unruly Movies Android app and in Chrome on most Android phones.');
+                }
+            });
+
             player.on('waiting', () => {
                 // Show loading spinner during buffering
             });
@@ -2368,7 +2384,7 @@
                 // second time, a guaranteed failure, not a retry.
                 if (err && err.code === 4 && !alreadyProxied) {
                     console.warn('⚠️ Retrying playback for CODE:4 with stream proxy');
-                    const proxyUrl = `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(rawUrl)}`;
+                    const proxyUrl = proxyUrlFor(rawUrl, currentPlaybackToken);
 
                     player.src({ src: proxyUrl, type: type });
                     player.load();
@@ -2529,6 +2545,7 @@
                     showAuthGate(currentMovie);
                     return;
                 }
+                currentPlaybackToken = tokenData.token;
 
                 const resolveResponse = await fetch(`${API_BASE}/api/video/resolve/luganda/${id}?token=${encodeURIComponent(tokenData.token)}`);
                 const resolveData = await resolveResponse.json();
@@ -2606,6 +2623,19 @@
             }
         }
 
+        // Best real score for a movie as a display string (IMDb out of 10 first,
+        // then the site's own user rating), or null when there's none — so no
+        // badge shows instead of a made-up number.
+        function getMovieScore(movie) {
+            const r = movie && movie.rating;
+            if (typeof r === 'number' && r > 0) return r.toFixed(1);
+            const imdb = Number(r?.imdb || movie?.imdbRating);
+            if (imdb > 0) return imdb.toFixed(1);
+            const user = Number(r?.userRating);
+            if (user > 0) return user.toFixed(1);
+            return null;
+        }
+
         // ========== UPDATE MOVIE INFO ==========
         function updateMovieInfo(movie) {
             document.title = `${movie.originalTitle || movie.title} - Unruly Movies`;
@@ -2631,13 +2661,21 @@
                 document.getElementById('movieQuality').textContent = movie.quality;
             }
             
-            if (movie.rating || movie.imdbRating) {
-                document.getElementById('movieRating').innerHTML = `
+            // movie.rating is an object ({ imdb, userRating, translationRating }),
+            // not a number — printing it directly showed "[object Object]".
+            // Only show a badge for a real score; never a placeholder.
+            const ratingEl = document.getElementById('movieRating');
+            const score = getMovieScore(movie);
+            if (score) {
+                ratingEl.innerHTML = `
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
                         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                     </svg>
-                    <span>${movie.rating || movie.imdbRating}</span>
+                    <span>${score}</span>
                 `;
+                ratingEl.style.display = '';
+            } else {
+                ratingEl.style.display = 'none';
             }
             
             if (movie.year || movie.releaseYear) {
@@ -2839,7 +2877,7 @@
             // server also means this shows up as a real download in the
             // browser's native download UI (tray/history), unlike a
             // JS-driven fetch.
-            const proxyDownload = `${API_BASE}/api/video/stream-proxy?url=${encodeURIComponent(resolveData.directUrl)}&download=${encodeURIComponent(fileName)}`;
+            const proxyDownload = proxyUrlFor(resolveData.directUrl, tokenData.token, `&download=${encodeURIComponent(fileName)}`);
             const link = document.createElement('a');
             link.href = proxyDownload;
             link.download = fileName;
@@ -2882,7 +2920,7 @@
                 const year = movie.year || movie.releaseYear || '';
                 const vj = (movie.vjName || '').replace(/^vj[\s]*/i, '').trim();
                 const quality = movie.video?.quality || 'HD';
-                const rating = movie.rating?.translationRating || movie.rating?.userRating || 4.0;
+                const score = getMovieScore(movie);
                 const genre = movie.genres?.[0] || '';
                 const poster = movie.poster || 'assets/images/placeholder.svg';
                 const tmdbId = movie.tmdbId || '';
@@ -2894,10 +2932,10 @@
                             <img src="${poster}" alt="${title}" class="related-poster" loading="lazy" onerror="this.src='assets/images/placeholder.svg'">
                             <div class="related-badges">
                                 <span class="related-badge quality">${quality}</span>
-                                <span class="related-badge rating">
+                                ${score ? `<span class="related-badge rating">
                                     <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                                    ${rating.toFixed(1)}
-                                </span>
+                                    ${score}
+                                </span>` : ''}
                             </div>
                             <div class="related-overlay">
                                 <div class="related-buttons">

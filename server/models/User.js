@@ -143,13 +143,11 @@ const userSchema = new mongoose.Schema({
             default: null
         }
     }],
-    // Every new account gets 1 hour of full access from creation, no plan
-    // restrictions (see isInTrialPeriod/canAccessContent below). Set by the
-    // pre('save') hook below, guarded on isNew — NOT a plain schema
-    // `default`, which would backfill onto any EXISTING account too the
-    // next time literally anything calls .save() on it for an unrelated
-    // reason (a last-active touch, a profile edit, anything), silently
-    // granting a retroactive trial to the entire existing free user base.
+    // Optional full-access trial window (see isInTrialPeriod/canAccessContent
+    // below). New accounts no longer get one automatically — this is only
+    // set by a manual/admin grant. Deliberately NOT given a non-null schema
+    // `default`: that would backfill onto every existing account the next
+    // time anything calls .save() on it.
     trialEndsAt: {
         type: Date,
         default: null
@@ -267,15 +265,6 @@ userSchema.pre('save', async function(next) {
     next();
 });
 
-// Grant the 1-hour full-access trial exactly once, on genuine first
-// creation — isNew is only true before a document's first successful save,
-// so this can't fire again on a later save of an already-existing account.
-userSchema.pre('save', function(next) {
-    if (this.isNew && !this.trialEndsAt) {
-        this.trialEndsAt = new Date(Date.now() + 1 * 60 * 60 * 1000);
-    }
-    next();
-});
 
 // Compare password method
 userSchema.methods.comparePassword = async function(candidatePassword) {
@@ -290,7 +279,7 @@ userSchema.methods.hasActiveSubscription = function() {
            (!this.subscription.endDate || this.subscription.endDate > Date.now());
 };
 
-// Still within the free 1-hour full-access window granted at account creation?
+// Still within a manually granted full-access trial window?
 userSchema.methods.isInTrialPeriod = function() {
     return !!this.trialEndsAt && this.trialEndsAt > Date.now();
 };

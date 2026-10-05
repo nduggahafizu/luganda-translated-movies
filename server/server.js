@@ -185,6 +185,19 @@ app.use('/vendor', express.static(path.join(__dirname, '../vendor'), {
     immutable: true,
 }));
 
+// The static handler below serves the whole repo folder, so explicitly refuse
+// anything that isn't meant to be public: backend/tooling source, and any
+// path through a dot-folder (express.static's default skips dotFILES like
+// .env but still serves files INSIDE dot-folders such as .git/).
+// (/.well-known/ stays public — Android app-link verification lives there.)
+const PRIVATE_PATH = /^\/(server|scripts|native-app|node_modules)(\/|$)|(^|\/)\.(?!well-known(\/|$))[^/]/i;
+app.use((req, res, next) => {
+    if (PRIVATE_PATH.test(req.path)) {
+        return res.status(404).json({ status: 'error', message: 'Not found' });
+    }
+    next();
+});
+
 // Other frontend static assets (CSS, JS, images) — 1 day cache.
 // HTML pages are excluded from that: they have no cache-busting filename
 // scheme, so a 1-day cache means edits silently don't show up on a normal

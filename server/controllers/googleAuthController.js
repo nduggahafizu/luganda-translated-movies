@@ -3,6 +3,7 @@ const { logger } = require('../middleware/logger');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { sendWelcomeNotification } = require('../utils/notificationService');
+const { sendWelcomeEmail } = require('../utils/email');
 
 // Google Client ID - from env or fallback to hardcoded
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '573762962600-nr77v5emb2spn7aleg9p2l7c0d6be3a9.apps.googleusercontent.com';
@@ -65,6 +66,10 @@ exports.googleSignIn = async (req, res) => {
             } catch (err) {
                 console.error('Failed to send welcome notification:', err);
             }
+
+            // Welcome email (first Google sign-in only) — fire-and-forget so
+            // it never delays or breaks sign-in.
+            sendWelcomeEmail(user).catch(err => console.error('Welcome email failed:', err.message));
         } else {
             // Update existing user with Google info
             user.googleId = googleId;

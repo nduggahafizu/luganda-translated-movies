@@ -6,10 +6,6 @@ const LugandaMovie = require('../models/LugandaMovie');
 const User = require('../models/User');
 const { protect, optionalAuth } = require('../middleware/auth');
 
-// FFmpeg for MKV remuxing
-const ffmpeg = require('fluent-ffmpeg');
-const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
-ffmpeg.setFfmpegPath(ffmpegPath);
 
 const PLAYBACK_TOKEN_SECRET = process.env.PLAYBACK_TOKEN_SECRET || process.env.JWT_SECRET || 'unruly-movies-playback-token-secret';
 const PLAYBACK_TOKEN_EXPIRES_IN = process.env.PLAYBACK_TOKEN_EXPIRES_IN || '10m';
@@ -326,13 +322,9 @@ async function assertUserCanPlay(requiredPlan, tokenPayload) {
  * POST /api/video/playback-token
  * Body: { movieId: "..." }
  */
-// Season 1 Episode 1 is free to watch for any logged-in account regardless
-// of plan (a preview episode), but never for download — callers pass
-// forDownload:true to force the real entitlement check even on S1E1.
-function isFreeEpisode(season, episode) {
-    return Number(season) === 1 && Number(episode) === 1;
-}
-
+// No free content: every movie and every episode (including what used to be
+// the free Season 1 Episode 1 preview) needs a paid plan — or an admin-
+// granted trial — before a playback token is issued.
 router.post('/playback-token', protect, async (req, res) => {
     setCorsHeaders(req, res);
 
@@ -365,18 +357,15 @@ router.post('/playback-token', protect, async (req, res) => {
             }
         }
 
-        const freeEpisode = isEpisodeRequest && !forDownload && isFreeEpisode(season, episode);
-
-        if (!freeEpisode) {
-            const requiredPlan = effectiveRequiredPlan(movie);
-            if (!req.user.canAccessContent(requiredPlan)) {
-                return res.status(403).json({
-                    success: false,
-                    message: `This content requires a ${requiredPlan} subscription or higher`,
-                    requiredPlan,
-                    currentPlan: req.user.subscription?.plan
-                });
-            }
+        const requiredPlan = effectiveRequiredPlan(movie);
+        if (!req.user.canAccessContent(requiredPlan)) {
+            return res.status(403).json({
+                success: false,
+                code: 'SUBSCRIPTION_REQUIRED',
+                message: `This content requires a ${requiredPlan} subscription or higher`,
+                requiredPlan,
+                currentPlan: req.user.subscription?.plan
+            });
         }
 
         // canAccessContent grants full access during the trial window, but
@@ -579,11 +568,8 @@ router.get('/resolve/luganda/:movieId', async (req, res) => {
 
             // Re-verify entitlement, same defense-in-depth the movie path
             // uses — catches a subscription expiring inside the token's
-            // 10-minute window. Skipped for a genuine free episode.
-            if (!isFreeEpisode(season, episode)) {
-                const requiredPlan = effectiveRequiredPlan(movie);
-                await assertUserCanPlay(requiredPlan, payload);
-            }
+            // 10-minute window. No episode is free anymore.
+            await assertUserCanPlay(effectiveRequiredPlan(movie), payload);
 
             const seasonDoc = (movie.seasons || []).find(s => s.seasonNumber === Number(season));
             const episodeDoc = seasonDoc?.episodes?.find(e => e.episodeNumber === Number(episode));
@@ -916,70 +902,87 @@ async function extractFilemoon(embedUrl) {
     }
 }
 
-/**
- * Proxy video stream (for CORS issues)
- * GET /api/video/proxy?url=...
- */
-router.get('/proxy', async (req, res) => {
-    setCorsHeaders(req, res);
-    
+// (Removed: GET /proxy, GET /remux and GET /probe — nothing on the website
+// or in the app called them, and all three would fetch — or run ffmpeg/
+// ffprobe against — ANY URL anyone passed in, with no login: an open proxy
+// and a way to make this server reach internal addresses.)
+
+// ---------- stream-proxy host allowlist ----------
+// stream-proxy only ever needs to fetch our own video hosts. Without this it
+// fetched any URL for anyone (confirmed: ?url=https://example.com returned
+// the page), making the server a free open proxy. Allowed = the known CDN
+// families below, plus any host a catalogue movie/episode actually uses
+// (refreshed every 10 minutes, so newly added movies on a new host work).
+const ALLOWED_HOST_SUFFIXES = [
+    'pearlpix.xyz', 'b-cdn.net', 'cloudflarestream.com', 'wasabisys.com',
+    'archive.org', 'streamtape.com', 'tapecontent.net', 'streamzonemovies.online'
+];
+let catalogueHosts = new Set();
+let catalogueHostsLoadedAt = 0;
+
+async function refreshCatalogueHosts() {
+    if (Date.now() - catalogueHostsLoadedAt < 10 * 60 * 1000) return;
+    catalogueHostsLoadedAt = Date.now();
     try {
-        const { url } = req.query;
-        
-        if (!url) {
-            return res.status(400).send('URL required');
+        const docs = await LugandaMovie.find({}, {
+            'video.originalVideoPath': 1, 'video.embedUrl': 1, 'video.url': 1, embedUrl: 1,
+            'seasons.episodes.video.embedUrl': 1, 'seasons.episodes.video.archiveUrl': 1
+        }).lean();
+        const hosts = new Set();
+        const add = (u) => { try { if (u) hosts.add(new URL(String(u).trim()).hostname.toLowerCase()); } catch (e) {} };
+        for (const d of docs) {
+            add(d.video?.originalVideoPath); add(d.video?.embedUrl); add(d.video?.url); add(d.embedUrl);
+            for (const s of d.seasons || []) for (const e of s.episodes || []) { add(e.video?.embedUrl); add(e.video?.archiveUrl); }
         }
-
-        // Get range header for video seeking
-        const range = req.headers.range;
-        
-        const response = await axios({
-            method: 'GET',
-            url: url,
-            responseType: 'stream',
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                'Referer': 'https://streamtape.com/',
-                ...(range && { Range: range })
-            },
-            timeout: 30000
-        });
-
-        // Forward headers
-        if (response.headers['content-type']) {
-            res.setHeader('Content-Type', response.headers['content-type']);
-        }
-        if (response.headers['content-length']) {
-            res.setHeader('Content-Length', response.headers['content-length']);
-        }
-        if (response.headers['content-range']) {
-            res.setHeader('Content-Range', response.headers['content-range']);
-        }
-        if (response.headers['accept-ranges']) {
-            res.setHeader('Accept-Ranges', response.headers['accept-ranges']);
-        }
-
-        res.status(response.status);
-        response.data.pipe(res);
-
-    } catch (error) {
-        console.error('Video proxy error:', error.message);
-        res.status(500).send('Proxy error');
+        catalogueHosts = hosts;
+    } catch (e) {
+        console.error('stream-proxy: could not refresh catalogue hosts:', e.message);
     }
-});
+}
+
+function isAllowedVideoHost(hostname) {
+    const h = String(hostname || '').toLowerCase();
+    if (!h || h === 'localhost' || /^[\d.]+$/.test(h) || h.includes(':')) return false; // no IPs/localhost
+    if (catalogueHosts.has(h)) return true;
+    return ALLOWED_HOST_SUFFIXES.some(s => h === s || h.endsWith('.' + s));
+}
 
 /**
  * Simple video proxy - streams video directly without transcoding
  * GET /api/video/stream-proxy?url=...
  * This works for MKV and other formats by proxying the bytes through
  */
+// A playback token (only ever issued to a paying user — see /playback-token)
+// is required for every stream-proxy request, so free users and anyone with
+// a captured CDN link can't run video through this server's bandwidth.
+// Tokens expire after 10 minutes for *starting* playback, but a movie keeps
+// making range requests for hours (buffering, seeking, a resumed download),
+// so here a token is accepted for up to 6 hours after it was issued.
+const PROXY_TOKEN_MAX_AGE_SECONDS = 6 * 60 * 60;
+
+function verifyProxyToken(token) {
+    if (!token) return null;
+    try {
+        const payload = jwt.verify(String(token), PLAYBACK_TOKEN_SECRET, { issuer: 'unruly-movies', ignoreExpiration: true });
+        if (payload.type !== 'playback' || !payload.iat) return null;
+        if (Date.now() / 1000 - payload.iat > PROXY_TOKEN_MAX_AGE_SECONDS) return null;
+        return payload;
+    } catch (e) {
+        return null;
+    }
+}
+
 router.get('/stream-proxy', async (req, res) => {
     setCorsHeaders(req, res);
-    
+
     const { url } = req.query;
-    
+
     if (!url) {
         return res.status(400).json({ success: false, message: 'URL required' });
+    }
+
+    if (!verifyProxyToken(req.query.token)) {
+        return res.status(401).json({ success: false, code: 'PLAYBACK_TOKEN_REQUIRED', message: 'A valid playback token is required' });
     }
 
     let decodedUrl = decodeURIComponent(url);
@@ -997,6 +1000,21 @@ router.get('/stream-proxy', async (req, res) => {
 
     // Encode spaces for HTTP requests
     const fetchUrl = decodedUrl.replace(/ /g, '%20');
+
+    // Only our own video hosts — see isAllowedVideoHost above.
+    let parsedTarget;
+    try { parsedTarget = new URL(fetchUrl); } catch (e) {
+        return res.status(400).json({ success: false, message: 'Invalid URL' });
+    }
+    if (parsedTarget.protocol !== 'https:' && parsedTarget.protocol !== 'http:') {
+        return res.status(400).json({ success: false, message: 'Invalid URL' });
+    }
+    await refreshCatalogueHosts();
+    if (!isAllowedVideoHost(parsedTarget.hostname)) {
+        console.warn('🎬 stream-proxy refused non-catalogue host:', parsedTarget.hostname);
+        return res.status(403).json({ success: false, message: 'Host not allowed' });
+    }
+
     console.log('🎬 Proxying video:', decodedUrl.substring(0, 100) + '...', '| incoming Range:', req.headers.range || '(none)');
 
     try {
@@ -1151,153 +1169,6 @@ router.get('/stream-proxy', async (req, res) => {
         if (!res.headersSent) {
             res.status(500).json({ success: false, message: 'Proxy error: ' + error.message });
         }
-    }
-});
-
-/**
- * Remux MKV to MP4 on-the-fly for browser playback
- * GET /api/video-proxy/remux?url=...
- * This converts MKV container to MP4 without re-encoding (very fast)
- */
-router.get('/remux', async (req, res) => {
-    setCorsHeaders(req, res);
-    
-    const { url } = req.query;
-    
-    if (!url) {
-        return res.status(400).json({ success: false, message: 'URL required' });
-    }
-
-    // Decode the URL, then re-encode spaces for FFmpeg compatibility
-    let decodedUrl = decodeURIComponent(url);
-    // FFmpeg needs spaces encoded as %20, not literal spaces
-    const ffmpegUrl = decodedUrl.replace(/ /g, '%20');
-    console.log('🎬 Remuxing video:', decodedUrl.substring(0, 100) + '...');
-
-    let ffmpegProcess = null;
-    let isEnded = false;
-
-    try {
-        // Set response headers for streaming video
-        res.setHeader('Content-Type', 'video/mp4');
-        res.setHeader('Accept-Ranges', 'bytes');
-        res.setHeader('Cache-Control', 'no-cache');
-        res.setHeader('Access-Control-Expose-Headers', 'Content-Length, Content-Range, Accept-Ranges');
-
-        // Create FFmpeg command to remux MKV -> MP4
-        // -c copy means no transcoding, just container change (very fast)
-        // -movflags frag_keyframe+empty_moov+faststart enables streaming without full download
-        ffmpegProcess = ffmpeg(ffmpegUrl)
-            .inputOptions([
-                '-reconnect', '1',
-                '-reconnect_streamed', '1', 
-                '-reconnect_delay_max', '5',
-                '-timeout', '30000000',  // 30 second timeout in microseconds
-                '-user_agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-            ])
-            .outputOptions([
-                '-c:v', 'copy',           // Copy video codec (no transcoding)
-                '-c:a', 'aac',            // Convert audio to AAC for browser compatibility
-                '-b:a', '192k',           // Audio bitrate
-                '-movflags', 'frag_keyframe+empty_moov+faststart', // Enable streaming
-                '-f', 'mp4'               // Output format
-            ])
-            .on('start', (cmd) => {
-                console.log('🎬 FFmpeg started:', cmd.substring(0, 300));
-            })
-            .on('progress', (progress) => {
-                if (progress.timemark) {
-                    console.log('🎬 FFmpeg progress:', progress.timemark);
-                }
-            })
-            .on('error', (err, stdout, stderr) => {
-                console.error('🎬 FFmpeg error:', err.message);
-                console.error('🎬 FFmpeg stderr:', stderr ? stderr.substring(0, 500) : 'none');
-                isEnded = true;
-                if (!res.headersSent) {
-                    res.status(500).json({ success: false, message: 'Remux failed: ' + err.message });
-                } else {
-                    res.end();
-                }
-            })
-            .on('end', () => {
-                console.log('🎬 FFmpeg finished successfully');
-                isEnded = true;
-            });
-
-        // Pipe the output to response
-        ffmpegProcess.pipe(res, { end: true });
-
-        // Handle client disconnect
-        req.on('close', () => {
-            if (!isEnded) {
-                console.log('🎬 Client disconnected, killing FFmpeg');
-                if (ffmpegProcess) {
-                    ffmpegProcess.kill('SIGKILL');
-                }
-            }
-        });
-
-    } catch (error) {
-        console.error('Remux error:', error.message);
-        if (!res.headersSent) {
-            res.status(500).json({ success: false, message: 'Remux error: ' + error.message });
-        }
-    }
-});
-
-/**
- * Get info about a video file (codecs, duration, etc.)
- * GET /api/video-proxy/probe?url=...
- */
-router.get('/probe', async (req, res) => {
-    setCorsHeaders(req, res);
-    
-    const { url } = req.query;
-    
-    if (!url) {
-        return res.status(400).json({ success: false, message: 'URL required' });
-    }
-
-    const decodedUrl = decodeURIComponent(url);
-
-    try {
-        ffmpeg.ffprobe(decodedUrl, (err, metadata) => {
-            if (err) {
-                console.error('Probe error:', err.message);
-                return res.status(500).json({ success: false, message: 'Probe failed: ' + err.message });
-            }
-
-            const videoStream = metadata.streams.find(s => s.codec_type === 'video');
-            const audioStream = metadata.streams.find(s => s.codec_type === 'audio');
-
-            res.json({
-                success: true,
-                data: {
-                    format: metadata.format.format_name,
-                    duration: metadata.format.duration,
-                    size: metadata.format.size,
-                    bitrate: metadata.format.bit_rate,
-                    video: videoStream ? {
-                        codec: videoStream.codec_name,
-                        width: videoStream.width,
-                        height: videoStream.height,
-                        fps: videoStream.r_frame_rate
-                    } : null,
-                    audio: audioStream ? {
-                        codec: audioStream.codec_name,
-                        channels: audioStream.channels,
-                        sampleRate: audioStream.sample_rate
-                    } : null,
-                    // Recommend remux if MKV or incompatible audio
-                    needsRemux: metadata.format.format_name?.includes('matroska') || 
-                               (audioStream && !['aac', 'mp3'].includes(audioStream.codec_name))
-                }
-            });
-        });
-    } catch (error) {
-        console.error('Probe error:', error.message);
-        res.status(500).json({ success: false, message: 'Probe error: ' + error.message });
     }
 });
 

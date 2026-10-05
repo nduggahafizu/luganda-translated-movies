@@ -1409,8 +1409,10 @@
                     <section class="player-section">
                         <div class="video-container" id="video-container" onmousemove="markSeriesControlsActive()" onclick="markSeriesControlsActive()" ontouchstart="markSeriesControlsActive()">
                             ${(() => {
-                                const isFreeEpisode = currentEpisode && Number(currentEpisode.season) === 1 && Number(currentEpisode.episode) === 1;
-                                if (window._seriesAccess && window._seriesAccess.freeUser && !isFreeEpisode) {
+                                // No free episodes: anyone without an active plan (canWatch
+                                // false, from check-access) gets the subscribe overlay and
+                                // no video element — so no playback request is ever made.
+                                if (window._seriesAccess && window._seriesAccess.canWatch === false) {
                                     return `<div style="position:absolute;inset:0;width:100%;height:100%;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;" onclick="showSubscribePlans()">
                                         <div style="width:76px;height:76px;border-radius:50%;background:rgba(74,222,128,0.92);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 14px rgba(74,222,128,0.18);">
                                             <svg width="30" height="30" viewBox="0 0 24 24" fill="#000"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -1552,8 +1554,11 @@
         }
 
         // Real episode URL isn't in the page — resolve it via the same
-        // authenticated, entitlement-checked flow as movies (S1E1 is allowed
-        // through for any logged-in user; every other episode needs a paid plan).
+        // authenticated, entitlement-checked flow as movies. Every episode
+        // needs a paid plan; free users never reach here (no video element).
+        // The paid playback token is kept for the stream-proxy fallback, which
+        // refuses requests without one.
+        let currentEpisodePlaybackToken = null;
         async function loadCurrentEpisodeVideo() {
             const videoEl = document.getElementById('series-video');
             if (!videoEl || !currentEpisode) return;
@@ -1574,6 +1579,7 @@
                     showVideoLoadError(tokenData.message || 'Unable to start playback');
                     return;
                 }
+                currentEpisodePlaybackToken = tokenData.token;
 
                 const resolveResp = await fetch(`${API_BASE_URL}/api/video/resolve/luganda/${seriesData._id}?season=${currentEpisode.season}&episode=${currentEpisode.episode}&token=${encodeURIComponent(tokenData.token)}`);
                 const resolveData = await resolveResp.json();
@@ -1620,9 +1626,9 @@
         }
         
         function playEpisode(season, episodeNumber) {
-            // Free plan users can watch S1E1 (a preview episode) but nothing else
-            const isFreeEpisode = Number(season) === 1 && Number(episodeNumber) === 1;
-            if (window._seriesAccess && window._seriesAccess.freeUser && !isFreeEpisode) {
+            // No free episodes — show the plans straight away for anyone
+            // without an active plan.
+            if (window._seriesAccess && window._seriesAccess.canWatch === false) {
                 showSubscribePlans();
                 return;
             }
@@ -1668,7 +1674,7 @@
             // BunnyCDN Referer case (e.g. CORS on a source we didn't expect).
             if (!alreadyProxied) {
                 console.warn('Retrying playback via stream proxy after direct-source error');
-                const proxyUrl = `${API_BASE_URL}/api/video/stream-proxy?url=${encodeURIComponent(originalUrl)}`;
+                const proxyUrl = `${API_BASE_URL}/api/video/stream-proxy?url=${encodeURIComponent(originalUrl)}&token=${encodeURIComponent(currentEpisodePlaybackToken || '')}`;
                 videoElement.onerror = () => handleVideoError(videoElement, originalUrl, true);
                 videoElement.src = proxyUrl;
                 videoElement.load();
@@ -1960,7 +1966,7 @@
             // CDN URL. This also gets Content-Disposition: attachment so
             // Chrome saves instead of just playing the video, and shows up
             // as a real download in the browser's native download UI.
-            const proxyDownload = `${API_BASE_URL}/api/video/stream-proxy?url=${encodeURIComponent(url)}&download=${encodeURIComponent(fileName)}`;
+            const proxyDownload = `${API_BASE_URL}/api/video/stream-proxy?url=${encodeURIComponent(url)}&token=${encodeURIComponent(tokenData.token)}&download=${encodeURIComponent(fileName)}`;
 
             if (isIOS()) {
                 showIOSDownloadInstructions(proxyDownload);

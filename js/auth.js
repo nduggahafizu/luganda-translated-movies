@@ -440,7 +440,7 @@ function showNotification(message, type = 'info') {
     notification.style.cssText = `
         position: fixed;
         top: 80px;
-        right: 20px;
+        right: 16px;
         background: ${type === 'success' ? '#4ade80' : type === 'error' ? '#ff4444' : '#00D9FF'};
         color: ${type === 'success' || type === 'error' ? '#000' : '#fff'};
         padding: 15px 20px;
@@ -448,7 +448,10 @@ function showNotification(message, type = 'info') {
         box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         z-index: 10000;
         animation: slideIn 0.3s ease;
-        max-width: 300px;
+        /* Never wider than the screen minus margins — a fixed 300px ran off
+           the right edge of a phone. */
+        max-width: min(300px, calc(100vw - 32px));
+        box-sizing: border-box;
         font-weight: 600;
     `;
     notification.textContent = message;

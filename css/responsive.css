@@ -48,9 +48,13 @@
     .app-footer {
         padding-bottom: env(safe-area-inset-bottom);
     }
-    /* Nav drawer clears home bar */
-    .navbar-nav {
-        padding-bottom: calc(40px + env(safe-area-inset-bottom));
+    /* Nav drawer clears home bar — the drop-down drawer only exists at
+       ≤992px. Without this width limit the 40px applied to the desktop
+       header's link row too, pushing Login/Sign Up up off the screen. */
+    @media (max-width: 992px) {
+        .navbar-nav {
+            padding-bottom: calc(40px + env(safe-area-inset-bottom));
+        }
     }
 }
 @media (max-width: 767px) {

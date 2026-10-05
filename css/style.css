@@ -993,13 +993,8 @@ img {
         margin-top: 12px;
         gap: 8px;
     }
-    /* Keep the arrows clear of the bottom-anchored info panel on short mobile heroes */
-    .carousel-control { padding: 0 8px; top: 20px; transform: none; }
-    .control-prev, .control-next { width: 36px; height: 36px; }
-    .control-prev svg, .control-next svg { width: 24px; height: 24px; }
-    .carousel-indicators { right: 14px; gap: 7px; }
-    .carousel-indicators li { width: 6px; height: 6px; }
-    .carousel-indicators li.active { height: 20px; }
+    /* Hero arrows and dots for phones are set further down, after their base
+       rules — anything set here, earlier in the file, just gets overridden. */
 }
 
 .slide-header {
@@ -1157,6 +1152,14 @@ img {
     transform: scale(1.15);
     border-color: #4ade80;
     box-shadow: 0 8px 30px rgba(74, 222, 128, 0.4);
+}
+
+/* On phones the arrows sat on top of the hero's title and Watch Now
+   button. Phone users swipe instead (wired up in index.html's
+   initHeroCarousel), with the dots showing position. Must come after the
+   base .carousel-control rule above or it gets overridden. */
+@media (max-width: 768px) {
+    .carousel-control { display: none; }
 }
 
 /* Carousel Indicators - vertical dot column, right-aligned */
@@ -1851,9 +1854,13 @@ img {
 }
 
 /* Skip Link for Accessibility */
+/* Hidden until keyboard-focused. Was top:-40px, but the link is ~42px tall
+   so its bottom edge peeked out as a thin green bar at the top of every
+   page that looked like a stuck loading indicator. */
 .skip-link {
     position: absolute;
-    top: -40px;
+    top: 0;
+    transform: translateY(-110%);
     left: 0;
     background: var(--primary-color);
     color: #000;
@@ -1863,7 +1870,7 @@ img {
 }
 
 .skip-link:focus {
-    top: 0;
+    transform: none;
 }
 
 /* ===================================
@@ -3653,18 +3660,28 @@ a:focus-visible {
         height: 24px;
     }
     
+    /* On phones the vertical right-side dot column sat right on top of the
+       Watch Now / More Info row, so they become a small horizontal row along
+       the hero's bottom edge instead. */
     .carousel-indicators {
-        right: 20px;
-        gap: 8px;
+        top: auto;
+        bottom: 10px;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        flex-direction: row;
+        gap: 6px;
     }
 
     .carousel-indicators li {
-        width: 7px;
-        height: 7px;
+        width: 6px;
+        height: 6px;
     }
 
     .carousel-indicators li.active {
-        height: 22px;
+        width: 18px;
+        height: 6px;
+        border-radius: 3px;
     }
 
     .app-heading h2 {
