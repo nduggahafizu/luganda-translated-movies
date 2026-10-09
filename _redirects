@@ -20,6 +20,24 @@ http://unrulymovies.com/* https://unrulymovies.com/:splat 301!
 /scripts/*     /index.html  404!
 /native-app/*  /index.html  404!
 
+# Local-only test/dev pages and image-generator tools. They stay in the repo
+# for use on localhost, but are never served on the live site (Netlify also
+# serves them without .html, so both forms are blocked).
+/test-payments.html       /index.html  404!
+/test-payments            /index.html  404!
+/test-api.html            /index.html  404!
+/test-api                 /index.html  404!
+/airtel-test.html         /index.html  404!
+/airtel-test              /index.html  404!
+/test-push.html           /index.html  404!
+/test-push                /index.html  404!
+/local-admin-upload.html  /index.html  404!
+/local-admin-upload       /index.html  404!
+/assets/images/logo-generator.html      /index.html  404!
+/assets/images/logo-generator           /index.html  404!
+/assets/images/og-image-generator.html  /index.html  404!
+/assets/images/og-image-generator       /index.html  404!
+
 # API proxy
 /api/* https://luganda-translated-movies-production.up.railway.app/api/:splat 200
 
@@ -64,7 +82,6 @@ http://unrulymovies.com/* https://unrulymovies.com/:splat 301!
 /dmca             /dmca.html             200
 /faq              /faq.html              200
 /cookies          /cookies.html          200
-/test-api         /test-api.html         200
 /admin            /admin.html            200
 /admin-users      /admin-users.html      200
 /admin-movies     /admin-movies.html     200
