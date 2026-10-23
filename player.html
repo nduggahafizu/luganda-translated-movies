@@ -2864,23 +2864,24 @@
                 return;
             }
 
-            const resolveResponse = await fetch(`${API_BASE}/api/video/resolve/luganda/${movie._id}?token=${encodeURIComponent(tokenData.token)}`);
+            const fileName = `${(movie.originalTitle || movie.lugandaTitle || 'movie').replace(/[^a-zA-Z0-9 _-]/g, '').trim()}.mp4`;
+
+            const resolveResponse = await fetch(`${API_BASE}/api/video/resolve/luganda/${movie._id}?token=${encodeURIComponent(tokenData.token)}&download=${encodeURIComponent(fileName)}`);
             const resolveData = await resolveResponse.json();
             if (!resolveData.success || !resolveData.directUrl) {
                 showNotification(resolveData.message || 'Download unavailable for this movie');
                 return;
             }
 
-            const fileName = `${(movie.originalTitle || movie.lugandaTitle || 'movie').replace(/[^a-zA-Z0-9 _-]/g, '').trim()}.mp4`;
-            // Route through the backend proxy so the response carries
-            // Content-Disposition: attachment — a direct cross-origin CDN
-            // link makes Chrome/Safari just play the video instead of
-            // saving it, since the `download` attribute is ignored
-            // cross-origin without that header. Going through our own
-            // server also means this shows up as a real download in the
-            // browser's native download UI (tray/history), unlike a
-            // JS-driven fetch.
-            const proxyDownload = proxyUrlFor(resolveData.directUrl, tokenData.token, `&download=${encodeURIComponent(fileName)}`);
+            // direct:true means the server could sign the CDN URL itself
+            // (Bunny Token Authentication configured for that host) with the
+            // `download` param baked in — Bunny adds Content-Disposition on
+            // its own, so the file comes straight from the CDN, not through
+            // our own server's bandwidth. Otherwise fall back to the backend
+            // proxy, which still has to add that header itself.
+            const proxyDownload = resolveData.direct
+                ? resolveData.directUrl
+                : proxyUrlFor(resolveData.directUrl, tokenData.token, `&download=${encodeURIComponent(fileName)}`);
             const link = document.createElement('a');
             link.href = proxyDownload;
             link.download = fileName;

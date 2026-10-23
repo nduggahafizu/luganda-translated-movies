@@ -455,10 +455,13 @@
     display: none;
 }
 
+/* 110px was too small to make out a poster on a phone. 132px still leaves
+   the next card peeking in at the edge, so the row still reads as
+   scrollable. */
 .h-scroll > .content-card {
-    flex: 0 0 110px !important;
-    width: 110px !important;
-    max-width: 110px !important;
+    flex: 0 0 132px !important;
+    width: 132px !important;
+    max-width: 132px !important;
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {

@@ -299,7 +299,10 @@ userSchema.methods.canAccessContent = function(requiredPlan) {
 const PLAN_CONFIG = {
     free:     { devices: 1, download: false, ads: true },
     trial:    { devices: 2, download: false, ads: false },
-    daily:    { devices: 1, download: true,  ads: true },
+    // No downloads on daily: at UGX 1,000 (~$0.26) the plan is underwater
+    // after roughly three downloads — a ~1.5GB movie costs ~$0.075 in egress,
+    // and nothing capped how many a 24-hour subscriber could take.
+    daily:    { devices: 1, download: false, ads: true },
     weekly:   { devices: 1, download: true,  ads: true },
     biweekly: { devices: 1, download: true,  ads: false },
     monthly:  { devices: 2, download: true,  ads: false },

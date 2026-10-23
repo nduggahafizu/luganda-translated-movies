@@ -139,8 +139,17 @@
     box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5);
 }
 
+/* Title stays visible: these posters are only ~130px wide on a phone and
+   most come from TMDB, where the artwork often carries no legible title —
+   with .card-info hidden there was nothing at all identifying the movie.
+   Year/genre/rating stay hidden to keep the card from getting busy. */
 .card-grid.muno-style .card-info {
-    display: none;
+    display: block;
+    padding: 6px 2px 0;
+}
+
+.card-grid.muno-style .card-title {
+    margin-bottom: 0;
 }
 
 .card-grid.muno-style .card-meta {
@@ -757,11 +766,15 @@
 }
 
 @media (max-width: 480px) {
-    .card-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 4px;
+    /* 3 columns, not 4: at 4-across a poster is ~95px on a 393px phone,
+       too small to make out the artwork. 3-across with a real gutter gives
+       ~113px. Excludes .h-scroll, whose cards are sized in app-shell.css —
+       it only shares the .card-grid class. */
+    .card-grid:not(.h-scroll) {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
         margin: 0;
-        padding: 0;
+        padding: 0 15px;
     }
 
     .movie-section {
@@ -775,7 +788,7 @@
     }
 
     .card-title {
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .card-meta {

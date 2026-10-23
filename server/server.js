@@ -12,6 +12,42 @@ const swaggerUi = require('swagger-ui-express');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 
+// Every secret below signs or verifies something that gates paid access:
+// JWT_SECRET (login tokens, admin auth), SESSION_SECRET (session cookies).
+// These used to carry hardcoded `|| 'some-default'` fallbacks in a few
+// places, which meant a deploy with the env var missing kept running — just
+// signing tokens with a string published in this repo. Refusing to boot is
+// the safer failure: an outage is recoverable, forged admin tokens are not.
+// Checked here rather than at each use so it fails at startup, not on a
+// user's first login with a confusing error from deep inside jwt.sign.
+const GENERATE_SECRET_HINT =
+    '   Generate one with: node -e "console.log(require(\'crypto\').randomBytes(48).toString(\'base64url\'))"';
+
+function assertRequiredSecrets() {
+    // JWT_SECRET is non-negotiable: it signs login and admin tokens, and the
+    // rest of the codebase already reads it bare, so a missing value fails
+    // every login anyway — better to say so at boot than at 2am.
+    if (!process.env.JWT_SECRET) {
+        console.error('❌ JWT_SECRET is not set — refusing to start.');
+        console.error('   Set it in server/.env locally, or in the host\'s environment variables.');
+        console.error(GENERATE_SECRET_HINT);
+        process.exit(1);
+    }
+
+    // SESSION_SECRET only signs session cookies, which here hold watch
+    // progress and playlists — auth itself is JWT. Falling back to a random
+    // value per boot is survivable (that state resets on restart) and is
+    // still vastly better than the hardcoded string this used to use, which
+    // sat in public source. Loud, not fatal.
+    if (!process.env.SESSION_SECRET) {
+        process.env.SESSION_SECRET = require('crypto').randomBytes(48).toString('base64url');
+        console.warn('⚠️  SESSION_SECRET is not set — generated a random one for this boot.');
+        console.warn('   Sessions (watch progress, playlists) will reset on every restart until you set it.');
+        console.warn(GENERATE_SECRET_HINT);
+    }
+}
+assertRequiredSecrets();
+
 // Import middleware
 const { logger, requestLogger } = require('./middleware/logger');
 const requestIdMiddleware = require('./middleware/requestId');
@@ -198,17 +234,23 @@ app.use((req, res, next) => {
     next();
 });
 
-// Other frontend static assets (CSS, JS, images) — 1 day cache.
-// HTML pages are excluded from that: they have no cache-busting filename
-// scheme, so a 1-day cache means edits silently don't show up on a normal
-// reload for up to 24h. no-cache still lets the browser reuse a cached copy
-// once revalidated via ETag — just never blindly, without asking first.
+// Frontend static assets — 1 day cache for images/fonts, which are the bulk
+// of the bytes and rarely change.
+//
+// HTML, CSS and JS are excluded from that: none of them have a cache-busting
+// filename scheme (it's css/style.css, not css/style.a3f2b1.css), so a 1-day
+// cache means an edit silently doesn't reach a returning visitor for up to
+// 24h — they get the new HTML against yesterday's stylesheet. no-cache still
+// lets the browser reuse its cached copy; it just has to revalidate via ETag
+// first, which costs one 304 round-trip instead of a full re-download.
+// Versioned /vendor assets above keep their 1-year immutable cache.
+const REVALIDATE_EXT = /\.(html|css|js)$/i;
 app.use(express.static(path.join(__dirname, '..'), {
     maxAge: '1d',
     etag: true,
     index: false, // don't auto-serve index.html from here; let the SPA handle routing
     setHeaders: (res, filePath) => {
-        if (filePath.endsWith('.html')) {
+        if (REVALIDATE_EXT.test(filePath)) {
             res.setHeader('Cache-Control', 'no-cache');
         }
     }
@@ -217,14 +259,20 @@ app.use(express.static(path.join(__dirname, '..'), {
 // Database connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/luganda-movies';
 
-// Debug: Log environment variable presence (not the actual value for security)
-console.log(`🔧 MONGODB_URI from env: ${process.env.MONGODB_URI ? 'SET (' + MONGODB_URI.substring(0, 30) + '...)' : 'NOT SET - using default'}`);
+// Strip the user:password out of a connection string before it goes anywhere
+// loggable. Host and database name are kept — that's the part that's actually
+// useful when diagnosing "connected, but to what?", and it carries no secret.
+function redactUri(uri) {
+    return String(uri).replace(/\/\/[^@/]*@/, '//<credentials>@');
+}
+
+console.log(`🔧 MONGODB_URI from env: ${process.env.MONGODB_URI ? 'SET' : 'NOT SET - using default'}`);
 console.log(`🔧 NODE_ENV: ${process.env.NODE_ENV || 'not set'}`);
 
 mongoose.connect(MONGODB_URI)
 .then(() => {
     console.log('✅ MongoDB Connected Successfully');
-    console.log(`📦 Database: ${MONGODB_URI}`);
+    console.log(`📦 Database: ${redactUri(MONGODB_URI)}`);
 })
 .catch((err) => {
     console.error('⚠️  MongoDB Connection Warning:', err.message);
@@ -242,7 +290,7 @@ const session = require('express-session');
 
 // Configure session store - use MongoDB in production, memory in development
 const sessionConfig = {
-    secret: process.env.SESSION_SECRET || 'luganda-movies-secret-key',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: { 

@@ -2582,7 +2582,7 @@
                                         <span class="hero-watch-label">Watch Now</span>
                                     </a>
                                     <a href="movie.html?id=${movieId}" class="info-btn">
-                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="11" x2="12" y2="16"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                                         More Info
                                     </a>
                                     <button class="save-btn" onclick="addToWatchlist('${movieId}'); this.classList.toggle('saved')" aria-label="Save to watchlist">
@@ -2990,8 +2990,11 @@
     
     <!-- Cookie Consent Banner -->
 
-    <!-- Live Chat Widget -->
-    <script defer src="js/chat-widget.js"></script>
+    <!-- Live Chat Widget intentionally omitted on the homepage feed — its
+         fixed bottom-right position collides with this page's "View All"
+         links as each section scrolls past that corner. It stays on
+         contact.html and other non-feed pages where that collision
+         doesn't happen. -->
 
     <!-- System Notification -->
     <script defer src="js/system-notification.js"></script>

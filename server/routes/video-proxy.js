@@ -5,9 +5,15 @@ const jwt = require('jsonwebtoken');
 const LugandaMovie = require('../models/LugandaMovie');
 const User = require('../models/User');
 const { protect, optionalAuth } = require('../middleware/auth');
+const { signBunnyUrl, isTokenAuthHost, clientIpFromRequest } = require('../utils/bunnyToken');
 
 
-const PLAYBACK_TOKEN_SECRET = process.env.PLAYBACK_TOKEN_SECRET || process.env.JWT_SECRET || 'unruly-movies-playback-token-secret';
+// Falls back to JWT_SECRET when no dedicated playback secret is set, but no
+// further: a hardcoded default here was a paywall bypass waiting to happen —
+// the string sits in public source, so anyone could sign their own playback
+// token and stream or download the whole catalogue for free. Missing env =
+// refuse to start (see assertRequiredSecrets in server.js), never fall back.
+const PLAYBACK_TOKEN_SECRET = process.env.PLAYBACK_TOKEN_SECRET || process.env.JWT_SECRET;
 const PLAYBACK_TOKEN_EXPIRES_IN = process.env.PLAYBACK_TOKEN_EXPIRES_IN || '10m';
 
 /**
@@ -373,9 +379,14 @@ router.post('/playback-token', protect, async (req, res) => {
         // separately so a trial user can't get a download-flagged token just
         // because streaming access already passed above.
         if (forDownload && !req.user.hasDownloadAccess()) {
+            // A daily subscriber IS paying, so "requires a paid subscription"
+            // would read as a bug to them — name the actual upgrade path.
+            const onPaidPlanWithoutDownloads = req.user.hasActiveSubscription();
             return res.status(403).json({
                 success: false,
-                message: 'Downloads require a paid subscription',
+                message: onPaidPlanWithoutDownloads
+                    ? 'Downloads aren\'t included on the Daily plan — switch to Weekly or higher to download.'
+                    : 'Downloads require a paid subscription',
                 code: 'DOWNLOAD_REQUIRES_SUBSCRIPTION'
             });
         }
@@ -520,6 +531,37 @@ async function resolveUrlForDelivery(sourceUrl, fallbackProvider, fallbackFormat
     };
 }
 
+/**
+ * When the resolved URL lives on a host we hold a Bunny Token Authentication
+ * key for (see utils/bunnyToken.js), sign it — folding in a `download` query
+ * param when the caller asked for one — so the browser streams or saves the
+ * file straight from Bunny's edge instead of through stream-proxy and this
+ * server's own bandwidth. A host with no configured key comes back
+ * untouched, so this is a no-op until BUNNY_TOKEN_KEYS is actually set.
+ */
+function applyDirectDeliverySigning(result, req) {
+    if (!result?.success || !result.directUrl) return result;
+
+    let parsed;
+    try {
+        parsed = new URL(result.directUrl);
+    } catch (e) {
+        return result;
+    }
+    if (!isTokenAuthHost(parsed.hostname)) return result;
+
+    const downloadName = sanitizeUrl(req.query.download);
+    if (downloadName) {
+        parsed.searchParams.set('download', downloadName);
+    }
+
+    return {
+        ...result,
+        directUrl: signBunnyUrl(parsed.toString(), { clientIp: clientIpFromRequest(req) }),
+        direct: true
+    };
+}
+
 router.get('/resolve/luganda/:movieId', async (req, res) => {
     setCorsHeaders(req, res);
 
@@ -583,7 +625,7 @@ router.get('/resolve/luganda/:movieId', async (req, res) => {
             }
 
             const result = await resolveUrlForDelivery(sourceUrl, episodeDoc.video?.provider, 'mp4');
-            return res.json(result);
+            return res.json(applyDirectDeliverySigning(result, req));
         }
 
         const { requiredPlan, tokenPayload } = requirePlaybackAuthIfNeeded(movie, req);
@@ -598,7 +640,7 @@ router.get('/resolve/luganda/:movieId', async (req, res) => {
         }
 
         const result = await resolveUrlForDelivery(sourceUrl, movie.video?.provider, movie.video?.format);
-        return res.json(result);
+        return res.json(applyDirectDeliverySigning(result, req));
     } catch (error) {
         const httpStatus = error.httpStatus || 500;
         return res.status(httpStatus).json({

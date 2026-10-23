@@ -96,7 +96,7 @@ exports.googleSignIn = async (req, res) => {
                 email: user.email,
                 subscription: user.subscription.plan
             },
-            process.env.JWT_SECRET || 'your-secret-key-change-this-in-production',
+            process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
         );
         
@@ -190,7 +190,7 @@ exports.login = async (req, res) => {
                 email: user.email,
                 subscription: user.subscription.plan
             },
-            process.env.JWT_SECRET || 'your-secret-key-change-this-in-production',
+            process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
         );
         
@@ -266,7 +266,7 @@ exports.register = async (req, res) => {
                 email: user.email,
                 subscription: user.subscription.plan
             },
-            process.env.JWT_SECRET || 'your-secret-key-change-this-in-production',
+            process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
         );
         

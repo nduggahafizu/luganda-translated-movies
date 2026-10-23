@@ -106,21 +106,31 @@ html, body {
 }
 
 /* ===== CARD GRID ===== */
+/* 3 across on phones, not 4: at 4 columns a poster lands around 95px wide
+   on a 393px screen, too small to read the artwork. 3 columns with a real
+   gutter gives ~113px. */
 .card-grid {
     display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important;
-    gap: 4px !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 12px !important;
     margin: 0 0 32px 0;
     padding: 0;
     width: 100%;
 }
 
-/* Compact card info for 4-col mobile */
+/* Side gutters so posters aren't flush against the screen edge. Excluded
+   for .h-scroll, which shares this class but is a flex row sized in
+   app-shell.css. */
+.card-grid:not(.h-scroll) {
+    padding: 0 15px;
+}
+
+/* Compact card info for the 3-col mobile grid */
 .card-info {
     padding: 4px 5px 6px;
 }
 .card-title {
-    font-size: 10px;
+    font-size: 12px;
 }
 .card-meta {
     font-size: 9px;
@@ -161,30 +171,32 @@ html, body {
 
 /* ===== BREAKPOINTS ===== */
 
-/* Small phones (< 400px) — very tight, 4 columns */
+/* Small phones (< 400px) — 3 columns, tighter gutters */
 @media (max-width: 399px) {
     :root {
         --page-pad-md: 8px;
     }
     .card-grid {
-        gap: 3px;
+        gap: 10px !important;
+    }
+    .card-grid:not(.h-scroll) {
+        padding: 0 12px;
     }
     .slide {
         height: 220px !important;
     }
 }
 
-/* Phones (400px – 575px) — 4 columns */
+/* Phones (400px – 575px) — 3 columns */
 @media (min-width: 400px) and (max-width: 575px) {
     :root {
         --page-pad-md: 12px;
     }
-    .card-grid {
-        gap: 5px;
-    }
 }
 
-/* Small tablets / large phones (576px – 767px) — 5 columns, restore card sizing */
+/* Small tablets / large phones (576px – 767px) — 4 columns.
+   Steps up from the phone layout's 3 rather than jumping straight to 5,
+   which would have shrunk posters at the breakpoint instead of growing them. */
 @media (min-width: 576px) {
     :root {
         --page-pad-md: 16px;
@@ -192,8 +204,8 @@ html, body {
     .card-grid,
     .row-cols-2,
     .row-cols-md-5 {
-        grid-template-columns: repeat(5, 1fr) !important;
-        gap: 8px !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 10px !important;
     }
     .card-info { padding: 6px 8px 8px; }
     .card-title { font-size: 12px; }
