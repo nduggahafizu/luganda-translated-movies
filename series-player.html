@@ -1599,7 +1599,11 @@
                 // still reaches for the proxy, and only for whichever
                 // specific source turns out to need it.
                 seriesNetworkRetries = 0; // fresh source — don't inherit a previous episode's exhausted retry count
-                videoEl.onerror = () => handleVideoError(videoEl, resolveData.directUrl, false);
+                // direct:true means a CDN that serves the browser straight —
+                // pass it as alreadyProxied so the error path skips the
+                // stream-proxy retry and never routes those bytes through us.
+                const servesDirect = resolveData.direct === true;
+                videoEl.onerror = () => handleVideoError(videoEl, resolveData.directUrl, servesDirect);
                 videoEl.src = resolveData.directUrl;
                 videoEl.load();
             } catch (e) {

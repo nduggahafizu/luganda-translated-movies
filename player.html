@@ -2297,7 +2297,10 @@
         window.addEventListener('orientationchange', syncPlayerLayout);
         
         // ========== LOAD VIDEO SOURCE ==========
-        function loadVideo(url) {
+        // isDirect: the server resolved this to a CDN that serves the browser
+        // straight (ranges, CORS, no Referer needed). Those never fall back to
+        // stream-proxy — the point is that their bytes don't touch our server.
+        function loadVideo(url, isDirect = false) {
             if (!url) {
                 showError('No video URL provided');
                 return;
@@ -2385,7 +2388,7 @@
                 // proxied — retrying an already-proxied URL by wrapping
                 // rawUrl in another stream-proxy call just nests it a
                 // second time, a guaranteed failure, not a retry.
-                if (err && err.code === 4 && !alreadyProxied) {
+                if (err && err.code === 4 && !alreadyProxied && !isDirect) {
                     console.warn('⚠️ Retrying playback for CODE:4 with stream proxy');
                     const proxyUrl = proxyUrlFor(rawUrl, currentPlaybackToken);
 
@@ -2554,7 +2557,7 @@
                 const resolveData = await resolveResponse.json();
 
                 if (resolveData.success && resolveData.directUrl) {
-                    loadVideo(resolveData.directUrl);
+                    loadVideo(resolveData.directUrl, resolveData.direct === true);
                 } else {
                     showError(resolveData.message || 'This video is currently unavailable.');
                 }

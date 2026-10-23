@@ -531,13 +531,25 @@ async function resolveUrlForDelivery(sourceUrl, fallbackProvider, fallbackFormat
     };
 }
 
+// Bunny pull zones serve straight to the browser: verified 206 with range
+// support, Access-Control-Allow-Origin: *, and no Referer required. There is
+// no reason to pull those bytes through this server and pay egress on them
+// twice, so they're marked deliverable whether or not a signing key exists.
+function isDirectDeliveryHost(hostname) {
+    const h = String(hostname || '').toLowerCase();
+    return h === 'b-cdn.net' || h.endsWith('.b-cdn.net');
+}
+
 /**
- * When the resolved URL lives on a host we hold a Bunny Token Authentication
- * key for (see utils/bunnyToken.js), sign it — folding in a `download` query
- * param when the caller asked for one — so the browser streams or saves the
- * file straight from Bunny's edge instead of through stream-proxy and this
- * server's own bandwidth. A host with no configured key comes back
- * untouched, so this is a no-op until BUNNY_TOKEN_KEYS is actually set.
+ * Hand the browser the CDN URL itself instead of a stream-proxy link, so the
+ * bytes never touch this server. Signs the URL when a Bunny Token
+ * Authentication key is configured for that host (see utils/bunnyToken.js),
+ * which makes the link expire; without a key the plain CDN URL is returned,
+ * which Bunny serves fine.
+ *
+ * `direct: true` tells the client it can use the URL as-is. Hosts that are
+ * neither signable nor known-good — pearlpix, archive.org, embed hosts —
+ * come back untouched and keep going through the proxy.
  */
 function applyDirectDeliverySigning(result, req) {
     if (!result?.success || !result.directUrl) return result;
@@ -548,11 +560,18 @@ function applyDirectDeliverySigning(result, req) {
     } catch (e) {
         return result;
     }
-    if (!isTokenAuthHost(parsed.hostname)) return result;
+
+    const signable = isTokenAuthHost(parsed.hostname);
+    if (!signable && !isDirectDeliveryHost(parsed.hostname)) return result;
 
     const downloadName = sanitizeUrl(req.query.download);
     if (downloadName) {
         parsed.searchParams.set('download', downloadName);
+    }
+
+    // Unsigned but known-good host: hand back the plain URL.
+    if (!signable) {
+        return { ...result, directUrl: parsed.toString(), direct: true };
     }
 
     return {
