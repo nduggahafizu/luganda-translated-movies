@@ -1718,18 +1718,28 @@
 
             const loading = document.getElementById('video-loading');
             if (loading) {
+                // A network error (code 2/3) really may clear on a retry, so
+                // those still get "try again". Anything else means the source
+                // itself would not load even through the proxy — telling a
+                // paying viewer to retry that just sends them in circles and
+                // makes it look like their subscription or phone is at fault.
+                const isNetwork = errCode === 2 || errCode === 3;
+                const heading = isNetwork ? 'Connection interrupted' : 'This title is temporarily unavailable';
+                const detail = isNetwork
+                    ? 'Check your connection and try again.'
+                    : 'Our video host is having trouble with this file — it\'s not your subscription or your device. Other titles should still play normally.';
                 loading.innerHTML = `
                     <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2" style="margin-bottom: 15px;">
                         <circle cx="12" cy="12" r="10"></circle>
                         <line x1="12" y1="8" x2="12" y2="12"></line>
                         <line x1="12" y1="16" x2="12.01" y2="16"></line>
                     </svg>
-                    <p style="color: #fff; margin-bottom: 10px;">Failed to load video</p>
+                    <p style="color: #fff; margin-bottom: 10px;">${heading}</p>
                     <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 15px;">
-                        The server may be processing the file. Try again in a moment.
+                        ${detail}
                     </p>
-                    <button onclick="retryVideo()" style="padding: 8px 16px; background: var(--primary-color); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
-                        Retry
+                    <button onclick="${isNetwork ? 'retryVideo()' : 'window.location.href=\'index.html\''}" style="padding: 8px 16px; background: var(--primary-color); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                        ${isNetwork ? 'Retry' : 'Browse other titles'}
                     </button>
                 `;
             }
