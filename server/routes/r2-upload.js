@@ -3,6 +3,16 @@ const router = express.Router();
 const { S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const multer = require('multer');
+const { protect } = require('../middleware/auth');
+const { adminOnly } = require('../middleware/adminAuth');
+
+// Upload and delete let the caller write to (and remove from) the R2 bucket.
+// Left open, anyone on the internet could dump files into the bucket — storage
+// billed to this account, and whatever they upload served from our domain —
+// or delete the catalogue. So every mutating route is admin-only. (OPTIONS and
+// the read-only /status stay open: preflight can't carry a token, and status
+// returns nothing but a boolean.)
+const adminGuard = [protect, adminOnly];
 
 /**
  * Cloudflare R2 Upload Routes
@@ -27,7 +37,13 @@ const getR2Client = () => {
         credentials: {
             accessKeyId: process.env.R2_ACCESS_KEY_ID,
             secretAccessKey: process.env.R2_SECRET_ACCESS_KEY
-        }
+        },
+        // AWS SDK v3 (>=3.729) bakes a CRC32 checksum into presigned PUT URLs.
+        // R2 rejects that (the signed value is for an empty body, not the real
+        // file), so browser uploads fail with a checksum mismatch. WHEN_REQUIRED
+        // keeps checksums off unless an operation actually needs them.
+        requestChecksumCalculation: 'WHEN_REQUIRED',
+        responseChecksumValidation: 'WHEN_REQUIRED'
     });
 };
 
@@ -72,7 +88,7 @@ router.get('/status', (req, res) => {
  * POST /api/r2/presign
  * Body: { filename: "movie.mp4", contentType: "video/mp4" }
  */
-router.post('/presign', async (req, res) => {
+router.post('/presign', ...adminGuard, async (req, res) => {
     setCorsHeaders(req, res);
     
     try {
@@ -126,7 +142,7 @@ router.post('/presign', async (req, res) => {
  * Direct upload (for smaller files via admin panel)
  * POST /api/r2/upload
  */
-router.post('/upload', upload.single('video'), async (req, res) => {
+router.post('/upload', ...adminGuard, upload.single('video'), async (req, res) => {
     setCorsHeaders(req, res);
     
     try {
@@ -179,7 +195,7 @@ router.post('/upload', upload.single('video'), async (req, res) => {
  * Delete video from R2
  * DELETE /api/r2/delete/:key
  */
-router.delete('/delete/*', async (req, res) => {
+router.delete('/delete/*', ...adminGuard, async (req, res) => {
     setCorsHeaders(req, res);
     
     try {

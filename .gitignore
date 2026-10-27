@@ -41,6 +41,10 @@ build/
 *.tmp
 *.temp
 
+# Telegram auto-uploader runtime (temp movie downloads + poll state)
+server/telegram/downloads/
+server/telegram/state.json
+
 # App distribution files
 downloads/*.apk
 *.apk

@@ -1099,6 +1099,23 @@
                 <input type="hidden" id="edit-movie-id">
                 
                 <div class="form-grid">
+                    <!-- Fix poster & details from TMDB — never touches the video URL, VJ or Luganda title -->
+                    <div class="form-group full-width" style="background: var(--background-light); padding: 14px; border-radius: 10px; border: 1px solid var(--border-color);">
+                        <label>🔍 Fix poster &amp; details from TMDB</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="edit-tmdb-search" placeholder="Search the correct title..." style="flex: 1;">
+                            <select id="edit-tmdb-type" title="Content type" aria-label="Content type" style="width: 120px; padding: 10px; border-radius: 8px; background: var(--background); border: 1px solid var(--border-color); color: var(--text-primary);">
+                                <option value="movie">Movie</option>
+                                <option value="tv">TV Series</option>
+                                <option value="multi">Both</option>
+                            </select>
+                            <button type="button" class="btn-search" onclick="editSearchTMDB()">Search</button>
+                        </div>
+                        <p class="tmdb-results-hint" id="edit-tmdb-hint">Pick the right one — poster &amp; details update, your video URL stays:</p>
+                        <div class="tmdb-results" id="edit-tmdb-results"></div>
+                        <small style="color: var(--text-secondary); display: block; margin-top: 6px;">Updates poster, backdrop, title, year, runtime, genres &amp; description. Video URL, VJ &amp; Luganda title are kept.</small>
+                    </div>
+
                     <div class="form-group">
                         <label>Original Title *</label>
                         <input type="text" id="edit-title" required>
@@ -1158,7 +1175,15 @@
                         <label>Year</label>
                         <input type="number" id="edit-year" min="1900" max="2030">
                     </div>
-                    
+
+                    <div class="form-group">
+                        <label for="edit-status">Status</label>
+                        <select id="edit-status" title="Publish status" aria-label="Publish status">
+                            <option value="draft">Draft (hidden from users)</option>
+                            <option value="published">Published (live)</option>
+                        </select>
+                    </div>
+
                     <div class="form-group full-width">
                         <label>📺 Video URL *</label>
                         <input type="url" id="edit-embed-url" required placeholder="https://archive.org/download/...">
@@ -1281,7 +1306,7 @@
         // Check R2 configuration status
         async function checkR2Status() {
             try {
-                const response = await fetch(`${API_BASE}/api/r2/status`);
+                const response = await fetch(`${API_BASE}/r2/status`);
                 const data = await response.json();
                 
                 document.getElementById('r2-upload-section').style.display = 'block';
@@ -1331,9 +1356,13 @@
                 progressText.textContent = 'Getting upload URL...';
                 progressBar.style.width = '10%';
                 
-                const presignResponse = await fetch(`${API_BASE}/api/r2/presign`, {
+                const r2AuthToken = localStorage.getItem('token') || sessionStorage.getItem('token');
+                const presignResponse = await fetch(`${API_BASE}/r2/presign`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': r2AuthToken ? `Bearer ${r2AuthToken}` : ''
+                    },
                     body: JSON.stringify({
                         filename: selectedR2File.name,
                         contentType: selectedR2File.type || 'video/mp4'
@@ -1672,7 +1701,9 @@
             noMovies.style.display = 'none';
             
             try {
-                const response = await fetch(`${API_BASE}/luganda-movies?limit=500`, {
+                // status=all so drafts (e.g. from the Telegram uploader) are listed too,
+                // and so the response is unsanitized (keeps video.embedUrl for editing).
+                const response = await fetch(`${API_BASE}/luganda-movies?limit=500&status=all`, {
                     headers: getAuthHeaders()
                 });
                 const data = await response.json();
@@ -1912,7 +1943,90 @@
             document.getElementById('tmdb-preview').classList.remove('show');
             showToast(`${isTV ? 'Series' : 'Movie'} details loaded! Now add VJ and embed URL.`, 'success');
         }
-        
+
+        // ---- Edit-modal TMDB re-picker: fix poster/metadata, never touch the video URL ----
+        let editTMDBResults = [];
+
+        async function editSearchTMDB() {
+            const query = document.getElementById('edit-tmdb-search').value.trim();
+            const searchType = document.getElementById('edit-tmdb-type').value;
+            if (!query) { showToast('Enter a title to search', 'error'); return; }
+
+            const hint = document.getElementById('edit-tmdb-hint');
+            const grid = document.getElementById('edit-tmdb-results');
+            hint.classList.remove('show');
+            grid.classList.remove('show');
+
+            try {
+                const endpoint = searchType === 'movie' ? '/tmdb/search/movies'
+                               : searchType === 'tv' ? '/tmdb/search/tv' : '/tmdb/search/multi';
+                const response = await fetch(`${API_BASE}${endpoint}?query=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                const results = (data.success && data.data.results ? data.data.results : [])
+                    .filter(r => r.media_type !== 'person');
+
+                if (results.length === 0) {
+                    showToast('No results found. Try a different search or type.', 'error');
+                    return;
+                }
+
+                editTMDBResults = results;
+                grid.innerHTML = results.map((item, i) => {
+                    const isTV = item.media_type === 'tv' || searchType === 'tv' || (!!item.name && searchType !== 'movie');
+                    const title = isTV ? (item.name || item.original_name) : (item.title || item.original_title);
+                    const year = (isTV ? item.first_air_date : item.release_date) || '';
+                    const poster = item.poster_path
+                        ? `https://image.tmdb.org/t/p/w200${item.poster_path}`
+                        : '/assets/images/placeholder.svg';
+                    return `
+                        <button type="button" class="tmdb-result-card" onclick="editSelectTMDB(${i}, ${isTV})">
+                            <img src="${poster}" alt="">
+                            <div class="rc-title">${esc(title)}</div>
+                            <div class="rc-meta">${year ? year.substring(0, 4) : 'N/A'} · ${isTV ? 'TV Series' : 'Movie'}</div>
+                        </button>
+                    `;
+                }).join('');
+                grid.classList.add('show');
+                hint.classList.add('show');
+                showToast(`Found ${results.length} matches — pick the right one`, 'success');
+            } catch (error) {
+                console.error('Edit TMDB search error:', error);
+                showToast('Failed to search TMDB. Check your connection.', 'error');
+            }
+        }
+
+        async function editSelectTMDB(index, isTV) {
+            const item = editTMDBResults[index];
+            if (!item) return;
+
+            let details = item;
+            try {
+                const endpoint = isTV ? `/tmdb/tv/${item.id}` : `/tmdb/movie/${item.id}`;
+                const res = await fetch(`${API_BASE}${endpoint}`);
+                const d = await res.json();
+                if (d.success) details = { ...item, ...d.data };
+            } catch (error) {
+                console.error('Edit TMDB details error:', error);
+            }
+
+            const title = isTV ? (details.name || details.original_name) : (details.title || details.original_title);
+            const releaseDate = isTV ? details.first_air_date : details.release_date;
+            const runtime = isTV ? (details.number_of_seasons || '') : details.runtime;
+
+            // Fill only TMDB-derived fields. Video URL, VJ and Luganda title are left as they are.
+            if (title) document.getElementById('edit-title').value = title;
+            if (releaseDate) document.getElementById('edit-year').value = releaseDate.substring(0, 4);
+            if (details.overview) document.getElementById('edit-description').value = details.overview;
+            if (runtime) document.getElementById('edit-runtime').value = runtime;
+            if (details.poster_path) document.getElementById('edit-poster').value = `https://image.tmdb.org/t/p/w500${details.poster_path}`;
+            if (details.backdrop_path) document.getElementById('edit-backdrop').value = `https://image.tmdb.org/t/p/original${details.backdrop_path}`;
+            if (details.genres) document.getElementById('edit-genres').value = details.genres.map(g => g.name).join(', ');
+
+            document.getElementById('edit-tmdb-results').classList.remove('show');
+            document.getElementById('edit-tmdb-hint').classList.remove('show');
+            showToast('Poster & details updated — video URL and VJ kept. Review and Save.', 'success');
+        }
+
         // Clear form
         function clearForm() {
             document.getElementById('add-movie-form').reset();
@@ -2016,7 +2130,7 @@
             document.getElementById('edit-luganda-title').value = movie.lugandaTitle || '';
             document.getElementById('edit-vj').value = movie.vjName || '';
             document.getElementById('edit-year').value = movie.year || '';
-            document.getElementById('edit-embed-url').value = movie.embedUrl || '';
+            document.getElementById('edit-embed-url').value = movie.embedUrl || (movie.video && (movie.video.embedUrl || movie.video.originalVideoPath)) || '';
             document.getElementById('edit-description').value = movie.description || movie.overview || '';
             document.getElementById('edit-poster').value = movie.poster || '';
             document.getElementById('edit-backdrop').value = movie.backdrop || '';
@@ -2026,7 +2140,16 @@
             document.getElementById('edit-trending').checked = movie.trending || false;
             document.getElementById('edit-for-you').checked = movie.forYou || false;
             document.getElementById('edit-allow-download').checked = movie.allowDownload || false;
-            
+            document.getElementById('edit-status').value = movie.status || 'published';
+
+            // reset the TMDB re-picker each time the modal opens
+            const _erHint = document.getElementById('edit-tmdb-hint');
+            const _erGrid = document.getElementById('edit-tmdb-results');
+            if (_erHint) _erHint.classList.remove('show');
+            if (_erGrid) { _erGrid.classList.remove('show'); _erGrid.innerHTML = ''; }
+            const _erSearch = document.getElementById('edit-tmdb-search');
+            if (_erSearch) _erSearch.value = movie.originalTitle || movie.title || '';
+
             // Show the modal
             document.getElementById('edit-modal').classList.add('show');
         }
@@ -2060,7 +2183,8 @@
                 featured: document.getElementById('edit-featured').checked,
                 trending: document.getElementById('edit-trending').checked,
                 forYou: document.getElementById('edit-for-you').checked,
-                allowDownload: document.getElementById('edit-allow-download').checked
+                allowDownload: document.getElementById('edit-allow-download').checked,
+                status: document.getElementById('edit-status').value || undefined
             };
             
             // Clean undefined fields

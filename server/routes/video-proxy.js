@@ -532,13 +532,14 @@ async function resolveUrlForDelivery(sourceUrl, fallbackProvider, fallbackFormat
     };
 }
 
-// Bunny pull zones serve straight to the browser: verified 206 with range
-// support, Access-Control-Allow-Origin: *, and no Referer required. There is
-// no reason to pull those bytes through this server and pay egress on them
-// twice, so they're marked deliverable whether or not a signing key exists.
+// Hosts that serve straight to the browser (range support, CORS, no Referer),
+// so there's no reason to pull their bytes through this server and pay egress
+// twice. Bunny pull zones (*.b-cdn.net) verified live. Cloudflare R2 public
+// buckets (pub-*.r2.dev) are S3S behind Cloudflare's CDN and behave the same —
+// and R2 egress is free, so keeping these direct matters even more.
 function isDirectDeliveryHost(hostname) {
     const h = String(hostname || '').toLowerCase();
-    return h === 'b-cdn.net' || h.endsWith('.b-cdn.net');
+    return h === 'b-cdn.net' || h.endsWith('.b-cdn.net') || h.endsWith('.r2.dev');
 }
 
 /**
