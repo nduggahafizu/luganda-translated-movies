@@ -6,6 +6,7 @@ const LugandaMovie = require('../models/LugandaMovie');
 const User = require('../models/User');
 const { protect, optionalAuth } = require('../middleware/auth');
 const { signBunnyUrl, isTokenAuthHost, clientIpFromRequest } = require('../utils/bunnyToken');
+const { signWasabiUrl, isWasabiBackedUrl } = require('../utils/wasabiSign');
 
 
 // Falls back to JWT_SECRET when no dedicated playback secret is set, but no
@@ -551,7 +552,7 @@ function isDirectDeliveryHost(hostname) {
  * neither signable nor known-good — pearlpix, archive.org, embed hosts —
  * come back untouched and keep going through the proxy.
  */
-function applyDirectDeliverySigning(result, req) {
+async function applyDirectDeliverySigning(result, req) {
     if (!result?.success || !result.directUrl) return result;
 
     let parsed;
@@ -561,10 +562,23 @@ function applyDirectDeliverySigning(result, req) {
         return result;
     }
 
+    const downloadName = sanitizeUrl(req.query.download);
+
+    // Wasabi-backed catalogue URLs come first: these are the pearlpix/bujjuko
+    // entries whose CDN hostname points at a dead Backblaze origin while the
+    // objects themselves sit in a same-named Wasabi bucket. A presigned URL
+    // reaches the file directly and fixes the stored content type on the way
+    // through. No-ops until WASABI_* credentials are set.
+    if (isWasabiBackedUrl(result.directUrl)) {
+        const signed = await signWasabiUrl(result.directUrl, { downloadName });
+        if (signed) {
+            return { ...result, directUrl: signed, direct: true };
+        }
+    }
+
     const signable = isTokenAuthHost(parsed.hostname);
     if (!signable && !isDirectDeliveryHost(parsed.hostname)) return result;
 
-    const downloadName = sanitizeUrl(req.query.download);
     if (downloadName) {
         parsed.searchParams.set('download', downloadName);
     }
@@ -644,7 +658,7 @@ router.get('/resolve/luganda/:movieId', async (req, res) => {
             }
 
             const result = await resolveUrlForDelivery(sourceUrl, episodeDoc.video?.provider, 'mp4');
-            return res.json(applyDirectDeliverySigning(result, req));
+            return res.json(await applyDirectDeliverySigning(result, req));
         }
 
         const { requiredPlan, tokenPayload } = requirePlaybackAuthIfNeeded(movie, req);
@@ -659,7 +673,7 @@ router.get('/resolve/luganda/:movieId', async (req, res) => {
         }
 
         const result = await resolveUrlForDelivery(sourceUrl, movie.video?.provider, movie.video?.format);
-        return res.json(applyDirectDeliverySigning(result, req));
+        return res.json(await applyDirectDeliverySigning(result, req));
     } catch (error) {
         const httpStatus = error.httpStatus || 500;
         return res.status(httpStatus).json({
