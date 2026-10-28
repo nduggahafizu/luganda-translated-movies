@@ -29,6 +29,7 @@
     "@aws-sdk/lib-storage": "^3.1157.0",
     "@aws-sdk/s3-request-presigner": "^3.964.0",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@ffprobe-installer/ffprobe": "^2.1.2",
     "axios": "^1.6.2",
     "bcryptjs": "^2.4.3",
     "cheerio": "^1.0.0-rc.12",

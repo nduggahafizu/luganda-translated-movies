@@ -7,6 +7,7 @@ const User = require('../models/User');
 const { protect, optionalAuth } = require('../middleware/auth');
 const { signBunnyUrl, isTokenAuthHost, clientIpFromRequest } = require('../utils/bunnyToken');
 const { signWasabiUrl, isWasabiBackedUrl } = require('../utils/wasabiSign');
+const { signR2DownloadUrl, isR2PublicUrl } = require('../utils/r2Sign');
 
 
 // Falls back to JWT_SECRET when no dedicated playback secret is set, but no
@@ -572,6 +573,17 @@ async function applyDirectDeliverySigning(result, req) {
     // through. No-ops until WASABI_* credentials are set.
     if (isWasabiBackedUrl(result.directUrl)) {
         const signed = await signWasabiUrl(result.directUrl, { downloadName });
+        if (signed) {
+            return { ...result, directUrl: signed, direct: true };
+        }
+    }
+
+    // R2 public URL + download: the plain pub-*.r2.dev URL ignores ?download=
+    // and plays inline, and the browser ignores <a download> cross-origin. A
+    // presigned GET with Content-Disposition: attachment forces the save.
+    // Playback (no downloadName) keeps using the plain, cacheable public URL.
+    if (downloadName && isR2PublicUrl(result.directUrl)) {
+        const signed = await signR2DownloadUrl(result.directUrl, downloadName);
         if (signed) {
             return { ...result, directUrl: signed, direct: true };
         }

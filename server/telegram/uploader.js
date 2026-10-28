@@ -41,6 +41,9 @@ const { Upload } = require('@aws-sdk/lib-storage');
 const mongoose = require('mongoose');
 const LugandaMovie = require('../models/LugandaMovie');
 const tmdb = require('../services/tmdbService');
+const ffmpeg = require('fluent-ffmpeg');
+ffmpeg.setFfmpegPath(require('@ffmpeg-installer/ffmpeg').path);
+ffmpeg.setFfprobePath(require('@ffprobe-installer/ffprobe').path);
 
 const ENV_PATH = path.join(__dirname, '..', '.env');
 const STATE_PATH = path.join(__dirname, 'state.json');
@@ -102,7 +105,11 @@ function cleanTitleFromName(name) {
 }
 
 function safeFileName(name) {
-    return (name || `video-${Date.now()}.mp4`).replace(/[^a-zA-Z0-9.\-_ ]/g, '_');
+    // No spaces in R2 object keys: a space becomes %20 in the URL, and anything
+    // that strips whitespace (e.g. sanitizeUrl) then breaks the link. Use '_'.
+    return (name || `video-${Date.now()}.mp4`)
+        .replace(/\s+/g, '_')
+        .replace(/[^a-zA-Z0-9._-]/g, '_');
 }
 
 // ── TMDB enrichment ────────────────────────────────────────────────────────
@@ -375,6 +382,64 @@ async function upsertSeriesEpisode({ seriesTitle, season, episode, vj, publicUrl
     return { series, created, matchedTmdb: !!tv, season, episode };
 }
 
+// ── make files browser-streamable ─────────────────────────────────────────
+
+// Browsers can't play .mkv/.avi in <video> — only MP4 (H.264/AAC) and WebM.
+// Convert anything else to MP4 before upload: a fast remux when the codecs are
+// already browser-friendly, a full transcode only when they aren't.
+const BROWSER_SAFE_EXT = new Set(['.mp4', '.m4v', '.webm']);
+
+function probeCodecs(file) {
+    return new Promise((resolve) => {
+        ffmpeg.ffprobe(file, (err, data) => {
+            if (err || !data) return resolve(null);
+            const streams = data.streams || [];
+            const v = streams.find(s => s.codec_type === 'video');
+            const a = streams.find(s => s.codec_type === 'audio');
+            resolve({ vcodec: (v && v.codec_name) || '', acodec: (a && a.codec_name) || '' });
+        });
+    });
+}
+
+/**
+ * Ensure the file is browser-streamable MP4. Returns null when it already is
+ * (no work needed), otherwise { path, name } for the converted MP4.
+ */
+async function ensureStreamable(localPath, ext, fileName, id) {
+    if (BROWSER_SAFE_EXT.has(ext)) return null;     // mp4 / webm: assume playable
+
+    const codecs = await probeCodecs(localPath);
+    const vOk = /^(h264|avc)/i.test(codecs ? codecs.vcodec : '');
+    const aOk = /^aac/i.test(codecs ? codecs.acodec : '');
+    const outPath = path.join(DOWNLOAD_DIR, `${id}-stream.mp4`);
+    const outName = fileName.replace(/\.[^.]+$/, '') + '.mp4';
+
+    await new Promise((resolve, reject) => {
+        let cmd = ffmpeg(localPath);
+        if (vOk && aOk) {
+            log('    convert: remux → MP4 (copy, fast, no quality loss)');
+            cmd = cmd.videoCodec('copy').audioCodec('copy');
+        } else if (vOk) {
+            log('    convert: copy video, transcode audio → AAC');
+            cmd = cmd.videoCodec('copy').audioCodec('aac').audioBitrate('192k');
+        } else {
+            log(`    convert: full transcode → H.264/AAC (slow; source video=${codecs ? codecs.vcodec : '?'})`);
+            cmd = cmd.videoCodec('libx264').audioCodec('aac').audioBitrate('192k')
+                     .outputOptions(['-preset veryfast', '-crf 23']);
+        }
+        let lastPct = -20;
+        cmd.outputOptions(['-movflags +faststart'])
+            .on('progress', p => {
+                if (p.percent && p.percent >= lastPct + 20) { lastPct = p.percent; log(`    convert ${Math.floor(p.percent)}%`); }
+            })
+            .on('end', () => resolve())
+            .on('error', err => reject(err))
+            .save(outPath);
+    });
+
+    return { path: outPath, name: outName };
+}
+
 // ── message processing ───────────────────────────────────────────────────
 
 function describeVideo(message) {
@@ -411,15 +476,7 @@ async function handleMessage(client, r2, message) {
     const provisionalTitle = caption || query || cleanTitleFromName(info.name) || `Untitled ${message.id}`;
     const fileName = safeFileName(info.name);
     const ext = path.extname(fileName).toLowerCase();
-    const contentType = info.mime || CONTENT_TYPES[ext] || 'video/mp4';
     const localPath = path.join(DOWNLOAD_DIR, `${message.id}-${fileName}`);
-
-    // Series episodes are grouped in R2 under series/<series-name>/; movies go
-    // flat under movies/.
-    const pad = (n) => String(n).padStart(2, '0');
-    const key = seInfo
-        ? `series/${makeSlug(seInfo.seriesTitle) || 'untitled-series'}/S${pad(seInfo.season)}E${pad(seInfo.episode)}-${fileName}`
-        : `movies/${Date.now()}-${fileName}`;
 
     log(`▶ new ${seInfo ? `episode (S${seInfo.season}E${seInfo.episode})` : 'video'}: "${provisionalTitle}"  (${humanSize(info.size)})`);
 
@@ -436,9 +493,27 @@ async function handleMessage(client, r2, message) {
     });
     log('    download complete');
 
+    let uploadPath = localPath;
+    let uploadName = fileName;
+    let contentType = info.mime || CONTENT_TYPES[ext] || 'video/mp4';
     try {
-        // 2) stream the temp file into R2
-        await uploadToR2(r2, localPath, key, contentType);
+        // 2) make sure it's browser-streamable (convert .mkv/.avi/… → MP4)
+        const converted = await ensureStreamable(localPath, ext, fileName, message.id);
+        if (converted) {
+            uploadPath = converted.path;
+            uploadName = converted.name;
+            contentType = 'video/mp4';
+            log(`    converted -> ${uploadName}`);
+        }
+
+        // 3) build the R2 key — series grouped under series/<name>/, movies flat
+        const pad = (n) => String(n).padStart(2, '0');
+        const key = seInfo
+            ? `series/${makeSlug(seInfo.seriesTitle) || 'untitled-series'}/S${pad(seInfo.season)}E${pad(seInfo.episode)}-${uploadName}`
+            : `movies/${Date.now()}-${uploadName}`;
+
+        // 4) stream the file into R2
+        await uploadToR2(r2, uploadPath, key, contentType);
         const publicUrl = `${process.env.R2_PUBLIC_URL}/${key}`;
         log(`    uploaded -> ${publicUrl}`);
 
@@ -471,7 +546,7 @@ async function handleMessage(client, r2, message) {
         const lugandaTitle = caption || originalTitle;
         const draft = await createDraftMovie({
             originalTitle, lugandaTitle, publicUrl, size: info.size,
-            format: ext.replace('.', ''), meta, vj
+            format: path.extname(uploadName).slice(1) || 'mp4', meta, vj
         });
         log(`    draft created (id ${draft._id})`);
 
@@ -487,8 +562,9 @@ async function handleMessage(client, r2, message) {
 
         return true;
     } finally {
-        // always clean up the temp download
+        // always clean up temp files (the download + any converted copy)
         fs.promises.unlink(localPath).catch(() => {});
+        if (uploadPath !== localPath) fs.promises.unlink(uploadPath).catch(() => {});
     }
 }
 
@@ -610,4 +686,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = { parseTitleQuery, parseSeriesEpisode, fetchTmdbMeta, fetchTmdbTv, mapGenres, trailerUrl };
+module.exports = { parseTitleQuery, parseSeriesEpisode, fetchTmdbMeta, fetchTmdbTv, mapGenres, trailerUrl, ensureStreamable, probeCodecs };
