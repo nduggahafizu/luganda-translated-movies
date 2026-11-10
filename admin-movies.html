@@ -1379,18 +1379,35 @@
                 progressText.textContent = 'Uploading to Cloudflare R2...';
                 progressBar.style.width = '20%';
                 
-                const uploadResponse = await fetch(presignData.uploadUrl, {
-                    method: 'PUT',
-                    body: selectedR2File,
-                    headers: {
-                        'Content-Type': selectedR2File.type || 'video/mp4'
-                    }
+                // Use XMLHttpRequest (not fetch) so we get real-time upload
+                // progress — fetch() cannot report upload progress at all.
+                const startedAt = Date.now();
+                await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('PUT', presignData.uploadUrl, true);
+                    xhr.setRequestHeader('Content-Type', selectedR2File.type || 'video/mp4');
+                    xhr.upload.onprogress = (e) => {
+                        if (!e.lengthComputable) return;
+                        const frac = e.loaded / e.total;                      // 0..1
+                        progressBar.style.width = Math.round(20 + frac * 79) + '%';   // 20→99 (presign used 10→20)
+                        const secs = (Date.now() - startedAt) / 1000;
+                        const mbps = secs > 0 ? (e.loaded / 1048576) / secs : 0;
+                        const etaSec = mbps > 0 ? ((e.total - e.loaded) / 1048576) / mbps : 0;
+                        const eta = etaSec >= 90 ? Math.round(etaSec / 60) + ' min' : Math.max(0, Math.round(etaSec)) + ' sec';
+                        progressText.textContent =
+                            `Uploading… ${Math.round(frac * 100)}%  ` +
+                            `(${formatFileSize(e.loaded)} / ${formatFileSize(e.total)}` +
+                            (mbps > 0 ? `, ${mbps.toFixed(1)} MB/s, ~${eta} left)` : ')');
+                    };
+                    xhr.onload = () => {
+                        if (xhr.status >= 200 && xhr.status < 300) resolve();
+                        else reject(new Error('R2 rejected the upload (HTTP ' + xhr.status + ')'));
+                    };
+                    xhr.onerror = () => reject(new Error('Connection lost during upload — please try again'));
+                    xhr.ontimeout = () => reject(new Error('Upload timed out — please try again'));
+                    xhr.send(selectedR2File);
                 });
-                
-                if (!uploadResponse.ok) {
-                    throw new Error('Upload to R2 failed');
-                }
-                
+
                 progressBar.style.width = '100%';
                 progressText.textContent = '✅ Upload complete!';
                 

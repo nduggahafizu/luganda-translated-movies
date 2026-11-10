@@ -211,7 +211,12 @@ function r2Client() {
         },
         // Keep the SDK's CRC32 checksums off — R2 rejects them on uploads.
         requestChecksumCalculation: 'WHEN_REQUIRED',
-        responseChecksumValidation: 'WHEN_REQUIRED'
+        responseChecksumValidation: 'WHEN_REQUIRED',
+        // Flaky connections drop mid-upload (ECONNRESET). Retry each part more
+        // times, with adaptive backoff, so one blip retries the chunk instead
+        // of failing the whole movie.
+        maxAttempts: 8,
+        retryMode: 'adaptive'
     });
 }
 
