@@ -11,7 +11,7 @@ router.get('/', (req, res) => {
         success: true,
         android: {
             minVersionCode,
-            storeUrl: 'https://play.google.com/store/apps/details?id=com.unruly.movies'
+            storeUrl: 'https://play.google.com/store/apps/details?id=com.unruly.pix'
         }
     });
 });

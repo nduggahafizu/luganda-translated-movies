@@ -186,3 +186,86 @@ if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
         }
     });
 }
+
+// --- Android app install banner (slim bottom bar, Android web only) ---------
+// Shows a dismissible "Get the app" bar to Android visitors, sitting just above
+// the mobile bottom nav. Never shows inside the installed app, and remembers a
+// dismissal. Wrapped so it can never break the page.
+(function () {
+    try {
+        if (typeof window === 'undefined' || typeof document === 'undefined') return;
+        if (!/Android/i.test(navigator.userAgent || '')) return;
+
+        var inApp = (document.referrer || '').indexOf('android-app://com.unruly.pix') === 0
+            || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+        if (inApp) return;
+
+        try {
+            var until = parseInt(localStorage.getItem('unrulyAppBannerDismissed') || '0', 10);
+            if (until && Date.now() < until) return;
+        } catch (e) {}
+
+        var STORE = 'https://play.google.com/store/apps/details?id=com.unruly.pix';
+
+        function build() {
+            if (document.getElementById('unruly-app-banner') || !document.body) return;
+
+            // Sit just above the floating bottom nav. (offsetParent is always null
+            // for position:fixed elements, so it can't be used to test visibility.)
+            var nav = document.querySelector('.app-bottom-nav');
+            var navRect = nav && getComputedStyle(nav).display !== 'none' ? nav.getBoundingClientRect() : null;
+            var floating = !!(navRect && navRect.height > 0);
+            var offset = floating ? Math.max(0, Math.round(window.innerHeight - navRect.top) + 8) : 0;
+            var hidden = 'translateY(calc(100% + ' + offset + 'px))';
+
+            var bar = document.createElement('div');
+            bar.id = 'unruly-app-banner';
+            bar.setAttribute('role', 'region');
+            bar.setAttribute('aria-label', 'Get the Unruly Movies Android app');
+            bar.style.cssText = [
+                'position:fixed', 'left:' + (floating ? 10 : 0) + 'px', 'right:' + (floating ? 10 : 0) + 'px',
+                'bottom:' + offset + 'px', 'z-index:2147482000',
+                'display:flex', 'align-items:center', 'gap:10px',
+                'padding:10px 12px', 'box-sizing:border-box',
+                'background:#15171c', 'border-radius:' + (floating ? 14 : 0) + 'px',
+                floating ? 'border:1px solid rgba(255,255,255,0.12)' : 'border-top:1px solid rgba(255,255,255,0.12)',
+                'box-shadow:0 -6px 20px rgba(0,0,0,0.45)', 'color:#fff', 'font-family:inherit',
+                'transform:' + hidden, 'transition:transform .35s ease'
+            ].join(';');
+            bar.innerHTML =
+                '<img src="/assets/images/icons/icon-192x192.png" alt="" width="40" height="40" style="border-radius:9px;flex:0 0 auto" onerror="this.style.display=\'none\'">' +
+                '<div style="flex:1 1 auto;min-width:0;line-height:1.25">' +
+                  '<div style="font-weight:700;font-size:14px">Unruly Movies app</div>' +
+                  '<div style="font-size:12px;color:#b9c0cc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Faster streaming &amp; downloads on your phone</div>' +
+                '</div>' +
+                '<a href="' + STORE + '" target="_blank" rel="noopener" id="unrulyAppInstall" ' +
+                  'style="flex:0 0 auto;background:#f68712;color:#141414;font-weight:700;font-size:13px;text-decoration:none;padding:9px 16px;border-radius:8px">Install</a>' +
+                '<button type="button" id="unrulyAppClose" aria-label="Dismiss" ' +
+                  'style="flex:0 0 auto;background:transparent;border:0;color:#9aa3af;font-size:22px;line-height:1;padding:4px 6px;cursor:pointer">&times;</button>';
+            document.body.appendChild(bar);
+            requestAnimationFrame(function () { bar.style.transform = 'translateY(0)'; });
+
+            // Lift the chat button above the banner while it shows (a style rule,
+            // so it applies even if the chat widget is created after this).
+            var lift = document.createElement('style');
+            lift.id = 'unruly-app-banner-lift';
+            lift.textContent = '#chat-widget{transform:translateY(-' + (bar.offsetHeight + 8) + 'px);transition:transform .35s ease}';
+            document.head.appendChild(lift);
+
+            function dismiss(days) {
+                bar.style.transform = hidden;
+                lift.textContent = '#chat-widget{transform:none;transition:transform .35s ease}';
+                try { localStorage.setItem('unrulyAppBannerDismissed', String(Date.now() + days * 86400000)); } catch (e) {}
+                setTimeout(function () {
+                    if (bar.parentNode) bar.parentNode.removeChild(bar);
+                    if (lift.parentNode) lift.parentNode.removeChild(lift);
+                }, 350);
+            }
+            document.getElementById('unrulyAppClose').addEventListener('click', function () { dismiss(7); });
+            document.getElementById('unrulyAppInstall').addEventListener('click', function () { dismiss(30); });
+        }
+
+        if (document.readyState === 'complete') build();
+        else window.addEventListener('load', build);
+    } catch (e) { /* a banner must never break the page */ }
+})();

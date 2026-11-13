@@ -110,7 +110,7 @@
             { href: 'uganda-tv.html', label: 'TV Channels', icon: 'tv', match: ['/uganda-tv.html'] }
         ] },
         { header: 'Discovery', items: [
-            { href: 'https://play.google.com/store/apps/details?id=com.unruly.movies', label: 'Get the App', icon: 'download', external: true, highlight: true, id: 'getAppItem' },
+            { href: 'https://play.google.com/store/apps/details?id=com.unruly.pix', label: 'Get the App', icon: 'download', external: true, highlight: true, id: 'getAppItem' },
             { href: 'genres.html', label: 'Categories', icon: 'grid', match: ['/genres.html'] },
             { href: 'vjs.html', label: 'VJ Translators', icon: 'users', match: ['/vjs.html', '/vj.html'] },
             { href: 'search.html', label: 'Search', icon: 'search', match: ['/search.html'] }

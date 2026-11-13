@@ -70,7 +70,7 @@ exports.sendEmail = async (options) => {
 // welcome-banner.html — re-render that with headless Chrome to change it.
 const path = require('path');
 const WELCOME_BANNER_PATH = path.join(__dirname, '../../assets/images/email/welcome-banner.jpg');
-const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.unruly.movies';
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.unruly.pix';
 
 function escapeHtml(str) {
     return String(str == null ? '' : str)
