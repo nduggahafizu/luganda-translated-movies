@@ -100,8 +100,8 @@ router.post('/presign', ...adminGuard, async (req, res) => {
             });
         }
 
-        const { filename, contentType } = req.body;
-        
+        const { filename, contentType, folder } = req.body;
+
         if (!filename) {
             return res.status(400).json({
                 success: false,
@@ -109,8 +109,21 @@ router.post('/presign', ...adminGuard, async (req, res) => {
             });
         }
 
+        // Default to movies/, but allow a caller-supplied folder (the series
+        // manager sends "series/<slug>"). Sanitised so it can't escape the bucket.
+        let prefix = 'movies';
+        if (folder && typeof folder === 'string') {
+            const clean = folder.toLowerCase()
+                .replace(/\\/g, '/')
+                .replace(/[^a-z0-9/_.-]/g, '')
+                .replace(/\.{2,}/g, '')
+                .replace(/\/{2,}/g, '/')
+                .replace(/^\/+|\/+$/g, '');
+            if (clean) prefix = clean;
+        }
+
         // Generate unique key
-        const key = `movies/${Date.now()}-${filename.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+        const key = `${prefix}/${Date.now()}-${filename.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
         
         const command = new PutObjectCommand({
             Bucket: process.env.R2_BUCKET_NAME,

@@ -659,13 +659,17 @@
                                         ${episode.video?.embedUrl || episode.video ? '✅ Ready' : '⚠️ No Video'}
                                     </span>
                                     <div class="episode-actions">
-                                        <input type="text" 
+                                        <input type="text"
                                                id="url_${season.seasonNumber}_${episode.episodeNumber}"
-                                               placeholder="Video URL (Streamtape, Archive.org...)"
+                                               placeholder="Video URL — or use Upload →"
                                                value="${episode.video?.embedUrl || episode.video || ''}">
                                         <button onclick="saveEpisodeUrl(${season.seasonNumber}, ${episode.episodeNumber})" class="btn-admin" style="padding: 8px 12px;">
                                             💾 Save
                                         </button>
+                                        <button onclick="uploadEpisodeToR2(${season.seasonNumber}, ${episode.episodeNumber})" class="btn-admin secondary" style="padding: 8px 12px;" title="Upload a video file to R2 for this episode">
+                                            ⬆️ Upload
+                                        </button>
+                                        <small id="prog_${season.seasonNumber}_${episode.episodeNumber}" style="display:block; width:100%; margin-top:6px; color: var(--text-secondary);"></small>
                                     </div>
                                 </div>
                             `).join('')}
@@ -689,6 +693,83 @@
             }
         }
         
+        function slugify(s) {
+            return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        }
+
+        // Upload a video file straight to R2 for one episode, grouped under
+        // series/<series-slug>/, then fill the URL field and save it.
+        function uploadEpisodeToR2(seasonNumber, episodeNumber) {
+            const prog = document.getElementById(`prog_${seasonNumber}_${episodeNumber}`);
+            const urlInput = document.getElementById(`url_${seasonNumber}_${episodeNumber}`);
+
+            const picker = document.createElement('input');
+            picker.type = 'file';
+            picker.accept = 'video/*,.mkv,.mp4,.avi,.mov,.webm';
+            picker.onchange = async () => {
+                const file = picker.files && picker.files[0];
+                if (!file) return;
+
+                // The web upload can't convert — warn if it isn't already a phone-safe MP4.
+                const ext = (file.name.split('.').pop() || '').toLowerCase();
+                if (!['mp4', 'm4v', 'webm'].includes(ext)) {
+                    if (!confirm(`"${file.name}" isn't an MP4 — it won't play on phones.\n\n` +
+                        `Convert it to MP4 first (drag it onto server\\tools\\convert-mp4.bat), then upload the MP4.\n\n` +
+                        `Upload the original anyway?`)) return;
+                }
+
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                const seriesName = (currentSeries && (currentSeries.originalTitle || currentSeries.lugandaTitle)) || 'series';
+                const folder = `series/${slugify(seriesName) || 'series'}`;
+
+                try {
+                    prog.style.color = 'var(--text-secondary)';
+                    prog.textContent = 'Preparing upload…';
+
+                    // 1) presign (admin-only), with the series folder
+                    const presignRes = await fetch(`${API_BASE_URL}/api/r2/presign`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': token ? `Bearer ${token}` : '' },
+                        body: JSON.stringify({ filename: file.name, contentType: file.type || 'video/mp4', folder })
+                    });
+                    const presign = await presignRes.json();
+                    if (!presign.success) throw new Error(presign.message || 'Could not get upload URL (is R2 configured?)');
+
+                    // 2) upload with live progress (XHR, so we get upload % )
+                    const startedAt = Date.now();
+                    await new Promise((resolve, reject) => {
+                        const xhr = new XMLHttpRequest();
+                        xhr.open('PUT', presign.uploadUrl, true);
+                        xhr.setRequestHeader('Content-Type', file.type || 'video/mp4');
+                        xhr.upload.onprogress = (e) => {
+                            if (!e.lengthComputable) return;
+                            const pct = Math.round((e.loaded / e.total) * 100);
+                            const secs = (Date.now() - startedAt) / 1000;
+                            const mbps = secs > 0 ? (e.loaded / 1048576) / secs : 0;
+                            const etaSec = mbps > 0 ? ((e.total - e.loaded) / 1048576) / mbps : 0;
+                            const eta = etaSec >= 90 ? Math.round(etaSec / 60) + ' min' : Math.max(0, Math.round(etaSec)) + ' sec';
+                            prog.textContent = `Uploading… ${pct}%` + (mbps > 0 ? ` (${mbps.toFixed(1)} MB/s, ~${eta} left)` : '');
+                        };
+                        xhr.onload = () => (xhr.status >= 200 && xhr.status < 300) ? resolve() : reject(new Error('R2 rejected the upload (HTTP ' + xhr.status + ')'));
+                        xhr.onerror = () => reject(new Error('Connection lost during upload — please try again'));
+                        xhr.send(file);
+                    });
+
+                    // 3) fill the URL field and save it to the episode
+                    urlInput.value = presign.publicUrl;
+                    prog.style.color = '#22c55e';
+                    prog.textContent = '✅ Uploaded — saving to episode…';
+                    await saveEpisodeUrl(seasonNumber, episodeNumber);
+                    prog.textContent = '✅ Uploaded & saved';
+                } catch (err) {
+                    console.error('Episode upload error:', err);
+                    prog.style.color = '#ff6666';
+                    prog.textContent = '❌ ' + (err.message || 'Upload failed');
+                }
+            };
+            picker.click();
+        }
+
         async function saveEpisodeUrl(seasonNumber, episodeNumber) {
             const input = document.getElementById(`url_${seasonNumber}_${episodeNumber}`);
             const embedUrl = input.value.trim();
