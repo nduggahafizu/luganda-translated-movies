@@ -107,6 +107,11 @@
   status = 200
 
 [[redirects]]
+  from = "/free-movies"
+  to = "/free-movies.html"
+  status = 200
+
+[[redirects]]
   from = "/about"
   to = "/about.html"
   status = 200

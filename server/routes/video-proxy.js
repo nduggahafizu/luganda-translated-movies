@@ -8,6 +8,7 @@ const { protect, optionalAuth } = require('../middleware/auth');
 const { signBunnyUrl, isTokenAuthHost, clientIpFromRequest } = require('../utils/bunnyToken');
 const { signWasabiUrl, isWasabiBackedUrl } = require('../utils/wasabiSign');
 const { signR2DownloadUrl, isR2PublicUrl } = require('../utils/r2Sign');
+const { deviceLimitBody } = require('../utils/deviceLimit');
 
 
 // Falls back to JWT_SECRET when no dedicated playback secret is set, but no
@@ -259,8 +260,10 @@ async function resolveMovieSourceUrl(movie) {
 // deliberately, it isn't shown to users anywhere, and enforcing it
 // silently blocked paying customers from titles they'd already paid for.
 // Any active paid plan, including the cheapest (daily), unlocks any movie.
+// Every movie and episode needs a paid plan, except the ones the admin marks
+// as free (isFree), which anyone signed in can watch.
 function effectiveRequiredPlan(movie) {
-    return 'daily';
+    return movie && movie.isFree ? 'free' : 'daily';
 }
 
 function requirePlaybackAuthIfNeeded(movie, req) {
@@ -297,8 +300,7 @@ function requirePlaybackAuthIfNeeded(movie, req) {
 }
 
 async function assertUserCanPlay(requiredPlan, tokenPayload) {
-    // All content requires at least the cheapest paid plan (daily)
-    const effectivePlan = requiredPlan === 'free' ? 'daily' : requiredPlan;
+    const effectivePlan = requiredPlan;
 
     const userId = tokenPayload?.uid;
     if (!userId) {
@@ -316,7 +318,8 @@ async function assertUserCanPlay(requiredPlan, tokenPayload) {
         throw error;
     }
 
-    if (!user.canAccessContent(effectivePlan)) {
+    // A free movie only needs the signed-in account that got the token
+    if (effectivePlan !== 'free' && !user.canAccessContent(effectivePlan)) {
         const error = new Error(`This content requires a paid subscription`);
         error.code = 'SUBSCRIPTION_REQUIRED';
         error.httpStatus = 403;
@@ -366,7 +369,9 @@ router.post('/playback-token', protect, async (req, res) => {
         }
 
         const requiredPlan = effectiveRequiredPlan(movie);
-        if (!req.user.canAccessContent(requiredPlan)) {
+        // A free movie: anyone signed in can watch it (downloads still need a plan)
+        const freeToWatch = requiredPlan === 'free' && !forDownload;
+        if (!freeToWatch && !req.user.canAccessContent(requiredPlan)) {
             return res.status(403).json({
                 success: false,
                 code: 'SUBSCRIPTION_REQUIRED',
@@ -381,16 +386,20 @@ router.post('/playback-token', protect, async (req, res) => {
         // separately so a trial user can't get a download-flagged token just
         // because streaming access already passed above.
         if (forDownload && !req.user.hasDownloadAccess()) {
-            // A daily subscriber IS paying, so "requires a paid subscription"
-            // would read as a bug to them — name the actual upgrade path.
-            const onPaidPlanWithoutDownloads = req.user.hasActiveSubscription();
+            // Every paid plan includes downloads (PLAN_CONFIG in models/User.js),
+            // so only someone watching on a trial gets here.
             return res.status(403).json({
                 success: false,
-                message: onPaidPlanWithoutDownloads
-                    ? 'Downloads aren\'t included on the Daily plan — switch to Weekly or higher to download.'
-                    : 'Downloads require a paid subscription',
+                message: 'Downloads come with every paid plan, from UGX 1,000 a day.',
                 code: 'DOWNLOAD_REQUIRES_SUBSCRIPTION'
             });
+        }
+
+        // Daily is 1 device at a time (PLAN_CONFIG in models/User.js). protect
+        // didn't register this device because another one is in use; the site
+        // offers "Watch on this device" (POST /api/auth/device-switch).
+        if (req.deviceLimitExceeded && !freeToWatch) {
+            return res.status(403).json(deviceLimitBody(req.user));
         }
 
         const token = jwt.sign(

@@ -195,6 +195,8 @@ if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
     try {
         if (typeof window === 'undefined' || typeof document === 'undefined') return;
         if (!/Android/i.test(navigator.userAgent || '')) return;
+        // Keep the sign-in and sign-up screens free of extra bars
+        if (/\/(login|register)(\.html)?$/i.test(location.pathname)) return;
 
         var inApp = (document.referrer || '').indexOf('android-app://com.unruly.pix') === 0
             || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
@@ -210,28 +212,44 @@ if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
         function build() {
             if (document.getElementById('unruly-app-banner') || !document.body) return;
 
-            // Sit just above the floating bottom nav. (offsetParent is always null
-            // for position:fixed elements, so it can't be used to test visibility.)
-            var nav = document.querySelector('.app-bottom-nav');
-            var navRect = nav && getComputedStyle(nav).display !== 'none' ? nav.getBoundingClientRect() : null;
-            var floating = !!(navRect && navRect.height > 0);
-            var offset = floating ? Math.max(0, Math.round(window.innerHeight - navRect.top) + 8) : 0;
-            var hidden = 'translateY(calc(100% + ' + offset + 'px))';
+            // Sit just above the floating bottom nav. The gap is worked out from the
+            // nav's own CSS position and height, not from the window height, so it
+            // stays right when the phone's address bar slides away, the screen
+            // rotates, or the nav appears after this runs. (offsetParent is always
+            // null for position:fixed elements, so it can't test visibility.)
+            function navOffset() {
+                var nav = document.querySelector('.app-bottom-nav');
+                if (!nav) return 0;
+                var cs = getComputedStyle(nav);
+                if (cs.display === 'none' || !nav.offsetHeight) return 0;
+                return Math.round((parseFloat(cs.bottom) || 0) + nav.offsetHeight + 8);
+            }
+            var offset = navOffset();
+            function hiddenTransform() { return 'translateY(calc(100% + ' + offset + 'px))'; }
 
             var bar = document.createElement('div');
             bar.id = 'unruly-app-banner';
             bar.setAttribute('role', 'region');
             bar.setAttribute('aria-label', 'Get the Unruly Movies Android app');
             bar.style.cssText = [
-                'position:fixed', 'left:' + (floating ? 10 : 0) + 'px', 'right:' + (floating ? 10 : 0) + 'px',
-                'bottom:' + offset + 'px', 'z-index:2147482000',
+                'position:fixed', 'z-index:2147482000',
                 'display:flex', 'align-items:center', 'gap:10px',
                 'padding:10px 12px', 'box-sizing:border-box',
-                'background:#15171c', 'border-radius:' + (floating ? 14 : 0) + 'px',
-                floating ? 'border:1px solid rgba(255,255,255,0.12)' : 'border-top:1px solid rgba(255,255,255,0.12)',
+                'background:#15171c',
                 'box-shadow:0 -6px 20px rgba(0,0,0,0.45)', 'color:#fff', 'font-family:inherit',
-                'transform:' + hidden, 'transition:transform .35s ease'
+                'transform:' + hiddenTransform(), 'transition:transform .35s ease, bottom .2s ease'
             ].join(';');
+
+            function place() {
+                offset = navOffset();
+                var floating = offset > 0;
+                bar.style.left = bar.style.right = (floating ? 10 : 0) + 'px';
+                bar.style.bottom = offset + 'px';
+                bar.style.borderRadius = (floating ? 14 : 0) + 'px';
+                bar.style.border = floating ? '1px solid rgba(255,255,255,0.12)' : '0';
+                bar.style.borderTop = '1px solid rgba(255,255,255,0.12)';
+            }
+            place();
             bar.innerHTML =
                 '<img src="/assets/images/icons/icon-192x192.png" alt="" width="40" height="40" style="border-radius:9px;flex:0 0 auto" onerror="this.style.display=\'none\'">' +
                 '<div style="flex:1 1 auto;min-width:0;line-height:1.25">' +
@@ -239,7 +257,7 @@ if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
                   '<div style="font-size:12px;color:#b9c0cc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Faster streaming &amp; downloads on your phone</div>' +
                 '</div>' +
                 '<a href="' + STORE + '" target="_blank" rel="noopener" id="unrulyAppInstall" ' +
-                  'style="flex:0 0 auto;background:#f68712;color:#141414;font-weight:700;font-size:13px;text-decoration:none;padding:9px 16px;border-radius:8px">Install</a>' +
+                  'style="flex:0 0 auto;background:#4ade80;color:#04140a;font-weight:700;font-size:13px;text-decoration:none;padding:9px 16px;border-radius:8px">Install</a>' +
                 '<button type="button" id="unrulyAppClose" aria-label="Dismiss" ' +
                   'style="flex:0 0 auto;background:transparent;border:0;color:#9aa3af;font-size:22px;line-height:1;padding:4px 6px;cursor:pointer">&times;</button>';
             document.body.appendChild(bar);
@@ -252,9 +270,29 @@ if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
             lift.textContent = '#chat-widget{transform:translateY(-' + (bar.offsetHeight + 8) + 'px);transition:transform .35s ease}';
             document.head.appendChild(lift);
 
+            // Leave room at the bottom of the page so the banner doesn't cover
+            // the last bit of content (e.g. the footer's copyright line).
+            var originalPad = document.body.style.paddingBottom;
+            var basePad = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
+            function reserveSpace() {
+                document.body.style.paddingBottom = (basePad + bar.offsetHeight + 8) + 'px';
+            }
+            reserveSpace();
+
+            var resizeTimer;
+            function onResize() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function () { place(); reserveSpace(); }, 150);
+            }
+            window.addEventListener('resize', onResize);
+            window.addEventListener('orientationchange', onResize);
+
             function dismiss(days) {
-                bar.style.transform = hidden;
+                window.removeEventListener('resize', onResize);
+                window.removeEventListener('orientationchange', onResize);
+                bar.style.transform = hiddenTransform();
                 lift.textContent = '#chat-widget{transform:none;transition:transform .35s ease}';
+                document.body.style.paddingBottom = originalPad;
                 try { localStorage.setItem('unrulyAppBannerDismissed', String(Date.now() + days * 86400000)); } catch (e) {}
                 setTimeout(function () {
                     if (bar.parentNode) bar.parentNode.removeChild(bar);

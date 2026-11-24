@@ -120,7 +120,7 @@ class UnrulyNotifications {
             color: '#ffffff',
             fontFamily: 'Inter, -apple-system, sans-serif'
         });
-        title.textContent = '🔔 Stay Updated!';
+        title.textContent = 'Stay Updated!';
         
         // Description
         const desc = document.createElement('p');
@@ -211,13 +211,13 @@ class UnrulyNotifications {
                 
                 // Show welcome notification
                 this.showNotification({
-                    title: '🎬 Notifications Enabled!',
+                    title: 'Notifications Enabled!',
                     body: 'You\'ll be notified when new movies and series are added.',
                     icon: '/assets/images/logo.png'
                 });
                 
                 // Show success toast
-                this.showToast('Notifications enabled! 🔔', 'success');
+                this.showToast('Notifications enabled! ', 'success');
             } else if (permission === 'denied') {
                 this.removePrompt();
                 localStorage.setItem('notification-prompt-dismissed', 'permanent');
@@ -287,7 +287,7 @@ class UnrulyNotifications {
                         // New movie found!
                         const movieTitle = movie.originalTitle || movie.title || 'New Movie';
                         this.showNotification({
-                            title: '🎬 New Movie Added!',
+                            title: 'New Movie Added!',
                             body: `${movieTitle} is now available to watch`,
                             icon: movie.poster || '/assets/images/logo.png',
                             image: movie.poster,
@@ -442,7 +442,7 @@ class UnrulyNotifications {
     // Manually trigger notification for new movie
     notifyNewMovie(movie) {
         this.showNotification({
-            title: '🎬 New Movie!',
+            title: 'New Movie!',
             body: `${movie.title} - Watch now in Luganda!`,
             icon: movie.poster || '/assets/images/logo.png',
             image: movie.backdrop || movie.poster,
@@ -455,7 +455,7 @@ class UnrulyNotifications {
     // Notify for new series episode
     notifyNewEpisode(series, season, episode) {
         this.showNotification({
-            title: `📺 New Episode!`,
+            title: `New Episode!`,
             body: `${series.title} S${season}E${episode} is now available`,
             icon: series.poster || '/assets/images/logo.png',
             url: `/series-player.html?id=${series._id}&season=${season}&episode=${episode}`,
@@ -485,7 +485,7 @@ class UnrulyNotifications {
         
         console.log('🔔 Sending test notification...');
         this.showNotification({
-            title: '🎬 Test Notification',
+            title: 'Test Notification',
             body: 'If you see this, notifications are working!',
             icon: '/assets/images/logo.png',
             tag: 'test-notification',

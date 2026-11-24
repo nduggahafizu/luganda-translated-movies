@@ -30,7 +30,7 @@ class EmailSubscription {
             <div class="email-popup-overlay"></div>
             <div class="email-popup-content">
                 <button class="email-popup-close" aria-label="Close">&times;</button>
-                <div class="email-popup-icon">🎬📧</div>
+                <div class="email-popup-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
                 <h2>Never Miss a Movie!</h2>
                 <p>Get notified when new Luganda-translated movies are added.</p>
                 
@@ -56,7 +56,7 @@ class EmailSubscription {
                 <p class="email-disclaimer">No spam, unsubscribe anytime.</p>
                 
                 <div class="email-success hidden">
-                    <div class="success-icon">✅</div>
+                    <div class="success-icon"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
                     <h3>You're In!</h3>
                     <p>Check your email to confirm your subscription.</p>
                 </div>
@@ -84,7 +84,7 @@ class EmailSubscription {
         newsletterSection.innerHTML = `
             <div class="newsletter-container">
                 <div class="newsletter-text">
-                    <h3>📧 Stay Updated</h3>
+                    <h3>Stay Updated</h3>
                     <p>Subscribe to get notifications about new Luganda movies</p>
                 </div>
                 <form class="newsletter-form">
@@ -216,7 +216,7 @@ class EmailSubscription {
                     setTimeout(() => this.hidePopup(), 3000);
                 } else {
                     // Footer form success
-                    form.innerHTML = '<p class="newsletter-success">✅ Subscribed! Check your email.</p>';
+                    form.innerHTML = '<p class="newsletter-success">Subscribed! Check your email.</p>';
                 }
                 
                 // Track

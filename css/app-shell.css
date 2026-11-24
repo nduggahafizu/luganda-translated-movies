@@ -69,6 +69,13 @@
     body.has-app-bottom-nav:not(:has(.app-container)) {
         padding-bottom: calc(75px + env(safe-area-inset-bottom));
     }
+
+    /* On pages that do have .app-container, the footer sits outside it, so
+       the container's bottom space doesn't help the footer — without this
+       the floating nav covers the copyright line. */
+    body.has-app-bottom-nav:has(.app-container) .site-footer {
+        padding-bottom: calc(75px + env(safe-area-inset-bottom));
+    }
 }
 
 @media (min-width: 769px) {
@@ -513,6 +520,17 @@
            alone sizes this to the full viewport width — margin-left then
            pushes it 280px past the right edge instead of narrowing it. */
         width: calc(100% - 280px);
+    }
+
+    /* The footer sits outside .app-container — next to .app-wrapper on some
+       pages (index, movies, series…) and next to .app-container on others
+       (genres, search, trending, vjs) — so it needs the same offset, or the
+       fixed sidebar covers its left side and hides the footer logo. */
+    .app-wrapper ~ .site-footer,
+    .app-container ~ .site-footer {
+        margin-left: 280px;
+        width: calc(100% - 280px);
+        box-sizing: border-box;
     }
 
     #menuToggle {

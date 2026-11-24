@@ -197,6 +197,14 @@ async function updatePassword({ userId, currentPassword, newPassword }) {
 async function refreshTokenService({ refreshToken }) {
     try {
         const decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
+        // A device that was signed out (log out everywhere, or "log out the
+        // other device" when a Daily plan moved to a new device) can't use an
+        // older refresh token to sign itself back in
+        const user = await User.findById(decoded.id).select('lastSecurityUpdate isActive');
+        if (!user || user.isActive === false) return { error: 'Invalid refresh token' };
+        if (user.lastSecurityUpdate && decoded.iat * 1000 < user.lastSecurityUpdate.getTime()) {
+            return { error: 'Invalid refresh token' };
+        }
         const newToken = generateToken(decoded.id);
         const newRefreshToken = generateRefreshToken(decoded.id);
         return { token: newToken, refreshToken: newRefreshToken };

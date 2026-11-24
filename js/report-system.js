@@ -49,7 +49,7 @@ class ReportSystem {
             <div class="report-modal-overlay"></div>
             <div class="report-modal-content">
                 <button class="report-modal-close">&times;</button>
-                <h2>🚨 Report an Issue</h2>
+                <h2>Report an Issue</h2>
                 <p class="report-subtitle">Help us improve by reporting problems with this video</p>
                 
                 <form id="reportForm">
@@ -57,42 +57,36 @@ class ReportSystem {
                         <label class="report-type">
                             <input type="radio" name="issueType" value="video_not_playing" required>
                             <span class="report-type-box">
-                                <span class="report-icon">📺</span>
                                 <span class="report-label">Video Not Playing</span>
                             </span>
                         </label>
                         <label class="report-type">
                             <input type="radio" name="issueType" value="audio_issue">
                             <span class="report-type-box">
-                                <span class="report-icon">🔇</span>
                                 <span class="report-label">Audio Problem</span>
                             </span>
                         </label>
                         <label class="report-type">
                             <input type="radio" name="issueType" value="wrong_translation">
                             <span class="report-type-box">
-                                <span class="report-icon">🗣️</span>
                                 <span class="report-label">Wrong Translation</span>
                             </span>
                         </label>
                         <label class="report-type">
                             <input type="radio" name="issueType" value="buffering">
                             <span class="report-type-box">
-                                <span class="report-icon">⏳</span>
                                 <span class="report-label">Constant Buffering</span>
                             </span>
                         </label>
                         <label class="report-type">
                             <input type="radio" name="issueType" value="wrong_movie">
                             <span class="report-type-box">
-                                <span class="report-icon">🎬</span>
                                 <span class="report-label">Wrong Movie</span>
                             </span>
                         </label>
                         <label class="report-type">
                             <input type="radio" name="issueType" value="other">
                             <span class="report-type-box">
-                                <span class="report-icon">❓</span>
                                 <span class="report-label">Other Issue</span>
                             </span>
                         </label>
@@ -110,12 +104,12 @@ class ReportSystem {
                     
                     <button type="submit" class="report-submit-btn">
                         <span class="btn-text">Submit Report</span>
-                        <span class="btn-loading hidden">⏳ Sending...</span>
+                        <span class="btn-loading hidden">Sending...</span>
                     </button>
                 </form>
                 
                 <div class="report-success hidden">
-                    <div class="success-icon">✅</div>
+                    <div class="success-icon"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
                     <h3>Thank You!</h3>
                     <p>Your report has been submitted. We'll look into it soon.</p>
                     <button class="report-close-btn">Close</button>

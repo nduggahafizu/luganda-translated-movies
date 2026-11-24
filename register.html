@@ -4,573 +4,299 @@
     <title>Sign Up - Unruly Movies</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Create your Unruly Movies account">
+    <meta name="description" content="Create your free Unruly Movies account and watch Luganda translated movies from your favourite VJs.">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#4ade80">    
+    <meta name="theme-color" content="#050705">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
     <link rel="shortcut icon" type="image/png" href="/assets/images/favicon.png">
     <link rel="apple-touch-icon" href="/assets/images/logo.png">
+    <link rel="preconnect" href="https://image.tmdb.org" crossorigin>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 
     <!-- Google Sign-In -->
     <script src="https://accounts.google.com/gsi/client" async defer onload="window.googleApiLoaded = true; if(typeof initGoogleSignIn === 'function') initGoogleSignIn();"></script>
-    
-    <style>
-        .auth-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: linear-gradient(135deg, rgba(74, 222, 128, 0.05), rgba(0, 217, 255, 0.05));
-        }
-        
-        .auth-box {
-            background: var(--background-light);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 50px 40px;
-            max-width: 450px;
-            width: 100%;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-        }
-        
-        .auth-logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .auth-logo img {
-            height: 50px;
-            width: auto;
-        }
-        
-        .auth-title {
-            font-size: 32px;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 10px;
-            color: var(--text-primary);
-        }
-        
-        .auth-subtitle {
-            text-align: center;
-            color: var(--text-secondary);
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            font-size: 14px;
-            color: var(--text-primary);
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            background-color: var(--background-dark);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-size: 15px;
-            transition: all 0.3s ease;
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.1);
-        }
-        
-        .form-control::placeholder {
-            color: var(--text-secondary);
-        }
-        
-        .form-control.error {
-            border-color: #ff4444;
-        }
-        
-        .error-message {
-            color: #ff4444;
-            font-size: 12px;
-            margin-top: 5px;
-            display: none;
-        }
-        
-        .error-message.show {
-            display: block;
-        }
-        
-        .password-toggle {
-            position: relative;
-        }
-        
-        .password-toggle-btn {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            padding: 5px;
-        }
-        
-        .password-toggle-btn:hover {
-            color: var(--primary-color);
-        }
-        
-        .password-strength {
-            margin-top: 8px;
-            height: 4px;
-            background-color: var(--border-color);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        
-        .password-strength-bar {
-            height: 100%;
-            width: 0;
-            transition: all 0.3s ease;
-        }
-        
-        .password-strength-bar.weak {
-            width: 33%;
-            background-color: #ff4444;
-        }
-        
-        .password-strength-bar.medium {
-            width: 66%;
-            background-color: #ffaa00;
-        }
-        
-        .password-strength-bar.strong {
-            width: 100%;
-            background-color: var(--primary-color);
-        }
-        
-        .form-checkbox {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            margin-bottom: 25px;
-            font-size: 14px;
-        }
-        
-        .form-checkbox input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: var(--primary-color);
-            margin-top: 2px;
-            flex-shrink: 0;
-        }
-        
-        .form-checkbox label {
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-        
-        .form-checkbox a {
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-        
-        .form-checkbox a:hover {
-            text-decoration: underline;
-        }
-        
-        .btn-submit {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: #000;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .btn-submit:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(74, 222, 128, 0.4);
-        }
-        
-        .btn-submit:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 30px 0;
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-        
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background-color: var(--border-color);
-        }
-        
-        .divider span {
-            padding: 0 15px;
-        }
-        
-        .social-login {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .social-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 12px;
-            background-color: var(--background-dark);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .social-btn:hover {
-            border-color: var(--primary-color);
-            background-color: var(--hover-bg);
-        }
-        
-        .social-btn svg {
-            width: 20px;
-            height: 20px;
-        }
 
-        .google-custom-btn {
-            width: 100%;
-            padding: 11px 16px;
-            background: #fff;
-            color: #3c4043;
-            border: 1px solid #dadce0;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            font-family: 'Google Sans', Roboto, sans-serif;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: background 0.15s, box-shadow 0.15s;
-            letter-spacing: 0.25px;
-        }
-        .google-custom-btn:hover {
-            background: #f8f9fa;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
-        }
-        .google-custom-btn:active { background: #f1f3f4; }
-        .google-custom-btn:disabled { opacity: 0.65; cursor: not-allowed; }
-        
-        .auth-footer {
-            text-align: center;
-            margin-top: 25px;
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-        
-        .auth-footer a {
-            color: var(--primary-color);
-            font-weight: 600;
-            text-decoration: none;
-        }
-        
-        .auth-footer a:hover {
-            text-decoration: underline;
-        }
-        
-        .back-home {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        
-        .back-home:hover {
-            color: var(--primary-color);
-        }
-        
-        .back-home svg {
-            width: 20px;
-            height: 20px;
-        }
-        
-        @media (max-width: 480px) {
-            .auth-box {
-                padding: 40px 25px;
-            }
-            
-            .auth-title {
-                font-size: 28px;
-            }
-            
-            .social-login {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/access-prompt.css">
     <meta name="google-adsense-account" content="ca-pub-1904736753681797">
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
 </head>
 
-<body>
-    <a href="index.html" class="back-home">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-        </svg>
-        Back to Home
-    </a>
+<body class="auth-page">
+    <div class="poster-wall" aria-hidden="true">
+        <div class="poster-grid" id="posterGrid"></div>
+    </div>
+    <div class="wall-shade" aria-hidden="true"></div>
 
-    <div class="auth-container">
-        <div class="auth-box">
-            <div class="auth-logo">
+    <div class="auth-hero">
+        <header class="auth-topbar">
+            <a href="index.html" class="auth-brand" aria-label="Unruly Movies home">
                 <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
-            </div>
-            
-            <h1 class="auth-title">Create Account</h1>
-            <p class="auth-subtitle">Join Unruly Movies today</p>
-            
-            <form id="registerForm" method="post" action="#">
-                <div class="form-group">
-                    <label for="fullname" class="form-label">Full Name</label>
-                    <input type="text" id="fullname" name="fullname" class="form-control" placeholder="Enter your full name" required>
-                    <div class="error-message" id="fullnameError">Please enter your full name</div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="email" class="form-label">Email Address</label>
-                    <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required>
-                    <div class="error-message" id="emailError">Please enter a valid email address</div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password" class="form-label">Password</label>
-                    <div class="password-toggle">
-                        <input type="password" id="password" name="password" class="form-control" placeholder="Create a password" required>
-                        <button type="button" class="password-toggle-btn" onclick="togglePassword('password', 'eyeIcon1')" aria-label="Toggle password visibility" title="Show/hide password">
-                            <svg id="eyeIcon1" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                <circle cx="12" cy="12" r="3"></circle>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="password-strength">
-                        <div class="password-strength-bar" id="strengthBar"></div>
-                    </div>
-                    <div class="error-message" id="passwordError">Password must be at least 8 characters with uppercase, lowercase, and number</div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="confirmPassword" class="form-label">Confirm Password</label>
-                    <div class="password-toggle">
-                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Confirm your password" required>
-                        <button type="button" class="password-toggle-btn" onclick="togglePassword('confirmPassword', 'eyeIcon2')" aria-label="Toggle confirm password visibility" title="Show/hide password">
-                            <svg id="eyeIcon2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                <circle cx="12" cy="12" r="3"></circle>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="error-message" id="confirmPasswordError">Passwords do not match</div>
-                </div>
-                
-                <div class="form-checkbox">
-                    <input type="checkbox" id="terms" name="terms" required>
-                    <label for="terms">
-                        I agree to the <a href="terms.html">Terms of Service</a> and <a href="privacy-policy.html">Privacy Policy</a>
-                    </label>
-                </div>
-                
-                <button type="submit" class="btn-submit" id="submitBtn" data-original-text="Create Account">Create Account</button>
-            </form>
-            
-            <div class="divider">
-                <span>OR</span>
-            </div>
-            <div class="social-login">
+            </a>
+            <a href="login.html" class="topbar-signup">Sign In</a>
+        </header>
+
+        <main class="auth-container">
+            <div class="auth-box">
+                <h1 class="auth-title">Create Account</h1>
+                <p class="auth-subtitle">Join free and start watching today</p>
+
                 <button type="button" class="google-custom-btn" id="googleSignInBtn" onclick="triggerGoogleSignIn(this)">
-                    <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
                         <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
                         <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
                         <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
                     </svg>
-                    Continue with Google
+                    Sign up with Google
                 </button>
+
+                <div class="divider">
+                    <span>OR</span>
+                </div>
+
+                <form id="registerForm" method="post" action="#" novalidate>
+                    <div class="form-group">
+                        <label for="fullname" class="form-label">Full name</label>
+                        <input type="text" id="fullname" name="fullname" class="form-control" placeholder="Your name" required autocomplete="name">
+                        <div class="error-message" id="fullnameError">Please enter your full name</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email address</label>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="you@example.com" required autocomplete="email" inputmode="email">
+                        <div class="error-message" id="emailError">Please enter a valid email address</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="password-toggle">
+                            <input type="password" id="password" name="password" class="form-control" placeholder="Create a password" required autocomplete="new-password" aria-describedby="passwordHint">
+                            <button type="button" class="password-toggle-btn" onclick="togglePassword('password', 'eyeIcon1')" aria-label="Show password" title="Show/hide password">
+                                <svg id="eyeIcon1" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="password-strength">
+                            <div class="password-strength-bar" id="strengthBar"></div>
+                        </div>
+                        <div class="field-hint" id="passwordHint">At least 8 characters, with a capital letter, a small letter and a number</div>
+                        <div class="error-message" id="passwordError">Password must be at least 8 characters with uppercase, lowercase, and number</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">Confirm password</label>
+                        <div class="password-toggle">
+                            <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Type it again" required autocomplete="new-password">
+                            <button type="button" class="password-toggle-btn" onclick="togglePassword('confirmPassword', 'eyeIcon2')" aria-label="Show password" title="Show/hide password">
+                                <svg id="eyeIcon2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="error-message" id="confirmPasswordError">Passwords do not match</div>
+                    </div>
+
+                    <div class="terms-block">
+                        <label class="form-checkbox terms-check">
+                            <input type="checkbox" id="terms" name="terms" required>
+                            <span>I agree to the <a href="terms.html">Terms of Service</a> and <a href="privacy-policy.html">Privacy Policy</a></span>
+                        </label>
+                        <div class="error-message" id="termsError">Please accept the Terms of Service and Privacy Policy</div>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="submitBtn" data-original-text="Create Account">Create Account</button>
+                </form>
+
+                <p class="auth-switch">
+                    Already have an account? <a href="login.html">Sign in</a>
+                </p>
             </div>
-            
-            <div class="auth-footer">
-                Already have an account? <a href="login.html">Login</a>
+        </main>
+    </div>
+
+    <footer class="auth-footer">
+        <div class="auth-footer-inner">
+            <div>
+                <a href="index.html" class="af-logo" aria-label="Unruly Movies home">
+                    <img src="assets/images/logo-wordmark.png" alt="Unruly Movies" width="1679" height="202" loading="lazy">
+                </a>
+                <p class="af-tagline">Luganda translated movies and series from Uganda's favourite VJs.</p>
+                <a href="https://play.google.com/store/apps/details?id=com.unruly.pix" class="af-play" target="_blank" rel="noopener" aria-label="Get the Unruly Movies app on Google Play">
+                    <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" width="646" height="250" loading="lazy">
+                </a>
+            </div>
+
+            <div>
+                <h2 class="af-heading">Help</h2>
+                <ul class="af-list af-pages">
+                    <li><a href="faq.html">FAQ</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="dmca.html">DMCA</a></li>
+                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms &amp; Conditions</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h2 class="af-heading">Contacts</h2>
+                <ul class="af-list af-contacts">
+                    <li>
+                        <a href="mailto:nduggahafizu@gmail.com">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            nduggahafizu@gmail.com
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://wa.me/256743311809" target="_blank" rel="noopener">
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                            WhatsApp +256 743 311 809
+                        </a>
+                    </li>
+                    <li>
+                        <a href="contact.html">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                            Send us a message
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div>
+                <h2 class="af-heading">Follow us</h2>
+                <div class="af-social">
+                    <a href="https://wa.me/256743311809" class="social-tile social-whatsapp" target="_blank" rel="noopener" aria-label="Unruly Movies on WhatsApp">
+                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                    </a>
+                    <a href="mailto:nduggahafizu@gmail.com" class="social-tile social-email" aria-label="Email Unruly Movies">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    </a>
+                </div>
+                <p class="af-note">Request a movie or report a problem on WhatsApp.</p>
             </div>
         </div>
-    </div>
+        <div class="auth-footer-bottom">
+            <p>&copy; 2026 Unruly Movies. All rights reserved. Founded and managed by Nduga Hafizu.</p>
+        </div>
+    </footer>
 
     <!-- API Configuration (must load first) -->
     <script src="js/config.js"></script>
+    <script src="js/access-prompt.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/poster-wall.js"></script>
     <script>
-    // Google Sign-In integration for register page - now using auth.js functions
-    document.addEventListener('DOMContentLoaded', function() {
-        // Google Sign-In is handled by auth.js - initGoogleSignIn()
-        // No additional code needed here as auth.js is loaded
-    });
-    </script>
-    <script>
+        // Keep the "send me back where I was" link from the login page
+        (function() {
+            const redirectUrl = new URLSearchParams(window.location.search).get('redirect');
+            if (redirectUrl) {
+                localStorage.setItem('redirectAfterLogin', redirectUrl);
+            }
+        })();
+
         function togglePassword(inputId, iconId) {
             const passwordInput = document.getElementById(inputId);
             const eyeIcon = document.getElementById(iconId);
-            
+            const btn = eyeIcon.closest('button');
+
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
+                btn.setAttribute('aria-label', 'Hide password');
                 eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
             } else {
                 passwordInput.type = 'password';
+                btn.setAttribute('aria-label', 'Show password');
                 eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
             }
         }
-        
-        // Password strength checker
+
+        // Password strength meter
         const passwordInput = document.getElementById('password');
         const strengthBar = document.getElementById('strengthBar');
-        
+
         passwordInput.addEventListener('input', function() {
             const password = this.value;
             let strength = 0;
-            
+
             if (password.length >= 8) strength++;
             if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
             if (password.match(/[0-9]/)) strength++;
             if (password.match(/[^a-zA-Z0-9]/)) strength++;
-            
+
             strengthBar.className = 'password-strength-bar';
-            
-            if (strength === 0 || strength === 1) {
+            if (!password) return;
+
+            if (strength <= 1) {
                 strengthBar.classList.add('weak');
-            } else if (strength === 2 || strength === 3) {
+            } else if (strength <= 3) {
                 strengthBar.classList.add('medium');
             } else {
                 strengthBar.classList.add('strong');
             }
         });
-        
-        // Form validation
+
+        function setFieldError(input, errorEl, hasError) {
+            if (input) input.classList.toggle('error', hasError);
+            if (input) input.setAttribute('aria-invalid', hasError ? 'true' : 'false');
+            errorEl.classList.toggle('show', hasError);
+        }
+
+        // Clear a field's error as soon as the user fixes it
+        [['fullname', 'fullnameError'], ['email', 'emailError'], ['password', 'passwordError'], ['confirmPassword', 'confirmPasswordError']].forEach(function (pair) {
+            const input = document.getElementById(pair[0]);
+            input.addEventListener('input', function () {
+                if (input.classList.contains('error')) setFieldError(input, document.getElementById(pair[1]), false);
+            });
+        });
+        document.getElementById('terms').addEventListener('change', function () {
+            if (this.checked) setFieldError(null, document.getElementById('termsError'), false);
+        });
+
+        // Form validation (rules match the backend)
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
-            let isValid = true;
-            
-            // Full name validation
+
             const fullname = document.getElementById('fullname');
-            const fullnameError = document.getElementById('fullnameError');
-            if (fullname.value.trim().length < 2) {
-                fullname.classList.add('error');
-                fullnameError.classList.add('show');
-                isValid = false;
-            } else {
-                fullname.classList.remove('error');
-                fullnameError.classList.remove('show');
-            }
-            
-            // Email validation
             const email = document.getElementById('email');
-            const emailError = document.getElementById('emailError');
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email.value)) {
-                email.classList.add('error');
-                emailError.classList.add('show');
-                isValid = false;
-            } else {
-                email.classList.remove('error');
-                emailError.classList.remove('show');
-            }
-            
-            // Password validation (must match backend requirements)
             const password = document.getElementById('password');
-            const passwordError = document.getElementById('passwordError');
-            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-            if (!passwordRegex.test(password.value)) {
-                password.classList.add('error');
-                passwordError.textContent = 'Password must be at least 8 characters with uppercase, lowercase, and number';
-                passwordError.classList.add('show');
-                isValid = false;
-            } else {
-                password.classList.remove('error');
-                passwordError.classList.remove('show');
-            }
-            
-            // Confirm password validation
             const confirmPassword = document.getElementById('confirmPassword');
-            const confirmPasswordError = document.getElementById('confirmPasswordError');
-            if (confirmPassword.value !== password.value) {
-                confirmPassword.classList.add('error');
-                confirmPasswordError.classList.add('show');
-                isValid = false;
-            } else {
-                confirmPassword.classList.remove('error');
-                confirmPasswordError.classList.remove('show');
-            }
-            
-            // Terms checkbox
             const terms = document.getElementById('terms');
-            if (!terms.checked) {
-                alert('Please agree to the Terms of Service and Privacy Policy');
-                isValid = false;
+
+            const nameBad = fullname.value.trim().length < 2;
+            const emailBad = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim());
+            const passwordBad = !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password.value);
+            const confirmBad = confirmPassword.value !== password.value;
+            const termsBad = !terms.checked;
+
+            setFieldError(fullname, document.getElementById('fullnameError'), nameBad);
+            setFieldError(email, document.getElementById('emailError'), emailBad);
+            setFieldError(password, document.getElementById('passwordError'), passwordBad);
+            setFieldError(confirmPassword, document.getElementById('confirmPasswordError'), confirmBad);
+            setFieldError(null, document.getElementById('termsError'), termsBad);
+
+            // Put the cursor on the first thing that needs fixing
+            const firstBad = [[nameBad, fullname], [emailBad, email], [passwordBad, password], [confirmBad, confirmPassword], [termsBad, terms]]
+                .find(function (pair) { return pair[0]; });
+            if (firstBad) {
+                firstBad[1].focus();
+                return;
             }
-            
-            if (isValid) {
-                // Call the actual registration API
-                const submitBtn = document.getElementById('submitBtn');
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Creating Account...';
-                
-                // Call registerWithEmail from auth.js and handle errors
-                try {
-                    await registerWithEmail(fullname.value.trim(), email.value.trim(), password.value);
-                } catch (error) {
-                    // Re-enable button on error
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Create Account';
-                }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating account...';
+
+            try {
+                await registerWithEmail(fullname.value.trim(), email.value.trim(), password.value);
+            } catch (error) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Account';
             }
         });
     </script>

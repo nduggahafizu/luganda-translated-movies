@@ -1,0 +1,227 @@
+/* ===================================
+   Unruly Movies — the boxes and notices from js/access-prompt.js:
+   "Sign in to watch", "Log out your other device?" and the toast.
+   Used by the movie and series players and the sign-in pages.
+   =================================== */
+html.ap-open,
+html.ap-open body {
+    overflow: hidden;
+}
+
+.ap-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.78);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    animation: ap-fade 0.18s ease;
+}
+
+@keyframes ap-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.ap-box {
+    position: relative;
+    width: 100%;
+    max-width: 430px;
+    margin: auto;
+    padding: 34px 28px 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    background: #111513;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+    color: #fff;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+}
+
+.ap-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.07);
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+}
+
+.ap-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
+
+.ap-close svg {
+    width: 16px;
+    height: 16px;
+}
+
+.ap-icon {
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: var(--st-green, #22c55e);
+    color: #fff;
+}
+
+.ap-icon svg {
+    width: 26px;
+    height: 26px;
+}
+
+.ap-title {
+    margin: 0 0 8px;
+    color: #fff;
+    font-size: 23px;
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+.ap-text {
+    margin: 0 0 22px;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 15px;
+    line-height: 1.55;
+}
+
+.ap-text strong {
+    color: #fff;
+    font-weight: 700;
+}
+
+/* small line under the buttons */
+.ap-note {
+    margin: 14px 0 0;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.ap-btn:disabled {
+    opacity: 0.7;
+    cursor: progress;
+}
+
+/* Sign in / Create an account */
+.ap-actions {
+    display: grid;
+    gap: 10px;
+}
+
+.ap-btn {
+    height: 50px;
+    border-radius: 999px;
+    font: 700 16px 'Inter', sans-serif;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.ap-primary {
+    border: 0;
+    background: var(--st-green, #22c55e);
+    color: #fff;
+}
+
+.ap-primary:hover,
+.ap-primary:focus-visible {
+    background: var(--st-green-light, #4ade80);
+    color: #06170d;
+}
+
+.ap-secondary {
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: transparent;
+    color: #fff;
+}
+
+.ap-secondary:hover,
+.ap-secondary:focus-visible {
+    border-color: #fff;
+}
+
+.ap-link {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--st-green-light, #4ade80);
+    font: 600 14px 'Inter', sans-serif;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.ap-later {
+    display: block;
+    margin: 12px auto 0;
+    padding: 8px 14px;
+    border: 0;
+    background: none;
+    color: rgba(255, 255, 255, 0.6);
+    font: 600 14px 'Inter', sans-serif;
+    cursor: pointer;
+}
+
+.ap-later:hover {
+    color: #fff;
+}
+
+/* Notices: clear white text on a dark pill, above the phone menu bar */
+.ap-toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    z-index: 100001;
+    max-width: min(92vw, 520px);
+    padding: 13px 20px;
+    border: 1px solid rgba(34, 197, 94, 0.5);
+    border-radius: 14px;
+    background: #151917;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font: 600 15px/1.4 'Inter', sans-serif;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 12px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.ap-toast.is-shown {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+.ap-toast.is-error {
+    border-color: rgba(239, 68, 68, 0.6);
+}
+
+body.has-app-bottom-nav .ap-toast {
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+}
+
+@media (max-width: 767px) {
+    .ap-box {
+        padding: 30px 18px 20px;
+    }
+
+    .ap-title {
+        font-size: 21px;
+    }
+}

@@ -1,0 +1,1111 @@
+/* ===================================
+   Unruly Movies — site theme
+   Top menu bar instead of the left sidebar, full-width hero with a big
+   round play button, large poster rows with arrows, VJ badge top-right and
+   lock top-left. Loaded last on every page with the shared header so it
+   overrides the older layout files. Behaviour lives in js/site-theme.js.
+   =================================== */
+
+:root {
+    --st-bg: #070908;
+    --st-panel: #0e1210;
+    --st-green: #22c55e;
+    --st-green-light: #4ade80;
+    --st-text: #ffffff;
+    --st-muted: #a3aca7;
+    --st-max: 1520px;
+    --st-pad: clamp(16px, 4vw, 56px);
+}
+
+body {
+    background-color: var(--st-bg);
+    background-image: none;
+}
+
+/* ---------- Header ---------- */
+.app-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: 0 !important;
+    background: var(--st-bg) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    border-bottom: 0 !important;
+    box-shadow: none;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.app-header .navbar {
+    position: relative;
+    max-width: var(--st-max);
+    height: 72px;
+    margin: 0 auto !important;
+    padding: 0 var(--st-pad) !important;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 20px;
+}
+
+.app-header .navbar-brand img,
+.app-header .navbar-brand picture img {
+    height: 32px !important;
+    width: auto !important;
+    max-width: none;
+}
+
+/* Over a hero the header floats on top of the picture and turns solid
+   once the page scrolls (js/site-theme.js adds .st-scrolled). */
+body:has(.app-slider) .app-header {
+    position: fixed;
+    left: 0;
+    right: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.35) 70%, rgba(0, 0, 0, 0) 100%) !important;
+}
+
+.app-header.st-scrolled,
+body:has(.app-slider) .app-header.st-scrolled {
+    background: rgba(7, 9, 8, 0.97) !important;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- Desktop top menu ---------- */
+.st-topnav {
+    display: none;
+    list-style: none;
+    margin: 0 0 0 auto;
+    padding: 0;
+    align-items: center;
+    gap: 2px;
+}
+
+.st-topnav > li {
+    position: relative;
+}
+
+.st-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
+    background: none;
+    border: 0;
+    color: var(--st-text);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.2s;
+}
+
+.st-link:hover,
+.st-link:focus-visible,
+.st-link.st-active,
+.st-has-menu.st-open > .st-link {
+    color: var(--st-green-light);
+}
+
+.st-chev {
+    transition: transform 0.2s;
+}
+
+.st-has-menu.st-open .st-chev {
+    transform: rotate(180deg);
+}
+
+.st-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    min-width: 210px;
+    padding: 8px;
+    display: none;
+    background: var(--st-panel);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+    z-index: 20;
+}
+
+/* invisible bridge so the menu doesn't close while the mouse moves down */
+.st-menu::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 0;
+    right: 0;
+    height: 10px;
+}
+
+.st-menu a {
+    display: block;
+    padding: 9px 12px;
+    border-radius: 8px;
+    color: #d8dfdb;
+    font-size: 14.5px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.st-menu a:hover,
+.st-menu a:focus-visible {
+    background: rgba(74, 222, 128, 0.1);
+    color: var(--st-green-light);
+}
+
+.st-menu a:last-child {
+    margin-top: 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 0 0 8px 8px;
+    color: var(--st-green-light);
+}
+
+.st-has-menu.st-open .st-menu {
+    display: block;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .st-has-menu:hover .st-menu {
+        display: block;
+    }
+}
+
+/* Right-hand items (Get the App, bell, account, search) */
+.app-header .navbar-user {
+    margin-left: 0 !important;
+    gap: 6px;
+    flex-wrap: nowrap;
+}
+
+.app-header .navbar-user .nav-item:has(> a[href="contact.html"]) {
+    display: none !important;
+}
+
+.app-header .navbar-user a[href*="play.google.com"] {
+    background: none !important;
+    padding: 10px 12px !important;
+    color: var(--st-green-light) !important;
+    font-weight: 800;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+}
+
+.app-header .navbar-user a[href*="play.google.com"] svg {
+    display: none;
+}
+
+.app-header .btn-login {
+    border: 1.5px solid var(--st-green-light) !important;
+    border-radius: 10px !important;
+    padding: 8px 16px !important;
+    color: var(--st-green-light) !important;
+    background: rgba(0, 0, 0, 0.25) !important;
+    font-weight: 700;
+}
+
+.app-header .btn-login:hover {
+    background: var(--st-green-light) !important;
+    color: #04140a !important;
+}
+
+.st-search-btn {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: 0;
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.6));
+}
+
+.st-search-btn:hover,
+.app-header.st-search-open .st-search-btn {
+    color: var(--st-green-light);
+}
+
+/* The mobile drop-down is only for phones */
+.st-mobile-menu {
+    display: none;
+}
+
+@media (min-width: 1024px) {
+    .st-topnav {
+        display: flex;
+    }
+
+    /* The sidebar is replaced by the top menu */
+    .app-aside,
+    .sidebar-backdrop {
+        display: none !important;
+    }
+
+    .app-container {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .app-wrapper ~ .site-footer,
+    .app-container ~ .site-footer {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Desktop has the top menu, so no menu button */
+    .app-header #menuToggle {
+        display: none !important;
+    }
+
+    /* Search box: hidden until the search button is pressed */
+    .app-header form.header-search {
+        display: none !important;
+    }
+
+    .app-header.st-search-open form.header-search {
+        display: block !important;
+        position: absolute;
+        top: 72px;
+        right: var(--st-pad);
+        width: min(520px, 90vw);
+        z-index: 30;
+    }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+    .st-link {
+        padding: 10px 9px;
+        font-size: 14px;
+    }
+
+    .app-header .navbar-brand img,
+    .app-header .navbar-brand picture img {
+        height: 26px !important;
+    }
+}
+
+/* ---------- Phones and tablets: logo left, search + menu right ---------- */
+@media (max-width: 1023px) {
+    .app-header .navbar {
+        height: 60px;
+        gap: 6px;
+    }
+
+    .app-header .app-navbar {
+        order: 1;
+        margin-right: auto;
+    }
+
+    .app-header #mobileSearchBtn {
+        order: 2;
+    }
+
+    .app-header #menuToggle {
+        order: 3;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        margin: 0 -6px 0 0 !important;
+        cursor: pointer;
+    }
+
+    .app-header .navbar-brand img,
+    .app-header .navbar-brand picture img {
+        height: 24px !important;
+    }
+
+    .st-menu-open #menuToggle {
+        color: var(--st-green-light);
+    }
+
+    .st-mobile-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        max-height: calc(100vh - 60px);
+        overflow-y: auto;
+        background: rgba(7, 9, 8, 0.97);
+        border-bottom: 1px solid rgba(74, 222, 128, 0.18);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+        z-index: 40;
+    }
+
+    .st-menu-open .st-mobile-menu {
+        display: block;
+    }
+
+    .st-mobile-menu ul {
+        list-style: none;
+        margin: 0;
+        padding: 6px var(--st-pad) 14px;
+    }
+
+    .st-mobile-menu li {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .st-mobile-menu li:last-child {
+        border-bottom: 0;
+    }
+
+    .st-mobile-menu a,
+    .st-mobile-menu li > button {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 15px 0;
+        background: none;
+        border: 0;
+        color: #fff;
+        font: inherit;
+        font-size: 17px;
+        font-weight: 700;
+        text-align: right;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .st-mobile-menu a.st-active,
+    .st-mobile-menu a.st-green {
+        color: var(--st-green-light);
+    }
+
+    .st-sub {
+        display: none;
+        padding: 0 0 10px;
+    }
+
+    .st-has-sub.st-open .st-sub {
+        display: block;
+    }
+
+    .st-has-sub.st-open .st-chev {
+        transform: rotate(180deg);
+    }
+
+    .st-sub a {
+        padding: 9px 0;
+        font-size: 15px;
+        font-weight: 600;
+        color: #c9d1cc;
+    }
+
+    /* The old side drawer is replaced by the drop-down above */
+    .app-aside,
+    .sidebar-backdrop {
+        display: none !important;
+    }
+}
+
+/* ---------- Page width: content centred with even side margins ---------- */
+.app-container,
+.app-container > .container,
+.app-content {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.app-container > .container {
+    max-width: 100% !important;
+}
+
+.app-content > *:not(h1):not(.app-section:has(.app-slider)) {
+    max-width: var(--st-max);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--st-pad);
+    padding-right: var(--st-pad);
+    box-sizing: border-box;
+}
+
+/* ---------- Hero ---------- */
+body:has(.app-slider) .app-content {
+    padding-top: 0 !important;
+}
+
+.app-content > .app-section:has(.app-slider) {
+    position: relative;
+    z-index: 0;
+    max-width: none;
+    margin: 0 0 -150px !important;
+    padding: 0 !important;
+}
+
+.app-content > .app-section:has(.app-slider) ~ * {
+    position: relative;
+    z-index: 1;
+}
+
+.app-slider,
+.app-slider #slider,
+.app-slider .carousel-inner {
+    border-radius: 0 !important;
+    margin: 0 !important;
+}
+
+.app-slider #slider,
+.app-slider .carousel-item .slide,
+.app-slider .carousel-item.active .slide {
+    height: min(90vh, 880px) !important;
+    border-radius: 0 !important;
+}
+
+.app-slider .slide-poster-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+}
+
+.app-slider .hero-overlay {
+    background:
+        linear-gradient(90deg, rgba(7, 9, 8, 0.9) 0%, rgba(7, 9, 8, 0.55) 38%, rgba(7, 9, 8, 0.05) 70%),
+        linear-gradient(0deg, var(--st-bg) 2%, rgba(7, 9, 8, 0.6) 22%, rgba(7, 9, 8, 0) 45%),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 22%) !important;
+}
+
+.app-slider .hero-content {
+    justify-content: center !important;
+    align-items: flex-start !important;
+    padding: 0 var(--st-pad) 120px !important;
+    padding-left: max(var(--st-pad), calc((100vw - var(--st-max)) / 2 + var(--st-pad))) !important;
+}
+
+.app-slider .hero-info-panel {
+    max-width: 780px;
+    padding: 0 !important;
+    background: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+
+.app-slider .hero-badges,
+.app-slider .hero-genres,
+.app-slider .info-btn,
+.app-slider .carousel-control {
+    display: none !important;
+}
+
+.app-slider .hero-title {
+    margin: 0 0 12px;
+    font-size: clamp(30px, 4.4vw, 68px) !important;
+    font-weight: 800 !important;
+    line-height: 1.05;
+    letter-spacing: -0.5px;
+    color: #fff;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55);
+}
+
+.st-hero-vj {
+    color: var(--st-green-light);
+    font-weight: 400;
+}
+
+.st-hero-vj::before {
+    content: ': ';
+    color: #fff;
+    font-weight: 800;
+}
+
+.app-slider .hero-desc {
+    max-width: 760px;
+    margin: 0;
+    font-size: clamp(15px, 1.35vw, 21px) !important;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.88) !important;
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.6);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.app-slider .hero-btns {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    margin-top: 30px !important;
+}
+
+.app-slider .hero-watch-now {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 18px;
+    padding: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    color: #fff !important;
+    text-decoration: none;
+}
+
+.app-slider .hero-play-circle {
+    width: clamp(64px, 6.6vw, 100px) !important;
+    height: clamp(64px, 6.6vw, 100px) !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--st-green) !important;
+    color: #fff !important;
+    box-shadow: 0 12px 34px rgba(34, 197, 94, 0.35);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.app-slider .hero-play-circle svg {
+    width: 42% !important;
+    height: 42% !important;
+    margin-left: 7%;
+}
+
+.app-slider .hero-watch-now:hover .hero-play-circle {
+    transform: scale(1.06);
+    background: var(--st-green-light) !important;
+}
+
+.app-slider .hero-watch-label {
+    font-size: clamp(16px, 1.4vw, 21px) !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.6);
+}
+
+.app-slider .save-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.35) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Slide dots: vertical on the right, the current one is a green pill */
+.app-slider .carousel-indicators {
+    position: absolute !important;
+    top: 50% !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: clamp(14px, 2.6vw, 44px) !important;
+    transform: translateY(-50%);
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center;
+    gap: 14px;
+    z-index: 5;
+}
+
+.app-slider .carousel-indicators li {
+    width: 14px !important;
+    height: 14px !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.55) !important;
+    opacity: 1 !important;
+    cursor: pointer;
+    transition: height 0.25s ease, background-color 0.25s ease;
+}
+
+.app-slider .carousel-indicators li.active {
+    height: 42px !important;
+    border-radius: 8px !important;
+    background: var(--st-green) !important;
+}
+
+/* ---------- VJ filter chips ---------- */
+.vj-filter-row {
+    margin-bottom: 18px;
+}
+
+.vj-filter-chip {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    color: #e5ebe8 !important;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+}
+
+.vj-filter-chip.active,
+.vj-filter-chip:hover {
+    background: var(--st-green) !important;
+    border-color: var(--st-green) !important;
+    color: #fff !important;
+}
+
+/* ---------- Row headings ---------- */
+.section-header {
+    margin-bottom: 14px !important;
+    padding-bottom: 0 !important;
+    border-bottom: 0 !important;
+    align-items: center;
+}
+
+.section-header h2 {
+    margin: 0;
+    padding-left: 0 !important;
+    border-left: 0 !important;
+    font-size: clamp(18px, 1.5vw, 24px) !important;
+    font-weight: 800 !important;
+    color: #fff !important;
+}
+
+.section-header h2::before,
+.section-header h2 > svg {
+    display: none !important;
+}
+
+.section-header .view-all {
+    background: none !important;
+    border: 0 !important;
+    padding: 6px 0 !important;
+    color: var(--st-muted) !important;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.section-header .view-all:hover {
+    color: var(--st-green-light) !important;
+}
+
+.app-section.movie-section {
+    margin-bottom: 44px !important;
+}
+
+/* ---------- Poster rows ---------- */
+.st-row {
+    position: relative;
+}
+
+.h-scroll {
+    gap: 18px !important;
+    padding: 4px 0 !important;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+}
+
+.h-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+@media (min-width: 1024px) {
+    .h-scroll > .content-card {
+        flex: 0 0 clamp(180px, 15vw, 262px) !important;
+        width: clamp(180px, 15vw, 262px) !important;
+        max-width: clamp(180px, 15vw, 262px) !important;
+    }
+}
+
+.st-arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 6;
+    width: 58px;
+    height: 58px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(-50%);
+    border: 0;
+    border-radius: 50%;
+    background: rgba(28, 31, 30, 0.88);
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.st-arrow-left { left: 8px; }
+.st-arrow-right { right: 8px; }
+
+.st-arrow:hover,
+.st-arrow:focus-visible {
+    background: var(--st-green);
+    color: #fff;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .st-row.st-can-left .st-arrow-left,
+    .st-row.st-can-right .st-arrow-right {
+        display: flex;
+    }
+}
+
+/* ---------- Poster cards (rows and grids) ---------- */
+.content-card .card-poster {
+    border-radius: 6px !important;
+    transition: box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.content-card:hover .card-poster,
+.content-card:focus-visible .card-poster {
+    box-shadow: inset 0 0 0 3px #fff, 0 10px 28px rgba(0, 0, 0, 0.5) !important;
+    filter: brightness(1.06);
+}
+
+.content-card:focus-visible {
+    outline: none;
+}
+
+/* Posters already carry the title, so the text under them is kept for
+   screen readers and search engines only. */
+.content-card .card-info {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* VJ name: green tag in the top-right corner */
+.card-badges .badge-vj {
+    top: 0 !important;
+    left: auto !important;
+    right: 0 !important;
+    max-width: calc(100% - 40px);
+    padding: 4px 9px !important;
+    background: var(--st-green) !important;
+    color: #fff !important;
+    border-radius: 5px !important;
+    font-size: clamp(11px, 1vw, 15px) !important;
+    font-weight: 800 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Lock: plain white padlock in the top-left corner */
+.card-badges .badge-lock,
+.card-badges > .badge-lock {
+    margin-left: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    background: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    color: #fff !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.85));
+}
+
+.card-badges .badge-lock svg {
+    width: clamp(18px, 1.6vw, 24px) !important;
+    height: clamp(18px, 1.6vw, 24px) !important;
+}
+
+.card-badges .badge-lock svg rect {
+    fill: currentColor;
+}
+
+/* ---------- Page titles (Movies, Series, Trending) ----------
+   The old big banner becomes a plain title above the posters, and the
+   filter bar under it is hidden — Genre and VJ are in the top menu. The
+   filter fields stay in the page (just hidden) so links like
+   movies.html?vj=VJ%20Junior keep filtering the list. */
+.page-hero {
+    min-height: 0 !important;
+    margin: 0 0 18px !important;
+    padding: 22px 0 0 !important;
+    background: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    text-align: left !important;
+}
+
+.page-hero::before,
+.page-hero::after {
+    display: none !important;
+}
+
+.page-hero h1,
+.page-hero .page-hero-title {
+    display: block !important;
+    margin: 0 !important;
+    font-size: clamp(20px, 1.8vw, 26px) !important;
+    font-weight: 800 !important;
+    color: #fff !important;
+    background: none !important;
+    -webkit-text-fill-color: currentColor !important;
+    text-align: left !important;
+}
+
+.page-hero h1 svg,
+.page-hero .page-hero-title svg {
+    display: none !important;
+}
+
+.page-hero p {
+    margin: 6px 0 0 !important;
+    font-size: 14px !important;
+    color: var(--st-muted) !important;
+    text-align: left !important;
+}
+
+.page-hero ~ .filter-section {
+    display: none !important;
+}
+
+/* ---------- Trending page cards ---------- */
+.trending-card {
+    border-radius: 6px !important;
+    background: transparent !important;
+}
+
+.trending-card img {
+    border-radius: 6px;
+}
+
+.trending-card .vj-badge {
+    top: 8px !important;
+    left: auto !important;
+    right: 8px !important;
+    max-width: calc(100% - 52px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 4px 9px !important;
+    background: var(--st-green) !important;
+    color: #fff !important;
+    border-radius: 5px !important;
+    font-size: clamp(11px, 1vw, 15px) !important;
+    font-weight: 800 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45) !important;
+}
+
+.trending-card:hover,
+.trending-card:focus-visible {
+    transform: none !important;
+    box-shadow: inset 0 0 0 3px #fff, 0 10px 28px rgba(0, 0, 0, 0.5) !important;
+    outline: none;
+}
+
+.trending-card:hover img {
+    filter: brightness(1.06);
+}
+
+/* the white frame has to sit above the picture */
+.trending-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    box-shadow: inset 0 0 0 3px transparent;
+    pointer-events: none;
+    transition: box-shadow 0.2s ease;
+    z-index: 11;
+}
+
+.trending-card:hover::after,
+.trending-card:focus-visible::after {
+    box-shadow: inset 0 0 0 3px #fff;
+}
+
+.trending-card .trending-card-info {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* ---------- Bits further down the homepage ---------- */
+.uganda-tv-band-btn {
+    background: var(--st-green) !important;
+    color: #fff !important;
+    box-shadow: 0 8px 24px rgba(34, 197, 94, 0.3) !important;
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+    background: #050605 !important;
+    border-top: 1px solid rgba(74, 222, 128, 0.15) !important;
+}
+
+.site-footer .footer-main,
+.site-footer .footer-bottom p {
+    max-width: var(--st-max);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--st-pad);
+    padding-right: var(--st-pad);
+    box-sizing: border-box;
+}
+
+.site-footer .footer-links h4 {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+/* ---------- Phones ---------- */
+@media (max-width: 767px) {
+    .app-content > .app-section:has(.app-slider) {
+        margin-bottom: -70px !important;
+    }
+
+    .app-slider #slider,
+    .app-slider .carousel-item .slide,
+    .app-slider .carousel-item.active .slide {
+        height: min(78vh, 640px) !important;
+    }
+
+    .app-slider .hero-overlay {
+        background:
+            linear-gradient(0deg, var(--st-bg) 4%, rgba(7, 9, 8, 0.7) 30%, rgba(7, 9, 8, 0.25) 60%, rgba(0, 0, 0, 0.45) 100%) !important;
+    }
+
+    .app-slider .hero-content {
+        justify-content: flex-end !important;
+        padding: 0 56px 110px 18px !important;
+    }
+
+    .app-slider .hero-title {
+        font-size: clamp(26px, 7.4vw, 34px) !important;
+    }
+
+    .app-slider .hero-desc {
+        font-size: 15px !important;
+        -webkit-line-clamp: 3;
+    }
+
+    .app-slider .hero-btns {
+        margin-top: 20px !important;
+        gap: 14px;
+    }
+
+    .app-slider .save-btn {
+        width: 42px;
+        height: 42px;
+    }
+
+    .app-slider .carousel-indicators {
+        top: auto !important;
+        bottom: 150px !important;
+        transform: none;
+        right: 14px !important;
+        gap: 10px;
+    }
+
+    .app-slider .carousel-indicators li {
+        width: 12px !important;
+        height: 12px !important;
+    }
+
+    .app-slider .carousel-indicators li.active {
+        height: 34px !important;
+    }
+
+    .h-scroll {
+        gap: 10px !important;
+    }
+
+    .card-badges .badge-vj {
+        max-width: calc(100% - 24px);
+        padding: 2px 5px !important;
+        border-radius: 4px !important;
+        font-size: 10.5px !important;
+    }
+
+    .card-badges .badge-lock svg {
+        width: 16px !important;
+        height: 16px !important;
+    }
+
+    .app-section.movie-section {
+        margin-bottom: 30px !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .h-scroll {
+        scroll-behavior: auto;
+    }
+
+    .app-slider .hero-play-circle,
+    .content-card .card-poster,
+    .app-header {
+        transition: none;
+    }
+}
+
+/* ===================================
+   Load more as you scroll (js/infinite-scroll.js)
+   Sits under a listing grid; shows a spinner while the next batch loads.
+   =================================== */
+.st-load-more {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 1px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+}
+
+.st-load-more:not(:empty) {
+    min-height: 72px;
+    padding: 8px 0 24px;
+}
+
+.st-load-more-spinner {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2.5px solid rgba(255, 255, 255, 0.15);
+    border-top-color: var(--st-green, #22c55e);
+    animation: st-load-more-spin 0.8s linear infinite;
+}
+
+@keyframes st-load-more-spin {
+    to { transform: rotate(360deg); }
+}
+
+.st-load-more-retry {
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: transparent;
+    color: #fff;
+    font: 600 14px 'Inter', sans-serif;
+    cursor: pointer;
+}
+
+.st-load-more-retry:hover {
+    border-color: #fff;
+}
+
+/* Free movies link in the top menu: green, like the brand */
+.st-link.st-link-free {
+    color: var(--st-green-light, #4ade80);
+}
+
+.st-link.st-link-free:hover,
+.st-link.st-link-free.st-active {
+    color: #fff;
+}

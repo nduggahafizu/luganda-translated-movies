@@ -54,7 +54,11 @@ const paymentSchema = new mongoose.Schema({
         pesapalTrackingId: String,
         pesapalMerchantReference: String,
         pesapalOrderTrackingId: String,
-        
+        // Filled in once PesaPal confirms the payment (these were being
+        // written by the controller but silently dropped — not in the schema)
+        pesapalConfirmationCode: String,
+        paymentMethod: String,
+
         // Mobile Money specific
         phoneNumber: String,
         network: {
@@ -82,7 +86,15 @@ const paymentSchema = new mongoose.Schema({
     description: String,
     failureReason: String,
     completedAt: Date,
-    expiresAt: Date
+    expiresAt: Date,
+    // Asking PesaPal again until the payment settles: see
+    // reconcilePendingPesapalPayments in controllers/paymentController.js
+    reconcile: {
+        checks: { type: Number, default: 0 },
+        lastCheckedAt: Date,
+        nextCheckAt: Date,
+        lastStatusCode: Number   // PesaPal: 0 not paid yet, 1 completed, 2 failed, 3 reversed
+    }
 }, {
     timestamps: true
 });
@@ -90,6 +102,8 @@ const paymentSchema = new mongoose.Schema({
 // Index for faster queries
 paymentSchema.index({ user: 1, createdAt: -1 });
 paymentSchema.index({ status: 1 });
+// the background sweep looks for open PesaPal payments that are due a check
+paymentSchema.index({ status: 1, paymentMethod: 1, createdAt: -1 });
 paymentSchema.index({ 'paymentDetails.pesapalTrackingId': 1 });
 paymentSchema.index({ 'paymentDetails.stripePaymentIntentId': 1 });
 

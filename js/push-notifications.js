@@ -172,7 +172,7 @@ const UnrulyPush = {
         prompt.innerHTML = `
             <div class="push-prompt-overlay">
                 <div class="push-prompt-modal">
-                    <div class="push-prompt-icon">🔔</div>
+                    <div class="push-prompt-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
                     <h3>Stay Updated!</h3>
                     <p>Get notified when new movies and series are added. Never miss a new release!</p>
                     <div class="push-prompt-buttons">
@@ -348,7 +348,7 @@ const UnrulyPush = {
             const subscribed = await this.subscribe();
             
             if (subscribed) {
-                this.showToast('🔔 Notifications enabled! You\'ll be notified of new releases.', 'success');
+                this.showToast('Notifications enabled! You\'ll be notified of new releases.', 'success');
                 localStorage.setItem('pushSubscribed', 'true');
                 localStorage.setItem('notificationPermissionState', 'granted');
             } else {

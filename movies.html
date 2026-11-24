@@ -58,53 +58,12 @@
     <link rel="stylesheet" href="css/content-guide.css">
     <link rel="stylesheet" href="css/app-shell.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-    
-    <style>
-        .editorial-panel {
-            margin: 0 0 28px;
-            padding: 22px 24px;
-            border-radius: 18px;
-            background: linear-gradient(135deg, rgba(74, 222, 128, 0.08), rgba(0, 217, 255, 0.05));
-            border: 1px solid rgba(74, 222, 128, 0.18);
-        }
 
-        .editorial-panel h2 {
-            margin: 0 0 12px;
-            font-size: 1.35rem;
-            color: var(--text-primary);
-        }
-
-        .editorial-panel p {
-            margin: 0 0 12px;
-            color: var(--text-secondary);
-            line-height: 1.8;
-        }
-
-        .editorial-points {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 12px;
-            margin-top: 14px;
-        }
-
-        .editorial-point {
-            padding: 14px 16px;
-            border-radius: 14px;
-            background: rgba(0, 0, 0, 0.18);
-            border: 1px solid rgba(74, 222, 128, 0.1);
-            color: var(--text-secondary);
-            line-height: 1.7;
-        }
-
-        .editorial-point strong {
-            display: block;
-            margin-bottom: 6px;
-            color: var(--primary-color);
-        }
-    </style>
     <meta name="google-adsense-account" content="ca-pub-1904736753681797">
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
+    <!-- Site theme (top menu, big poster rows) — keep last so it wins -->
+    <link rel="stylesheet" href="css/site-theme.css">
 </head>
 
 <body>
@@ -269,7 +228,7 @@
                                         <line x1="17" y1="2" x2="17" y2="22"></line>
                                         <line x1="2" y1="12" x2="22" y2="12"></line>
                                     </svg>
-                                    Browse Luganda Movies
+                                    Latest Luganda movies
                                 </h1>
                             </div>
 
@@ -382,46 +341,8 @@
                                 </noscript>
                             </div>
 
-                            <!-- Pagination -->
-                            <div class="pagination">
-                                <button class="page-btn" id="prevPage" disabled aria-label="Previous page" title="Previous page">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polyline points="15 18 9 12 15 6"></polyline>
-                                    </svg>
-                                </button>
-                                <button class="page-btn active" aria-label="Page 1" title="Page 1">1</button>
-                                <button class="page-btn" aria-label="Page 2" title="Page 2">2</button>
-                                <button class="page-btn" aria-label="Page 3" title="Page 3">3</button>
-                                <button class="page-btn" aria-label="Page 4" title="Page 4">4</button>
-                                <button class="page-btn" aria-label="Page 5" title="Page 5">5</button>
-                                <button class="page-btn" id="nextPage" aria-label="Next page" title="Next page">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polyline points="9 18 15 12 9 6"></polyline>
-                                    </svg>
-                                </button>
-                            </div>
-
-                            <div class="editorial-panel">
-                                <h2>What makes this catalog useful</h2>
-                                <p>
-                                    Unruly Movies aims to be more than a bare list of playable links. The catalog is organized so visitors can compare titles,
-                                    track translator identity, and move through genre and quality filters before deciding what to watch.
-                                </p>
-                                <div class="editorial-points">
-                                    <div class="editorial-point">
-                                        <strong>Named VJ credits</strong>
-                                        Discover titles by translator style instead of browsing anonymous entries.
-                                    </div>
-                                    <div class="editorial-point">
-                                        <strong>Useful filters</strong>
-                                        Narrow the catalog by genre, year, quality, and popularity for faster discovery.
-                                    </div>
-                                    <div class="editorial-point">
-                                        <strong>Public standards</strong>
-                                        Read the <a href="editorial-standards.html">editorial standards</a> page for how public-facing pages are reviewed.
-                                    </div>
-                                </div>
-                            </div>
+                            <!-- More movies load automatically when this comes into view -->
+                            <div class="st-load-more" id="loadMore" aria-live="polite"></div>
 
                         </div>
                     </div>
@@ -439,13 +360,13 @@
                             <p class="footer-tagline">Uganda's premier platform for Luganda VJ translated movies.</p>
                             <div class="footer-social">
                                 <a href="mailto:nduggahafizu@gmail.com" aria-label="Email support" class="social-link">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                                 </a>
-                                <a href="https://wa.me/256743311809" aria-label="WhatsApp support" class="social-link">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                                <a href="https://wa.me/256743311809" target="_blank" rel="noopener" aria-label="WhatsApp support" class="social-link">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
                                 </a>
                                 <a href="faq.html" aria-label="Read the FAQ" class="social-link">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                                 </a>
                             </div>
                             <a href="https://play.google.com/store/apps/details?id=com.unruly.pix" target="_blank" class="footer-playstore" aria-label="Get it on Google Play">
@@ -501,41 +422,93 @@
     <script src="js/luganda-movies-api.js"></script>
     <script src="js/notifications.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/infinite-scroll.js"></script>
     <script>
-        // Movies will be loaded from API
+        // Movies load a batch at a time; the next batch loads automatically as
+        // the visitor nears the bottom of the grid (js/infinite-scroll.js).
+        const PAGE_SIZE = 48;
         let movies = [];
         let currentPage = 1;
         let totalPages = 1;
+        let activeParams = {};
+        let vjSource = null;       // a VJ's movies can only be fetched from the top
+        let loadToken = 0;         // replies for an older filter choice are ignored
+        let posterSeq = 0;         // unique poster element ids across batches
+        const seenIds = new Set(); // skip a movie that shifts into the next batch
 
-        // Load movies from API
+        function keepNew(list) {
+            return (list || []).filter(m => {
+                if (!m || seenIds.has(m._id)) return false;
+                seenIds.add(m._id);
+                return true;
+            });
+        }
+
+        function apiList(data) {
+            if (!data || !data.success || !Array.isArray(data.data)) {
+                throw new Error((data && data.message) || 'Failed to load movies');
+            }
+            return data.data;
+        }
+
+        const feed = InfiniteScroll.attach(document.getElementById('loadMore'), {
+            label: 'Loading more movies',
+            loadNext: async (isCurrent) => {
+                let batch;
+                if (vjSource) {
+                    batch = await vjSource.next();
+                } else {
+                    const data = await LugandaMoviesAPI.getAllMovies({ ...activeParams, page: currentPage + 1, limit: PAGE_SIZE });
+                    batch = apiList(data);
+                    if (!isCurrent()) return;
+                    const pg = data.pagination || {};
+                    currentPage = pg.page || currentPage + 1;
+                    totalPages = pg.pages || totalPages;
+                }
+                if (!isCurrent()) return;
+                const fresh = keepNew(batch);
+                movies = movies.concat(fresh);
+                renderMovies(fresh, true);
+                return vjSource ? vjSource.hasMore() : currentPage < totalPages;
+            }
+        });
+
+        // First batch for the current filters: replaces the grid
         async function loadMovies(params = {}) {
+            const token = ++loadToken;
+            feed.stop();
+            activeParams = params;
+            currentPage = 1;
+            totalPages = 1;
+            movies = [];
+            seenIds.clear();
+            // The movie list endpoint ignores ?vj=, so a VJ's movies (e.g. from
+            // the VJ menu) come from the VJ endpoint, which can't page.
+            vjSource = params.vj ? InfiniteScroll.fromTop({
+                size: PAGE_SIZE,
+                fetch: limit => LugandaMoviesAPI.getByVJ(params.vj, limit).then(apiList)
+            }) : null;
+
             const grid = document.getElementById('moviesGrid');
             grid.innerHTML = Array(10).fill('<div class="content-card"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-meta"></div></div>').join('');
-            
+
             try {
-                const queryParams = {
-                    page: currentPage,
-                    limit: 100,
-                    ...params
-                };
-                
-                const data = await LugandaMoviesAPI.getAllMovies(queryParams);
-                
-                if (data.success && data.data) {
-                    movies = data.data;
-                    const pg = data.pagination || {};
-                    totalPages = pg.pages || 1;
-                    renderMovies(movies);
-                    updatePagination({
-                        page: pg.page || currentPage,
-                        pages: pg.pages || 1,
-                        total: pg.total || movies.length,
-                        hasMore: (pg.page || 1) < (pg.pages || 1)
-                    });
+                let first;
+                if (vjSource) {
+                    first = await vjSource.first();
                 } else {
-                    throw new Error(data.message || 'Failed to load movies');
+                    const data = await LugandaMoviesAPI.getAllMovies({ ...params, page: 1, limit: PAGE_SIZE });
+                    first = apiList(data);
+                    const pg = data.pagination || {};
+                    currentPage = pg.page || 1;
+                    totalPages = pg.pages || 1;
                 }
+                if (token !== loadToken) return;
+                movies = keepNew(first);
+                renderMovies(movies);
+                feed.reset(vjSource ? vjSource.hasMore() : currentPage < totalPages);
             } catch (error) {
+                if (token !== loadToken) return;
                 console.error('Error loading movies:', error);
                 grid.innerHTML = `
                     <div class="empty-state">
@@ -548,27 +521,6 @@
                         <p class="empty-subtext">Please check your connection and try again</p>
                     </div>`;
             }
-        }
-
-        function updatePagination(pagination) {
-            const paginationEl = document.querySelector('.pagination');
-            if (!paginationEl) return;
-            
-            let html = '';
-            if (pagination.page > 1) {
-                html += `<button class="page-btn" onclick="goToPage(${pagination.page - 1})">← Prev</button>`;
-            }
-            html += `<span class="page-info">Page ${pagination.page} of ${pagination.pages} (${pagination.total} movies)</span>`;
-            if (pagination.hasMore) {
-                html += `<button class="page-btn" onclick="goToPage(${pagination.page + 1})">Next →</button>`;
-            }
-            paginationEl.innerHTML = html;
-        }
-
-        function goToPage(page) {
-            currentPage = page;
-            applyFilters();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function applyFilters() {
@@ -618,11 +570,13 @@
             return suffix ? `VJ ${suffix}` : name.toUpperCase();
         }
 
-        function renderMovies(moviesToRender) {
+        // append = true adds the cards under the ones already shown
+        function renderMovies(moviesToRender, append = false) {
             const grid = document.getElementById('moviesGrid');
-            grid.innerHTML = '';
+            if (!append) grid.innerHTML = '';
 
             if (moviesToRender.length === 0) {
+                if (append) return;
                 grid.innerHTML = `
                     <div class="empty-state">
                         <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -648,7 +602,7 @@
                 const fallbackPoster = getPlaceholderPoster(movie.originalTitle, movie.year);
                 const vjName = movie.vjName || 'Unknown';
                 const vjBadge = formatVjBadge(vjName);
-                const posterId = `poster-${index}`;
+                const posterId = `poster-${posterSeq++}`;
                 const title = movie.originalTitle || movie.lugandaTitle || 'Unknown Title';
 
                 // Store poster data for later loading (always set fallback; swap to real poster when available)
@@ -673,7 +627,8 @@
             });
             
             // Add all cards to DOM at once
-            grid.innerHTML = cardsHTML;
+            if (append) grid.insertAdjacentHTML('beforeend', cardsHTML);
+            else grid.innerHTML = cardsHTML;
             
             // Now load posters with validation (after DOM is updated)
             setTimeout(() => {
@@ -714,15 +669,10 @@
 
     </script>
     
-    <!-- Trailer Player -->
-    <script src="js/trailer-player.js"></script>
+    <!-- Trailer Player: js/trailer-player.js (loaded above) creates the
+         global trailerPlayer, so it is not loaded or declared again here. -->
     <script>
-        // Initialize trailer player
-        let trailerPlayer;
-        document.addEventListener('DOMContentLoaded', () => {
-            trailerPlayer = new TrailerPlayer();
-        });
-        
+
         // Play movie trailer using TMDB ID
         async function playMovieTrailer(tmdbId, movieTitle) {
             if (!tmdbId) {
@@ -820,5 +770,6 @@
     <!-- Web Push Notifications -->
     <script src="js/push-notifications.js"></script>
     <script defer src="js/app-shell.js"></script>
+    <script defer src="js/site-theme.js"></script>
 </body>
 </html>

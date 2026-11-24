@@ -210,14 +210,19 @@ exports.initiatePesapalPayment = async (req, res) => {
             phoneNumber: phoneNumber ? '***' + phoneNumber.slice(-4) : 'none'
         });
 
-        // Get price in UGX
+        // The price always comes from our own plan list — never from the
+        // browser, which could send any amount (pay UGX 100 for Monthly).
         const planConfig = SUBSCRIPTION_PRICES[subscriptionPlan];
-        const paymentAmount = amount || planConfig?.ugx;
-
-        if (!paymentAmount) {
+        if (!planConfig) {
             return res.status(400).json({
                 status: 'error',
-                message: 'Invalid subscription plan or amount'
+                message: `Choose a valid plan: ${Object.keys(SUBSCRIPTION_PRICES).join(', ')}`
+            });
+        }
+        const paymentAmount = planConfig.ugx;
+        if (amount && Number(amount) !== paymentAmount) {
+            logger.warn('PesaPal initiate: ignoring a price sent by the browser', {
+                userId: req.user.id, subscriptionPlan, sent: amount, price: paymentAmount
             });
         }
 
@@ -233,8 +238,9 @@ exports.initiatePesapalPayment = async (req, res) => {
             paymentMethod: 'pesapal',
             paymentProvider: 'pesapal',
             status: 'pending',
-            subscriptionPlan: subscriptionPlan || 'basic',
-            subscriptionDuration: subscriptionDuration || 'monthly',
+            subscriptionPlan,
+            // daily / weekly / biweekly / monthly are also valid durations
+            subscriptionDuration: subscriptionPlan,
             paymentDetails: {
                 pesapalMerchantReference: merchantReference,
                 phoneNumber: phoneNumber || '',
@@ -415,11 +421,11 @@ exports.pesapalCallback = async (req, res) => {
 
             if (statusCode === 1) { // Completed
                 await processSuccessfulPesapalPayment(payment, statusResponse.data);
-                res.redirect(`https://unrulymovies.com/payment-success.html?ref=${OrderMerchantReference}`);
-            } else if (statusCode === 2) { // Failed
-                payment.status = 'failed';
-                payment.paymentDetails.failureReason = statusResponse.data?.message || 'Payment failed';
-                await payment.save();
+                res.redirect(payment.status === 'completed'
+                    ? `https://unrulymovies.com/payment-success.html?ref=${OrderMerchantReference}`
+                    : 'https://unrulymovies.com/payment-failed.html');
+            } else if (statusCode === 2 || statusCode === 3) { // Failed / reversed
+                await markPesapalNotPaid(payment, statusResponse.data, statusCode);
                 res.redirect('https://unrulymovies.com/payment-failed.html');
             } else { // Pending
                 res.redirect(`https://unrulymovies.com/payment-pending.html?ref=${OrderMerchantReference}`);
@@ -434,38 +440,102 @@ exports.pesapalCallback = async (req, res) => {
     }
 };
 
-// Process successful PesaPal payment
+// Switch on the plan for a payment PesaPal says is completed.
+// Safe to call more than once — IPN, the callback, the browser's verify
+// check and the background sweep can all arrive together:
+//   1. the user's plan is switched on first (an atomic update, so an
+//      unrelated invalid field on an old account can't block it), and
+//   2. only then is the payment marked completed — exactly once.
+// If step 1 throws, the payment stays open and the sweep tries again, so a
+// paid customer is never left on a "completed" payment without a plan.
 async function processSuccessfulPesapalPayment(payment, transactionData) {
-    if (payment.status === 'completed') return; // Already processed
-    
-    payment.status = 'completed';
-    payment.completedAt = new Date();
-    if (transactionData) {
-        payment.paymentDetails.pesapalConfirmationCode = transactionData.confirmation_code;
-        payment.paymentDetails.paymentMethod = transactionData.payment_method;
+    if (payment.status === 'completed') return;
+
+    const plan = SUBSCRIPTION_PRICES[payment.subscriptionPlan];
+
+    // Paid less than the plan costs (only possible if a price was tampered
+    // with): don't switch anything on. Small tolerance for rounding.
+    const paid = Number(transactionData && transactionData.amount);
+    const currency = transactionData && transactionData.currency;
+    const expected = plan ? plan.ugx : payment.amount;
+    if (Number.isFinite(paid) && paid > 0 && (!currency || currency === 'UGX') && paid + 1 < expected) {
+        logger.error('PesaPal payment is below the plan price — not activating', {
+            transactionId: payment.transactionId, plan: payment.subscriptionPlan, paid, expected
+        });
+        await Payment.updateOne(
+            { _id: payment._id, status: { $ne: 'completed' } },
+            { $set: { status: 'failed', failureReason: `Paid UGX ${paid}, but the ${payment.subscriptionPlan} plan costs UGX ${expected}` } }
+        );
+        payment.status = 'failed';
+        return;
     }
-    await payment.save();
 
-    // Update user subscription
-    const user = await User.findById(payment.user);
-    if (user) {
-        user.subscription.plan = payment.subscriptionPlan;
-        user.subscription.status = 'active';
-        user.subscription.startDate = new Date();
-        
-        const duration = SUBSCRIPTION_PRICES[payment.subscriptionPlan]?.days || 30;
-        user.subscription.endDate = new Date(Date.now() + duration * 24 * 60 * 60 * 1000);
-        
-        await user.save();
-
-        // Send emails
-        try {
-            await sendPaymentReceipt(user, payment);
-            await sendSubscriptionEmail(user, payment.subscriptionPlan, payment.amount);
-        } catch (emailError) {
-            logger.error('Email error', { error: emailError.message });
+    const days = (plan && plan.days) || 30;
+    const now = new Date();
+    const activation = await User.updateOne(
+        { _id: payment.user },
+        {
+            $set: {
+                'subscription.plan': payment.subscriptionPlan,
+                'subscription.status': 'active',
+                'subscription.startDate': now,
+                'subscription.endDate': new Date(now.getTime() + days * 24 * 60 * 60 * 1000)
+            }
         }
+    );
+    if (!activation.matchedCount) {
+        // The account no longer exists: nothing to switch on, but the money
+        // did arrive, so record the payment as completed for follow-up.
+        logger.error('PesaPal payment completed for a user that no longer exists', {
+            transactionId: payment.transactionId, user: payment.user
+        });
     }
+
+    const completed = await Payment.findOneAndUpdate(
+        { _id: payment._id, status: { $ne: 'completed' } },
+        {
+            $set: {
+                status: 'completed',
+                completedAt: now,
+                failureReason: null,
+                'paymentDetails.pesapalConfirmationCode': transactionData && transactionData.confirmation_code,
+                'paymentDetails.paymentMethod': transactionData && transactionData.payment_method,
+                'reconcile.lastStatusCode': 1,
+                'reconcile.lastCheckedAt': now
+            }
+        },
+        { new: true }
+    );
+    payment.status = 'completed';
+    if (!completed) return; // another check finished it first — it sends the emails
+
+    logger.info('PesaPal payment activated', {
+        transactionId: payment.transactionId, user: payment.user, plan: payment.subscriptionPlan
+    });
+
+    try {
+        const user = await User.findById(payment.user);
+        if (user) {
+            await sendPaymentReceipt(user, completed);
+            await sendSubscriptionEmail(user, payment.subscriptionPlan, payment.amount);
+        }
+    } catch (emailError) {
+        logger.error('Email error', { error: emailError.message });
+    }
+}
+
+// PesaPal says this attempt failed (status 2) or was reversed (status 3).
+// A failed mobile-money attempt can be retried on the same PesaPal order, so
+// failed payments keep being re-checked for a few hours (see the sweep).
+async function markPesapalNotPaid(payment, transactionData, statusCode) {
+    if (payment.status === 'completed') return;
+    const reason = (transactionData && (transactionData.message || transactionData.payment_status_description)) ||
+        (statusCode === 3 ? 'Payment reversed' : 'Payment failed');
+    await Payment.updateOne(
+        { _id: payment._id, status: { $ne: 'completed' } },
+        { $set: { status: 'failed', failureReason: reason, 'reconcile.lastStatusCode': statusCode, 'reconcile.lastCheckedAt': new Date() } }
+    );
+    payment.status = 'failed';
 }
 
 // Uganda mobile numbers vary in stored format (+256..., 256..., 07..., 7...).
@@ -624,11 +694,9 @@ exports.pesapalIPN = async (req, res) => {
             if (statusCode === 1) { // Completed
                 await processSuccessfulPesapalPayment(payment, statusResponse.data);
                 logger.info('Payment completed via IPN', { OrderMerchantReference });
-            } else if (statusCode === 2) { // Failed
-                payment.status = 'failed';
-                payment.paymentDetails.failureReason = statusResponse.data?.message || 'Payment failed';
-                await payment.save();
-                logger.info('Payment failed via IPN', { OrderMerchantReference });
+            } else if (statusCode === 2 || statusCode === 3) { // Failed / reversed
+                await markPesapalNotPaid(payment, statusResponse.data, statusCode);
+                logger.info('Payment failed via IPN', { OrderMerchantReference, statusCode });
             }
         } catch (statusError) {
             // Don't falsely acknowledge — if we couldn't actually verify the
@@ -646,64 +714,122 @@ exports.pesapalIPN = async (req, res) => {
     }
 };
 
-// Re-checks Payment records stuck in "pending" against PesaPal's live status
-// and activates any that actually completed. Runs on a short interval (see
-// server.js) so activation happens within about a minute regardless of
-// whether IPN was delivered or the browser ever made it back to a redirect —
-// this is the primary safety net, not a slow last-resort fallback.
+// Background sweep (every minute, see server.js): asks PesaPal again about
+// every PesaPal payment that hasn't settled yet, until it does, so a paid
+// customer is switched on whether or not the IPN arrived or their browser
+// made it back from PesaPal.
+//
+//  - Newest payments first, and each payment is re-checked on a schedule
+//    that slows down with age (every minute for the first 30 minutes, every
+//    5 minutes up to 6 hours, then every 30 minutes up to 48 hours) — so
+//    abandoned checkouts can't crowd out someone who has just paid.
+//  - A failed mobile-money attempt (wrong PIN, prompt timed out) can be
+//    retried on the same PesaPal order, so failed payments are still
+//    re-checked for 6 hours.
+const SWEEP_WINDOW_MS = 48 * 60 * 60 * 1000;
+const RETRY_FAILED_MS = 6 * 60 * 60 * 1000;
+const SWEEP_BATCH = 100;
+
+function nextPesapalCheckDelay(ageMs) {
+    const minute = 60 * 1000;
+    if (ageMs < 30 * minute) return minute;
+    if (ageMs < 6 * 60 * minute) return 5 * minute;
+    return 30 * minute;
+}
+
+let sweepRunning = false;
+
 exports.reconcilePendingPesapalPayments = async function reconcilePendingPesapalPayments() {
-    const now = Date.now();
-    const olderThan = new Date(now - 20 * 1000);            // let the order actually reach PesaPal first
-    const newerThan = new Date(now - 48 * 60 * 60 * 1000);  // don't keep re-checking week-old abandoned carts
-
-    const stuck = await Payment.find({
-        status: 'pending',
-        paymentMethod: 'pesapal',
-        'paymentDetails.pesapalOrderTrackingId': { $exists: true, $ne: null },
-        createdAt: { $lte: olderThan, $gte: newerThan }
-    }).limit(50);
-
-    if (stuck.length === 0) return { checked: 0, activated: 0 };
-
-    let activated = 0;
-    let token;
+    if (sweepRunning) return { checked: 0, activated: 0, skipped: true }; // previous sweep still going
+    sweepRunning = true;
     try {
-        token = await getPesapalToken();
-    } catch (e) {
-        logger.error('Reconciliation sweep: could not get PesaPal token', { error: e.message });
-        return { checked: 0, activated: 0 };
-    }
+        const now = Date.now();
+        const due = await Payment.find({
+            paymentMethod: 'pesapal',
+            'paymentDetails.pesapalOrderTrackingId': { $exists: true, $ne: null },
+            createdAt: { $lte: new Date(now - 20 * 1000), $gte: new Date(now - SWEEP_WINDOW_MS) },
+            $and: [
+                {
+                    $or: [
+                        { status: 'pending' },
+                        { status: 'failed', 'reconcile.lastStatusCode': 2, createdAt: { $gte: new Date(now - RETRY_FAILED_MS) } }
+                    ]
+                },
+                {
+                    $or: [
+                        { 'reconcile.nextCheckAt': { $exists: false } },
+                        { 'reconcile.nextCheckAt': null },
+                        { 'reconcile.nextCheckAt': { $lte: new Date(now) } }
+                    ]
+                }
+            ]
+        }).sort({ createdAt: -1 }).limit(SWEEP_BATCH);
 
-    for (const payment of stuck) {
+        if (due.length === 0) return { checked: 0, activated: 0 };
+
+        let token;
         try {
-            const statusResponse = await axios.get(
-                `${PESAPAL_CONFIG.baseUrl}/api/Transactions/GetTransactionStatus?orderTrackingId=${payment.paymentDetails.pesapalOrderTrackingId}`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            const statusCode = statusResponse.data?.status_code;
-            if (statusCode === 1) {
-                await processSuccessfulPesapalPayment(payment, statusResponse.data);
-                activated++;
-                logger.info('Reconciliation sweep activated a stuck payment', {
-                    transactionId: payment.transactionId, user: payment.user
-                });
-            } else if (statusCode === 2) {
-                payment.status = 'failed';
-                payment.paymentDetails.failureReason = statusResponse.data?.message || 'Payment failed';
-                await payment.save();
-            }
+            token = await getPesapalToken();
         } catch (e) {
-            logger.error('Reconciliation sweep: status check failed for one payment', {
-                transactionId: payment.transactionId, error: e.message
-            });
+            logger.error('Reconciliation sweep: could not get PesaPal token', { error: e.message });
+            return { checked: 0, activated: 0 };
         }
-        await new Promise(r => setTimeout(r, 200)); // be gentle with PesaPal's API
-    }
 
-    if (activated > 0) {
-        logger.info('Reconciliation sweep complete', { checked: stuck.length, activated });
+        let activated = 0;
+        for (const payment of due) {
+            const checkedAt = new Date();
+            const ageMs = checkedAt.getTime() - new Date(payment.createdAt).getTime();
+            let statusCode = null;
+            try {
+                const statusResponse = await axios.get(
+                    `${PESAPAL_CONFIG.baseUrl}/api/Transactions/GetTransactionStatus?orderTrackingId=${encodeURIComponent(payment.paymentDetails.pesapalOrderTrackingId)}`,
+                    { headers: { Authorization: `Bearer ${token}` }, timeout: 15000 }
+                );
+                statusCode = statusResponse.data?.status_code;
+                if (statusCode === 1) {
+                    await processSuccessfulPesapalPayment(payment, statusResponse.data);
+                    if (payment.status === 'completed') {
+                        activated++;
+                        logger.info('Reconciliation sweep activated a payment', {
+                            transactionId: payment.transactionId, user: payment.user, ageMinutes: Math.round(ageMs / 60000)
+                        });
+                    }
+                } else if (statusCode === 2 || statusCode === 3) {
+                    if (payment.status !== 'failed') {
+                        await markPesapalNotPaid(payment, statusResponse.data, statusCode);
+                    }
+                }
+            } catch (e) {
+                // PesaPal unreachable, or activation failed: try this one again next minute
+                logger.error('Reconciliation sweep: could not settle one payment', {
+                    transactionId: payment.transactionId, error: e.message
+                });
+            }
+
+            // Book the next check (completed payments drop out of the query anyway)
+            const retrySoon = statusCode === null || statusCode === 1;
+            const update = {
+                $inc: { 'reconcile.checks': 1 },
+                $set: {
+                    'reconcile.lastCheckedAt': checkedAt,
+                    'reconcile.nextCheckAt': new Date(checkedAt.getTime() + (retrySoon ? 60 * 1000 : nextPesapalCheckDelay(ageMs)))
+                }
+            };
+            if (typeof statusCode === 'number') update.$set['reconcile.lastStatusCode'] = statusCode;
+            await Payment.updateOne({ _id: payment._id }, update).catch(e =>
+                logger.error('Reconciliation sweep: could not book next check', { transactionId: payment.transactionId, error: e.message })
+            );
+
+            await new Promise(r => setTimeout(r, 200)); // be gentle with PesaPal's API
+        }
+
+        if (activated > 0 || due.length >= SWEEP_BATCH) {
+            logger.info('Reconciliation sweep complete', { checked: due.length, activated });
+        }
+        return { checked: due.length, activated };
+    } finally {
+        sweepRunning = false;
     }
-    return { checked: stuck.length, activated };
 };
 
 // @desc    Verify PesaPal payment (client-side check after redirect)
@@ -744,10 +870,12 @@ exports.verifyPesapalPayment = async (req, res) => {
 
         if (statusCode === 1) {
             await processSuccessfulPesapalPayment(payment, statusResponse.data);
+            if (payment.status !== 'completed') {
+                return res.json({ status: 'failed', message: 'The amount paid does not match the plan. Please contact support.' });
+            }
             return res.json({ status: 'success', message: 'Payment confirmed', plan: payment.subscriptionPlan });
-        } else if (statusCode === 2) {
-            payment.status = 'failed';
-            await payment.save();
+        } else if (statusCode === 2 || statusCode === 3) {
+            await markPesapalNotPaid(payment, statusResponse.data, statusCode);
             return res.json({ status: 'failed', message: 'Payment failed' });
         } else {
             return res.json({ status: 'pending', message: 'Payment still processing' });
@@ -950,3 +1078,6 @@ exports.getPlans = (req, res) => {
         }
     });
 };
+
+// For automated tests only (not used by any route)
+exports._test = { processSuccessfulPesapalPayment, markPesapalNotPaid, nextPesapalCheckDelay };

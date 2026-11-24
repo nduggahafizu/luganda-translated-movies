@@ -109,7 +109,9 @@
         });
 
         let attempts = 0;
-        const maxAttempts = 24; // 2 minutes at 5-second intervals
+        // 10 minutes at 5-second intervals: mobile money can take a few
+        // minutes. After that the server's background check still carries on.
+        const maxAttempts = 120;
 
         async function checkStatus() {
             if (!ref) return;
@@ -128,20 +130,22 @@
                     window.location.replace('payment-failed.html');
                 } else {
                     attempts++;
-                    document.getElementById('psStatus').textContent = `Checking… (${attempts}/${maxAttempts})`;
+                    document.getElementById('psStatus').textContent = attempts < 12
+                        ? 'Checking with Pesapal…'
+                        : 'Still checking… You can leave this page: your plan switches on automatically once Pesapal confirms.';
                     if (attempts < maxAttempts) {
                         setTimeout(checkStatus, 5000);
                     } else {
                         // Timed out — let user know
                         document.querySelector('.ps-title').textContent = 'Still Processing';
                         document.querySelector('.ps-subtitle').innerHTML =
-                            'Your payment is taking longer than expected. If you paid, your subscription will activate automatically within a few minutes.<br><br>Check your dashboard or contact support if it doesn\'t appear.';
-                        document.getElementById('psStatus').textContent = 'Pending — check back soon';
+                            'Pesapal hasn\'t confirmed your payment yet. If you paid, we keep checking and your plan switches on automatically as soon as it\'s confirmed. You don\'t need to pay again.<br><br>If it hasn\'t switched on within an hour, send us the payment reference above.';
+                        document.getElementById('psStatus').textContent = 'Pending — we\'re still checking';
                         document.querySelector('.ps-progress').style.display = 'none';
                         const act = document.createElement('div');
                         act.innerHTML = `
-                            <a href="dashboard.html" class="ps-btn primary">Go to Dashboard</a>
-                            <a href="mailto:support@unrulymovies.com" class="ps-btn secondary">Contact Support</a>
+                            <a href="index.html" class="ps-btn primary">Keep browsing</a>
+                            <a href="https://wa.me/256743311809" target="_blank" rel="noopener" class="ps-btn secondary">WhatsApp us</a>
                         `;
                         document.getElementById('psWrap').appendChild(act);
                     }

@@ -507,7 +507,7 @@
 }
 
 .premium-badge::before {
-    content: '👑';
+    content: '★';
 }
 
 /* ============ SCROLL REVEAL ============ */

@@ -1,588 +1,820 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-
     <title>Subscription Plans - Premium Access | Unruly Movies</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#4ade80">
+    <meta name="theme-color" content="#22c55e">
     <meta name="description" content="Subscribe to Unruly Movies premium plans. Choose from Daily (UGX 1,000), Weekly (UGX 5,000), 2 Weeks (UGX 7,000) or Monthly (UGX 12,000) access to unlimited Luganda VJ translated movies. Pay securely with PesaPal — MTN, Airtel, Visa or Mastercard.">
     <meta name="robots" content="noindex, nofollow">
-    <link rel="canonical" href="https://unrulymovies.com/subscription">    
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/responsive.css">
-    <link rel="stylesheet" href="css/modern-ui.css">
-    <link rel="stylesheet" href="css/payment-modal.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="canonical" href="https://unrulymovies.com/subscription">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
-    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mobile-improvements.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/app-shell.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/pesapal-checkout.js"></script>
-    <script src="js/payment-manager.js?v=3"></script>
-    
+    <script src="js/payment-manager.js?v=4"></script>
+
     <style>
-        .subscription-page {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
-            padding: 40px 20px 80px;
+        /* ===================================
+           Plans page: "Find your perfect plan", four plan cards, then
+           questions and answers. Prices and what each plan includes match
+           server/controllers/paymentController.js and PLAN_CONFIG in
+           server/models/User.js.
+           =================================== */
+        .pl-page {
+            padding-top: 30px;
+            padding-bottom: 50px;
         }
-        
-        .subscription-header {
+
+        .pl-hero {
             text-align: center;
-            margin-bottom: 50px;
-            padding-top: 20px;
         }
-        
-        .subscription-header h1 {
-            font-size: 42px;
+
+        .pl-kicker {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: clamp(22px, 2.6vw, 38px);
+            font-weight: 300;
+        }
+
+        .pl-title {
+            margin: 6px 0 0;
+            color: #fff;
+            font-size: clamp(28px, 4vw, 54px);
             font-weight: 800;
-            margin-bottom: 15px;
-            background: linear-gradient(135deg, #4ade80, #22c55e);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            letter-spacing: 0.01em;
+            text-transform: uppercase;
         }
-        
-        .subscription-header p {
-            font-size: 18px;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto;
+
+        /* "To watch <movie>, choose a plan" when coming from a player */
+        .pl-context {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            max-width: 620px;
+            margin: 22px auto 0;
+            padding: 12px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            background: #111513;
+            text-align: left;
         }
-        
-        .airtel-badge {
+
+        .pl-context[hidden] {
+            display: none;
+        }
+
+        .pl-context img {
+            flex: none;
+            width: 46px;
+            height: 69px;
+            border-radius: 6px;
+            object-fit: cover;
+            background: #1c211f;
+        }
+
+        .pl-context p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .pl-context strong {
+            color: #fff;
+        }
+
+        .pl-context a {
+            color: var(--st-green-light, #4ade80);
+            font-weight: 600;
+        }
+
+        /* Not signed in */
+        .pl-signin {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 12px 18px;
+            max-width: 720px;
+            margin: 22px auto 0;
+            padding: 14px 18px;
+            border: 1px solid rgba(34, 197, 94, 0.35);
+            border-radius: 14px;
+            background: rgba(34, 197, 94, 0.08);
+            color: #fff;
+            font-size: 15px;
+            text-align: center;
+        }
+
+        .pl-signin[hidden] {
+            display: none;
+        }
+
+        .pl-signin a {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            background: rgba(255, 0, 0, 0.1);
-            border: 1px solid rgba(255, 0, 0, 0.3);
-            padding: 10px 20px;
-            border-radius: 30px;
-            margin-top: 20px;
+            height: 40px;
+            padding: 0 18px;
+            border-radius: 999px;
+            font-weight: 700;
+            text-decoration: none;
         }
-        
-        .airtel-badge span {
+
+        .pl-signin .is-primary {
+            background: var(--st-green, #22c55e);
             color: #fff;
-            font-weight: 600;
         }
-        
-        .plans-container {
-            max-width: 1200px;
-            margin: 0 auto;
+
+        .pl-signin .is-secondary {
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+        }
+
+        /* ---------- Plan cards: white, green price, outlined button ---------- */
+        .pl-cards {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 20px;
-            padding: 0 10px;
+            margin-top: 34px;
         }
-        
-        @media (max-width: 1100px) {
-            .plans-container {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .plans-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .subscription-header h1 {
-                font-size: 32px;
-            }
-        }
-        
-        @media (max-width: 500px) {
-            .plans-container {
-                grid-template-columns: 1fr;
-                max-width: 350px;
-            }
-        }
-        
-        .plan-card {
-            background: linear-gradient(145deg, #1a1a2e, #16213e);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 25px 20px;
-            text-align: center;
+
+        .pl-card {
             position: relative;
-            transition: all 0.4s ease;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 26px 26px;
+            border-radius: 6px;
+            background: #fff;
+            color: #1f2937;
         }
-        
-        .plan-card::before {
-            content: '';
+
+        .pl-card.is-best {
+            box-shadow: 0 0 0 3px var(--st-green, #22c55e);
+        }
+
+        .pl-best {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--plan-color, #888);
-            opacity: 0.5;
-            transition: opacity 0.3s ease;
-        }
-        
-        .plan-card:hover {
-            transform: translateY(-10px);
-            border-color: var(--plan-color, #888);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-        }
-        
-        .plan-card:hover::before {
-            opacity: 1;
-        }
-        
-        .plan-card.popular {
-            border-color: #FFD700;
-            background: linear-gradient(145deg, #2a2a1e, #16213e);
-            transform: scale(1.05);
-        }
-        
-        .plan-card.popular:hover {
-            transform: scale(1.05) translateY(-10px);
-        }
-        
-        .popular-badge {
-            position: absolute;
-            top: -1px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-            color: #000;
-            padding: 6px 16px;
-            border-radius: 0 0 12px 12px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .plan-icon {
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
-        
-        .plan-name {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 5px;
-            color: var(--plan-color, #fff);
-        }
-        
-        .plan-duration {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-bottom: 15px;
-        }
-        
-        .plan-price {
-            margin-bottom: 20px;
-        }
-        
-        .currency {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-        
-        .amount {
-            font-size: 36px;
+            top: -13px;
+            left: 26px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: var(--st-green, #22c55e);
+            color: #fff;
+            font-size: 12px;
             font-weight: 800;
-            color: #fff;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
         }
-        
-        .plan-features {
-            list-style: none;
+
+        .pl-name {
+            margin: 0;
+            color: #111827;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .pl-price {
+            margin: 10px 0 0;
+            color: #16a34a;
+            font-size: clamp(30px, 2.6vw, 40px);
+            font-weight: 800;
+            line-height: 1.05;
+        }
+
+        .pl-price small {
+            font-size: 0.5em;
+            font-weight: 700;
+        }
+
+        .pl-per {
+            margin: 4px 0 0;
+            color: #6b7280;
+            font-size: 15px;
+        }
+
+        .pl-perks {
+            flex: 1;
+            margin: 18px 0 22px;
             padding: 0;
-            margin: 0 0 20px;
-            text-align: left;
-            font-size: 13px;
+            list-style: none;
+            font-size: 15px;
+            line-height: 1.45;
         }
-        
-        .plan-features li {
+
+        .pl-perks li {
             display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 0;
-            color: var(--text-secondary);
+            gap: 9px;
+            padding: 5px 0;
         }
-        
-        .plan-features li svg {
-            width: 16px;
-            height: 16px;
-            fill: var(--plan-color, #4ade80);
-            flex-shrink: 0;
+
+        .pl-perks svg {
+            flex: none;
+            width: 18px;
+            height: 18px;
+            margin-top: 1px;
         }
-        
-        .btn-subscribe {
-            width: 100%;
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #4ade80, #22c55e);
-            color: #000;
-            border: none;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 700;
+
+        .pl-perks .yes svg { color: #16a34a; }
+        .pl-perks .no { color: #9ca3af; }
+        .pl-perks .no svg { color: #d1d5db; }
+
+        .pl-choose {
+            height: 46px;
+            border: 1px solid #16a34a;
+            border-radius: 4px;
+            background: #fff;
+            color: #16a34a;
+            font: 600 16px 'Inter', sans-serif;
             cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .btn-subscribe:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(74, 222, 128, 0.4);
-        }
-        
-        /* Trust Section */
-        .trust-section {
-            max-width: 800px;
-            margin: 60px auto 0;
-            text-align: center;
-        }
-        
-        .trust-section h3 {
-            color: var(--text-secondary);
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-        
-        .trust-badges {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 30px;
-        }
-        
-        .trust-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-secondary);
-            font-size: 13px;
-        }
-        
-        .trust-badge svg {
-            width: 20px;
-            height: 20px;
-            fill: #4ade80;
-        }
-        
-        /* Login prompt */
-        .login-prompt {
-            background: rgba(74, 222, 128, 0.08);
-            border: 1px solid rgba(74, 222, 128, 0.3);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            max-width: 600px;
-            margin: 0 auto 40px;
-        }
-        
-        .login-prompt p {
-            color: #4ade80;
-            margin-bottom: 15px;
-        }
-        
-        .login-prompt a {
-            color: #4ade80;
-            font-weight: 600;
-            text-decoration: underline;
+            transition: background-color 0.15s ease, color 0.15s ease;
         }
 
-        /* Ad slots */
-        .ad-slot {
-            max-width: 728px;
-            margin: 30px auto;
-            text-align: center;
-            min-height: 90px;
-            background: rgba(255,255,255,0.02);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-        .ad-slot-square {
-            max-width: 360px;
-            margin: 20px auto;
-            min-height: 280px;
-            background: rgba(255,255,255,0.02);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        /* Step number brand color */
-        .step-number {
-            background: linear-gradient(135deg, #4ade80, #22c55e) !important;
-            color: #000 !important;
-        }
-        
-        /* How it works */
-        .how-it-works {
-            max-width: 800px;
-            margin: 60px auto 0;
-            text-align: center;
-        }
-        
-        .how-it-works h2 {
-            font-size: 24px;
-            margin-bottom: 30px;
-        }
-        
-        .steps {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            flex-wrap: wrap;
-        }
-        
-        .step {
-            text-align: center;
-            max-width: 200px;
-        }
-        
-        .step-number {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #FF0000, #CC0000);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: 700;
+        .pl-choose:hover,
+        .pl-choose:focus-visible {
+            background: #16a34a;
             color: #fff;
-            margin: 0 auto 15px;
         }
-        
-        .step h4 {
+
+        .pl-card.is-best .pl-choose {
+            background: #16a34a;
+            color: #fff;
+        }
+
+        .pl-card.is-best .pl-choose:hover {
+            background: #15803d;
+        }
+
+        /* plans without downloads, when the visitor came to download */
+        .pl-card.is-muted {
+            opacity: 0.55;
+        }
+
+        .pl-pay-note {
+            margin: 18px 0 0;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            text-align: center;
+        }
+
+        /* ---------- Questions and answers ---------- */
+        .pl-faq {
+            max-width: 960px;
+            margin: 64px auto 0;
+        }
+
+        .pl-faq-title {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: clamp(22px, 2.2vw, 32px);
+            font-weight: 400;
+            text-align: center;
+        }
+
+        .pl-faq-title::after {
+            content: '';
+            display: block;
+            width: 120px;
+            height: 2px;
+            margin: 18px auto 0;
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        .pl-faq-sub {
+            margin: 18px 0 24px;
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 17px;
+            text-align: center;
+        }
+
+        .pl-faq details {
+            margin-bottom: 14px;
+            border-radius: 4px;
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .pl-faq summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 20px 20px;
+            font-size: 17px;
+            cursor: pointer;
+            list-style: none;
+        }
+
+        .pl-faq summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .pl-faq summary::after {
+            content: '';
+            flex: none;
+            width: 10px;
+            height: 10px;
+            margin-top: -5px;
+            border: solid #374151;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+            transition: transform 0.15s ease;
+        }
+
+        .pl-faq details[open] summary::after {
+            margin-top: 5px;
+            transform: rotate(-135deg);
+        }
+
+        .pl-faq summary:focus-visible {
+            outline: 2px solid var(--st-green, #22c55e);
+            outline-offset: 2px;
+        }
+
+        .pl-faq details p {
+            margin: 0;
+            padding: 0 20px 20px;
+            color: #4b5563;
             font-size: 16px;
-            margin-bottom: 8px;
+            line-height: 1.65;
         }
-        
-        .step p {
-            font-size: 13px;
-            color: var(--text-secondary);
+
+        .pl-faq details a {
+            color: #16a34a;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1100px) {
+            .pl-cards {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            .pl-page {
+                padding-top: 20px;
+            }
+
+            .pl-cards {
+                grid-template-columns: 1fr;
+                gap: 22px;
+            }
+
+            .pl-card {
+                padding: 26px 20px 20px;
+            }
+
+            .pl-faq {
+                margin-top: 48px;
+            }
+
+            .pl-faq summary {
+                padding: 16px;
+                font-size: 16px;
+            }
+
+            .pl-faq details p {
+                padding: 0 16px 16px;
+                font-size: 15px;
+            }
         }
     </style>
-    <meta name="google-adsense-account" content="ca-pub-1904736753681797">
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
+    <!-- Site theme (top menu) — keep last so it wins -->
+    <link rel="stylesheet" href="css/site-theme.css">
 </head>
+
 <body>
-    <!-- Header -->
-    <header class="app-header">
-        <nav class="navbar">
-            <div class="navbar-brand">
-                <a href="index.html">
-                    <img src="assets/images/logo-wordmark.png" alt="Unruly Movies" class="logo">
-                </a>
-            </div>
-            <button class="menu d-md-none" id="menuToggle" aria-label="Toggle navigation menu">
-                <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
-                    <rect y="4" width="24" height="2" rx="1"/>
-                    <rect y="11" width="24" height="2" rx="1"/>
-                    <rect y="18" width="24" height="2" rx="1"/>
-                </svg>
-            </button>
-            <ul class="navbar-nav" id="navbarNav">
-                <li class="nav-item"><a class="nav-link" href="index.html">🏠 Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="movies.html">🎬 Movies</a></li>
-                <li class="nav-item"><a class="nav-link" href="series.html">📺 Series</a></li>
-                <li class="nav-item"><a class="nav-link" href="uganda-tv.html">📡 Uganda TV</a></li>
-                <li class="nav-item"><a class="nav-link active" href="subscription.html">💎 Subscribe</a></li>
-            </ul>
-            <div class="app-navbar">
-                <a href="dashboard.html" class="user-icon" title="My Account">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                        <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/>
-                    </svg>
-                </a>
-            </div>
-        </nav>
-    </header>
+    <a class="skip-link" href="#maincontent">Skip to content</a>
 
-    <main class="subscription-page">
-        <!-- Login Prompt -->
-        <div class="login-prompt" id="loginPrompt" style="display: none;">
-            <p>⚠️ Please log in to subscribe</p>
-            <a href="login.html?redirect=subscription.html">Log In</a> or <a href="register.html?redirect=subscription.html">Create Account</a>
-        </div>
+    <div class="container">
+        <div class="app">
+            <!-- Header -->
+            <div class="app-header">
+                <div class="navbar navbar-expand-lg">
+                    <div class="menu" id="menuToggle" role="button" aria-label="Open navigation menu" tabindex="0">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </div>
+                    <div class="app-navbar">
+                        <a href="index.html" class="navbar-brand">
+                            <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
+                        </a>
+                    </div>
+                    <div class="search-btn d-md-none d-block" id="mobileSearchBtn" aria-label="Open search" role="button" tabindex="0">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </div>
 
-        <div id="freePlanBanner" style="display:none;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);border-radius:12px;padding:14px 20px;margin-bottom:20px;text-align:center;color:#fca5a5;">
-            🔒 <strong>Subscription required</strong> — Your free account does not have access to this content. Choose a plan below to continue watching.
-        </div>
+                    <!-- Mobile Search Form -->
+                    <form class="mobile-search-form" id="mobileSearchForm" method="get" action="search.html">
+                        <input type="text" name="q" placeholder="Search movies, VJs..." class="mobile-search-input" id="mobileSearchInput" required>
+                        <button type="submit" class="mobile-search-submit" title="Search" aria-label="Search">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+                        </button>
+                        <button type="button" class="mobile-search-close" id="mobileSearchClose" title="Close search" aria-label="Close search">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </form>
 
-        <div class="subscription-header">
-            <h1>🎬 Premium Access</h1>
-            <p>Watch & download unlimited Luganda VJ translated movies and series. Cancel anytime.</p>
-            <div class="airtel-badge" style="background:rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.3);margin-top:16px;">
-                <div style="background: linear-gradient(135deg, #4ade80, #22c55e); padding: 5px 12px; border-radius: 6px;">
-                    <span style="font-weight: bold; color: #000;">PesaPal</span>
-                </div>
-                <span style="color:#ccc;">MTN &middot; Airtel &middot; Visa &middot; Mastercard</span>
-            </div>
-        </div>
-        
-        <div class="plans-container" style="max-width:600px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-            <div class="plan-card" data-plan="daily" style="--plan-color: #f59e0b;">
-                <div class="plan-icon" style="font-size:36px;">⚡</div>
-                <h3 class="plan-name">Daily</h3>
-                <div class="plan-duration">1 Day Access</div>
-                <div class="plan-price"><span class="currency">UGX</span><span class="amount">1,000</span></div>
-                <ul class="plan-features">
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Stream all movies</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 1 day access</li>
-                </ul>
-                <button class="btn-subscribe" onclick="paymentManager.subscribe('daily')">Pay UGX 1,000</button>
-            </div>
-
-            <div class="plan-card" data-plan="weekly" style="--plan-color: #00D9FF;">
-                <div class="plan-icon" style="font-size:36px;">🎬</div>
-                <h3 class="plan-name">Weekly</h3>
-                <div class="plan-duration">7 Days Access</div>
-                <div class="plan-price"><span class="currency">UGX</span><span class="amount">5,000</span></div>
-                <ul class="plan-features">
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Stream all movies</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 7 days access</li>
-                </ul>
-                <button class="btn-subscribe" onclick="paymentManager.subscribe('weekly')">Pay UGX 5,000</button>
-            </div>
-
-            <div class="plan-card" data-plan="biweekly" style="--plan-color: #a78bfa;">
-                <div class="plan-icon" style="font-size:36px;">🎞️</div>
-                <h3 class="plan-name">2 Weeks</h3>
-                <div class="plan-duration">14 Days Access</div>
-                <div class="plan-price"><span class="currency">UGX</span><span class="amount">7,000</span></div>
-                <ul class="plan-features">
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Stream all movies</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 14 days access</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Save 30% vs weekly</li>
-                </ul>
-                <button class="btn-subscribe" onclick="paymentManager.subscribe('biweekly')">Pay UGX 7,000</button>
-            </div>
-
-            <div class="plan-card popular" data-plan="monthly" style="--plan-color: #4ade80;">
-                <div class="popular-badge">Best Value</div>
-                <div class="plan-icon" style="font-size:36px;">🏆</div>
-                <h3 class="plan-name">Monthly</h3>
-                <div class="plan-duration">30 Days Access</div>
-                <div class="plan-price"><span class="currency">UGX</span><span class="amount">12,000</span></div>
-                <ul class="plan-features">
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Stream all movies</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 30 days access</li>
-                    <li><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Save 57% vs weekly</li>
-                </ul>
-                <button class="btn-subscribe" onclick="paymentManager.subscribe('monthly')">Pay UGX 12,000</button>
-            </div>
-        </div>
-        
-        <!-- Trust Section -->
-        <div class="trust-section">
-            <h3>Why Choose Us?</h3>
-            <div class="trust-badges">
-                <div class="trust-badge">
-                    <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
-                    <span>Secure Payments</span>
-                </div>
-                <div class="trust-badge">
-                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                    <span>Instant Activation</span>
-                </div>
-                <div class="trust-badge">
-                    <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                    <span>24/7 Access</span>
-                </div>
-                <div class="trust-badge">
-                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                    <span>Cancel Anytime</span>
+                    <form class="header-search input-group d-md-block d-none" method="get" action="search.html">
+                        <div class="typeahead__container app-search">
+                            <div class="typeahead__field">
+                                <div class="typeahead__query">
+                                    <label for="search-input" class="btn px-0 mb-0" aria-label="Search">
+                                        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <path d="m21 21-4.35-4.35"></path>
+                                        </svg>
+                                    </label>
+                                    <input class="video-search form-control" name="q" type="text" id="search-input" placeholder="Search Luganda movies, VJs..." autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </div>
-    </main>
 
-    <!-- Footer -->
-    <footer style="background:linear-gradient(180deg,#0d0d0d 0%,#000 100%);border-top:1px solid #1a1a1a;margin-top:40px;padding:40px 20px 24px;">
-        <div style="max-width:1000px;margin:0 auto;">
-            <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:30px;margin-bottom:30px;">
-                <div>
-                    <img src="assets/images/logo-wordmark.png" alt="Unruly Movies" style="height:36px;margin-bottom:12px;">
-                    <p style="color:#888;font-size:13px;line-height:1.7;">Uganda's #1 platform for Luganda VJ translated movies and series. Watch online or download for offline viewing.</p>
-                    <p style="color:#555;font-size:12px;margin-top:10px;">📧 support@unrulymovies.com</p>
+            <div class="app-wrapper">
+                <!-- Sidebar -->
+                <div class="app-aside nav-aside" id="aside">
+                    <button class="modal-close" data-dismiss="modal" aria-label="Close menu" title="Close menu">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+
+                    <div class="drawer-logo">
+                        <span class="drawer-logo-text">Unruly Movies</span>
+                    </div>
+
+                    <!-- Profile Card -->
+                    <a href="login.html" class="drawer-profile" id="drawerProfile">
+                        <div class="dp-circle">
+                            <img src="" alt="" class="d-none" id="drawerProfileAvatar">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="drawerProfileIcon">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <div class="dp-info">
+                            <h4 id="drawerProfileName">Sign In</h4>
+                            <p id="drawerProfileSub">Tap to access your account</p>
+                        </div>
+                        <svg class="dp-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </a>
+
+                    <ul class="nav">
+                        <li>
+                            <a href="index.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                </svg>
+                                Home
+                            </a>
+                        </li>
+                        <li>
+                            <a href="movies.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                                    <line x1="7" y1="2" x2="7" y2="22"></line>
+                                    <line x1="17" y1="2" x2="17" y2="22"></line>
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                    <line x1="2" y1="7" x2="7" y2="7"></line>
+                                    <line x1="2" y1="17" x2="7" y2="17"></line>
+                                    <line x1="17" y1="17" x2="22" y2="17"></line>
+                                    <line x1="17" y1="7" x2="22" y2="7"></line>
+                                </svg>
+                                Movies
+                            </a>
+                        </li>
+                        <li>
+                            <a href="vjs.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                                VJ Translators
+                            </a>
+                        </li>
+                        <li>
+                            <a href="uganda-tv.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                    <line x1="12" y1="7" x2="12" y2="22"></line>
+                                </svg>
+                                Uganda TV
+                            </a>
+                        </li>
+                    </ul>
                 </div>
-                <div>
-                    <h4 style="color:#fff;font-size:14px;font-weight:600;margin-bottom:14px;">Quick Links</h4>
-                    <div style="display:flex;flex-direction:column;gap:8px;">
-                        <a href="index.html" style="color:#888;font-size:13px;">🏠 Home</a>
-                        <a href="movies.html" style="color:#888;font-size:13px;">🎬 Movies</a>
-                        <a href="series.html" style="color:#888;font-size:13px;">📺 Series</a>
-                        <a href="vjs.html" style="color:#888;font-size:13px;">🎙️ VJ Profiles</a>
-                        <a href="uganda-tv.html" style="color:#888;font-size:13px;">📡 Uganda TV</a>
+
+                <!-- Main Content -->
+                <div class="app-container flex-fill">
+                    <div class="container">
+                        <div class="app-content pt-md-3">
+                            <main id="maincontent" class="pl-page">
+                                <div class="pl-hero">
+                                    <p class="pl-kicker">Find your perfect plan.</p>
+                                    <h1 class="pl-title">Upgrade your account</h1>
+
+                                    <!-- The movie or series the visitor came from -->
+                                    <div class="pl-context" id="plContext" hidden>
+                                        <img id="plContextPoster" src="assets/images/placeholder.svg" alt="" hidden>
+                                        <p id="plContextText"></p>
+                                    </div>
+
+                                    <!-- Not signed in -->
+                                    <div class="pl-signin" id="plSignin" hidden>
+                                        <span>Sign in or create an account to choose a plan.</span>
+                                        <a class="is-primary" id="plLogin" href="login.html">Sign in</a>
+                                        <a class="is-secondary" id="plRegister" href="register.html">Create an account</a>
+                                    </div>
+                                </div>
+
+                                <!-- Plans -->
+                                <div class="pl-cards">
+                                    <article class="pl-card" data-plan-card="daily">
+                                        <h2 class="pl-name">Daily</h2>
+                                        <p class="pl-price"><small>UGX</small> 1,000</p>
+                                        <p class="pl-per">per day</p>
+                                        <ul class="pl-perks">
+                                            <li class="yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Watch every movie and series</li>
+                                            <li class="yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Download to watch offline</li>
+                                            <li class="yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>1 device at a time</li>
+                                        </ul>
+                                        <button type="button" class="pl-choose" data-plan="daily">Choose Daily</button>
+                                    </article>
+
+                                    <article class="pl-card" data-plan-card="weekly">
+                                        <h2 class="pl-name">Weekly</h2>
+                                        <p class="pl-price"><small>UGX</small> 5,000</p>
+                                        <p class="pl-per">per week</p>
+                                        <ul class="pl-perks">
+                                            <li class="yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Watch every movie and series</li>
+                                            <li class="yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Download to watch offline</li>
+                                            <li class="yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>No device limit</li>
+                                        </ul>
+                                        <button type="button" class="pl-choose" data-plan="weekly">Choose Weekly</button>
+                                    </article>
+
+                                    <article class="pl-card" data-plan-card="biweekly">
+                                        <h2 class="pl-name">2 Weeks</h2>
+                                        <p class="pl-price"><small>UGX</small> 7,000</p>
+                                        <p class="pl-per">per 2 weeks</p>
+                                        <ul class="pl-perks">
+                                            <li class="yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Watch every movie and series</li>
+                                            <li class="yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Download to watch offline</li>
+                                            <li class="yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>No ads</li>
+                                            <li class="yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>No device limit</li>
+                                        </ul>
+                                        <button type="button" class="pl-choose" data-plan="biweekly">Choose 2 Weeks</button>
+                                    </article>
+
+                                    <article class="pl-card is-best" data-plan-card="monthly">
+                                        <span class="pl-best">Best value</span>
+                                        <h2 class="pl-name">Monthly</h2>
+                                        <p class="pl-price"><small>UGX</small> 12,000</p>
+                                        <p class="pl-per">per month</p>
+                                        <ul class="pl-perks">
+                                            <li class="yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Watch every movie and series</li>
+                                            <li class="yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Download to watch offline</li>
+                                            <li class="yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>No ads</li>
+                                            <li class="yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>No device limit</li>
+                                        </ul>
+                                        <button type="button" class="pl-choose" data-plan="monthly">Choose Monthly</button>
+                                    </article>
+                                </div>
+                                <p class="pl-pay-note">Pay securely with Pesapal: MTN Mobile Money, Airtel Money, Visa or Mastercard.</p>
+
+                                <!-- Questions and answers -->
+                                <section class="pl-faq" aria-labelledby="plFaqTitle">
+                                    <h2 class="pl-faq-title" id="plFaqTitle">Frequently asked questions</h2>
+                                    <p class="pl-faq-sub">Everything you need to know before you pay.</p>
+
+                                    <details>
+                                        <summary>Can I pay with mobile money?</summary>
+                                        <p>Yes. Payments go through Pesapal, which takes MTN Mobile Money, Airtel Money, Visa and Mastercard.</p>
+                                    </details>
+                                    <details>
+                                        <summary>How do I subscribe?</summary>
+                                        <p>Sign in, choose a plan above and pay in the Pesapal window that opens. Your plan starts as soon as the payment is confirmed.</p>
+                                    </details>
+                                    <details>
+                                        <summary>What do I get with a plan?</summary>
+                                        <p>Every movie and series translated into Luganda, for as long as your plan lasts, and you can download on every plan. 2 Weeks and Monthly have no ads. Daily works on 1 device at a time; every other plan has no device limit.</p>
+                                    </details>
+                                    <details>
+                                        <summary>Can I download movies?</summary>
+                                        <p>Yes, on every plan, Daily included.</p>
+                                    </details>
+                                    <details>
+                                        <summary>How many devices can I use?</summary>
+                                        <p>On the Daily plan, 1 device at a time (a phone, a computer or a TV), with as many tabs as you like on it. Weekly, 2 Weeks and Monthly have no device limit.</p>
+                                    </details>
+                                    <details>
+                                        <summary>Does my plan renew by itself?</summary>
+                                        <p>No. Each plan is a single payment. When its days are up, choose another plan to keep watching.</p>
+                                    </details>
+                                    <details>
+                                        <summary>Can I change my plan at any time?</summary>
+                                        <p>Yes. A new plan starts straight away and replaces the one you have, so any days left on your old plan are not added on. It's best to switch when your current plan ends.</p>
+                                    </details>
+                                    <details>
+                                        <summary>I paid but I still can't watch. What should I do?</summary>
+                                        <p>Give Pesapal a minute to confirm the payment, then refresh the page. If it still doesn't work, message us on <a href="https://wa.me/256743311809" target="_blank" rel="noopener">WhatsApp (+256 743 311 809)</a> or email <a href="mailto:nduggahafizu@gmail.com">nduggahafizu@gmail.com</a> with your payment reference.</p>
+                                    </details>
+                                </section>
+                            </main>
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <h4 style="color:#fff;font-size:14px;font-weight:600;margin-bottom:14px;">Legal</h4>
-                    <div style="display:flex;flex-direction:column;gap:8px;">
-                        <a href="privacy-policy.html" style="color:#888;font-size:13px;">Privacy Policy</a>
-                        <a href="terms.html" style="color:#888;font-size:13px;">Terms of Service</a>
-                        <a href="dmca.html" style="color:#888;font-size:13px;">DMCA</a>
-                        <a href="contact.html" style="color:#888;font-size:13px;">Contact Us</a>
+            </div>
+
+            <!-- Professional Footer -->
+            <footer class="site-footer">
+                <div class="footer-main">
+                    <div class="footer-grid">
+                        <div class="footer-brand">
+                            <a href="index.html" class="footer-logo">
+                                <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
+                            </a>
+                            <p class="footer-tagline">Uganda's premier platform for Luganda VJ translated movies.</p>
+                            <div class="footer-social">
+                                <a href="mailto:nduggahafizu@gmail.com" aria-label="Email support" class="social-link">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                </a>
+                                <a href="https://wa.me/256743311809" target="_blank" rel="noopener" aria-label="WhatsApp support" class="social-link">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                                </a>
+                                <a href="faq.html" aria-label="Read the FAQ" class="social-link">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                </a>
+                            </div>
+                            <a href="https://play.google.com/store/apps/details?id=com.unruly.pix" target="_blank" class="footer-playstore" aria-label="Get it on Google Play">
+                                <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" width="135" height="40" loading="lazy">
+                            </a>
+                        </div>
+                        <div class="footer-links">
+                            <h4>Quick Links</h4>
+                            <ul>
+                                <li><a href="index.html">Home</a></li>
+                                <li><a href="movies.html">Browse Movies</a></li>
+                                <li><a href="vjs.html">VJ Translators</a></li>
+                                <li><a href="genres.html">Genres</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-links">
+                            <h4>Legal</h4>
+                            <ul>
+                                <li><a href="terms.html">Terms of Service</a></li>
+                                <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                                <li><a href="dmca.html">DMCA Policy</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-links">
+                            <h4>Company</h4>
+                            <ul>
+                                <li><a href="about.html">About Us</a></li>
+                                <li><a href="editorial-standards.html">Editorial Standards</a></li>
+                                <li><a href="contact.html">Contact</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div style="border-top:1px solid #1a1a1a;padding-top:20px;text-align:center;">
-                <p style="color:#555;font-size:12px;">&copy; 2026 Unruly Movies. All rights reserved. | Payments secured by <strong style="color:#888;">PesaPal</strong></p>
-            </div>
+                <div class="footer-bottom">
+                    <p>Copyright © 2026 Unruly Movies</p>
+                </div>
+            </footer>
         </div>
-    </footer>
+    </div>
 
-    <!-- Scripts -->
     <script>
-        // Mobile navbar toggle for this page (subscription.html uses navbarNav, not the app sidebar)
-        (function() {
-            const menuToggle = document.getElementById('menuToggle');
-            const navbarNav = document.getElementById('navbarNav');
-            if (!menuToggle || !navbarNav) return;
+        (function () {
+            'use strict';
+            const params = new URLSearchParams(window.location.search);
+            const token = (localStorage.getItem('token') || localStorage.getItem('authToken') ||
+                sessionStorage.getItem('token') || sessionStorage.getItem('authToken') || '').trim();
+            const reason = params.get('reason') || '';
+            const forDownload = reason === 'download' || reason === 'upgrade';
 
-            const toggleMenu = () => navbarNav.classList.toggle('open');
-
-            menuToggle.addEventListener('click', toggleMenu);
-            menuToggle.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    toggleMenu();
+            // Where to go after paying: only a page on this site
+            function safeReturn(value) {
+                if (!value) return '';
+                try {
+                    const u = new URL(value, window.location.origin);
+                    return u.origin === window.location.origin ? u.pathname + u.search : '';
+                } catch (e) {
+                    return '';
                 }
+            }
+            const back = safeReturn(params.get('return'));
+            if (back) {
+                try { localStorage.setItem('unrulyReturnAfterPayment', back); } catch (e) { /* private mode */ }
+            }
+
+            // Sign in first, then come back here (with the same movie)
+            function signInUrl(page) {
+                return page + '?redirect=' + encodeURIComponent(window.location.href);
+            }
+            function goSignIn() {
+                try { localStorage.setItem('redirectAfterLogin', window.location.href); } catch (e) { /* private mode */ }
+                window.location.href = signInUrl('login.html');
+            }
+            if (!token) {
+                document.getElementById('plSignin').hidden = false;
+                document.getElementById('plLogin').href = signInUrl('login.html');
+                document.getElementById('plRegister').href = signInUrl('register.html');
+                ['plLogin', 'plRegister'].forEach(id => document.getElementById(id).addEventListener('click', () => {
+                    try { localStorage.setItem('redirectAfterLogin', window.location.href); } catch (e) { /* private mode */ }
+                }));
+            }
+
+
+            // "To watch <title>, choose a plan below."
+            const context = document.getElementById('plContext');
+            const contextText = document.getElementById('plContextText');
+            const contextPoster = document.getElementById('plContextPoster');
+            function showContext(title, poster) {
+                const strong = document.createElement('strong');
+                strong.textContent = title;
+                contextText.textContent = '';
+                if (forDownload) {
+                    contextText.append('To download ', strong, ', choose a plan below.');
+                } else {
+                    contextText.append('To watch ', strong, ', choose a plan below.');
+                }
+                if (back) {
+                    const link = document.createElement('a');
+                    link.href = back;
+                    link.textContent = 'Back to ' + title;
+                    contextText.append(' ', link);
+                }
+                if (poster) {
+                    contextPoster.src = poster;
+                    contextPoster.hidden = false;
+                }
+                context.hidden = false;
+            }
+
+            const movieId = params.get('movie');
+            const seriesId = params.get('series');
+            const base = (window.API_CONFIG && API_CONFIG.BASE_URL) || '';
+            if (movieId || seriesId) {
+                const url = movieId
+                    ? `${base}/api/luganda-movies/${encodeURIComponent(movieId)}`
+                    : `${base}/api/series/${encodeURIComponent(seriesId)}`;
+                fetch(url).then(r => r.json()).then(d => {
+                    const item = d && (d.data || d.movie);
+                    if (!item) return;
+                    const title = item.originalTitle || item.lugandaTitle || item.title;
+                    if (title) showContext(title, item.poster);
+                }).catch(() => { /* the plans still work without it */ });
+            } else if (reason === 'free_plan') {
+                contextText.textContent = 'Your free account can’t watch this yet. Choose a plan below.';
+                context.hidden = false;
+            }
+
+            // Choosing a plan
+            document.querySelectorAll('[data-plan]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (!token) { goSignIn(); return; }
+                    paymentManager.subscribe(btn.getAttribute('data-plan'));
+                });
             });
 
-            navbarNav.addEventListener('click', (e) => {
-                const link = e.target?.closest('a');
-                if (link) navbarNav.classList.remove('open');
-            });
-
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') navbarNav.classList.remove('open');
+            // Paid in the Pesapal window: go back to the movie
+            window.addEventListener('pesapal-payment-success', () => {
+                if (!back) return;
+                try { localStorage.removeItem('unrulyReturnAfterPayment'); } catch (e) { /* private mode */ }
+                setTimeout(() => { window.location.href = back; }, 900);
             });
         })();
-
-        // Check login status
-        document.addEventListener('DOMContentLoaded', function() {
-            const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-            if (!token) {
-                document.getElementById('loginPrompt').style.display = 'block';
-            }
-            // Show banner if redirected due to free plan
-            const reason = new URLSearchParams(window.location.search).get('reason');
-            if (reason === 'free_plan') {
-                document.getElementById('freePlanBanner').style.display = 'block';
-            }
-        });
-        
-        // Add spin animation for loading buttons
-        const style = document.createElement('style');
-        style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
-        document.head.appendChild(style);
     </script>
+    <script defer src="js/app-shell.js"></script>
+    <script defer src="js/site-theme.js"></script>
 </body>
 </html>

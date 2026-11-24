@@ -46,7 +46,7 @@ const FeaturedCarousel = {
                 <div class="carousel-overlay">
                     <div class="carousel-content">
                         <div class="carousel-badge">
-                            <span class="badge-icon">🔥</span>
+                            
                             <span>Featured</span>
                         </div>
                         <h2 class="carousel-title">${this.slides[0]?.title || ''}</h2>

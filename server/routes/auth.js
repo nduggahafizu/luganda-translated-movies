@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 const authController = require('../controllers/authController');
 const googleAuthController = require('../controllers/googleAuthController');
 const { protect } = require('../middleware/auth');
@@ -33,6 +34,13 @@ router.post('/logout', protect, async (req, res) => {
             'logout',
             req.deviceInfo
         );
+
+        // This device no longer holds a place on the plan, so signing in on
+        // another device afterwards doesn't ask to log this one out
+        if (req.deviceId && req.user.activeDevices.some(d => d.deviceId === req.deviceId)) {
+            req.user.activeDevices = req.user.activeDevices.filter(d => d.deviceId !== req.deviceId);
+            await req.user.save({ validateBeforeSave: false });
+        }
 
         res.json({
             status: 'success',
@@ -84,17 +92,25 @@ router.post('/logout-all', protect, async (req, res) => {
     }
 });
 
+const deviceIdFor = require('../utils/deviceId');
+
+// Device limit for API replies: a number, or null when there is no limit
+// (every plan except Daily — see PLAN_CONFIG in models/User.js)
+function deviceLimitForApi(max) {
+    return Number.isFinite(max) ? max : null;
+}
+
 // Get active sessions/devices
 router.get('/sessions', protect, async (req, res) => {
     try {
-        const user = await User.findById(req.user._id).select('activeDevices lastLogin role');
+        const user = await User.findById(req.user._id).select('activeDevices lastLogin role subscription trialEndsAt');
 
         res.json({
             status: 'success',
             data: {
                 devices: user.activeDevices || [],
                 lastLogin: user.lastLogin,
-                maxDevices: (user.role === 'admin') ? 10 : 1
+                maxDevices: deviceLimitForApi(user.getMaxDevices())
             }
         });
     } catch (error) {
@@ -120,49 +136,60 @@ router.get('/check-admin', protect, (req, res) => {
 });
 
 const { enforceDeviceLimit } = require('../middleware/auth');
+const { otherDeviceInfo } = require('../utils/deviceLimit');
 
-// Check device status — tells frontend if another device needs to be logged out
+// Checked right after signing in (js/auth.js). A Daily plan (1 device) that is
+// signed in on another device answers 'device_limit', and the site asks
+// "Log out your other device?": Yes = POST /device-switch, No = this new
+// sign-in is cancelled (POST /logout). protect has already tried to register
+// this device; req.deviceLimitExceeded means the other device holds the plan.
 router.get('/device-check', protect, async (req, res) => {
     const user = req.user;
     const maxDevices = user.getMaxDevices();
 
-    // Clean stale devices (>24h)
-    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    user.activeDevices = user.activeDevices.filter(d => d.lastActive > cutoff);
-    await user.save({ validateBeforeSave: false });
-
-    if (user.activeDevices.length > maxDevices) {
-        const devices = user.activeDevices.map(d => {
-            const browser = (d.userAgent || '').match(/(Chrome|Firefox|Safari|Edge|Opera|Mobile)/i)?.[1] || 'Browser';
-            const os = (d.userAgent || '').match(/(Windows|Mac|Linux|Android|iPhone|iPad)/i)?.[1] || 'Unknown';
-            return { deviceId: d.deviceId, label: `${browser} on ${os}`, ip: d.ip, lastActive: d.lastActive };
-        });
+    if (req.deviceLimitExceeded) {
         return res.json({
             status: 'device_limit',
-            message: `Your account is active on ${user.activeDevices.length} devices. Maximum is ${maxDevices}.`,
-            maxDevices,
-            devices
+            message: `The ${user.subscription?.plan === 'daily' ? 'Daily ' : ''}plan plays on ${maxDevices} device at a time, and your account is signed in on another device.`,
+            maxDevices: deviceLimitForApi(maxDevices),
+            otherDevice: otherDeviceInfo(user)
         });
     }
 
-    res.json({ status: 'ok', activeDevices: user.activeDevices.length, maxDevices });
+    res.json({
+        status: 'ok',
+        activeDevices: user.activeDevices.length,
+        maxDevices: deviceLimitForApi(maxDevices)
+    });
 });
 
-// Force switch — logout all other devices and register current one
+// "Yes, log out the other device": this device keeps the plan and every other
+// device is signed out (their tokens stop working, refresh tokens included).
+// Returns a fresh token for this device, which the site stores in place of
+// the old one.
 router.post('/device-switch', protect, async (req, res) => {
     try {
-        const crypto = require('crypto');
         const ua = req.headers['user-agent'] || '';
         const ip = req.ip || req.headers['x-forwarded-for'] || '';
-        const deviceId = crypto.createHash('md5').update(ua + ip).digest('hex');
+        const deviceId = deviceIdFor(req);
 
         const user = req.user;
+        // Whole seconds, like a token's issue time, so the new token below
+        // (issued now or later) passes protect's lastSecurityUpdate check and
+        // every token issued before this moment doesn't
+        user.lastSecurityUpdate = new Date(Math.floor(Date.now() / 1000) * 1000);
         user.activeDevices = [{ deviceId, userAgent: ua, ip, lastActive: new Date() }];
         await user.save({ validateBeforeSave: false });
 
-        res.json({ status: 'success', message: 'Switched to this device', activeDevices: 1 });
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+        res.json({
+            status: 'success',
+            message: 'Your other device was signed out',
+            activeDevices: 1,
+            data: { token }
+        });
     } catch (e) {
-        res.status(500).json({ status: 'error', message: e.message });
+        res.status(500).json({ status: 'error', message: 'Could not switch devices. Please try again.' });
     }
 });
 
@@ -182,10 +209,7 @@ router.delete('/devices/:deviceId', protect, async (req, res) => {
 // Remove all devices except current
 router.delete('/devices', protect, async (req, res) => {
     try {
-        const crypto = require('crypto');
-        const ua = req.headers['user-agent'] || '';
-        const ip = req.ip || req.headers['x-forwarded-for'] || '';
-        const currentDeviceId = crypto.createHash('md5').update(ua + ip).digest('hex');
+        const currentDeviceId = deviceIdFor(req);
 
         const user = req.user;
         user.activeDevices = user.activeDevices.filter(d => d.deviceId === currentDeviceId);
@@ -213,8 +237,13 @@ router.get('/check-access', protect, enforceDeviceLimit, (req, res) => {
             showAds: user.shouldSeeAds(),
             freeUser: plan === 'free',
             endDate: user.subscription.endDate,
-            maxDevices: user.getMaxDevices(),
-            activeDevices: user.activeDevices.length
+            maxDevices: deviceLimitForApi(user.getMaxDevices()),
+            activeDevices: user.activeDevices.length,
+            // Daily (1 device): true when the plan is in use on another
+            // device. The players ask "Watch on this device?" and, while a
+            // video plays, check this every few minutes so only one plays.
+            deviceLimitReached: !!req.deviceLimitExceeded,
+            otherDevice: req.deviceLimitExceeded ? otherDeviceInfo(user) : null
         }
     });
 });

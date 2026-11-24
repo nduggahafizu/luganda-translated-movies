@@ -62,20 +62,21 @@
             padding: 20px 0;
         }
         .genre-card {
-            background: linear-gradient(145deg, #1a1a2e, #16213e);
-            border-radius: 16px;
-            padding: 30px 20px;
+            background: #111513;
+            border-radius: 14px;
+            padding: 28px 18px;
             text-align: center;
-            transition: transform 0.3s, box-shadow 0.3s;
-            border: 1px solid rgba(74, 222, 128, 0.1);
+            transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.08);
             cursor: pointer;
             text-decoration: none;
             display: block;
         }
-        .genre-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(74, 222, 128, 0.2);
-            border-color: rgba(74, 222, 128, 0.4);
+        .genre-card:hover,
+        .genre-card:focus-visible {
+            transform: translateY(-4px);
+            border-color: var(--st-green, #22c55e);
+            background: #15201a;
         }
         .genre-icon {
             display: flex;
@@ -123,100 +124,65 @@
         .genre-movies-section.active {
             display: block;
         }
-        .section-header {
+        /* "Action movies" heading with the green line, like the players */
+        .gx-head {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
-        }
-        .section-title {
-            font-size: 1.8rem;
+            gap: 12px;
+            margin: 0 0 16px;
             color: #fff;
+            font-size: 1.7rem;
+            font-weight: 800;
+            text-transform: capitalize;
         }
-        .back-btn {
-            padding: 10px 24px;
-            background: transparent;
-            border: 2px solid #4ade80;
-            color: #4ade80;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        .back-btn:hover {
-            background: #4ade80;
-            color: #1a1a2e;
-        }
-        .movies-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 20px;
-        }
-        .movie-card {
-            background: #1a1a2e;
-            border-radius: 12px;
-            overflow: hidden;
-            transition: transform 0.3s;
-        }
-        .movie-card:hover {
-            transform: translateY(-8px);
-        }
-        .movie-poster {
-            aspect-ratio: 2/3;
-            background-size: cover;
-            background-position: center;
-            position: relative;
-        }
-        .movie-poster::before {
+        .gx-head::before {
             content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            flex: 0 0 auto;
+            width: 28px;
+            height: 4px;
+            border-radius: 2px;
+            background: var(--st-green, #22c55e);
         }
-        .movie-quality {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: #4ade80;
-            color: #1a1a2e;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-        .movie-rating {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.7);
-            color: #4ade80;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-        .movie-info {
-            padding: 12px;
-        }
-        .movie-title {
-            color: #fff;
+        .gx-count {
+            margin-left: auto;
+            color: rgba(255, 255, 255, 0.55);
             font-size: 0.95rem;
             font-weight: 600;
-            margin-bottom: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            text-transform: none;
         }
-        .movie-vj {
-            display: inline-flex;
-            align-items: center;
-            color: #4ade80;
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding: 2px 8px;
-            background: linear-gradient(135deg, rgba(74, 222, 128, 0.16), rgba(0, 217, 255, 0.08));
-            border: 1px solid rgba(74, 222, 128, 0.25);
+        /* Genre buttons to switch quickly */
+        .gx-pills {
+            display: flex;
+            gap: 8px;
+            margin: 0 0 22px;
+            padding-bottom: 6px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .gx-pills::-webkit-scrollbar { display: none; }
+        .gx-pill {
+            flex: 0 0 auto;
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
             border-radius: 999px;
+            background: transparent;
+            color: #fff;
+            font: 600 14px 'Inter', sans-serif;
+            text-transform: capitalize;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.15s ease, border-color 0.15s ease;
+        }
+        .gx-pill:hover,
+        .gx-pill:focus-visible { border-color: #fff; }
+        .gx-pill.is-active {
+            border-color: var(--st-green, #22c55e);
+            background: var(--st-green, #22c55e);
+            color: #fff;
+        }
+        #genreMoviesGrid.card-grid { padding: 0; }
+        @media (max-width: 767px) {
+            .gx-head { font-size: 1.35rem; }
         }
         .loading-spinner {
             text-align: center;
@@ -228,6 +194,8 @@
     <meta name="google-adsense-account" content="ca-pub-1904736753681797">
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
+    <!-- Site theme (top menu, big poster rows) — keep last so it wins -->
+    <link rel="stylesheet" href="css/site-theme.css">
 </head>
 <body>
     <div class="container">
@@ -399,53 +367,6 @@
                     <p class="page-hero-subtitle">Browse movies by your favorite category</p>
                 </div>
 
-                <!-- Genre descriptions — always visible, crawlable editorial content -->
-                <div class="genre-descriptions" style="max-width:900px;margin:0 auto 36px;padding:0 4px;">
-                    <p style="font-size:15px;line-height:1.8;color:rgba(255,255,255,0.65);margin-bottom:24px;">Every movie in the Unruly Movies catalog is tagged by genre so you can find the right type of film for your mood. All titles are narrated in Luganda by Uganda's licensed Video Jockeys — click a genre below to browse its full catalog.</p>
-                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:32px;">
-                        <a href="genres.html?genre=action" style="display:block;padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;color:inherit;">
-                            <div style="margin-bottom:8px;color:var(--primary-color,#4ade80);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></div>
-                            <strong style="color:var(--primary-color,#4ade80);font-size:16px;">Action</strong>
-                            <p style="font-size:13px;color:rgba(255,255,255,0.55);margin:6px 0 0;line-height:1.5;">Fight sequences, car chases, and high-stakes confrontations narrated with the energy and pace that Ugandan action fans expect from Uganda's top VJs.</p>
-                        </a>
-                        <a href="genres.html?genre=comedy" style="display:block;padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;color:inherit;">
-                            <div style="margin-bottom:8px;color:var(--primary-color,#4ade80);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M8 13c0 2 2 4 4 4s4-2 4-4"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg></div>
-                            <strong style="color:var(--primary-color,#4ade80);font-size:16px;">Comedy</strong>
-                            <p style="font-size:13px;color:rgba(255,255,255,0.55);margin:6px 0 0;line-height:1.5;">The hardest genre to translate — and the most rewarding when a VJ gets it right. Ugandan humour woven into international comedies by translators who understand both worlds.</p>
-                        </a>
-                        <a href="genres.html?genre=drama" style="display:block;padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;color:inherit;">
-                            <div style="margin-bottom:8px;color:var(--primary-color,#4ade80);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M8 15c0-1 2-2 4-2s4 1 4 2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg></div>
-                            <strong style="color:var(--primary-color,#4ade80);font-size:16px;">Drama</strong>
-                            <p style="font-size:13px;color:rgba(255,255,255,0.55);margin:6px 0 0;line-height:1.5;">Character-driven stories where emotional depth is everything. VJs like Emmy excel at bringing the full weight of dramatic performances into Luganda without losing a note of feeling.</p>
-                        </a>
-                        <a href="genres.html?genre=thriller" style="display:block;padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;color:inherit;">
-                            <div style="margin-bottom:8px;color:var(--primary-color,#4ade80);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2 12 7 12 9 18 15 6 17 12 22 12"></polyline></svg></div>
-                            <strong style="color:var(--primary-color,#4ade80);font-size:16px;">Thriller</strong>
-                            <p style="font-size:13px;color:rgba(255,255,255,0.55);margin:6px 0 0;line-height:1.5;">Suspense films where pacing and atmosphere define the experience. VJ Ice P's measured Luganda delivery is widely considered the best match for the thriller genre.</p>
-                        </a>
-                        <a href="genres.html?genre=romance" style="display:block;padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;color:inherit;">
-                            <div style="margin-bottom:8px;color:var(--primary-color,#4ade80);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"></path></svg></div>
-                            <strong style="color:var(--primary-color,#4ade80);font-size:16px;">Romance</strong>
-                            <p style="font-size:13px;color:rgba(255,255,255,0.55);margin:6px 0 0;line-height:1.5;">Love stories that work across cultures. Luganda romance narration softens the distance between international filmmaking and East African audiences in a way subtitles never achieve.</p>
-                        </a>
-                        <a href="genres.html?genre=horror" style="display:block;padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;color:inherit;">
-                            <div style="margin-bottom:8px;color:var(--primary-color,#4ade80);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></div>
-                            <strong style="color:var(--primary-color,#4ade80);font-size:16px;">Horror</strong>
-                            <p style="font-size:13px;color:rgba(255,255,255,0.55);margin:6px 0 0;line-height:1.5;">Fear in any language. Horror films translated to Luganda hit differently — the VJ's voice in the quiet moments before a scare is part of what makes them work so well on Ugandan audiences.</p>
-                        </a>
-                        <a href="genres.html?genre=sci-fi" style="display:block;padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;color:inherit;">
-                            <div style="margin-bottom:8px;color:var(--primary-color,#4ade80);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg></div>
-                            <strong style="color:var(--primary-color,#4ade80);font-size:16px;">Sci-Fi</strong>
-                            <p style="font-size:13px;color:rgba(255,255,255,0.55);margin:6px 0 0;line-height:1.5;">Science fiction titles that reach Ugandan audiences in Luganda for the first time. Space operas, dystopian futures, and speculative thrillers narrated by VJs who make the extraordinary feel immediate.</p>
-                        </a>
-                        <a href="genres.html?genre=adventure" style="display:block;padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;color:inherit;">
-                            <div style="margin-bottom:8px;color:var(--primary-color,#4ade80);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg></div>
-                            <strong style="color:var(--primary-color,#4ade80);font-size:16px;">Adventure</strong>
-                            <p style="font-size:13px;color:rgba(255,255,255,0.55);margin:6px 0 0;line-height:1.5;">Epic journeys and high-stakes exploration. Adventure films in Luganda let Ugandan audiences experience the world's greatest stories in the language they know best.</p>
-                        </a>
-                    </div>
-                </div>
-                
                 <div id="genresGrid" class="genres-grid">
                     <div class="genre-card skeleton" style="height:110px;"></div>
                     <div class="genre-card skeleton" style="height:110px;"></div>
@@ -459,17 +380,17 @@
 
             <!-- Genre Movies Section (Hidden by default) -->
             <section id="genreMoviesSection" class="genre-movies-section">
-                <div class="section-header">
-                    <h2 class="section-title"><span id="selectedGenreName">Action</span> Movies</h2>
-                    <button class="back-btn" onclick="showAllGenres()">← All Genres</button>
-                </div>
-                <div id="genreMoviesGrid" class="movies-grid">
+                <h1 class="gx-head"><span><span id="selectedGenreName">Action</span> movies</span><span class="gx-count" id="genreCount"></span></h1>
+                <nav class="gx-pills" id="genrePills" aria-label="Genres"></nav>
+                <div id="genreMoviesGrid" class="card-grid">
                     <div class="content-card"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-meta"></div></div>
                     <div class="content-card"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-meta"></div></div>
                     <div class="content-card"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-meta"></div></div>
                     <div class="content-card"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-meta"></div></div>
                     <div class="content-card"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-meta"></div></div>
                 </div>
+                <!-- More movies load automatically when this comes into view -->
+                <div class="st-load-more" id="loadMore" aria-live="polite"></div>
             </section>
 
                         </div>
@@ -487,13 +408,13 @@
                                 <p class="footer-tagline">Uganda's premier platform for Luganda VJ translated movies.</p>
                                 <div class="footer-social">
                                     <a href="mailto:nduggahafizu@gmail.com" aria-label="Email support" class="social-link">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                                     </a>
-                                    <a href="https://wa.me/256743311809" aria-label="WhatsApp support" class="social-link">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                                    <a href="https://wa.me/256743311809" target="_blank" rel="noopener" aria-label="WhatsApp support" class="social-link">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
                                     </a>
                                     <a href="faq.html" aria-label="Read the FAQ" class="social-link">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                                     </a>
                                 </div>
                                 <a href="https://play.google.com/store/apps/details?id=com.unruly.pix" target="_blank" class="footer-playstore" aria-label="Get it on Google Play">
@@ -546,6 +467,7 @@
     <script src="js/header-search.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/infinite-scroll.js"></script>
     <script>
         // Genre icons — inline SVG (stroke style, matches the rest of the
         // site's icon set) rather than emoji, so this grid reads as one
@@ -617,34 +539,100 @@
             }
         }
 
+        let allGenres = [];
+
+        // The genre buttons above a genre's movies ("All genres" first)
+        function renderGenrePills(active) {
+            const pills = document.getElementById('genrePills');
+            if (!pills) return;
+            const current = (active || '').toLowerCase();
+            pills.innerHTML = `<button type="button" class="gx-pill" onclick="showAllGenres()">All genres</button>` +
+                allGenres.map(g => {
+                    const isActive = g.toLowerCase() === current;
+                    return `<button type="button" class="gx-pill${isActive ? ' is-active' : ''}"${isActive ? ' aria-current="true"' : ''} data-genre="${escapeHtml(g)}">${escapeHtml(g)}</button>`;
+                }).join('');
+            const activePill = pills.querySelector('.is-active');
+            if (activePill) pills.scrollLeft = activePill.offsetLeft - pills.clientWidth / 2 + activePill.offsetWidth / 2;
+        }
+
+        document.addEventListener('click', (e) => {
+            const pick = e.target.closest('.gx-pill[data-genre], .genre-card[data-genre]');
+            if (!pick || e.ctrlKey || e.metaKey || e.shiftKey) return;
+            e.preventDefault();
+            showGenreMovies(pick.getAttribute('data-genre'));
+        });
+
+        function escapeHtml(value) {
+            return String(value == null ? '' : value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
         function renderGenres(genres) {
+            allGenres = genres.slice();
             const genresGrid = document.getElementById('genresGrid');
             
             genresGrid.innerHTML = genres.map(genre => {
                 return `
-                    <a href="javascript:void(0)" onclick="showGenreMovies('${genre}')" class="genre-card">
+                    <a href="?genre=${encodeURIComponent(genre)}" class="genre-card" data-genre="${escapeHtml(genre)}">
                         <div class="genre-icon">${genreIconSvg(genre)}</div>
-                        <div class="genre-name">${genre}</div>
+                        <div class="genre-name">${escapeHtml(genre)}</div>
                     </a>
                 `;
             }).join('');
         }
 
-        async function showGenreMovies(genre) {
+        // A genre's movies load 48 at a time as the visitor scrolls. The genre
+        // API can't page, so the first 48 are one small request and the rest
+        // of the genre is fetched once, only if the visitor scrolls that far.
+        const BATCH_SIZE = 48;
+        let genreSource = null;
+        let genreToken = 0;       // replies for a previous genre are ignored
+
+        function fetchGenre(genre, limit) {
+            return fetch(`${API_CONFIG.API_ENDPOINTS.LUGANDA_MOVIES}/genre/${encodeURIComponent(genre)}?limit=${limit}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data || !data.success || !Array.isArray(data.data)) throw new Error('Failed to load movies');
+                    return data.data;
+                });
+        }
+
+        const feed = InfiniteScroll.attach(document.getElementById('loadMore'), {
+            label: 'Loading more movies',
+            loadNext: async (isCurrent) => {
+                const batch = await genreSource.next();
+                if (!isCurrent()) return;
+                renderMovies(batch, true);
+                return genreSource.hasMore();
+            }
+        });
+
+        async function showGenreMovies(genre, opts = {}) {
+            const token = ++genreToken;
+            feed.stop();
+
             // Hide genres, show movies
             document.getElementById('genresSection').style.display = 'none';
             document.getElementById('genreMoviesSection').classList.add('active');
-            document.getElementById('selectedGenreName').textContent = genre.charAt(0).toUpperCase() + genre.slice(1);
-            
+            document.getElementById('selectedGenreName').textContent = genre;
+            document.getElementById('genreCount').textContent = '';
+            document.title = `${genre.charAt(0).toUpperCase() + genre.slice(1)} Movies - Luganda Translated | Unruly Movies`;
+            renderGenrePills(genre);
+            window.scrollTo({ top: 0, behavior: 'instant' });
+
             const moviesGrid = document.getElementById('genreMoviesGrid');
             moviesGrid.innerHTML = Array(5).fill('<div class="content-card"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-meta"></div></div>').join('');
-            
+
             try {
-                const response = await fetch(`${API_CONFIG.API_ENDPOINTS.LUGANDA_MOVIES}/genre/${encodeURIComponent(genre)}?limit=30`);
-                const data = await response.json();
-                
-                if (data.success && data.data.length > 0) {
-                    renderMovies(data.data);
+                genreSource = InfiniteScroll.fromTop({ size: BATCH_SIZE, fetch: limit => fetchGenre(genre, limit) });
+                const firstBatch = await genreSource.first();
+                if (token !== genreToken) return;
+
+                if (firstBatch.length > 0) {
+                    renderMovies(firstBatch);
+                    feed.reset(genreSource.hasMore());
+                    if (!genreSource.hasMore()) {
+                        document.getElementById('genreCount').textContent = firstBatch.length === 1 ? '1 movie' : `${firstBatch.length} movies`;
+                    }
                 } else {
                     moviesGrid.innerHTML = `
                         <div class="empty-state">
@@ -659,44 +647,74 @@
                         </div>`;
                 }
             } catch (error) {
+                if (token !== genreToken) return;
                 console.error('Error loading genre movies:', error);
                 moviesGrid.innerHTML = '<p style="text-align: center; color: #888; grid-column: 1/-1;">Failed to load movies. Please try again later.</p>';
             }
             
             // Update URL
-            history.pushState(null, '', `?genre=${encodeURIComponent(genre)}`);
+            if (!opts.fromHistory) history.pushState(null, '', `?genre=${encodeURIComponent(genre)}`);
         }
 
         function showAllGenres() {
+            genreToken++;
+            feed.stop();
             document.getElementById('genresSection').style.display = 'block';
             document.getElementById('genreMoviesSection').classList.remove('active');
+            document.title = 'Movie Genres - Browse by Category | Unruly Movies';
             history.pushState(null, '', window.location.pathname);
         }
 
-        function renderMovies(movies) {
-            const moviesGrid = document.getElementById('genreMoviesGrid');
-            
-            moviesGrid.innerHTML = movies.map(movie => {
-                const poster = movie.poster || `https://placehold.co/300x450/16161f/4ade80?text=${encodeURIComponent(movie.originalTitle || 'Movie')}`;
-                const quality = movie.video?.quality?.toUpperCase() || 'HD';
-                const rating = movie.rating?.userRating || movie.rating?.imdb || 0;
-                const vjName = movie.vjName || 'Unknown';
-                
-                return `
-                    <a href="${movie.contentType === 'series' ? 'series-player.html?id=' + (movie.slug || movie._id) : '/movie/' + (movie.slug || movie._id)}" class="movie-card">
-                        <div class="movie-poster" style="background-image: url('${poster}')">
-                            <span class="movie-quality">${quality}</span>
-                            <span class="movie-rating">★ ${rating.toFixed(1)}</span>
-                        </div>
-                        <div class="movie-info">
-                            <div class="movie-title">${movie.originalTitle || movie.lugandaTitle}</div>
-                            <div class="movie-vj">VJ ${vjName}</div>
-                        </div>
-                    </a>
-                `;
-            }).join('');
+        function tmdbResize(url, size) {
+            if (!url) return '';
+            return url.replace(/\/t\/p\/[^/]+\//, `/t/p/${size}/`);
         }
+
+        // Same poster card as the Movies page: poster, green VJ tag, title.
+        // append = add under the movies already shown
+        function renderMovies(movies, append = false) {
+            const moviesGrid = document.getElementById('genreMoviesGrid');
+
+            const html = movies.map(movie => {
+                const title = escapeHtml(movie.originalTitle || movie.lugandaTitle || movie.title || 'Unknown');
+                const slug = encodeURIComponent(movie.slug || movie._id);
+                const url = movie.contentType === 'series' ? `series-player.html?id=${slug}` : `/movie/${slug}`;
+                const poster = escapeHtml(tmdbResize(movie.poster, 'w342') || movie.poster || 'assets/images/placeholder.svg').replace(/'/g, '%27');
+                const vjRaw = String(movie.vjName || '').trim();
+                const vjSuffix = vjRaw.replace(/^vj[\s:\-.]*/i, '').trim();
+                const vj = !vjRaw || /^unknown/i.test(vjRaw) ? '' : escapeHtml(vjSuffix ? 'VJ ' + vjSuffix : vjRaw);
+                return `
+                    <a href="${url}" class="content-card" data-movie-id="${escapeHtml(movie._id)}">
+                        <!-- the placeholder underneath shows if the poster link is broken -->
+                        <div class="card-poster" style="background-image: url('${poster}'), url('assets/images/placeholder.svg');">
+                            ${vj ? `<div class="card-badges"><span class="card-badge badge-vj">${vj}</span></div>` : ''}
+                            <div class="play-overlay">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                            </div>
+                        </div>
+                        <div class="card-info">
+                            <h3 class="card-title">${title}</h3>
+                        </div>
+                    </a>`;
+            }).join('');
+
+            if (append) moviesGrid.insertAdjacentHTML('beforeend', html);
+            else moviesGrid.innerHTML = html;
+        }
+
+        // Back and forward buttons move between genres
+        window.addEventListener('popstate', () => {
+            const genre = new URLSearchParams(window.location.search).get('genre');
+            if (genre) showGenreMovies(genre, { fromHistory: true });
+            else {
+                genreToken++;
+                feed.stop();
+                document.getElementById('genresSection').style.display = 'block';
+                document.getElementById('genreMoviesSection').classList.remove('active');
+            }
+        });
     </script>
     <script defer src="js/app-shell.js"></script>
+    <script defer src="js/site-theme.js"></script>
 </body>
 </html>

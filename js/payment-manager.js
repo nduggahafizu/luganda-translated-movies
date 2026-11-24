@@ -8,10 +8,12 @@ class PaymentManager {
     constructor() {
         this.apiUrl = API_CONFIG.BASE_URL;
         this.plans = {
-            daily:    { name: 'Daily',    price: 1000,  duration: '1 day',   features: ['Stream all movies', 'Download access', '1 device'] },
-            weekly:   { name: 'Weekly',   price: 5000,  duration: '7 days',  features: ['Stream all movies', 'Download access', '1 device'] },
-            biweekly: { name: '2 Weeks',  price: 7000,  duration: '14 days', features: ['Stream all movies', 'Download access', 'No ads', '1 device'] },
-            monthly:  { name: 'Monthly',  price: 12000, duration: '30 days', features: ['Stream all movies', 'Download access', 'No ads', '2 devices'] }
+            // Matches PLAN_CONFIG in server/models/User.js: downloads on every
+            // plan; only Daily is limited to 1 device
+            daily:    { name: 'Daily',    price: 1000,  duration: '1 day',   features: ['Stream all movies', 'Download access', '1 device at a time'] },
+            weekly:   { name: 'Weekly',   price: 5000,  duration: '7 days',  features: ['Stream all movies', 'Download access', 'No device limit'] },
+            biweekly: { name: '2 Weeks',  price: 7000,  duration: '14 days', features: ['Stream all movies', 'Download access', 'No ads', 'No device limit'] },
+            monthly:  { name: 'Monthly',  price: 12000, duration: '30 days', features: ['Stream all movies', 'Download access', 'No ads', 'No device limit'] }
         };
         this._injectStyles();
     }
@@ -32,7 +34,7 @@ class PaymentManager {
             .pm-modal {
                 position: relative;
                 width: 100%; max-width: 400px;
-                background: #0f0f1a;
+                background: #111513;
                 border-radius: 24px;
                 border: 1px solid rgba(74,222,128,0.2);
                 box-shadow: 0 40px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04);
@@ -214,9 +216,16 @@ class PaymentManager {
                                 window.dispatchEvent(new CustomEvent('pesapal-payment-success', { detail: { plan: planKey, result } }));
                                 setTimeout(() => window.location.reload(), 1200);
                             },
+                            // PesaPal window closed before confirmation (e.g. approved
+                            // on the phone): we keep checking, and so does the server
+                            onWaiting: () => {
+                                this.showToast('Checking your payment… Your plan switches on automatically as soon as Pesapal confirms it, usually within a few minutes.', 'info');
+                            },
                             onFailure: (status) => {
                                 if (status === 'cancelled') return;
-                                this.showToast(status === 'timeout' ? 'Still waiting on confirmation — check your dashboard shortly.' : 'Payment failed. Please try again.', status === 'timeout' ? 'info' : 'error');
+                                this.showToast(status === 'timeout'
+                                    ? 'Pesapal hasn’t confirmed your payment yet. If you paid, your plan switches on automatically as soon as it does.'
+                                    : 'The payment didn’t go through. Please try again.', status === 'timeout' ? 'info' : 'error');
                             }
                         });
                     } else {
@@ -258,7 +267,8 @@ class PaymentManager {
         `;
         toast.textContent = message;
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
+        // longer messages stay up long enough to read
+        setTimeout(() => toast.remove(), message.length > 80 ? 8000 : 3500);
     }
 }
 

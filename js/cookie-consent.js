@@ -31,7 +31,7 @@
         banner.id = 'cookie-consent-banner';
         banner.innerHTML = `
             <div class="cookie-consent-content">
-                <div class="cookie-icon">🍪</div>
+                
                 <div class="cookie-text">
                     <strong>We use cookies</strong>
                     <p>We use cookies to enhance your browsing experience, serve personalized ads, and analyze our traffic. By clicking "Accept All", you consent to our use of cookies. 

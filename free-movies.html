@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Free Movies - Watch Luganda Translated Movies Free | Unruly Movies</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Watch Luganda translated movies for free on Unruly Movies. Sign in and stream these VJ translated films without a plan.">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#4ade80">
+    <meta name="author" content="Nduga Hafizu">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://unrulymovies.com/free-movies">    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Free Movies - Unruly Movies">
+    <meta property="og:description" content="Luganda translated movies you can watch for free on Unruly Movies.">
+    <meta property="og:url" content="https://unrulymovies.com/free-movies">
+    <meta property="og:site_name" content="Unruly Movies">
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.png">
+    <link rel="shortcut icon" type="image/png" href="/assets/images/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/mobile-improvements.css">
+    <link rel="stylesheet" href="css/content-guide.css">
+    <link rel="stylesheet" href="css/app-shell.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
+
+    <style>
+        .trending-hero {
+            background: linear-gradient(135deg, rgba(74, 222, 128, 0.2) 0%, rgba(30, 30, 30, 0.95) 50%);
+            padding: 60px 0 40px;
+            margin-bottom: 40px;
+        }
+        
+        .trending-hero h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .trending-hero h1 .fire-icon {
+            font-size: 2.8rem;
+        }
+        
+        .trending-hero p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+        
+        .trending-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            padding: 0 10px;
+        }
+        
+        .trending-card {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(30, 30, 30, 0.8);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .trending-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.5);
+        }
+        
+        .trending-rank {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 13px;
+            z-index: 10;
+        }
+        
+        .trending-rank.gold {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        }
+        
+        .trending-rank.silver {
+            background: linear-gradient(135deg, #C0C0C0, #A0A0A0);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(192, 192, 192, 0.4);
+        }
+        
+        .trending-rank.bronze {
+            background: linear-gradient(135deg, #CD7F32, #8B4513);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(205, 127, 50, 0.4);
+        }
+        
+        .trending-rank.regular {
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .trending-card img {
+            width: 100%;
+            aspect-ratio: 2/3;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .trending-card-info {
+            padding: 8px 10px 10px;
+        }
+        
+        .trending-card-title {
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #fff;
+        }
+        
+        .trending-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .trending-card-meta .views {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--primary-color);
+        }
+        
+        /* Trending Card Hover Overlay */
+        .trending-card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.8) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        
+        .trending-card:hover .trending-card-overlay {
+            opacity: 1;
+        }
+        
+        .trending-card-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .trend-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.8);
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(4px);
+        }
+        
+        .trend-btn:hover {
+            transform: scale(1.15);
+            border-color: #fff;
+        }
+        
+        .trend-btn.btn-play {
+            background: #fff;
+            border: none;
+            color: #000;
+        }
+        
+        .trend-btn.btn-play:hover {
+            background: #4ade80;
+        }
+        
+        .trend-btn.btn-trailer {
+            background: rgba(124,252,0,0.15);
+            border-color: #4ade80;
+            color: #4ade80;
+        }
+        
+        .trend-btn.btn-trailer:hover {
+            background: #4ade80;
+            color: #000;
+        }
+        
+        .trend-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .trend-btn.btn-play svg {
+            margin-left: 2px;
+        }
+        
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+        }
+        
+        .loading-spinner .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(74, 222, 128, 0.2);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .no-movies {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .no-movies svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        @media (max-width: 768px) {
+            .trending-hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .trending-grid {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                gap: 8px;
+                padding: 0 8px;
+            }
+        }
+
+        /* FREE tag, top left of each poster (the VJ name sits top right) */
+        .free-tag {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            z-index: 11;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: var(--st-green, #22c55e);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.6px;
+        }
+
+        .vj-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: #e50914;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            z-index: 10;
+            max-width: calc(100% - 50px);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+    <meta name="google-adsense-account" content="ca-pub-1904736753681797">
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
+    <!-- Site theme (top menu, big poster rows) — keep last so it wins -->
+    <link rel="stylesheet" href="css/site-theme.css">
+</head>
+<body>
+    <div class="container">
+        <div class="app">
+            <!-- Header -->
+            <div class="app-header">
+                <div class="navbar navbar-expand-lg">
+                    <div class="menu" id="menuToggle" role="button" aria-label="Open navigation menu" tabindex="0">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </div>
+                    <div class="app-navbar">
+                        <a href="index.html" class="navbar-brand">
+                            <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
+                        </a>
+                    </div>
+                    <div class="search-btn d-md-none d-block" id="mobileSearchBtn">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </div>
+
+                    <!-- Mobile Search Form -->
+                    <form class="mobile-search-form" id="mobileSearchForm" method="get" action="search.html">
+                        <input type="text" name="q" placeholder="Search movies, VJs..." class="mobile-search-input" id="mobileSearchInput" required>
+                        <button type="submit" class="mobile-search-submit" title="Search">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+                        </button>
+                        <button type="button" class="mobile-search-close" id="mobileSearchClose" title="Close search">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </form>
+
+                    <form class="header-search input-group d-md-block d-none" method="get" action="search.html">
+                        <div class="typeahead__container app-search">
+                            <div class="typeahead__field">
+                                <div class="typeahead__query">
+                                    <label for="search-input" class="btn px-0 mb-0" aria-label="Search">
+                                        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <path d="m21 21-4.35-4.35"></path>
+                                        </svg>
+                                    </label>
+                                    <input class="video-search form-control" name="q" type="text" id="search-input" placeholder="Search Luganda movies, VJs..." autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <ul class="navbar-nav navbar-user ml-auto align-items-center text-nowrap">
+                        <li class="nav-item">
+                            <a class="nav-link btn-login" href="login.html">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn-register" href="register.html">Sign Up</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="app-wrapper">
+                <!-- Sidebar -->
+                <div class="app-aside nav-aside" id="aside">
+                    <button class="modal-close" data-dismiss="modal" aria-label="Close menu" title="Close menu">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+
+                    <div class="drawer-logo">
+                        <span class="drawer-logo-text">Unruly Movies</span>
+                    </div>
+
+                    <!-- Profile Card -->
+                    <a href="login.html" class="drawer-profile" id="drawerProfile">
+                        <div class="dp-circle">
+                            <img src="" alt="" class="d-none" id="drawerProfileAvatar">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="drawerProfileIcon">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <div class="dp-info">
+                            <h4 id="drawerProfileName">Sign In</h4>
+                            <p id="drawerProfileSub">Tap to access your account</p>
+                        </div>
+                        <svg class="dp-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </a>
+
+                    <ul class="nav">
+                        <li>
+                            <a href="index.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                </svg>
+                                Home
+                            </a>
+                        </li>
+                        <li>
+                            <a href="movies.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                                    <line x1="7" y1="2" x2="7" y2="22"></line>
+                                    <line x1="17" y1="2" x2="17" y2="22"></line>
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                    <line x1="2" y1="7" x2="7" y2="7"></line>
+                                    <line x1="2" y1="17" x2="7" y2="17"></line>
+                                    <line x1="17" y1="17" x2="22" y2="17"></line>
+                                    <line x1="17" y1="7" x2="22" y2="7"></line>
+                                </svg>
+                                Movies
+                            </a>
+                        </li>
+                        <li class="active">
+                            <a href="trending.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                    <polyline points="17 6 23 6 23 12"></polyline>
+                                </svg>
+                                Trending
+                            </a>
+                        </li>
+                        <li>
+                            <a href="uganda-tv.html">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                    <line x1="12" y1="7" x2="12" y2="22"></line>
+                                </svg>
+                                Uganda TV
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Main Content -->
+                <div class="app-container flex-fill">
+                    <div class="container">
+                        <div class="app-content pt-md-3">
+
+            <!-- Page Hero -->
+            <div class="page-hero">
+                <h1 class="page-hero-title">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="20 12 20 22 4 22 4 12"></polyline>
+                        <rect x="2" y="7" width="20" height="5"></rect>
+                        <line x1="12" y1="22" x2="12" y2="7"></line>
+                        <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+                        <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+                    </svg>
+                    Free movies
+                </h1>
+                <p class="page-hero-subtitle">Sign in and watch these Luganda translated movies at no cost</p>
+            </div>
+
+            <div class="trending-grid" id="freeGrid">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+            </div>
+        </div>
+            <!-- More movies load automatically when this comes into view -->
+            <div class="st-load-more" id="loadMore" aria-live="polite"></div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <footer class="site-footer">
+                    <div class="footer-main">
+                        <div class="footer-grid">
+                            <div class="footer-brand">
+                                <a href="index.html" class="footer-logo">
+                                    <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
+                                </a>
+                                <p class="footer-tagline">Uganda's premier platform for Luganda VJ translated movies.</p>
+                                <div class="footer-social">
+                                    <a href="mailto:nduggahafizu@gmail.com" aria-label="Email support" class="social-link">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                    </a>
+                                    <a href="https://wa.me/256743311809" target="_blank" rel="noopener" aria-label="WhatsApp support" class="social-link">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                                    </a>
+                                    <a href="faq.html" aria-label="Read the FAQ" class="social-link">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                    </a>
+                                </div>
+                                <a href="https://play.google.com/store/apps/details?id=com.unruly.pix" target="_blank" class="footer-playstore" aria-label="Get it on Google Play">
+                                    <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" width="135" height="40" loading="lazy">
+                                </a>
+                            </div>
+                            <div class="footer-links">
+                                <h4>Quick Links</h4>
+                                <ul>
+                                    <li><a href="index.html">Home</a></li>
+                                    <li><a href="movies.html">Browse Movies</a></li>
+                                    <li><a href="genres.html">Genres</a></li>
+                                    <li><a href="trending.html">Trending</a></li>
+                                </ul>
+                            </div>
+                            <div class="footer-links">
+                                <h4>Legal</h4>
+                                <ul>
+                                    <li><a href="terms.html">Terms of Service</a></li>
+                                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                                    <li><a href="dmca.html">DMCA Policy</a></li>
+                                </ul>
+                            </div>
+                            <div class="footer-links">
+                                <h4>Company</h4>
+                                <ul>
+                                    <li><a href="about.html">About Us</a></li>
+                                    <li><a href="editorial-standards.html">Editorial Standards</a></li>
+                                    <li><a href="contact.html">Contact</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer-bottom">
+                        <p>Copyright © 2026 Unruly Movies</p>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll to Top -->
+    <div class="scroll-up">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/header-search.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/infinite-scroll.js"></script>
+    <script>
+        // Free movies: the ones the admin marks "Free movie" in All movies.
+        // Anyone signed in can watch them without a plan. Newest first;
+        // more load as the visitor scrolls.
+        const PAGE_SIZE = 24;
+        let lastPage = 0;
+        const shownIds = new Set();
+
+        function apiBase() {
+            return typeof API_CONFIG !== 'undefined' ? API_CONFIG.BASE_URL : 'http://localhost:5000';
+        }
+
+        async function fetchFreePage(page) {
+            const response = await fetch(`${apiBase()}/api/luganda-movies/free?page=${page}&limit=${PAGE_SIZE}`);
+            const data = await response.json();
+            if (!data.success || !Array.isArray(data.data)) throw new Error('Invalid response');
+            return data;
+        }
+
+        function keepNew(list) {
+            return (list || []).filter(movie => {
+                if (!movie || shownIds.has(movie._id)) return false;
+                shownIds.add(movie._id);
+                return true;
+            });
+        }
+
+        function escapeHtml(value) {
+            return String(value == null ? '' : value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        function renderFree(movies, append = false) {
+            const grid = document.getElementById('freeGrid');
+            const html = movies.map(movie => {
+                const poster = tmdbResize(movie.poster, 'w342') || movie.poster || 'assets/images/placeholder.svg';
+                const title = escapeHtml(movie.originalTitle || movie.lugandaTitle || movie.title);
+                const vjBadge = escapeHtml(formatVjBadge(movie.vjName));
+                const href = movie.contentType === 'series'
+                    ? 'series-player.html?id=' + encodeURIComponent(movie.slug || movie._id)
+                    : '/movie/' + encodeURIComponent(movie.slug || movie._id);
+
+                return `
+                    <a href="${href}" class="trending-card" data-movie-id="${movie._id}">
+                        <div class="free-tag">FREE</div>
+                        ${vjBadge ? `<div class="vj-badge">${vjBadge}</div>` : ''}
+                        <img src="${escapeHtml(poster)}" alt="${title}" loading="lazy" onerror="this.src='assets/images/placeholder.svg'">
+                        <div class="trending-card-info">
+                            <div class="trending-card-title">${title}</div>
+                        </div>
+                    </a>
+                `;
+            }).join('');
+
+            if (append) grid.insertAdjacentHTML('beforeend', html);
+            else grid.innerHTML = html;
+        }
+
+        function showMessage(text) {
+            document.getElementById('freeGrid').innerHTML = `
+                <div class="no-movies">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                        <line x1="7" y1="2" x2="7" y2="22"></line>
+                        <line x1="17" y1="2" x2="17" y2="22"></line>
+                    </svg>
+                    <p>${text}</p>
+                </div>
+            `;
+        }
+
+        const feed = InfiniteScroll.attach(document.getElementById('loadMore'), {
+            label: 'Loading more free movies',
+            loadNext: async () => {
+                const data = await fetchFreePage(lastPage + 1);
+                lastPage = data.pagination.page;
+                renderFree(keepNew(data.data), true);
+                return lastPage < data.pagination.pages;
+            }
+        });
+
+        async function loadFreeMovies() {
+            try {
+                const data = await fetchFreePage(1);
+                lastPage = 1;
+                const movies = keepNew(data.data);
+                if (movies.length === 0) {
+                    showMessage('No free movies right now. Check back soon.');
+                    return;
+                }
+                renderFree(movies);
+                feed.reset(lastPage < data.pagination.pages);
+            } catch (error) {
+                console.error('Error loading free movies:', error);
+                showMessage('Unable to load free movies. Please try again later.');
+            }
+        }
+
+        function tmdbResize(url, size) {
+            if (!url) return '';
+            return url.replace(/\/t\/p\/[^/]+\//, `/t/p/${size}/`);
+        }
+
+        function formatVjBadge(vjName) {
+            const name = (vjName || '').toString().trim();
+            if (!name) return '';
+            if (/^unknown\b/i.test(name)) return '';
+            const cleaned = name.replace(/^vj[\s:\-\.]*?/i, '').trim();
+            if (!cleaned) return '';
+            return `VJ ${cleaned}`;
+        }
+
+        loadFreeMovies();
+    </script>
+    
+    <!-- Trailer Player -->
+    <link rel="stylesheet" href="css/trailer-player.css">
+    <script>
+        function showToast(message, type = 'info') {
+            const existing = document.querySelector('.toast-notification');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 14px 24px;
+                background: ${type === 'success' ? '#4ade80' : type === 'error' ? '#ff4444' : '#333'};
+                color: ${type === 'success' ? '#000' : '#fff'};
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 14px;
+                z-index: 10000;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.remove(), 2500);
+        }
+    </script>
+    <script defer src="js/app-shell.js"></script>
+    <script defer src="js/site-theme.js"></script>
+</body>
+</html>

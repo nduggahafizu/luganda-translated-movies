@@ -329,7 +329,7 @@ async function enablePushNotifications(preferences = {}) {
     const result = await window.pushManager.subscribe(preferences);
     
     if (result.success) {
-        showNotification?.('🔔 Notifications enabled!', 'success');
+        showNotification?.('Notifications enabled!', 'success');
     } else {
         showNotification?.(result.error || 'Failed to enable notifications', 'error');
     }
@@ -344,7 +344,7 @@ async function disablePushNotifications() {
     const result = await window.pushManager.unsubscribe();
     
     if (result.success) {
-        showNotification?.('🔕 Notifications disabled', 'info');
+        showNotification?.('Notifications disabled', 'info');
     } else {
         showNotification?.(result.error || 'Failed to disable notifications', 'error');
     }

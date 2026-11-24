@@ -1232,6 +1232,10 @@
                                 <input type="checkbox" id="edit-for-you">
                                 Picks for You
                             </label>
+                            <label class="checkbox-label" title="Anyone signed in can watch it without a plan. It appears on the Free movies page.">
+                                <input type="checkbox" id="edit-free">
+                                Free movie (watch without a plan)
+                            </label>
                             <label class="checkbox-label">
                                 <input type="checkbox" id="edit-allow-download">
                                 Allow Download
@@ -1757,7 +1761,7 @@
                     </td>
                     <td><span class="movie-row-vj">${movie.vjName || 'Unknown'}</span></td>
                     <td>${movie.year || '-'}</td>
-                    <td><span class="status-badge ${movie.status || 'published'}">${movie.status || 'Published'}</span></td>
+                    <td><span class="status-badge ${movie.status || 'published'}">${movie.status || 'Published'}</span>${movie.isFree ? ' <span class="status-badge published" title="Free movie: watch without a plan">Free</span>' : ''}</td>
                     <td>${(movie.views || 0).toLocaleString()}</td>
                     <td>
                         <div class="action-btns">
@@ -2156,6 +2160,7 @@
             document.getElementById('edit-featured').checked = movie.featured || false;
             document.getElementById('edit-trending').checked = movie.trending || false;
             document.getElementById('edit-for-you').checked = movie.forYou || false;
+            document.getElementById('edit-free').checked = movie.isFree || false;
             document.getElementById('edit-allow-download').checked = movie.allowDownload || false;
             document.getElementById('edit-status').value = movie.status || 'published';
 
@@ -2200,6 +2205,7 @@
                 featured: document.getElementById('edit-featured').checked,
                 trending: document.getElementById('edit-trending').checked,
                 forYou: document.getElementById('edit-for-you').checked,
+                isFree: document.getElementById('edit-free').checked,
                 allowDownload: document.getElementById('edit-allow-download').checked,
                 status: document.getElementById('edit-status').value || undefined
             };

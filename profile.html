@@ -447,10 +447,143 @@
                 justify-content: center;
             }
         }
+
+        /* ---------- Account page layout: title, overview, two panels ---------- */
+        main.profile-container.app-container {
+            max-width: 1240px;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            padding: 24px var(--st-pad, 20px) 40px !important;
+        }
+
+        .account-title {
+            margin: 8px 0 22px;
+            text-align: center;
+            font-size: clamp(22px, 2.4vw, 30px);
+            font-weight: 800;
+        }
+
+        .account-title #userName {
+            color: var(--primary-color);
+        }
+
+        .account-title-sep {
+            margin: 0 4px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .profile-header {
+            gap: 18px;
+            margin-bottom: 24px;
+            padding: 18px 24px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .profile-header .user-avatar {
+            width: 64px;
+            height: 64px;
+            font-size: 26px;
+        }
+
+        .user-overview-label {
+            margin: 0 0 2px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .profile-header .user-email {
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .account-panels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+            align-items: start;
+        }
+
+        .account-panels > * {
+            margin: 0 !important;
+        }
+
+        .account-panel {
+            padding: 34px 40px;
+            background: var(--background-light);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+        }
+
+        .password-section.account-panel {
+            margin-top: 0;
+            padding-top: 34px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .account-panel-title {
+            margin: 0 0 28px;
+            text-align: center;
+            font-size: clamp(22px, 2vw, 30px);
+            font-weight: 500;
+        }
+
+        .account-panel .form-row {
+            grid-template-columns: 1fr;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .account-panel .form-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* short green line before each label */
+        .account-panel .form-label::before {
+            content: '';
+            width: 26px;
+            height: 3px;
+            flex-shrink: 0;
+            border-radius: 2px;
+            background: var(--primary-color);
+        }
+
+        .account-panel .form-control {
+            padding: 16px 18px;
+            font-size: 16px;
+        }
+
+        .account-panel .btn-group .btn-primary {
+            flex: 1;
+            justify-content: center;
+        }
+
+        @media (max-width: 600px) {
+            .account-panel {
+                padding: 26px 20px;
+            }
+
+            .password-section.account-panel {
+                padding-top: 26px;
+            }
+        }
     </style>
     <meta name="google-adsense-account" content="ca-pub-1904736753681797">
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
+    <!-- Site theme (top menu, big poster rows) — keep last so it wins -->
+    <link rel="stylesheet" href="css/site-theme.css">
 </head>
 
 <body>
@@ -596,13 +729,16 @@
                 <div class="alert alert-success" id="successAlert"></div>
                 <div class="alert alert-error" id="errorAlert"></div>
 
-                <!-- Profile Header -->
+                <!-- Page title: "My account - Name" -->
+                <h1 class="account-title">My account <span class="account-title-sep">-</span> <span id="userName">Loading...</span></h1>
+
+                <!-- Overview -->
                 <div class="profile-header">
                     <div class="user-avatar" id="userAvatar">
                         <span id="avatarInitial">U</span>
                     </div>
                     <div class="user-info">
-                        <h1 id="userName">Loading...</h1>
+                        <p class="user-overview-label">Overview</p>
                         <p class="user-email" id="userEmail">loading@example.com</p>
                         <div class="user-meta">
                             <span class="meta-item">
@@ -622,6 +758,73 @@
                     </div>
                 </div>
 
+                <!-- Account settings | Change your password -->
+                <div class="account-panels">
+                    <section class="profile-section account-panel" aria-labelledby="accountSettingsTitle">
+                        <h2 class="account-panel-title" id="accountSettingsTitle">Account settings</h2>
+                    <form id="profileForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="fullName">Full Name</label>
+                                <input type="text" class="form-control" id="fullName" placeholder="Your full name">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="email">Email Address</label>
+                                <input type="email" class="form-control" id="email" placeholder="—" disabled>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="phone">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" placeholder="e.g. 07XXXXXXXX">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="language">Preferred Language</label>
+                                <select class="form-control" id="language">
+                                    <option value="en">English</option>
+                                    <option value="lg">Luganda</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary" id="saveProfileBtn">Save Changes</button>
+                            <button type="button" class="btn btn-secondary" onclick="resetForm()">Cancel</button>
+                        </div>
+                    </form>
+                    </section>
+
+                    <section class="password-section account-panel" id="passwordSection" aria-labelledby="changePasswordTitle">
+                        <h2 class="account-panel-title" id="changePasswordTitle">Change your password</h2>
+                    <form id="passwordForm" class="password-form active">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="currentPassword">Current Password</label>
+                                <input type="password" class="form-control" id="currentPassword" placeholder="Enter current password">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="newPassword">New Password</label>
+                                <input type="password" class="form-control" id="newPassword" placeholder="Enter new password">
+                                <p class="form-hint">At least 8 characters with uppercase, lowercase, and number</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="confirmPassword">Confirm New Password</label>
+                                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password">
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary" id="changePasswordBtn">Update password</button>
+                            <button type="button" class="btn btn-secondary" onclick="togglePasswordForm()">Clear</button>
+                        </div>
+                    </form>
+                    </section>
+                </div>
+
+                <!-- Subscription | Devices -->
+                <div class="account-panels">
                 <!-- Subscription Status -->
                 <div class="subscription-card">
                     <div class="subscription-header">
@@ -665,7 +868,7 @@
                 </div>
 
                 <!-- Active Devices -->
-                <div class="subscription-card" style="margin-top:20px;">
+                <div class="subscription-card">
                     <div class="subscription-header">
                         <div>
                             <h2 class="subscription-title">Active Devices</h2>
@@ -677,80 +880,6 @@
                         <!-- Devices loaded dynamically -->
                     </div>
                 </div>
-
-                <!-- Profile Information -->
-                <div class="profile-section">
-                    <h2 class="section-title">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
-                        Profile Information
-                    </h2>
-                    
-                    <form id="profileForm">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label" for="fullName">Full Name</label>
-                                <input type="text" class="form-control" id="fullName" placeholder="Your full name">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="email">Email Address</label>
-                                <input type="email" class="form-control" id="email" placeholder="—" disabled>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label" for="phone">Phone Number</label>
-                                <input type="tel" class="form-control" id="phone" placeholder="e.g. 07XXXXXXXX">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="language">Preferred Language</label>
-                                <select class="form-control" id="language">
-                                    <option value="en">English</option>
-                                    <option value="lg">Luganda</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="btn-group">
-                            <button type="submit" class="btn btn-primary" id="saveProfileBtn">Save Changes</button>
-                            <button type="button" class="btn btn-secondary" onclick="resetForm()">Cancel</button>
-                        </div>
-                    </form>
-                    
-                    <!-- Password Change Section -->
-                    <div class="password-section" id="passwordSection">
-                        <div class="password-header">
-                            <h3 class="password-title">Password</h3>
-                            <button type="button" class="change-password-btn" onclick="togglePasswordForm()">Change Password</button>
-                        </div>
-                        
-                        <form id="passwordForm" class="password-form">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label" for="currentPassword">Current Password</label>
-                                    <input type="password" class="form-control" id="currentPassword" placeholder="Enter current password">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label" for="newPassword">New Password</label>
-                                    <input type="password" class="form-control" id="newPassword" placeholder="Enter new password">
-                                    <p class="form-hint">At least 8 characters with uppercase, lowercase, and number</p>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label" for="confirmPassword">Confirm New Password</label>
-                                    <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password">
-                                </div>
-                            </div>
-                            <div class="btn-group">
-                                <button type="submit" class="btn btn-primary" id="changePasswordBtn">Update Password</button>
-                                <button type="button" class="btn btn-secondary" onclick="togglePasswordForm()">Cancel</button>
-                            </div>
-                        </form>
-                    </div>
                 </div>
 
                 <!-- Account Actions -->
@@ -1031,7 +1160,8 @@
                 });
                 const data = await res.json();
                 if (data.status === 'success') {
-                    renderDevices(data.data.devices || [], data.data.maxDevices || 1);
+                    // maxDevices is null when the plan has no device limit (every plan except Daily)
+                    renderDevices(data.data.devices || [], data.data.maxDevices);
                 }
             } catch (e) {
                 console.error('Failed to load devices:', e);
@@ -1040,7 +1170,9 @@
 
         function renderDevices(devices, maxDevices) {
 
-            document.getElementById('deviceCount').textContent = `${devices.length}/${maxDevices}`;
+            document.getElementById('deviceCount').textContent = maxDevices
+                ? `${devices.length}/${maxDevices}`
+                : `${devices.length} (no limit)`;
 
             const list = document.getElementById('deviceList');
             if (devices.length === 0) {
@@ -1224,11 +1356,9 @@
         }
 
         function togglePasswordForm() {
-            const form = document.getElementById('passwordForm');
-            form.classList.toggle('active');
-            if (!form.classList.contains('active')) {
-                form.reset();
-            }
+            // The password form is always shown now, so "Clear" (and a
+            // successful change) just empties it.
+            document.getElementById('passwordForm').reset();
         }
 
         function resetForm() {
@@ -1293,7 +1423,7 @@
         }
 
         function confirmDeleteAccount() {
-            if (confirm('⚠️ WARNING: This action cannot be undone!\n\nAre you sure you want to permanently delete your account and all associated data?')) {
+            if (confirm('WARNING: This action cannot be undone!\n\nAre you sure you want to permanently delete your account and all associated data?')) {
                 if (confirm('This is your final chance. Type "DELETE" in the next prompt to confirm.')) {
                     const confirmation = prompt('Type DELETE to confirm account deletion:');
                     if (confirmation === 'DELETE') {
@@ -1350,5 +1480,6 @@
             <p>Copyright © unruly movies watch 2026</p>
         </div>
     </footer>
+    <script defer src="js/site-theme.js"></script>
 </body>
 </html>

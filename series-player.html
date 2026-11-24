@@ -927,6 +927,10 @@
     <meta name="google-adsense-account" content="ca-pub-1904736753681797">
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
+    <!-- Site theme + player theme (top menu, full-width video) — keep last -->
+    <link rel="stylesheet" href="css/site-theme.css">
+    <link rel="stylesheet" href="css/player-theme.css">
+    <link rel="stylesheet" href="css/access-prompt.css">
 </head>
 
 <body>
@@ -980,6 +984,7 @@
 
     <script src="js/config.js?v=20260124"></script>
     <script src="js/pesapal-checkout.js"></script>
+    <script src="js/access-prompt.js"></script>
 
     <script>
         // API Configuration - always use production API in production
@@ -1016,37 +1021,53 @@
             return /Googlebot|bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot|Sogou|Exabot|facebot|ia_archiver|AhrefsBot|SemrushBot|MJ12bot|DotBot|Applebot|Twitterbot|LinkedInBot|WhatsApp|Slack|Discordbot/i.test(ua);
         }
 
-        async function requireLoggedInMember() {
+        // Who is visiting: signed out (window._seriesSignedOut), signed in with
+        // their plan details (window._seriesAccess), or on a Daily plan that is
+        // signed in on another device (window._seriesDeviceLimit: { label,
+        // minutesAgo } of that device). Nobody is sent away: the page always
+        // loads, and signing in or a plan is only asked for at Play/Download.
+        function clearSeriesSession() {
+            ['token', 'authToken'].forEach(k => { localStorage.removeItem(k); sessionStorage.removeItem(k); });
+            window._seriesAccess = null;
+            window._seriesSignedOut = true;
+        }
+
+        async function checkSeriesAccess() {
+            window._seriesAccess = null;
+            window._seriesSignedOut = false;
+            window._seriesDeviceLimit = null;
+
             const token = normalizeBearerToken(getAuthToken());
-            if (!token) { redirectToLogin(); return false; }
+            if (!token) { window._seriesSignedOut = true; return; }
 
             try {
                 const response = await fetch(`${API_BASE_URL}/api/auth/check-access`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
-                if (response.status === 401 || response.status === 403) {
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('authToken');
-                    redirectToLogin();
-                    return false;
+                if (response.status === 401) {
+                    // the stored sign-in has expired
+                    clearSeriesSession();
+                    return;
+                }
+                if (response.status === 403) {
+                    // banned or restricted account
+                    clearSeriesSession();
+                    return;
                 }
 
-                if (!response.ok) return true;
+                // Server trouble: let the server decide when they press play
+                if (!response.ok) return;
 
                 const data = await response.json();
-                if (!data.success) { redirectToLogin(); return false; }
-
-                window._seriesAccess = data.access;
-
-                // Free plan — let the page load, gate at play time
-                if (data.access && data.access.freeUser) {
-                    return true; // allow loadSeries() so episode list is visible
+                if (data.success) {
+                    window._seriesAccess = data.access;
+                    if (data.access && data.access.deviceLimitReached) {
+                        window._seriesDeviceLimit = data.access.otherDevice || {};
+                    }
                 }
-
-                return true;
             } catch (error) {
-                return true;
+                // offline: decide when they press play
             }
         }
         
@@ -1077,8 +1098,14 @@
         </svg>`;
         const CC_PLAY_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>`;
         const CC_PAUSE_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>`;
-        const CC_CENTER_PLAY_ICON = `<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>`;
-        const CC_SEEK_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a8 8 0 1 1-8 8"></path><polyline points="12 1 12 4 9 4"></polyline></svg><span class="seek-label">10</span>`;
+        const CC_CENTER_PLAY_ICON = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.6v12.8c0 .8.9 1.3 1.6.8l10-6.4c.6-.4.6-1.3 0-1.7l-10-6.4C8.9 4.3 8 4.8 8 5.6z"/></svg>`;
+        const CC_CENTER_PAUSE_ICON = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4.5" width="4.2" height="15" rx="1.2"/><rect x="13.8" y="4.5" width="4.2" height="15" rx="1.2"/></svg>`;
+        // Circular arrows with "10" inside
+        const CC_SEEK_BACK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 1 1-8.5 8.5"/><path d="M14.6 1.2 12 3.5l2.6 2.3"/><text x="12" y="15.3" text-anchor="middle" font-size="8" font-weight="700" font-family="Inter, Arial, sans-serif" fill="currentColor" stroke="none">10</text></svg>`;
+        const CC_LOCK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`;
+        const CC_UNLOCK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.6-1.7"/></svg>`;
+        const CC_NEXT_ICON = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 5.6v12.8c0 .8.9 1.3 1.6.8l9-6.4c.6-.4.6-1.3 0-1.7l-9-6.4C5.9 4.3 5 4.8 5 5.6z"/><rect x="17" y="5" width="2.6" height="14" rx="1"/></svg>`;
+        const CC_SEEK_FWD_ICON =`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5"/><path d="M9.4 1.2 12 3.5 9.4 5.8"/><text x="12" y="15.3" text-anchor="middle" font-size="8" font-weight="700" font-family="Inter, Arial, sans-serif" fill="currentColor" stroke="none">10</text></svg>`;
         const CC_VOLUME_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 9 7 9 12 4 12 20 7 15 3 15 3 9" fill="currentColor" stroke="none"></polygon><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18 6a9 9 0 0 1 0 12"></path></svg>`;
         const CC_MUTED_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 9 7 9 12 4 12 20 7 15 3 15 3 9" fill="currentColor" stroke="none"></polygon><line x1="16" y1="9" x2="22" y2="15"></line><line x1="22" y1="9" x2="16" y2="15"></line></svg>`;
 
@@ -1101,9 +1128,14 @@
 
         function updateSeriesPlayState(isPlaying) {
             const container = document.getElementById('video-container');
-            if (container) container.classList.toggle('cc-playing', isPlaying);
+            if (container) {
+                container.classList.toggle('cc-playing', isPlaying);
+                if (isPlaying) container.classList.add('cc-started');
+            }
             const btn = document.getElementById('ccPlayBtn');
             if (btn) btn.innerHTML = isPlaying ? CC_PAUSE_ICON : CC_PLAY_ICON;
+            const center = document.getElementById('ccCenterPlay');
+            if (center) center.innerHTML = isPlaying ? CC_CENTER_PAUSE_ICON : CC_CENTER_PLAY_ICON;
         }
 
         function formatSeriesTime(seconds) {
@@ -1124,8 +1156,11 @@
             const handle = document.getElementById('ccHandle');
             if (played) played.style.width = pct + '%';
             if (handle) handle.style.left = pct + '%';
-            const timeEl = document.getElementById('ccTime');
-            if (timeEl) timeEl.textContent = `${formatSeriesTime(video.currentTime)} / ${formatSeriesTime(video.duration)}`;
+            // "00:51 ————o——— 21:47": time played on the left, length on the right
+            const cur = document.getElementById('ccTimeCur');
+            const dur = document.getElementById('ccTimeDur');
+            if (cur) cur.textContent = formatSeriesTime(video.currentTime);
+            if (dur) dur.textContent = formatSeriesTime(video.duration);
         }
 
         function updateSeriesBuffered() {
@@ -1184,9 +1219,113 @@
             const video = document.getElementById('series-video');
             if (!video) return;
             video.muted = !video.muted;
-            const btn = document.getElementById('ccMuteBtn');
-            if (btn) btn.innerHTML = video.muted ? CC_MUTED_ICON : CC_VOLUME_ICON;
+            if (!video.muted && video.volume === 0) video.volume = 0.5;
+            syncSeriesVolume();
             markSeriesControlsActive();
+        }
+
+        // Volume slider next to the speaker
+        function setSeriesVolume(value) {
+            const video = document.getElementById('series-video');
+            if (!video) return;
+            video.volume = Math.min(1, Math.max(0, Number(value)));
+            video.muted = video.volume === 0;
+            syncSeriesVolume();
+            markSeriesControlsActive();
+        }
+
+        function syncSeriesVolume() {
+            const video = document.getElementById('series-video');
+            const level = video ? (video.muted ? 0 : video.volume) : 1;
+            const slider = document.getElementById('ccVolume');
+            if (slider) {
+                slider.value = level;
+                slider.style.setProperty('--level', (level * 100) + '%');
+            }
+            const btn = document.getElementById('ccMuteBtn');
+            if (btn) btn.innerHTML = level === 0 ? CC_MUTED_ICON : CC_VOLUME_ICON;
+        }
+
+        // ---------- Speed: only a choice from the Speed menu may change it ----------
+        const SERIES_SPEEDS = [2, 1.5, 1.25, 1, 0.75, 0.5];
+        let seriesPlaybackRate = 1;
+
+        function seriesSpeedLabel(rate) {
+            return `<span class="st-speed-word">Speed </span>${rate}x` +
+                (rate === 1 ? '<span class="st-speed-normal"> (Normal)</span>' : '');
+        }
+
+        function toggleSeriesSpeedMenu(event) {
+            if (event) event.stopPropagation();
+            const menu = document.getElementById('ccSpeedMenu');
+            if (!menu) return;
+            const open = !menu.classList.contains('open');
+            menu.classList.toggle('open', open);
+            const btn = document.getElementById('ccSpeedBtn');
+            if (btn) btn.setAttribute('aria-expanded', String(open));
+            markSeriesControlsActive();
+        }
+
+        function closeSeriesSpeedMenu() {
+            const menu = document.getElementById('ccSpeedMenu');
+            if (menu) menu.classList.remove('open');
+            const btn = document.getElementById('ccSpeedBtn');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        }
+
+        function setSeriesSpeed(rate, event) {
+            if (event) event.stopPropagation();
+            seriesPlaybackRate = rate;
+            const video = document.getElementById('series-video');
+            if (video) video.playbackRate = rate;
+            const label = document.getElementById('ccSpeedLabel');
+            if (label) label.innerHTML = seriesSpeedLabel(rate);
+            document.querySelectorAll('#ccSpeedMenu [data-rate]').forEach(b => {
+                b.classList.toggle('selected', Number(b.dataset.rate) === rate);
+            });
+            closeSeriesSpeedMenu();
+            markSeriesControlsActive();
+        }
+
+        // Any other speed change (browser, extension, a new episode loading) is put back
+        function keepSeriesSpeed() {
+            const video = document.getElementById('series-video');
+            if (video && video.playbackRate !== seriesPlaybackRate) video.playbackRate = seriesPlaybackRate;
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.cc-speed')) closeSeriesSpeedMenu();
+        });
+
+        // ---------- Lock: hide every control so taps can't pause or skip ----------
+        function setSeriesLocked(locked, event) {
+            if (event) event.stopPropagation();
+            const container = document.getElementById('video-container');
+            if (!container) return;
+            container.classList.toggle('cc-locked', locked);
+            closeSeriesSpeedMenu();
+            markSeriesControlsActive();
+        }
+
+        // ---------- Next: the next episode that has a video ----------
+        function findNextEpisode() {
+            if (!seriesData || !currentEpisode) return null;
+            const seasons = (seriesData.seasons || []).slice().sort((a, b) => a.seasonNumber - b.seasonNumber);
+            let passedCurrent = false;
+            for (const season of seasons) {
+                const episodes = (season.episodes || []).slice().sort((a, b) => a.episodeNumber - b.episodeNumber);
+                for (const ep of episodes) {
+                    if (passedCurrent && ep.video?.hasVideo) return { season: season.seasonNumber, episode: ep.episodeNumber };
+                    if (season.seasonNumber === currentEpisode.season && ep.episodeNumber === currentEpisode.episode) passedCurrent = true;
+                }
+            }
+            return null;
+        }
+
+        function playNextEpisode(event) {
+            if (event) event.stopPropagation();
+            const next = findNextEpisode();
+            if (next) playEpisode(next.season, next.episode);
         }
 
         function updateFullscreenIcon(isFullscreen) {
@@ -1222,6 +1361,7 @@
             const video = document.getElementById('series-video');
             if (!video || !isFinite(video.duration)) return;
             video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime + deltaSeconds));
+            markSeriesControlsActive();
         }
 
         function isMobileSeriesViewport() {
@@ -1283,8 +1423,9 @@
                 if (seriesId) loadSeries();
                 return;
             }
-            const isAuthorized = await requireLoggedInMember();
-            if (!isAuthorized) return;
+            // Everyone can see the series; signing in and a plan are only
+            // needed to play or download (like the movie player).
+            await checkSeriesAccess();
 
             if (!seriesId) {
                 showError('No series ID provided');
@@ -1344,195 +1485,212 @@
                     ?.episodes?.find(e => e.episodeNumber === currentEpisode.episode)
                 : null;
             
+            // Layout (like the movie player): the video first, then the story
+            // on the left with facts and buttons on the right, then the
+            // episodes as a poster grid.
+            const vjLabel = seriesData.vjName ? (/^vj\b/i.test(seriesData.vjName) ? seriesData.vjName : 'VJ ' + seriesData.vjName) : '';
+            const seriesTitle = seriesData.lugandaTitle || seriesData.originalTitle;
+            const nextEp = findNextEpisode();
+            const totalMinutes = (seriesData.seasons || []).reduce((sum, s) =>
+                sum + (s.episodes || []).reduce((t, e) => t + (parseInt(e.runtime, 10) || 0), 0), 0);
+            const totalRuntime = totalMinutes
+                ? (Math.floor(totalMinutes / 60) ? `${Math.floor(totalMinutes / 60)}h ${totalMinutes % 60}m` : `${totalMinutes}m`)
+                : '';
+            const tilePoster = seasonData?.poster || seriesData.poster || '/assets/images/placeholder.svg';
+            const seasonCount = seriesData.totalSeasons || (seriesData.seasons || []).length || 0;
+
             container.innerHTML = `
-                <!-- Hero Section -->
-                <section class="series-hero">
-                    <img src="${seriesData.backdrop || seriesData.poster || '/assets/images/placeholder.svg'}" 
-                         alt="${seriesData.originalTitle}" class="series-backdrop"
-                         onerror="this.src='/assets/images/placeholder.svg'">
-                    <div class="series-hero-overlay">
-                        <div class="series-hero-content">
-                            <img src="${seriesData.poster || '/assets/images/placeholder.svg'}" 
-                                 alt="${seriesData.originalTitle}" class="series-poster"
-                                 onerror="this.src='/assets/images/placeholder.svg'">
-                            <div class="series-info">
-                                <div class="sp-eyebrow">Series</div>
-                                <h1>${seriesData.lugandaTitle || seriesData.originalTitle}</h1>
-                                ${seriesData.lugandaTitle && seriesData.lugandaTitle !== seriesData.originalTitle
-                                    ? `<p style="color: var(--text-secondary); margin-bottom: 10px;">${seriesData.originalTitle}</p>`
-                                    : ''}
-                                <div class="series-meta">
-                                    <span class="sp-rating-badge">★ ${(seriesData.rating?.imdb || 0).toFixed(1)}</span>
-                                    <span>📅 ${seriesData.year || 'Unknown'}</span>
-                                    <span>📺 ${seriesData.totalSeasons || 0} Season${seriesData.totalSeasons !== 1 ? 's' : ''}</span>
-                                    <span>🎬 ${seriesData.totalEpisodes || 0} Episodes</span>
-                                    ${seriesData.vjName ? `<span>🎙️ VJ ${seriesData.vjName}</span>` : ''}
+                <!-- Player -->
+                <section class="player-section sp-player">
+                    <div class="video-container" id="video-container" onmousemove="markSeriesControlsActive()" onclick="markSeriesControlsActive()" ontouchstart="markSeriesControlsActive()">
+                        ${(() => {
+                            // Signed out, or signed in without a plan (canWatch false,
+                            // from check-access): a play button that asks them to sign
+                            // in or choose a plan, and no video element — so no
+                            // playback request is ever made.
+                            const gateBg = (seriesData.backdrop || seriesData.poster || '').replace(/'/g, '%27');
+                            const gate = (title, text, action) => `
+                                <button type="button" class="sp-gate" onclick="event.stopPropagation(); ${action}"${gateBg ? ` style="background-image:url('${gateBg}')"` : ''}>
+                                    <span class="sp-gate-btn"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.6v12.8c0 .8.9 1.3 1.6.8l10-6.4c.6-.4.6-1.3 0-1.7l-10-6.4C8.9 4.3 8 4.8 8 5.6z"/></svg></span>
+                                    <span class="sp-gate-title">${title}</span>
+                                    <span class="sp-gate-text">${text}</span>
+                                </button>`;
+                            if (window._seriesSignedOut) {
+                                return gate('Sign in to watch', 'Watch every episode in Luganda with a plan from UGX 1,000 a day.', "AccessPrompt.signIn('watch')");
+                            }
+                            if (window._seriesDeviceLimit && !(window._seriesAccess && window._seriesAccess.canWatch === false)) {
+                                return gate('Watch on this device', 'Your Daily plan is signed in on another device.', 'askSeriesOtherDevice()');
+                            }
+                            if (window._seriesAccess && window._seriesAccess.canWatch === false) {
+                                return gate('Subscribe to watch', 'Choose a plan to watch every episode.', 'showSubscribePlans()');
+                            }
+                            if (!currentEp?.video?.hasVideo) {
+                                return `<div class="no-video-message">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                    </svg>
+                                    <h3>Select an Episode</h3>
+                                    <p>Choose an episode from the list below to start watching</p>
+                                </div>`;
+                            }
+                            // Real URL isn't in the page — resolved after render via
+                            // loadCurrentEpisodeVideo(), the same authenticated,
+                            // entitlement-checked flow movies use.
+                            return `
+                                <div class="video-loading-overlay" id="video-loading">
+                                    <div class="spinner"></div>
+                                    <p>Loading video...</p>
                                 </div>
-                                <div class="series-genres">
-                                    ${(seriesData.genres || []).map(g => `<span class="genre-tag">${g}</span>`).join('')}
-                                </div>
-                                <div class="sp-actions">
-                                    <a class="sp-action-btn ${seriesData.trailer ? '' : 'is-disabled'}" ${seriesData.trailer ? `href="${seriesData.trailer}" target="_blank" rel="noopener"` : 'href="javascript:void(0)"'}>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                                            <path d="M10 9l5 3-5 3z" fill="currentColor" stroke="none"></path>
-                                        </svg>
-                                        <span>Trailer</span>
-                                    </a>
-                                    <button class="sp-action-btn" onclick="addToWatchlistSeries()">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-                                        </svg>
-                                        <span>My List</span>
-                                    </button>
-                                    <button class="sp-action-btn" onclick="handleSeriesDownload()">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                            <polyline points="7 10 12 15 17 10"></polyline>
-                                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                                        </svg>
-                                        <span>Download</span>
-                                    </button>
-                                    <button class="sp-action-btn" onclick="openSeriesRequestModal()">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <line x1="22" y1="2" x2="11" y2="13"></line>
-                                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                                        </svg>
-                                        <span>Request</span>
-                                    </button>
-                                </div>
-                                <p class="series-overview">${seriesData.description || 'No description available.'}</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                
-                <div class="series-container">
-                    <!-- Player Section -->
-                    <section class="player-section">
-                        <div class="video-container" id="video-container" onmousemove="markSeriesControlsActive()" onclick="markSeriesControlsActive()" ontouchstart="markSeriesControlsActive()">
-                            ${(() => {
-                                // No free episodes: anyone without an active plan (canWatch
-                                // false, from check-access) gets the subscribe overlay and
-                                // no video element — so no playback request is ever made.
-                                if (window._seriesAccess && window._seriesAccess.canWatch === false) {
-                                    return `<div style="position:absolute;inset:0;width:100%;height:100%;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;" onclick="showSubscribePlans()">
-                                        <div style="width:76px;height:76px;border-radius:50%;background:rgba(74,222,128,0.92);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 14px rgba(74,222,128,0.18);">
-                                            <svg width="30" height="30" viewBox="0 0 24 24" fill="#000"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                                        </div>
-                                        <span style="color:#fff;font-size:13px;background:rgba(0,0,0,0.65);padding:5px 16px;border-radius:20px;">Subscribe to watch</span>
-                                    </div>`;
-                                }
-                                if (!currentEp?.video?.hasVideo) {
-                                    return `<div class="no-video-message">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                        </svg>
-                                        <h3>Select an Episode</h3>
-                                        <p>Choose an episode from the list below to start watching</p>
-                                    </div>`;
-                                }
-                                // Real URL isn't in the page — resolved after render via
-                                // loadCurrentEpisodeVideo(), the same authenticated,
-                                // entitlement-checked flow movies use.
-                                return `
-                                    <div class="video-loading-overlay" id="video-loading">
-                                        <div class="spinner"></div>
-                                        <p>Loading video...</p>
-                                    </div>
-                                    <video id="series-video" controlslist="nodownload noplaybackrate" disablepictureinpicture
-                                           autoplay preload="auto" playsinline
-                                           style="position:absolute;top:0;left:0;width:100%;height:100%;background:#000;"
-                                           oncontextmenu="return false"
-                                           onclick="toggleSeriesPlay()"
-                                           onplay="updateSeriesPlayState(true)"
-                                           onpause="updateSeriesPlayState(false)"
-                                           onended="updateSeriesPlayState(false)"
-                                           ontimeupdate="updateSeriesProgress()"
-                                           onprogress="updateSeriesBuffered()"
-                                           onloadedmetadata="updateSeriesProgress()"
-                                           onwebkitbeginfullscreen="updateFullscreenIcon(true)"
-                                           onwebkitendfullscreen="updateFullscreenIcon(false)"
-                                           oncanplay="hideVideoLoading()">
-                                    </video>
+                                <video id="series-video" controlslist="nodownload noplaybackrate" disablepictureinpicture
+                                       autoplay preload="auto" playsinline
+                                       style="position:absolute;top:0;left:0;width:100%;height:100%;background:#000;"
+                                       oncontextmenu="return false"
+                                       onclick="toggleSeriesPlay()"
+                                       onplay="updateSeriesPlayState(true)"
+                                       onpause="updateSeriesPlayState(false)"
+                                       onended="updateSeriesPlayState(false)"
+                                       ontimeupdate="updateSeriesProgress()"
+                                       onprogress="updateSeriesBuffered()"
+                                       onloadedmetadata="updateSeriesProgress(); keepSeriesSpeed()"
+                                       onratechange="keepSeriesSpeed()"
+                                       onvolumechange="syncSeriesVolume()"
+                                       onwebkitbeginfullscreen="updateFullscreenIcon(true)"
+                                       onwebkitendfullscreen="updateFullscreenIcon(false)"
+                                       oncanplay="hideVideoLoading()">
+                                </video>
 
-                                    <button class="cc-center-play" id="ccCenterPlay" type="button" aria-label="Play" onclick="toggleSeriesPlay()">${CC_CENTER_PLAY_ICON}</button>
+                                <!-- Full screen: "SERIES BY VJ NAME · S1 E2" across the top -->
+                                <div class="cc-top-title">${seriesTitle}${vjLabel ? ' by ' + vjLabel : ''}<span>S${currentEpisode.season} E${currentEpisode.episode}</span></div>
 
-                                    <div class="cc-bar" id="ccBar">
+                                <div class="cc-center">
+                                    <button class="cc-center-seek" type="button" aria-label="Rewind 10 seconds" onclick="seekSeriesVideo(-10)">${CC_SEEK_BACK_ICON}</button>
+                                    <button class="cc-center-play" id="ccCenterPlay" type="button" aria-label="Play or pause" onclick="toggleSeriesPlay()">${CC_CENTER_PLAY_ICON}</button>
+                                    <button class="cc-center-seek" type="button" aria-label="Forward 10 seconds" onclick="seekSeriesVideo(10)">${CC_SEEK_FWD_ICON}</button>
+                                </div>
+
+                                <div class="cc-bar" id="ccBar">
+                                    <div class="cc-timeline">
+                                        <span class="cc-time" id="ccTimeCur">0:00</span>
                                         <div class="cc-progress" id="ccProgress" onclick="seekFromProgressClick(event)" onmousedown="startProgressDrag(event)" ontouchstart="startProgressDrag(event)">
                                             <div class="cc-progress-buffered" id="ccBuffered"></div>
                                             <div class="cc-progress-played" id="ccPlayed"></div>
                                             <div class="cc-progress-handle" id="ccHandle"></div>
                                         </div>
-                                        <div class="cc-row">
-                                            <button class="cc-btn" id="ccPlayBtn" type="button" aria-label="Play/Pause" onclick="toggleSeriesPlay()">${CC_PLAY_ICON}</button>
-                                            <button class="cc-btn" type="button" aria-label="Rewind 10 seconds" onclick="seekSeriesVideo(-10)">${CC_SEEK_ICON}</button>
-                                            <button class="cc-btn forward" type="button" aria-label="Forward 10 seconds" onclick="seekSeriesVideo(10)">${CC_SEEK_ICON}</button>
+                                        <span class="cc-time" id="ccTimeDur">0:00</span>
+                                    </div>
+                                    <div class="cc-row">
+                                        <button class="cc-btn cc-text-btn" type="button" aria-label="Lock the controls" onclick="setSeriesLocked(true, event)">${CC_LOCK_ICON}<span>Lock</span></button>
+                                        <div class="cc-speed">
+                                            <button class="cc-btn cc-text-btn cc-speed-btn" id="ccSpeedBtn" type="button" aria-haspopup="true" aria-expanded="false" onclick="toggleSeriesSpeedMenu(event)"><span id="ccSpeedLabel">${seriesSpeedLabel(seriesPlaybackRate)}</span><span class="cc-caret" aria-hidden="true"></span></button>
+                                            <div class="cc-speed-menu" id="ccSpeedMenu" role="menu">
+                                                ${SERIES_SPEEDS.map(rate => `<button type="button" role="menuitemradio" data-rate="${rate}" class="${rate === seriesPlaybackRate ? 'selected' : ''}" onclick="setSeriesSpeed(${rate}, event)">${rate === 1 ? '1x (Normal)' : rate + 'x'}</button>`).join('')}
+                                            </div>
+                                        </div>
+                                        <button class="cc-btn cc-text-btn cc-next ${nextEp ? '' : 'cc-no-next'}" type="button" aria-label="Next episode" onclick="playNextEpisode(event)">${CC_NEXT_ICON}<span>Next</span></button>
+                                        <div class="cc-volume">
                                             <button class="cc-btn" id="ccMuteBtn" type="button" aria-label="Mute" onclick="toggleSeriesMute()">${CC_VOLUME_ICON}</button>
-                                            <span class="cc-time" id="ccTime">0:00 / 0:00</span>
-                                            <div class="cc-spacer"></div>
-                                            <button class="cc-btn" id="embedFullscreenBtn" type="button" aria-label="Fullscreen" onclick="toggleVideoContainerFullscreen(event)">${FULLSCREEN_ENTER_ICON}</button>
+                                            <input type="range" id="ccVolume" class="cc-volume-slider" min="0" max="1" step="0.05" value="1" aria-label="Volume" oninput="setSeriesVolume(this.value)">
                                         </div>
+                                        <button class="cc-btn" id="embedFullscreenBtn" type="button" aria-label="Fullscreen" onclick="toggleVideoContainerFullscreen(event)">${FULLSCREEN_ENTER_ICON}</button>
                                     </div>
-                                `;
-                            })()}
+                                </div>
+
+                                <!-- Lock: a layer that swallows taps, and one button to unlock -->
+                                <div class="cc-lock-shield" onclick="event.stopPropagation(); markSeriesControlsActive()"></div>
+                                <button class="cc-unlock-btn" type="button" onclick="setSeriesLocked(false, event)">${CC_UNLOCK_ICON}<span>Tap to unlock</span></button>
+                            `;
+                        })()}
+                    </div>
+                </section>
+
+                <div class="series-container">
+                    <!-- Story on the left; facts and buttons on the right -->
+                    <section class="st-details sp-details">
+                        <div class="st-details-main">
+                            <h1 class="movie-title">${seriesTitle}${vjLabel ? `<span class="st-hero-vj">${vjLabel}</span>` : ''}</h1>
+                            ${currentEp ? `<p class="sp-now-playing">Now playing: Season ${currentEpisode.season}, Episode ${currentEpisode.episode}${currentEp.name ? ' &middot; ' + currentEp.name : ''}</p>` : ''}
+                            <p class="movie-description">${seriesData.description || 'No description available.'}</p>
                         </div>
-                        ${currentEp ? `
-                        <div class="now-playing-info" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
-                            <div>
-                                <h3>S${currentEpisode.season} E${currentEpisode.episode}: ${currentEp.name || 'Episode ' + currentEpisode.episode}</h3>
-                                <p>${currentEp.overview || 'No description available.'}</p>
-                            </div>
-                            <button onclick="handleSeriesDownload()" style="flex-shrink:0;padding:8px 16px;background:rgba(74,222,128,0.15);color:#4ade80;border:1px solid rgba(74,222,128,0.3);border-radius:8px;cursor:pointer;font-weight:600;font-size:13px;display:flex;align-items:center;gap:6px;">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                Download
-                            </button>
-                        </div>
-                        ` : ''}
-                        
-                        <!-- Season Tabs -->
-                        <div class="season-tabs">
-                            ${(seriesData.seasons || []).map(season => `
-                                <button class="season-tab ${season.seasonNumber === currentSeason ? 'active' : ''}" 
-                                        onclick="switchSeason(${season.seasonNumber})">
-                                    Season ${season.seasonNumber}
+                        <aside class="st-details-side">
+                            <ul class="st-facts">
+                                <li><span class="st-fact-label">Genre:</span> <span class="movie-genres">${(seriesData.genres || []).map(g => `<span class="genre-tag">${g}</span>`).join('')}</span></li>
+                                <li><span class="st-fact-label">Translated by:</span> <span>${vjLabel}</span></li>
+                                <li><span class="st-fact-label">Released:</span> <span>${seriesData.year || ''}</span></li>
+                                <li><span class="st-fact-label">Seasons:</span> <span>${seasonCount || ''}</span></li>
+                                ${seriesData.rating?.imdb ? `<li class="st-fact-rating"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg><span>${Number(seriesData.rating.imdb).toFixed(1)}</span></li>` : ''}
+                                <li><span class="st-fact-label">Narration:</span> <span>Luganda</span></li>
+                            </ul>
+                            <div class="st-duration">${totalRuntime}</div>
+                            <div class="sp-actions">
+                                <a class="sp-action-btn ${seriesData.trailer ? '' : 'is-disabled'}" ${seriesData.trailer ? `href="${seriesData.trailer}" target="_blank" rel="noopener"` : 'href="javascript:void(0)"'}>
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                                        <path d="M10 9l5 3-5 3z" fill="currentColor" stroke="none"></path>
+                                    </svg>
+                                    <span>Trailer</span>
+                                </a>
+                                <button class="sp-action-btn" onclick="addToWatchlistSeries()">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                    </svg>
+                                    <span>My List</span>
                                 </button>
-                            `).join('')}
-                        </div>
-                        
-                        <!-- Episodes List -->
-                        <div class="episodes-container">
-                            <div class="episodes-header">
-                                <h3>${seasonData?.name || 'Season ' + currentSeason}</h3>
-                                <span class="episode-count">${seasonData?.episodes?.length || 0} Episodes</span>
+                                <button class="sp-action-btn" onclick="handleSeriesDownload()">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                                    </svg>
+                                    <span>Download</span>
+                                </button>
+                                <button class="sp-action-btn" onclick="openSeriesRequestModal()">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                    </svg>
+                                    <span>Request</span>
+                                </button>
                             </div>
-                            <div class="episodes-grid">
-                                ${(seasonData?.episodes || []).map(episode => `
-                                    <div class="episode-card ${!episode.video?.hasVideo ? 'unavailable' : ''} ${currentEpisode?.episode === episode.episodeNumber && currentEpisode?.season === currentSeason ? 'active' : ''}"
-                                         title="${episode.video?.hasVideo ? (episode.overview || episode.name || '') : 'Coming soon'}"
-                                         onclick="${episode.video?.hasVideo ? `playEpisode(${currentSeason}, ${episode.episodeNumber})` : ''}">
-                                        <div class="episode-thumb-wrap">
-                                            <img src="${episode.stillPath || '/assets/images/placeholder.svg'}"
-                                                 alt="${episode.name}" class="episode-thumbnail"
-                                                 onerror="this.src='/assets/images/placeholder.svg'">
-                                            <span class="episode-num-badge">${episode.episodeNumber}</span>
-                                            ${!episode.video?.hasVideo ? '<span class="episode-lock-badge">🔒</span>' : ''}
-                                        </div>
-                                        <div class="episode-info">
-                                            <div class="episode-title">${episode.episodeNumber}. ${episode.name || 'Episode ' + episode.episodeNumber}</div>
-                                            ${episode.runtime || episode.airDate ? `
-                                            <div class="episode-meta">
-                                                ${episode.runtime ? `<span>⏱️ ${episode.runtime} min</span>` : ''}
-                                                ${episode.airDate ? `<span>📅 ${new Date(episode.airDate).toLocaleDateString()}</span>` : ''}
-                                            </div>` : ''}
-                                            <p class="episode-overview">${episode.video?.hasVideo ? (episode.overview || 'No description available.') : 'Coming soon'}</p>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
+                        </aside>
                     </section>
-                    
+
+                    <!-- Season Tabs (only when there is more than one season) -->
+                    ${(seriesData.seasons || []).length > 1 ? `
+                    <div class="season-tabs">
+                        ${(seriesData.seasons || []).map(season => `
+                            <button class="season-tab ${season.seasonNumber === currentSeason ? 'active' : ''}"
+                                    onclick="switchSeason(${season.seasonNumber})">
+                                Season ${season.seasonNumber}
+                            </button>
+                        `).join('')}
+                    </div>` : ''}
+
+                    <!-- Episodes: "NEXT EPS 2" ... "8 Episodes", then a poster grid -->
+                    <div class="episodes-container sp-episodes">
+                        <div class="episodes-header">
+                            <h3>${nextEp
+                                ? `Next <span class="sp-next-badge">${nextEp.season !== currentEpisode.season ? 'S' + nextEp.season + ' ' : ''}EPS ${nextEp.episode}</span>`
+                                : (seasonData?.name || 'Season ' + currentSeason)}</h3>
+                            <span class="episode-count">${seasonData?.episodes?.length || 0} Episodes</span>
+                        </div>
+                        <div class="sp-episode-grid">
+                            ${(seasonData?.episodes || []).map(episode => {
+                                const playable = !!episode.video?.hasVideo;
+                                const isCurrent = currentEpisode?.episode === episode.episodeNumber && currentEpisode?.season === currentSeason;
+                                const label = `Episode ${episode.episodeNumber}${episode.name ? ': ' + episode.name : ''}${playable ? '' : ' (coming soon)'}`;
+                                return `
+                                <button type="button" class="sp-ep ${playable ? '' : 'unavailable'} ${isCurrent ? 'active' : ''}"
+                                        title="${label.replace(/"/g, '&quot;')}" aria-label="${label.replace(/"/g, '&quot;')}"
+                                        ${isCurrent ? 'aria-current="true"' : ''}
+                                        ${playable ? `onclick="playEpisode(${currentSeason}, ${episode.episodeNumber})"` : 'disabled'}>
+                                    <img src="${tilePoster}" alt="" loading="lazy" onerror="this.src='/assets/images/placeholder.svg'">
+                                    <span class="sp-ep-tag">EPS ${episode.episodeNumber}</span>
+                                    ${playable ? '' : `<span class="sp-ep-lock" aria-hidden="true">${CC_LOCK_ICON}</span>`}
+                                </button>`;
+                            }).join('')}
+                        </div>
+                    </div>
+
                     <!-- Cast Section -->
                     ${seriesData.cast && seriesData.cast.length > 0 ? `
                     <section class="cast-section">
@@ -1540,7 +1698,7 @@
                         <div class="cast-grid">
                             ${seriesData.cast.map(actor => `
                                 <div class="cast-card">
-                                    <img src="${actor.image || '/assets/images/placeholder.svg'}" 
+                                    <img src="${actor.image || '/assets/images/placeholder.svg'}"
                                          alt="${actor.name}"
                                          onerror="this.src='/assets/images/placeholder.svg'">
                                     <div class="name">${actor.name}</div>
@@ -1552,6 +1710,8 @@
                     ` : ''}
                 </div>
             `;
+
+            syncSeriesVolume();
 
             loadCurrentEpisodeVideo();
         }
@@ -1577,12 +1737,28 @@
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
                     body: JSON.stringify({ movieId: seriesData._id, season: currentEpisode.season, episode: currentEpisode.episode })
                 });
-                const tokenData = await tokenResp.json();
+                const tokenData = await tokenResp.json().catch(() => ({}));
                 if (!tokenData.success || !tokenData.token) {
-                    showVideoLoadError(tokenData.message || 'Unable to start playback');
+                    if (tokenResp.status === 401) {
+                        // signed out (on another device, or the sign-in expired)
+                        clearSeriesSession();
+                        renderSeries();
+                    } else if (tokenData.code === 'DEVICE_LIMIT') {
+                        // Daily plan signed in on another device: "Watch on this device" on the video
+                        window._seriesDeviceLimit = tokenData.otherDevice || {};
+                        renderSeries();
+                    } else {
+                        showVideoLoadError(tokenData.message || 'Unable to start playback');
+                    }
                     return;
                 }
                 currentEpisodePlaybackToken = tokenData.token;
+                // Daily plan: stop if the account moves to another device mid-episode
+                AccessPrompt.guardPlayback({
+                    apiBase: API_BASE_URL,
+                    getToken: () => normalizeBearerToken(getAuthToken()),
+                    getMedia: () => document.getElementById('series-video')
+                });
 
                 const resolveResp = await fetch(`${API_BASE_URL}/api/video/resolve/luganda/${seriesData._id}?season=${currentEpisode.season}&episode=${currentEpisode.episode}&token=${encodeURIComponent(tokenData.token)}`);
                 const resolveData = await resolveResp.json();
@@ -1633,8 +1809,11 @@
         }
         
         function playEpisode(season, episodeNumber) {
-            // No free episodes — show the plans straight away for anyone
-            // without an active plan.
+            // No free episodes — ask to sign in, or show the plans, straight away
+            if (window._seriesSignedOut) {
+                AccessPrompt.signIn('watch');
+                return;
+            }
             if (window._seriesAccess && window._seriesAccess.canWatch === false) {
                 showSubscribePlans();
                 return;
@@ -1642,6 +1821,7 @@
             currentSeason = season;
             currentEpisode = { season, episode: episodeNumber };
             renderSeries();
+            if (window._seriesDeviceLimit) askSeriesOtherDevice();
             
             // Scroll to player
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1650,7 +1830,7 @@
         function showError(message) {
             document.getElementById('main-content').innerHTML = `
                 <div class="error-state">
-                    <h2>😞 Oops!</h2>
+                    <h2>Oops!</h2>
                     <p>${message}</p>
                     <a href="series.html" class="btn-primary">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1749,13 +1929,27 @@
             if (currentEpisode) renderSeries();
         }
 
+        // Download: signed out → sign in; no plan with downloads → plans page
+        // (Daily subscribers are told downloads start at Weekly); otherwise the
+        // server makes the final check in downloadEpisode().
         function handleSeriesDownload() {
-            const access = window._seriesAccess;
-            if (access && (access.canDownload || access.isAdmin)) {
-                downloadEpisode();
-            } else {
-                showDownloadPrompt();
+            if (window._seriesSignedOut || !normalizeBearerToken(getAuthToken())) {
+                AccessPrompt.signIn('download');
+                return;
             }
+            const access = window._seriesAccess;
+            if (access && !(access.canDownload || access.isAdmin)) {
+                showSeriesPlans(seriesPayingWithoutDownloads() ? 'upgrade' : 'download');
+                return;
+            }
+            downloadEpisode();
+        }
+
+        // Paying, but on a plan without downloads (Daily)
+        function seriesPayingWithoutDownloads(data) {
+            const access = window._seriesAccess;
+            if (access) return !!(access.isActive && access.plan && access.plan !== 'free' && !access.canDownload);
+            return !!data && data.code === 'DOWNLOAD_REQUIRES_SUBSCRIPTION' && /daily/i.test(data.message || '');
         }
 
         function addToWatchlistSeries() {
@@ -1837,181 +2031,121 @@
             if (e.key === 'Escape') closeSeriesRequestModal();
         });
 
-        async function _seriesSelectPlan(plan) {
-            const token = localStorage.getItem('token') || localStorage.getItem('authToken') || '';
-            if (!token) { window.location.href = 'login.html'; return; }
-            const btn = document.querySelector(`[data-series-plan="${plan}"]`);
-            const origText = btn ? btn.textContent : '';
-            if (btn) { btn.disabled = true; btn.textContent = 'Processing...'; }
-
-            // Open synchronously, inside the click gesture, so it isn't popup-blocked.
-            const popup = window.PesapalCheckout?.openBlankPopup();
-
-            try {
-                const r = await fetch(`${API_BASE_URL}/api/payments/subscribe`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                    body: JSON.stringify({ plan, paymentMethod: 'pesapal' })
-                });
-                const d = await r.json();
-                if (d.status === 'success' && d.data && d.data.redirectUrl) {
-                    document.getElementById('downloadPrompt')?.remove();
-
-                    if (window.PesapalCheckout && popup) {
-                        window.PesapalCheckout.runCheckout(popup, d.data.redirectUrl, {
-                            ref: d.data.merchantReference,
-                            token,
-                            apiBase: API_BASE_URL,
-                            onSuccess: () => {
-                                window.dispatchEvent(new CustomEvent('pesapal-payment-success', { detail: { plan } }));
-                                window.location.reload();
-                            },
-                            onFailure: (status) => {
-                                if (status === 'cancelled') return;
-                                alert(status === 'timeout'
-                                    ? 'Still waiting on confirmation — check back in a moment.'
-                                    : 'Payment failed. Please try again.');
-                            }
-                        });
-                    } else {
-                        // Popup blocked or helper unavailable — fall back to same-tab redirect.
-                        window.location.href = d.data.redirectUrl;
-                    }
-                } else {
-                    if (popup && !popup.closed) popup.close();
-                    alert(d.message || d.error || 'Payment error. Please try again.');
-                    if (btn) { btn.disabled = false; btn.textContent = origText; }
-                }
-            } catch (e) {
-                if (popup && !popup.closed) popup.close();
-                alert('Network error. Please try again.');
-                if (btn) { btn.disabled = false; btn.textContent = origText; }
-            }
+        // Signed in without the right plan: the plans page (js/access-prompt.js),
+        // which shows this series and brings the viewer back here after paying.
+        // reason: 'watch' | 'download' | 'upgrade' (Daily plan, no downloads)
+        function showSeriesPlans(reason) {
+            AccessPrompt.plans(reason || 'watch', { seriesId: seriesData && seriesData._id });
         }
 
-        function showSubscribePlans() { showDownloadPrompt(); }
-
-        function showDownloadPrompt() {
-            const existing = document.getElementById('downloadPrompt');
-            if (existing) existing.remove();
-            const overlay = document.createElement('div');
-            overlay.id = 'downloadPrompt';
-            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
-            overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
-            overlay.innerHTML = `
-                <div style="background:linear-gradient(145deg,#1a1a2e,#16213e);border:1px solid rgba(74,222,128,0.2);border-radius:20px;padding:32px;max-width:420px;width:100%;text-align:center;">
-                    <div style="width:60px;height:60px;border-radius:50%;background:rgba(74,222,128,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    </div>
-                    <h3 style="color:#fff;font-size:18px;margin-bottom:8px;">Unlock Full Access</h3>
-                    <p style="color:#888;font-size:13px;line-height:1.6;margin-bottom:16px;">Watch every episode, ad-light, with download included — on any plan below.</p>
-                    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;text-align:left;">
-                        <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(255,255,255,0.75);">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            Every season, every VJ translation
-                        </div>
-                        <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(255,255,255,0.75);">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            Download for offline viewing
-                        </div>
-                        <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(255,255,255,0.75);">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            Cancel anytime, no contract
-                        </div>
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
-                        <button data-series-plan="daily" onclick="_seriesSelectPlan('daily')" style="padding:16px 12px;background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.25);border-radius:12px;cursor:pointer;">
-                            <div style="font-size:20px;font-weight:800;color:#ffc800;">1,000</div>
-                            <div style="font-size:11px;color:#888;margin-top:2px;">UGX / Day</div>
-                        </button>
-                        <button data-series-plan="weekly" onclick="_seriesSelectPlan('weekly')" style="padding:16px 12px;background:rgba(0,217,255,0.08);border:1px solid rgba(0,217,255,0.25);border-radius:12px;cursor:pointer;">
-                            <div style="font-size:20px;font-weight:800;color:#00d9ff;">5,000</div>
-                            <div style="font-size:11px;color:#888;margin-top:2px;">UGX / Week</div>
-                        </button>
-                        <button data-series-plan="biweekly" onclick="_seriesSelectPlan('biweekly')" style="padding:16px 12px;background:rgba(180,100,255,0.08);border:1px solid rgba(180,100,255,0.25);border-radius:12px;cursor:pointer;">
-                            <div style="font-size:20px;font-weight:800;color:#b464ff;">7,000</div>
-                            <div style="font-size:11px;color:#888;margin-top:2px;">UGX / 2 Weeks</div>
-                        </button>
-                        <button data-series-plan="monthly" onclick="_seriesSelectPlan('monthly')" style="padding:16px 12px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:12px;cursor:pointer;position:relative;">
-                            <div style="position:absolute;top:-8px;right:8px;background:#4ade80;color:#000;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;">BEST</div>
-                            <div style="font-size:20px;font-weight:800;color:#4ade80;">12,000</div>
-                            <div style="font-size:11px;color:#888;margin-top:2px;">UGX / Month</div>
-                        </button>
-                    </div>
-                    <button onclick="this.closest('#downloadPrompt').remove()" style="background:none;border:none;color:#666;font-size:12px;cursor:pointer;">Not now</button>
-                </div>
-            `;
-            document.body.appendChild(overlay);
-        }
+        function showSubscribePlans() { showSeriesPlans('watch'); }
+        function showDownloadPrompt() { showSeriesPlans('download'); }
 
         function isIOS() {
             return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         }
 
-        async function downloadEpisode() {
-            if (!currentEpisode) return;
-            const seasonData = seriesData.seasons?.find(s => s.seasonNumber === currentSeason);
-            const ep = seasonData?.episodes?.find(e => e.episodeNumber === currentEpisode?.episode);
-            if (!ep?.video?.hasVideo) return;
-
-            // forDownload:true forces the real paid-plan check server-side even
-            // for the free S1E1 preview episode.
-            const authToken = normalizeBearerToken(getAuthToken());
-            const tokenResp = await fetch(`${API_BASE_URL}/api/video/playback-token`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
-                body: JSON.stringify({ movieId: seriesData._id, season: currentEpisode.season, episode: currentEpisode.episode, forDownload: true })
+        let seriesDownloadInProgress = false;
+        // The Daily plan works on 1 device at a time: "Log out your other
+        // device?" Yes logs it out and carries on here (retry), No closes.
+        function askSeriesOtherDevice(reason, otherDevice, retry) {
+            AccessPrompt.otherDevice(reason || 'watch', {
+                apiBase: API_BASE_URL,
+                token: normalizeBearerToken(getAuthToken()),
+                otherDevice: otherDevice || window._seriesDeviceLimit,
+                onYes: () => {
+                    window._seriesDeviceLimit = null;
+                    if (retry) retry();
+                    else renderSeries();
+                }
             });
-            const tokenData = await tokenResp.json();
-            if (!tokenData.success || !tokenData.token) {
-                showNotificationToast(tokenData.message || 'Unable to start download');
-                return;
-            }
-
-            const title = `${seriesData.originalTitle || 'Series'} S${currentEpisode.season}E${currentEpisode.episode}`;
-            const fileName = `${title.replace(/[^a-zA-Z0-9 _-]/g, '').trim()}.mp4`;
-
-            const resolveResp = await fetch(`${API_BASE_URL}/api/video/resolve/luganda/${seriesData._id}?season=${currentEpisode.season}&episode=${currentEpisode.episode}&token=${encodeURIComponent(tokenData.token)}&download=${encodeURIComponent(fileName)}`);
-            const resolveData = await resolveResp.json();
-            if (!resolveData.success || !resolveData.directUrl) {
-                showNotificationToast(resolveData.message || 'Download unavailable for this episode');
-                return;
-            }
-
-            // direct:true means the server signed the CDN URL itself (Bunny
-            // Token Authentication configured for that host), with the
-            // `download` param baked in so Bunny adds Content-Disposition on
-            // its own — the file comes straight from the CDN, not through
-            // this server's bandwidth. Otherwise fall back to the backend
-            // proxy, which still has to add that header itself.
-            const proxyDownload = resolveData.direct
-                ? resolveData.directUrl
-                : `${API_BASE_URL}/api/video/stream-proxy?url=${encodeURIComponent(resolveData.directUrl)}&token=${encodeURIComponent(tokenData.token)}&download=${encodeURIComponent(fileName)}`;
-
-            if (isIOS()) {
-                showIOSDownloadInstructions(proxyDownload);
-                return;
-            }
-
-            const link = document.createElement('a');
-            link.href = proxyDownload;
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showNotificationToast('Download started!');
         }
 
-        function showNotificationToast(message) {
-            const existing = document.querySelector('.series-toast');
-            if (existing) existing.remove();
-            const toast = document.createElement('div');
-            toast.className = 'series-toast';
-            toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#13131f;border:1px solid rgba(74,222,128,0.3);color:#fff;padding:12px 22px;border-radius:24px;font-size:14px;font-weight:600;z-index:100000;box-shadow:0 12px 32px rgba(0,0,0,0.5);';
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 2800);
+        async function downloadEpisode() {
+            if (!currentEpisode) {
+                AccessPrompt.toast('Choose an episode first, then press Download.');
+                return;
+            }
+            const seasonData = seriesData.seasons?.find(s => s.seasonNumber === currentSeason);
+            const ep = seasonData?.episodes?.find(e => e.episodeNumber === currentEpisode?.episode);
+            if (!ep?.video?.hasVideo) {
+                AccessPrompt.toast('This episode isn’t available yet.');
+                return;
+            }
+            if (seriesDownloadInProgress) return;
+            seriesDownloadInProgress = true;
+            AccessPrompt.toast('Preparing your download...');
+
+            try {
+                // forDownload:true makes the server check the plan includes downloads
+                const authToken = normalizeBearerToken(getAuthToken());
+                const tokenResp = await fetch(`${API_BASE_URL}/api/video/playback-token`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
+                    body: JSON.stringify({ movieId: seriesData._id, season: currentEpisode.season, episode: currentEpisode.episode, forDownload: true })
+                });
+                const tokenData = await tokenResp.json().catch(() => ({}));
+                if (!tokenData.success || !tokenData.token) {
+                    if (tokenResp.status === 401) {
+                        clearSeriesSession();
+                        AccessPrompt.signIn('download');
+                    } else if (tokenData.code === 'DEVICE_LIMIT') {
+                        askSeriesOtherDevice('download', tokenData.otherDevice, () => {
+                            renderSeries();
+                            downloadEpisode();
+                        });
+                    } else if (tokenResp.status === 403) {
+                        showSeriesPlans(seriesPayingWithoutDownloads(tokenData) ? 'upgrade' : 'download');
+                    } else {
+                        AccessPrompt.toast(tokenData.message || 'The download couldn’t start. Please try again.', 'error');
+                    }
+                    return;
+                }
+
+                const title = `${seriesData.originalTitle || 'Series'} S${currentEpisode.season}E${currentEpisode.episode}`;
+                const fileName = `${title.replace(/[^a-zA-Z0-9 _-]/g, '').trim()}.mp4`;
+
+                const resolveResp = await fetch(`${API_BASE_URL}/api/video/resolve/luganda/${seriesData._id}?season=${currentEpisode.season}&episode=${currentEpisode.episode}&token=${encodeURIComponent(tokenData.token)}&download=${encodeURIComponent(fileName)}`);
+                const resolveData = await resolveResp.json().catch(() => ({}));
+                if (!resolveData.success || !resolveData.directUrl) {
+                    AccessPrompt.toast(resolveData.message || 'This episode can’t be downloaded right now.', 'error');
+                    return;
+                }
+
+                // direct:true means the server signed the CDN URL itself (Bunny
+                // Token Authentication configured for that host), with the
+                // `download` param baked in so Bunny adds Content-Disposition on
+                // its own — the file comes straight from the CDN, not through
+                // this server's bandwidth. Otherwise fall back to the backend
+                // proxy, which still has to add that header itself.
+                const proxyDownload = resolveData.direct
+                    ? resolveData.directUrl
+                    : `${API_BASE_URL}/api/video/stream-proxy?url=${encodeURIComponent(resolveData.directUrl)}&token=${encodeURIComponent(tokenData.token)}&download=${encodeURIComponent(fileName)}`;
+
+                if (isIOS()) {
+                    showIOSDownloadInstructions(proxyDownload);
+                    return;
+                }
+
+                const link = document.createElement('a');
+                link.href = proxyDownload;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                AccessPrompt.toast('Your download has started.');
+            } catch (error) {
+                console.error('Episode download error:', error);
+                AccessPrompt.toast('Network error. Check your connection and try again.', 'error');
+            } finally {
+                seriesDownloadInProgress = false;
+            }
+        }
+
+        // A clear notice at the bottom of the screen (js/access-prompt.js)
+        function showNotificationToast(message, kind) {
+            AccessPrompt.toast(message, kind);
         }
 
         function showIOSDownloadInstructions(url) {
@@ -2054,5 +2188,6 @@
     
     <!-- System Notification -->
     <script src="js/system-notification.js?v=20260124"></script>
+    <script defer src="js/site-theme.js"></script>
 </body>
 </html>

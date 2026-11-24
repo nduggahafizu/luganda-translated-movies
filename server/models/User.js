@@ -295,22 +295,23 @@ userSchema.methods.canAccessContent = function(requiredPlan) {
     return this.hasActiveSubscription() && userPlanLevel >= requiredPlanLevel;
 };
 
-// Plan capabilities
+// Plan capabilities (owner's decision, Nov 2026):
+//  - downloads on every paid plan, Daily included
+//  - only the UGX 1,000 Daily plan has a device limit (1 device); every other
+//    plan, the free account and the trial have no device limit
+const UNLIMITED_DEVICES = Infinity;
 const PLAN_CONFIG = {
-    free:     { devices: 1, download: false, ads: true },
-    trial:    { devices: 2, download: false, ads: false },
-    // No downloads on daily: at UGX 1,000 (~$0.26) the plan is underwater
-    // after roughly three downloads — a ~1.5GB movie costs ~$0.075 in egress,
-    // and nothing capped how many a 24-hour subscriber could take.
-    daily:    { devices: 1, download: false, ads: true },
-    weekly:   { devices: 1, download: true,  ads: true },
-    biweekly: { devices: 1, download: true,  ads: false },
-    monthly:  { devices: 2, download: true,  ads: false },
-    starter:  { devices: 1, download: true,  ads: true },
-    basic:    { devices: 1, download: true,  ads: true },
-    standard: { devices: 1, download: true,  ads: false },
-    premium:  { devices: 2, download: true,  ads: false },
-    vip:      { devices: 2, download: true,  ads: false }
+    free:     { devices: UNLIMITED_DEVICES, download: false, ads: true },
+    trial:    { devices: UNLIMITED_DEVICES, download: false, ads: false },
+    daily:    { devices: 1,                 download: true,  ads: true },
+    weekly:   { devices: UNLIMITED_DEVICES, download: true,  ads: true },
+    biweekly: { devices: UNLIMITED_DEVICES, download: true,  ads: false },
+    monthly:  { devices: UNLIMITED_DEVICES, download: true,  ads: false },
+    starter:  { devices: UNLIMITED_DEVICES, download: true,  ads: true },
+    basic:    { devices: UNLIMITED_DEVICES, download: true,  ads: true },
+    standard: { devices: UNLIMITED_DEVICES, download: true,  ads: false },
+    premium:  { devices: UNLIMITED_DEVICES, download: true,  ads: false },
+    vip:      { devices: UNLIMITED_DEVICES, download: true,  ads: false }
 };
 
 userSchema.methods.getPlanConfig = function() {
@@ -323,15 +324,15 @@ userSchema.methods.getPlanConfig = function() {
     if (this.subscription.plan !== 'free' && this.hasActiveSubscription()) {
         return PLAN_CONFIG[this.subscription.plan] || PLAN_CONFIG.free;
     }
-    // Trial gets full streaming access (2 devices, no ads) but NOT
+    // Trial gets full streaming access (no device limit, no ads) but NOT
     // downloads — downloads stay a paid-only perk even during the trial.
     if (this.isInTrialPeriod()) return PLAN_CONFIG.trial;
     return PLAN_CONFIG.free;
 };
 
-// Get max allowed devices for this user
+// Get max allowed devices for this user (Infinity = no limit; APIs send null)
 userSchema.methods.getMaxDevices = function() {
-    if (this.role === 'admin') return 10;
+    if (this.role === 'admin') return UNLIMITED_DEVICES;
     return this.getPlanConfig().devices;
 };
 
@@ -350,23 +351,42 @@ userSchema.methods.shouldSeeAds = function() {
 
 userSchema.statics.PLAN_CONFIG = PLAN_CONFIG;
 
-// Register a device — auto-evicts oldest device when limit is hit (newest wins)
+// Register the device making this request (one id per device and browser:
+// tabs and network changes are the same device — see utils/deviceId.js).
+// Returns { allowed: false } when the plan's device limit is reached (only
+// Daily: 1 device) by another device used in the last 24 hours; this device
+// is then not added. The site asks "Log out your other device?" on sign-in
+// (GET /api/auth/device-check) and on Play/Download (DEVICE_LIMIT from
+// /api/video/playback-token); Yes = POST /api/auth/device-switch.
 userSchema.methods.registerDevice = function(deviceId, userAgent, ip) {
+    const now = Date.now();
+    const lastUsed = d => new Date(d.lastActive).getTime();
+
+    // Forget devices not used for 24 hours
+    if (this.activeDevices.some(d => lastUsed(d) <= now - 24 * 60 * 60 * 1000)) {
+        this.activeDevices = this.activeDevices.filter(d => lastUsed(d) > now - 24 * 60 * 60 * 1000);
+    }
+
+    const maxDevices = this.getMaxDevices();
+    // More devices listed than the plan allows (e.g. used on several devices
+    // on Weekly, then bought Daily): the most recently used keep their place
+    if (this.activeDevices.length > maxDevices) {
+        const keep = new Set([...this.activeDevices]
+            .sort((a, b) => lastUsed(b) - lastUsed(a))
+            .slice(0, maxDevices)
+            .map(d => d.deviceId));
+        this.activeDevices = this.activeDevices.filter(d => keep.has(d.deviceId));
+    }
+
     const existing = this.activeDevices.find(d => d.deviceId === deviceId);
     if (existing) {
         existing.lastActive = new Date();
         existing.ip = ip;
         return { allowed: true };
     }
-    // Clean stale devices (inactive > 24 hours)
-    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    this.activeDevices = this.activeDevices.filter(d => d.lastActive > cutoff);
 
-    const maxDevices = this.getMaxDevices();
-    // Auto-evict oldest device(s) to make room — newest device always wins
-    while (this.activeDevices.length >= maxDevices) {
-        this.activeDevices.sort((a, b) => new Date(a.lastActive) - new Date(b.lastActive));
-        this.activeDevices.shift(); // remove the least-recently-active device
+    if (this.activeDevices.length >= maxDevices) {
+        return { allowed: false };
     }
     this.activeDevices.push({ deviceId, userAgent, ip, lastActive: new Date() });
     return { allowed: true };

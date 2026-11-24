@@ -44,19 +44,19 @@ class MobileVideoGestures {
         // Seek indicator
         this.seekIndicator = document.createElement('div');
         this.seekIndicator.className = 'gesture-indicator seek-indicator';
-        this.seekIndicator.innerHTML = '<span class="seek-icon">⏩</span><span class="seek-text">+10s</span>';
+        this.seekIndicator.innerHTML = '<span class="seek-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="13 19 22 12 13 5 13 19"/><polygon points="2 19 11 12 2 5 2 19"/></svg></span><span class="seek-text">+10s</span>';
         this.container.appendChild(this.seekIndicator);
         
         // Volume indicator
         this.volumeIndicator = document.createElement('div');
         this.volumeIndicator.className = 'gesture-indicator volume-indicator';
-        this.volumeIndicator.innerHTML = '<span class="indicator-icon">🔊</span><span class="indicator-value">100%</span>';
+        this.volumeIndicator.innerHTML = '<span class="indicator-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></span><span class="indicator-value">100%</span>';
         this.container.appendChild(this.volumeIndicator);
         
         // Brightness indicator
         this.brightnessIndicator = document.createElement('div');
         this.brightnessIndicator.className = 'gesture-indicator brightness-indicator';
-        this.brightnessIndicator.innerHTML = '<span class="indicator-icon">☀️</span><span class="indicator-value">100%</span>';
+        this.brightnessIndicator.innerHTML = '<span class="indicator-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span><span class="indicator-value">100%</span>';
         this.container.appendChild(this.brightnessIndicator);
         
         // Add styles
@@ -241,7 +241,7 @@ class MobileVideoGestures {
                 this.video.muted = false;
                 
                 this.volumeIndicator.querySelector('.indicator-value').textContent = Math.round(newVolume * 100) + '%';
-                this.volumeIndicator.querySelector('.indicator-icon').textContent = newVolume === 0 ? '🔇' : newVolume < 0.5 ? '🔉' : '🔊';
+                this.volumeIndicator.querySelector('.indicator-icon').innerHTML = newVolume === 0 ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>' : newVolume < 0.5 ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>' : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
                 this.showIndicator(this.volumeIndicator, true);
             } else if (touchX <= rect.width / 2 && this.options.enableSwipeBrightness) {
                 // Left side - Brightness (using CSS filter)

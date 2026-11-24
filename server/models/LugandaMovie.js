@@ -263,6 +263,15 @@ const lugandaMovieSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+
+    // Free movies (picked in the admin's All movies list): anyone signed in
+    // can watch them without a plan; downloads still need a plan.
+    // Listed on free-movies.html (GET /api/luganda-movies/free).
+    isFree: {
+        type: Boolean,
+        default: false,
+        index: true
+    },
     
     trending: {
         type: Boolean,

@@ -26,9 +26,12 @@
         }
     }
 
+    // opts: { ref, token, apiBase, onSuccess, onFailure(status), onDone,
+    //         onWaiting } — onWaiting runs when the PesaPal window is closed
+    //         before the payment is confirmed; checking carries on.
     function runCheckout(popup, redirectUrl, opts) {
         opts = opts || {};
-        const { ref, token, apiBase, onSuccess, onFailure, onDone } = opts;
+        const { ref, token, apiBase, onSuccess, onFailure, onDone, onWaiting } = opts;
         const origin = window.location.origin;
 
         if (!popup || popup.closed) {
@@ -63,33 +66,53 @@
         }
         window.addEventListener('message', onMessage);
 
-        // Polling fallback — covers the case where postMessage never arrives
-        // (e.g. the popup gets closed right after PesaPal settles, before
-        // its script runs).
+        // Keep asking our server (which asks PesaPal) until the payment
+        // settles. Mobile money is often approved on the phone after the
+        // PesaPal window has been closed, so closing it doesn't stop the
+        // checking; and a failed attempt can be retried inside the PesaPal
+        // window, so "failed" only counts once the window is closed.
+        // The server's own background check carries on after this stops.
+        const POLL_MS = 5000;
+        const MAX_MS_OPEN = 15 * 60 * 1000;    // window still open
+        const MAX_MS_CLOSED = 10 * 60 * 1000;  // after the window was closed
+        const startedAt = Date.now();
+        let closedAt = null;
+        let lastStatus = 'pending';
+
         if (ref && token && apiBase) {
-            let attempts = 0;
-            const maxAttempts = 90; // ~7.5 min at 5s
             pollTimer = setInterval(async () => {
                 if (settled) return;
-                attempts++;
                 try {
                     const res = await fetch(`${apiBase}/api/payments/pesapal/verify/${encodeURIComponent(ref)}`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     const data = await res.json();
-                    if (data.status === 'success') finish('success', data);
-                    else if (data.status === 'failed') finish('failed', data);
+                    lastStatus = data.status || 'pending';
+                    if (data.status === 'success') { finish('success', data); return; }
+                    if (data.status === 'failed' && closedAt) { finish('failed', data); return; }
                 } catch (e) { /* transient — keep trying */ }
 
-                if (!settled && attempts >= maxAttempts) finish('timeout', null);
-            }, 5000);
+                const now = Date.now();
+                if (closedAt && now - closedAt > MAX_MS_CLOSED) {
+                    // closed and still nothing: stop quietly (the page already
+                    // said the plan switches on by itself once PesaPal confirms)
+                    finish('cancelled', null);
+                } else if (!closedAt && now - startedAt > MAX_MS_OPEN) {
+                    finish(lastStatus === 'failed' ? 'failed' : 'timeout', null);
+                }
+            }, POLL_MS);
         }
 
-        // If the user just closes the popup themselves without paying,
-        // stop waiting instead of polling forever.
+        // Window closed before the payment was confirmed: keep checking
+        // (if we can), and let the page say so.
         closeWatchTimer = setInterval(() => {
-            if (settled) return;
-            if (popup.closed) finish('cancelled', null);
+            if (settled || closedAt || !popup.closed) return;
+            closedAt = Date.now();
+            clearInterval(closeWatchTimer);
+            closeWatchTimer = null;
+            if (!pollTimer) { finish('cancelled', null); return; }
+            if (lastStatus === 'failed') { finish('failed', null); return; }
+            if (onWaiting) onWaiting();
         }, 1000);
     }
 

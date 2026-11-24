@@ -6,6 +6,9 @@ const crypto = require('crypto');
 const axios = require('axios');
 const { memCache, clearMemoryCache } = require('../middleware/cache');
 const { protect } = require('../middleware/auth');
+// Changing or deleting a movie is for admins only (the admin pages send the
+// admin's sign-in) — otherwise anyone could, for example, mark movies free
+const { adminOnly } = require('../middleware/adminAuth');
 
 // Import notification service (optional - won't break if not available)
 let notifyNewMovie, notifyVjFollowers;
@@ -824,6 +827,36 @@ router.get('/featured', memCache(60), async (req, res) => {
     }
 });
 
+// GET /api/luganda-movies/free?page=1&limit=24 - Free movies, newest first
+// (picked in the admin's All movies list; shown on free-movies.html)
+router.get('/free', memCache(60), async (req, res) => {
+    setCorsHeaders(req, res);
+    setCacheHeaders(res, 60);
+    try {
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.min(60, Math.max(1, parseInt(req.query.limit) || 24));
+        const query = { status: 'published', isFree: true };
+        const [movies, total] = await Promise.all([
+            LugandaMovie.find(query)
+                .sort({ createdAt: -1 })
+                .skip((page - 1) * limit)
+                .limit(limit)
+                .select('-__v')
+                .lean(),
+            LugandaMovie.countDocuments(query)
+        ]);
+        res.json({
+            success: true,
+            data: sanitizeMoviesForPublic(movies),
+            count: movies.length,
+            pagination: { page, limit, total, pages: Math.ceil(total / limit) }
+        });
+    } catch (error) {
+        console.error('Error fetching free movies:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch free movies' });
+    }
+});
+
 // GET /api/luganda-movies/todays-picks - Get today's picks (CACHED for 60 seconds)
 router.get('/todays-picks', memCache(60), async (req, res) => {
     setCorsHeaders(req, res);
@@ -1178,7 +1211,7 @@ router.post('/:id/view', async (req, res) => {
 });
 
 // PATCH /api/luganda-movies/:id - Quick update (toggle trending, featured, todaysPicks, forYou)
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', adminOnly, async (req, res) => {
     setCorsHeaders(req, res);
     try {
         const { id } = req.params;
@@ -1199,6 +1232,7 @@ router.patch('/:id', async (req, res) => {
         if (body.isTodaysPicks !== undefined) updateData.todaysPicks = body.isTodaysPicks;
         if (body.forYou !== undefined) updateData.forYou = body.forYou;
         if (body.isForYou !== undefined) updateData.forYou = body.isForYou;
+        if (body.isFree !== undefined) updateData.isFree = !!body.isFree;
         
         // Also allow updating status
         if (body.status) updateData.status = body.status;
@@ -1229,7 +1263,7 @@ router.patch('/:id', async (req, res) => {
 });
 
 // PUT /api/luganda-movies/:id - Update a movie
-router.put('/:id', async (req, res) => {
+router.put('/:id', adminOnly, async (req, res) => {
     setCorsHeaders(req, res);
     try {
         const { id } = req.params;
@@ -1258,6 +1292,7 @@ router.put('/:id', async (req, res) => {
             featured,
             trending,
             forYou,
+            isFree,
             status,
             requiredPlan,
             trailer
@@ -1280,6 +1315,7 @@ router.put('/:id', async (req, res) => {
         if (featured !== undefined) updateData.featured = featured;
         if (trending !== undefined) updateData.trending = trending;
         if (forYou !== undefined) updateData.forYou = forYou;
+        if (isFree !== undefined) updateData.isFree = !!isFree;
         if (status) updateData.status = status;
         if (requiredPlan) updateData.requiredPlan = requiredPlan;
         if (trailer !== undefined) updateData.trailer = trailer;
@@ -1320,7 +1356,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE /api/luganda-movies/:id - Delete a movie
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', adminOnly, async (req, res) => {
     setCorsHeaders(req, res);
     try {
         const { id } = req.params;

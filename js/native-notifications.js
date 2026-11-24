@@ -165,7 +165,7 @@
     window.notifyNewMovie = function(movie) {
         if (isNativeApp) {
             showLocalNotification(
-                '🎬 New Movie Added!',
+                'New Movie Added!',
                 `${movie.title} is now available in ${movie.language || 'Luganda'}`,
                 { movieId: movie._id, url: `/movie-details.html?id=${movie._id}` }
             );

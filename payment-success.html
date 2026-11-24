@@ -174,13 +174,22 @@
                         showState('success', 'Payment Confirmed!', 'You can close this window.', null);
                         setTimeout(() => { try { window.close(); } catch (_) {} }, 1200);
                     } else {
+                        // Came from a movie or series (saved by subscription.html):
+                        // go straight back to it. Only pages on this site.
+                        let backTo = '';
+                        try {
+                            const saved = localStorage.getItem('unrulyReturnAfterPayment') || '';
+                            localStorage.removeItem('unrulyReturnAfterPayment');
+                            if (/^\/[^/\\]/.test(saved)) backTo = saved;
+                        } catch (_) {}
+                        const next = backTo || 'profile.html';
                         showState('success', 'Payment Successful!',
                             `Your <strong style="color:#fff">${data.plan || ''}</strong> plan is now active. Enjoy Unruly Movies!`,
-                            `<a href="index.html" class="ps-btn primary">Start Watching</a>`
+                            `<a href="${backTo ? backTo.replace(/"/g, '&quot;') : 'index.html'}" class="ps-btn primary">${backTo ? 'Continue watching' : 'Start Watching'}</a>`
                         );
                         setTimeout(() => {
                             try { window.close(); } catch (_) {}
-                            setTimeout(() => { window.location.href = 'profile.html'; }, 800);
+                            setTimeout(() => { window.location.href = next; }, 800);
                         }, 2000);
                     }
 

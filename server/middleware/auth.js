@@ -98,9 +98,9 @@ exports.protect = async (req, res, next) => {
             req.deviceInfo = { userAgent: ua, ip };
 
             // Update lastVisit + register device in one save
+            // (one id per device/browser — tabs and network changes don't add devices)
             try {
-                const crypto = require('crypto');
-                const deviceId = crypto.createHash('md5').update(ua + ip).digest('hex');
+                const deviceId = require('../utils/deviceId')(req);
                 const result = req.user.registerDevice(deviceId, ua, ip);
                 req.deviceLimitExceeded = !result.allowed;
                 req.deviceId = deviceId;

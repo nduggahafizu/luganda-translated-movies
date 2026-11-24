@@ -179,7 +179,7 @@ class VideoQualitySelector {
         const toast = document.createElement('div');
         toast.className = 'quality-toast';
         toast.innerHTML = `
-            <span>📺 Quality: ${quality}</span>
+            <span>Quality: ${quality}</span>
             <small>Playback adjusted for ${quality === 'auto' ? 'best' : quality} quality</small>
         `;
         document.body.appendChild(toast);

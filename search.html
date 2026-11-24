@@ -21,488 +21,412 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     
     <style>
-        .search-page {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 30px 20px;
+        /* ===================================
+           Search page: big search bar, one row of filter pills, and results
+           as the same poster cards used on the Movies page.
+           =================================== */
+        .sx-page {
+            padding-top: 26px;
+            padding-bottom: 40px;
         }
-        
-        .search-header {
-            margin-bottom: 40px;
+
+        /* green line, then "Search" */
+        .sx-title {
+            margin: 0 0 18px;
+            color: #fff;
+            font-size: clamp(28px, 3vw, 44px);
+            font-weight: 800;
+            line-height: 1.15;
         }
-        
-        .search-form {
-            display: flex;
-            gap: 15px;
-            max-width: 800px;
-            margin: 0 auto;
+
+        .sx-title::before {
+            content: '';
+            display: inline-block;
+            width: clamp(36px, 5vw, 100px);
+            height: 3px;
+            margin-right: clamp(12px, 1.4vw, 20px);
+            vertical-align: middle;
+            border-radius: 2px;
+            background: var(--st-green, #22c55e);
         }
-        
-        .search-input-wrapper {
-            flex: 1;
+
+        /* ---------- Search bar ---------- */
+        .sx-form {
+            max-width: 860px;
+        }
+
+        .sx-box {
             position: relative;
-        }
-        
-        .search-input {
-            width: 100%;
-            padding: 18px 20px 18px 55px;
-            background: var(--background-light);
-            border: 2px solid var(--border-color);
-            border-radius: 15px;
-            color: var(--text-primary);
-            font-size: 18px;
-            transition: all 0.3s ease;
-        }
-        
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.1);
-        }
-        
-        .search-icon {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-secondary);
-        }
-        
-        .search-btn {
-            padding: 18px 40px;
-            background: var(--primary-color);
-            border: none;
-            border-radius: 15px;
-            color: #000;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .search-btn:hover {
-            background: #9dff44;
-            transform: translateY(-2px);
-        }
-        
-        .filters-section {
-            background: linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.98) 100%);
-            padding: 25px;
-            border-radius: 20px;
-            margin-bottom: 30px;
-            border: 1px solid rgba(74, 222, 128, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        .filters-row {
             display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            align-items: flex-end;
+            align-items: center;
+            height: 60px;
+            padding: 0 8px 0 20px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 999px;
+            background: #151917;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
 
-        .filter-group {
+        .sx-box:focus-within {
+            border-color: var(--st-green, #22c55e);
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.15);
+        }
+
+        .sx-icon {
+            flex: none;
+            width: 22px;
+            height: 22px;
+            color: rgba(255, 255, 255, 0.55);
+        }
+
+        .sx-input {
             flex: 1;
-            min-width: 180px;
+            min-width: 0;
+            height: 100%;
+            padding: 0 14px;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: #fff;
+            font: 500 17px 'Inter', sans-serif;
         }
 
-        .active-filters {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 15px;
+        .sx-input::placeholder {
+            color: rgba(255, 255, 255, 0.45);
         }
-        
-        .filter-tag {
+
+        .sx-input::-webkit-search-cancel-button {
+            display: none;
+        }
+
+        .sx-clear {
+            flex: none;
+            display: grid;
+            place-items: center;
+            width: 34px;
+            height: 34px;
+            margin-right: 8px;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .sx-clear[hidden] {
+            display: none;
+        }
+
+        .sx-clear:hover {
+            background: rgba(255, 255, 255, 0.16);
+        }
+
+        .sx-submit {
+            flex: none;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 8px 15px;
-            background: rgba(74, 222, 128, 0.1);
-            border: 1px solid var(--primary-color);
-            border-radius: 20px;
-            font-size: 13px;
-            color: var(--primary-color);
-        }
-        
-        .filter-tag button {
-            background: none;
-            border: none;
-            color: inherit;
-            cursor: pointer;
-            padding: 0;
-            line-height: 1;
-        }
-        
-        .results-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-        
-        .results-count {
-            font-size: 16px;
-            color: var(--text-secondary);
-        }
-        
-        .results-count strong {
-            color: var(--text-primary);
-        }
-        
-        .view-toggle {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .view-btn {
-            padding: 10px;
-            background: var(--background-light);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .view-btn:hover, .view-btn.active {
-            background: var(--primary-color);
-            color: #000;
-            border-color: var(--primary-color);
-        }
-        
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 25px;
-        }
-        
-        .results-grid.list-view {
-            grid-template-columns: 1fr;
-        }
-        
-        .movie-card {
-            background: var(--background-light);
-            border-radius: 15px;
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .movie-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-        }
-        
-        .movie-poster {
-            position: relative;
-            aspect-ratio: 2/3;
-        }
-        
-        .movie-poster img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .movie-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 50%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .movie-card:hover .movie-overlay {
-            opacity: 1;
-        }
-        
-        .play-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--primary-color);
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
-        }
-        
-        .movie-card:hover .play-btn {
-            transform: translateY(0);
-        }
-        
-        .play-btn svg {
-            width: 24px;
-            height: 24px;
-            color: #000;
-            margin-left: 3px;
-        }
-        
-        .movie-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            padding: 5px 10px;
-            background: var(--primary-color);
-            color: #000;
-            font-size: 12px;
-            font-weight: 600;
-            border-radius: 5px;
-        }
-        
-        .movie-rating {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 5px 10px;
-            background: rgba(0,0,0,0.7);
-            border-radius: 5px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-        
-        .movie-rating svg {
-            width: 14px;
-            height: 14px;
-            color: #ffc107;
-        }
-        
-        .movie-info {
-            padding: 15px;
-        }
-        
-        .movie-title {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .movie-meta {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-        
-        .movie-vj {
-            display: inline-flex;
-            align-items: center;
-            color: var(--primary-color);
-            font-size: 11px;
-            font-weight: 600;
-            padding: 2px 8px;
-            background: linear-gradient(135deg, rgba(74, 222, 128, 0.16), rgba(0, 217, 255, 0.08));
-            border: 1px solid rgba(74, 222, 128, 0.25);
+            height: 44px;
+            padding: 0 26px;
+            border: 0;
             border-radius: 999px;
+            background: var(--st-green, #22c55e);
+            color: #fff;
+            font: 700 15px 'Inter', sans-serif;
+            cursor: pointer;
+            transition: background-color 0.15s ease, color 0.15s ease;
         }
-        
-        /* List View Styles */
-        .results-grid.list-view .movie-card {
-            display: flex;
-            gap: 20px;
+
+        .sx-submit svg {
+            display: none;
+            width: 20px;
+            height: 20px;
         }
-        
-        .results-grid.list-view .movie-poster {
-            width: 150px;
-            flex-shrink: 0;
-            aspect-ratio: 2/3;
+
+        .sx-submit:hover,
+        .sx-submit:focus-visible {
+            background: var(--st-green-light, #4ade80);
+            color: #06170d;
         }
-        
-        .results-grid.list-view .movie-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        
-        .results-grid.list-view .movie-title {
-            font-size: 20px;
-            white-space: normal;
-        }
-        
-        .results-grid.list-view .movie-description {
-            margin-top: 10px;
-            color: var(--text-secondary);
-            font-size: 14px;
-            line-height: 1.6;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 2;
-            line-clamp: 2;
-            overflow: hidden;
-        }
-        
+
+        /* Suggestions under the bar */
         .search-suggestions {
             position: absolute;
-            top: 100%;
+            top: calc(100% + 8px);
             left: 0;
             right: 0;
-            background: var(--background-light);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            margin-top: 10px;
-            z-index: 100;
-            max-height: 400px;
-            overflow-y: auto;
+            z-index: 30;
             display: none;
+            max-height: 420px;
+            overflow-y: auto;
+            padding: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            background: #111513;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
         }
-        
+
         .search-suggestions.active {
             display: block;
         }
-        
+
         .suggestion-item {
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 12px 15px;
+            gap: 12px;
+            padding: 8px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: background 0.2s ease;
         }
-        
+
         .suggestion-item:hover {
-            background: var(--background-dark);
+            background: rgba(255, 255, 255, 0.07);
         }
-        
+
         .suggestion-poster {
+            flex: none;
             width: 40px;
             height: 60px;
             border-radius: 5px;
             object-fit: cover;
+            background: #1c211f;
         }
-        
-        .suggestion-info {
-            flex: 1;
-        }
-        
+
         .suggestion-title {
-            font-weight: 500;
-            margin-bottom: 4px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
         }
-        
+
         .suggestion-meta {
-            font-size: 12px;
-            color: var(--text-secondary);
+            margin-top: 3px;
+            color: rgba(255, 255, 255, 0.55);
+            font-size: 13px;
         }
-        
-        .no-results {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-secondary);
+
+        /* ---------- Filters: one row of pills ---------- */
+        .sx-filters {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            overflow-x: auto;
+            scrollbar-width: none;
         }
-        
-        .no-results svg {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 20px;
-            opacity: 0.5;
+
+        .sx-filters::-webkit-scrollbar {
+            display: none;
         }
-        
-        .no-results h3 {
-            font-size: 22px;
-            color: var(--text-primary);
-            margin-bottom: 10px;
+
+        .sx-filter {
+            flex: none;
+            margin: 0;
         }
-        
-        .trending-searches {
-            margin-top: 40px;
-            text-align: center;
+
+        .sx-filter select {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 40px;
+            padding: 0 38px 0 16px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 999px;
+            background: #151917 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 14px center / 13px;
+            color: #fff;
+            font: 500 14px 'Inter', sans-serif;
+            cursor: pointer;
         }
-        
-        .trending-title {
+
+        .sx-filter select:hover {
+            border-color: rgba(255, 255, 255, 0.35);
+        }
+
+        .sx-filter select:focus-visible {
+            outline: none;
+            border-color: var(--st-green, #22c55e);
+        }
+
+        .sx-filter select.is-set {
+            border-color: var(--st-green, #22c55e);
+            color: var(--st-green-light, #4ade80);
+        }
+
+        .sx-filter option {
+            background: #151917;
+            color: #fff;
+        }
+
+        /* chosen filters, each with an x to clear it */
+        .active-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .active-filters:not(:empty) {
+            margin-top: 12px;
+        }
+
+        .filter-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 6px 5px 12px;
+            border-radius: 999px;
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--st-green-light, #4ade80);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .filter-tag button {
+            display: grid;
+            place-items: center;
+            width: 20px;
+            height: 20px;
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
             font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 15px;
+            line-height: 1;
+            cursor: pointer;
         }
-        
+
+        /* ---------- Results ---------- */
+        .results-header {
+            margin: 30px 0 16px;
+        }
+
+        .results-count {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: clamp(17px, 1.5vw, 22px);
+            font-weight: 600;
+        }
+
+        .results-count strong {
+            color: #fff;
+            font-weight: 800;
+        }
+
+        .sx-results:empty {
+            display: none;
+        }
+
+        /* line the poster grids up with the title and search bar */
+        .sx-page .card-grid {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        .no-results {
+            grid-column: 1 / -1;
+            padding: 60px 20px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .no-results svg {
+            width: 56px;
+            height: 56px;
+            margin-bottom: 14px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .no-results h3 {
+            margin: 0 0 8px;
+            color: #fff;
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .no-results p {
+            margin: 4px 0;
+            font-size: 15px;
+        }
+
+        /* ---------- Before searching: popular searches + most watched ---------- */
+        .sx-heading {
+            margin: 34px 0 14px;
+            color: #fff;
+            font-size: clamp(17px, 1.4vw, 22px);
+            font-weight: 800;
+        }
+
         .trending-tags {
             display: flex;
-            justify-content: center;
-            gap: 10px;
             flex-wrap: wrap;
-        }
-        
-        .trending-tag {
-            padding: 10px 20px;
-            background: var(--background-light);
-            border: 1px solid var(--border-color);
-            border-radius: 25px;
-            color: var(--text-primary);
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
-        
-        .trending-tag:hover {
-            background: var(--primary-color);
-            color: #000;
-            border-color: var(--primary-color);
-        }
-        
-        .pagination {
-            display: flex;
-            justify-content: center;
             gap: 10px;
-            margin-top: 50px;
         }
-        
-        .page-btn {
-            padding: 12px 18px;
-            background: var(--background-light);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-primary);
+
+        .trending-tag {
+            height: 40px;
+            padding: 0 18px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 999px;
+            background: #151917;
+            color: #fff;
+            font: 500 14px 'Inter', sans-serif;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: background-color 0.15s ease, border-color 0.15s ease;
         }
-        
-        .page-btn:hover, .page-btn.active {
-            background: var(--primary-color);
-            color: #000;
-            border-color: var(--primary-color);
+
+        .trending-tag:hover,
+        .trending-tag:focus-visible {
+            border-color: var(--st-green, #22c55e);
+            background: var(--st-green, #22c55e);
         }
-        
-        .page-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        @media (max-width: 768px) {
-            .search-form {
-                flex-direction: column;
+
+        @media (max-width: 767px) {
+            .sx-page {
+                padding-top: 18px;
             }
-            
-            .filter-group {
-                min-width: 100%;
+
+            .sx-title {
+                margin-bottom: 14px;
             }
-            
-            .results-grid.list-view .movie-card {
-                flex-direction: column;
+
+            .sx-box {
+                height: 52px;
+                padding: 0 6px 0 16px;
             }
-            
-            .results-grid.list-view .movie-poster {
-                width: 100%;
+
+            .sx-input {
+                padding: 0 10px;
+                font-size: 16px;   /* 16px stops phones zooming in on tap */
+            }
+
+            /* round search button with just the icon */
+            .sx-submit {
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                justify-content: center;
+            }
+
+            .sx-submit svg {
+                display: block;
+            }
+
+            .sx-submit span {
+                display: none;
+            }
+
+            .sx-filter select {
+                height: 38px;
+                font-size: 13.5px;
+            }
+
+            .results-header {
+                margin-top: 22px;
             }
         }
     </style>
     <meta name="google-adsense-account" content="ca-pub-1904736753681797">
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
+    <!-- Site theme (top menu, big poster rows) — keep last so it wins -->
+    <link rel="stylesheet" href="css/site-theme.css">
 </head>
 
 <body>
@@ -564,14 +488,6 @@
                             </div>
                         </div>
                     </form>
-                    <ul class="navbar-nav navbar-user ml-auto align-items-center text-nowrap">
-                        <li class="nav-item">
-                            <a class="nav-link" href="movies.html">Movies</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="vjs.html">VJs</a>
-                        </li>
-                    </ul>
                 </div>
             </div>
 
@@ -654,154 +570,155 @@
                     </ul>
                 </div>
 
+                <!-- Main Content -->
                 <div class="app-container flex-fill">
-                    <main id="maincontent" class="search-page">
+                    <div class="container">
+                        <div class="app-content pt-md-3">
+                            <main id="maincontent" class="sx-page">
+                                <h1 class="sx-title">Search</h1>
 
-                    </main>
-                <!-- Search Header -->
-                <div class="search-header">
-                    <form class="search-form" onsubmit="performSearch(event)">
-                        <div class="search-input-wrapper">
-                            <label for="searchInput" class="visually-hidden">Search movies, VJs, genres</label>
-                            <svg class="search-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                            </svg>
-                            <input type="text" class="search-input" id="searchInput" placeholder="Search movies, VJs, genres..." autocomplete="off">
-                            <div class="search-suggestions" id="searchSuggestions"></div>
-                        </div>
-                        <button type="submit" class="search-btn">Search</button>
-                    </form>
-                </div>
-
-                <!-- Filters -->
-                <div class="filters-section">
-                    <div class="filters-row">
-                        <div class="filter-group">
-                            <label class="filter-label" for="genreFilter">Genre</label>
-                            <select class="filter-select" id="genreFilter" onchange="applyFilters()">
-                                <option value="">All Genres</option>
-                                <option value="action">Action</option>
-                                <option value="comedy">Comedy</option>
-                                <option value="drama">Drama</option>
-                                <option value="horror">Horror</option>
-                                <option value="romance">Romance</option>
-                                <option value="thriller">Thriller</option>
-                                <option value="sci-fi">Sci-Fi</option>
-                                <option value="adventure">Adventure</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label" for="vjFilter">VJ Translator</label>
-                            <select class="filter-select" id="vjFilter" onchange="applyFilters()">
-                                <option value="">All VJs</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label" for="yearFilter">Year</label>
-                            <select class="filter-select" id="yearFilter" onchange="applyFilters()">
-                                <option value="">All Years</option>
-                                <option value="2024">2024</option>
-                                <option value="2023">2023</option>
-                                <option value="2022">2022</option>
-                                <option value="2021">2021</option>
-                                <option value="2020">2020</option>
-                                <option value="2019">2019</option>
-                                <option value="2018">2018</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label" for="sortFilter">Sort By</label>
-                            <select class="filter-select" id="sortFilter" onchange="applyFilters()">
-                                <option value="relevance">Most Relevant</option>
-                                <option value="newest">Newest First</option>
-                                <option value="oldest">Oldest First</option>
-                                <option value="rating">Highest Rated</option>
-                                <option value="popular">Most Popular</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="active-filters" id="activeFilters"></div>
-                </div>
-
-                <!-- Results Header -->
-                <div class="results-header" id="resultsHeader" style="display: none;">
-                    <div class="results-count" id="resultsCount">
-                        Showing <strong>0</strong> results
-                    </div>
-                    <div class="view-toggle">
-                        <button class="view-btn active" id="gridViewBtn" onclick="setView('grid')" title="Grid View">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="3" width="7" height="7"></rect>
-                                <rect x="14" y="3" width="7" height="7"></rect>
-                                <rect x="14" y="14" width="7" height="7"></rect>
-                                <rect x="3" y="14" width="7" height="7"></rect>
-                            </svg>
-                        </button>
-                        <button class="view-btn" id="listViewBtn" onclick="setView('list')" title="List View">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="8" y1="6" x2="21" y2="6"></line>
-                                <line x1="8" y1="12" x2="21" y2="12"></line>
-                                <line x1="8" y1="18" x2="21" y2="18"></line>
-                                <line x1="3" y1="6" x2="3.01" y2="6"></line>
-                                <line x1="3" y1="12" x2="3.01" y2="12"></line>
-                                <line x1="3" y1="18" x2="3.01" y2="18"></line>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Results Grid -->
-                <div class="results-grid" id="resultsGrid">
-                    <!-- Trending Searches (shown when no search) -->
-                    <div class="no-results" id="initialState">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
-                        <h3>Search for Movies</h3>
-                        <p>Find your favorite Luganda translated movies, VJ translators, and more</p>
-                        
-                        <div class="trending-searches">
-                            <p class="trending-title">Trending Searches</p>
-                            <div class="trending-tags" id="trendingTags">
-                                <a href="#" class="trending-tag" onclick="searchFor('Action')">Action</a>
-                                <a href="#" class="trending-tag" onclick="searchFor('VJ Ice P')">VJ Ice P</a>
-                                <a href="#" class="trending-tag" onclick="searchFor('2024')">2024 Movies</a>
-                                <a href="#" class="trending-tag" onclick="searchFor('Horror')">Horror</a>
-                                <a href="#" class="trending-tag" onclick="searchFor('VJ Emmy')">VJ Emmy</a>
+                                <!-- Search bar -->
+                                <form class="sx-form" role="search" onsubmit="performSearch(event)">
+                                    <div class="sx-box search-input-wrapper">
+                                        <label for="searchInput" class="visually-hidden">Search movies, series and VJs</label>
+                                        <svg class="sx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                        </svg>
+                                        <input type="search" class="sx-input" id="searchInput" placeholder="Search movies, series, VJs..." autocomplete="off" enterkeyhint="search">
+                                        <button type="button" class="sx-clear" id="searchClear" aria-label="Clear search" hidden>
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                        </button>
+                                        <button type="submit" class="sx-submit" aria-label="Search">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                                                <circle cx="11" cy="11" r="8"></circle>
+                                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                            </svg>
+                                            <span>Search</span>
+                                        </button>
+                                        <div class="search-suggestions" id="searchSuggestions"></div>
                                     </div>
+                                </form>
+
+                                <!-- Filters: one row of pills -->
+                                <div class="sx-filters" role="group" aria-label="Filters">
+                                    <label class="sx-filter">
+                                        <span class="visually-hidden">Genre</span>
+                                        <select class="filter-select" id="genreFilter" onchange="applyFilters()">
+                                            <option value="">All genres</option>
+                                        </select>
+                                    </label>
+                                    <label class="sx-filter">
+                                        <span class="visually-hidden">VJ</span>
+                                        <select class="filter-select" id="vjFilter" onchange="applyFilters()">
+                                            <option value="">All VJs</option>
+                                        </select>
+                                    </label>
+                                    <label class="sx-filter">
+                                        <span class="visually-hidden">Year</span>
+                                        <select class="filter-select" id="yearFilter" onchange="applyFilters()">
+                                            <option value="">All years</option>
+                                        </select>
+                                    </label>
+                                    <label class="sx-filter">
+                                        <span class="visually-hidden">Sort by</span>
+                                        <select class="filter-select" id="sortFilter" onchange="applyFilters()">
+                                            <option value="">Latest added</option>
+                                            <option value="popular">Most watched</option>
+                                            <option value="rating">Top rated</option>
+                                            <option value="year">Newest release</option>
+                                            <option value="title">A to Z</option>
+                                        </select>
+                                    </label>
                                 </div>
+                                <div class="active-filters" id="activeFilters"></div>
+
+                                <!-- Results -->
+                                <div class="results-header" id="resultsHeader" style="display: none;">
+                                    <h2 class="results-count" id="resultsCount" aria-live="polite"></h2>
+                                </div>
+                                <div class="card-grid sx-results" id="resultsGrid"></div>
+                                <!-- More results appear automatically when this comes into view -->
+                                <div class="st-load-more" id="loadMore" aria-live="polite"></div>
+
+                                <!-- Before searching: popular searches and the most watched titles -->
+                                <section id="initialState">
+                                    <h2 class="sx-heading">Popular searches</h2>
+                                    <div class="trending-tags" id="trendingTags">
+                                        <button type="button" class="trending-tag" onclick="searchFor('VJ Junior')">VJ Junior</button>
+                                        <button type="button" class="trending-tag" onclick="searchFor('VJ Ice P')">VJ Ice P</button>
+                                        <button type="button" class="trending-tag" onclick="searchFor('VJ Emmy')">VJ Emmy</button>
+                                        <button type="button" class="trending-tag" onclick="searchFor('Action')">Action</button>
+                                        <button type="button" class="trending-tag" onclick="searchFor('Comedy')">Comedy</button>
+                                        <button type="button" class="trending-tag" onclick="searchFor('Horror')">Horror</button>
+                                        <button type="button" class="trending-tag" onclick="searchFor('Spider-Man')">Spider-Man</button>
+                                    </div>
+
+                                    <h2 class="sx-heading">Most watched</h2>
+                                    <div class="card-grid" id="popularGrid"></div>
+                                </section>
+                            </main>
                         </div>
                     </div>
-                </div>
-
-                <!-- Pagination -->
-                <div class="pagination" id="pagination" style="display: none;"></div>
-            </main>
-
-            <!-- Static editorial section for SEO -->
-            <div style="max-width:800px;margin:0 auto;padding:40px 20px 0;">
-                <h2 style="font-size:20px;font-weight:700;color:var(--text-primary,#fff);margin-bottom:12px;">What Can You Find on Unruly Movies?</h2>
-                <p style="font-size:15px;line-height:1.8;color:rgba(255,255,255,0.6);margin-bottom:14px;">Use the search bar to find any movie, series, or VJ translator in the Unruly Movies catalog. You can search by English movie title, Luganda title, VJ name, genre, or release year. The catalog includes hundreds of Hollywood and international films translated to Luganda by Uganda's most recognised Video Jockeys.</p>
-                <p style="font-size:15px;line-height:1.8;color:rgba(255,255,255,0.6);margin-bottom:20px;">Popular searches include VJ Junior movies, VJ Ice P action films, 2024 releases, comedy movies in Luganda, and classic action titles that defined Uganda's video hall era. You can also search directly for genres such as Action, Drama, Thriller, Comedy, Horror, Romance, and Sci-Fi.</p>
-                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:40px;">
-                    <a href="search.html?q=VJ+Junior" style="padding:7px 16px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:20px;color:var(--primary-color,#4ade80);text-decoration:none;font-size:13px;">VJ Junior</a>
-                    <a href="search.html?q=VJ+Ice+P" style="padding:7px 16px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:20px;color:var(--primary-color,#4ade80);text-decoration:none;font-size:13px;">VJ Ice P</a>
-                    <a href="search.html?q=VJ+Emmy" style="padding:7px 16px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:20px;color:var(--primary-color,#4ade80);text-decoration:none;font-size:13px;">VJ Emmy</a>
-                    <a href="search.html?q=action" style="padding:7px 16px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:20px;color:var(--primary-color,#4ade80);text-decoration:none;font-size:13px;">Action</a>
-                    <a href="search.html?q=comedy" style="padding:7px 16px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:20px;color:var(--primary-color,#4ade80);text-decoration:none;font-size:13px;">Comedy</a>
-                    <a href="search.html?q=thriller" style="padding:7px 16px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:20px;color:var(--primary-color,#4ade80);text-decoration:none;font-size:13px;">Thriller</a>
-                    <a href="search.html?q=2024" style="padding:7px 16px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:20px;color:var(--primary-color,#4ade80);text-decoration:none;font-size:13px;">2024 Movies</a>
-                    <a href="search.html?q=horror" style="padding:7px 16px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:20px;color:var(--primary-color,#4ade80);text-decoration:none;font-size:13px;">Horror</a>
-                    <a href="search.html?q=drama" style="padding:7px 16px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:20px;color:var(--primary-color,#4ade80);text-decoration:none;font-size:13px;">Drama</a>
                 </div>
             </div>
 
-            <!-- Footer -->
-            <footer class="site-footer" style="margin-top: 40px;">
+            <!-- Professional Footer -->
+            <footer class="site-footer">
+                <div class="footer-main">
+                    <div class="footer-grid">
+                        <div class="footer-brand">
+                            <a href="index.html" class="footer-logo">
+                                <img src="assets/images/logo-wordmark.png" alt="Unruly Movies">
+                            </a>
+                            <p class="footer-tagline">Uganda's premier platform for Luganda VJ translated movies.</p>
+                            <div class="footer-social">
+                                <a href="mailto:nduggahafizu@gmail.com" aria-label="Email support" class="social-link">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                </a>
+                                <a href="https://wa.me/256743311809" target="_blank" rel="noopener" aria-label="WhatsApp support" class="social-link">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                                </a>
+                                <a href="faq.html" aria-label="Read the FAQ" class="social-link">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                </a>
+                            </div>
+                            <a href="https://play.google.com/store/apps/details?id=com.unruly.pix" target="_blank" class="footer-playstore" aria-label="Get it on Google Play">
+                                <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" width="135" height="40" loading="lazy">
+                            </a>
+                        </div>
+                        <div class="footer-links">
+                            <h4>Quick Links</h4>
+                            <ul>
+                                <li><a href="index.html">Home</a></li>
+                                <li><a href="movies.html">Browse Movies</a></li>
+                                <li><a href="vjs.html">VJ Translators</a></li>
+                                <li><a href="genres.html">Genres</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-links">
+                            <h4>Legal</h4>
+                            <ul>
+                                <li><a href="terms.html">Terms of Service</a></li>
+                                <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                                <li><a href="dmca.html">DMCA Policy</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-links">
+                            <h4>Company</h4>
+                            <ul>
+                                <li><a href="about.html">About Us</a></li>
+                                <li><a href="editorial-standards.html">Editorial Standards</a></li>
+                                <li><a href="contact.html">Contact</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 <div class="footer-bottom">
-                    <p>Copyright © unruly movies watch 2026</p>
+                    <p>Copyright © 2026 Unruly Movies</p>
                 </div>
             </footer>
         </div>
@@ -813,28 +730,55 @@
     <script src="js/tmdb-api.js"></script>
     <script src="js/trailer-player.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/infinite-scroll.js"></script>
     <script>
         const API_URL = API_CONFIG.API_ENDPOINTS.LUGANDA_MOVIES;
-        let currentPage = 1;
-        let currentView = 'grid';
+        const BATCH_SIZE = 48;
         let searchTimeout = null;
         let totalResults = 0;
+        let searchToken = 0;      // replies for an older search are ignored
+        let pendingResults = [];  // fetched results not shown yet
+
+        // The search API returns every match in one go (it can't page), so the
+        // results are shown 48 at a time as the visitor scrolls.
+        const feed = InfiniteScroll.attach(document.getElementById('loadMore'), {
+            label: 'Loading more results',
+            loadNext: async () => {
+                renderResults(pendingResults.splice(0, BATCH_SIZE), true);
+                return pendingResults.length > 0;
+            }
+        });
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            // Load VJs for filter
-            loadVJs();
-            
-            // Check URL params
-            const params = new URLSearchParams(window.location.search);
-            const query = params.get('q');
-            if (query) {
-                document.getElementById('searchInput').value = query;
-                performSearch();
-            }
+            const input = document.getElementById('searchInput');
+            const clearBtn = document.getElementById('searchClear');
 
-            // Setup live search
-            document.getElementById('searchInput').addEventListener('input', handleSearchInput);
+            fillYears();
+            const filtersReady = Promise.all([loadVJs(), loadGenres()]);
+
+            // Check URL params (search.html?q=...)
+            const query = new URLSearchParams(window.location.search).get('q');
+            if (query) {
+                input.value = query;
+                // wait for the VJ / genre lists so "VJ Junior" or "Action" become filters
+                filtersReady.then(() => performSearch());
+            } else {
+                loadPopular();
+            }
+            clearBtn.hidden = !input.value;
+
+            // Live suggestions, and the x that clears the box
+            input.addEventListener('input', (e) => {
+                clearBtn.hidden = !input.value;
+                handleSearchInput(e);
+            });
+            clearBtn.addEventListener('click', () => {
+                input.value = '';
+                clearBtn.hidden = true;
+                hideSuggestions();
+                input.focus();
+            });
         });
 
         async function loadVJs() {
@@ -857,11 +801,54 @@
             }
         }
 
+        async function loadGenres() {
+            try {
+                const response = await fetch(`${API_URL}/genres`);
+                const data = await response.json();
+                const select = document.getElementById('genreFilter');
+                (Array.isArray(data.data) ? data.data : [])
+                    .map(g => String(g).trim())
+                    .filter(Boolean)
+                    .sort((a, b) => a.localeCompare(b))
+                    .forEach(g => {
+                        const option = document.createElement('option');
+                        option.value = g.toLowerCase();
+                        option.textContent = g.charAt(0).toUpperCase() + g.slice(1);
+                        select.appendChild(option);
+                    });
+            } catch (error) {
+                console.error('Load genres error:', error);
+            }
+        }
+
+        function fillYears() {
+            const select = document.getElementById('yearFilter');
+            for (let y = new Date().getFullYear(); y >= 1990; y--) {
+                const option = document.createElement('option');
+                option.value = y;
+                option.textContent = y;
+                select.appendChild(option);
+            }
+        }
+
+        // Before anything is searched: the most watched titles
+        async function loadPopular() {
+            const grid = document.getElementById('popularGrid');
+            if (!grid) return;
+            try {
+                const data = await LugandaMoviesAPI.searchMovies('', { sort: 'popular', limit: 24 });
+                const movies = (data && data.data) || [];
+                grid.innerHTML = movies.map(cardHtml).join('');
+            } catch (error) {
+                console.error('Popular titles error:', error);
+            }
+        }
+
         function handleSearchInput(e) {
             const query = e.target.value.trim();
-            
+
             clearTimeout(searchTimeout);
-            
+
             if (query.length >= 2) {
                 searchTimeout = setTimeout(() => showSuggestions(query), 300);
             } else {
@@ -873,25 +860,24 @@
             try {
                 const response = await fetch(`${API_URL}/search?q=${encodeURIComponent(query)}&limit=5`);
                 const data = await response.json();
-                
+
                 const suggestions = document.getElementById('searchSuggestions');
                 const movies = data.data || [];
-                
+
                 if (movies.length > 0) {
                     suggestions.innerHTML = movies.map(movie => {
-                        const movieId = Sanitize.attr(movie._id);
                         const movieTitle = Sanitize.text(movie.originalTitle || movie.title || 'Unknown');
-                        const moviePoster = Sanitize.url(movie.poster) || 'https://placehold.co/50x75/16161f/4ade80?text=Movie';
+                        const moviePoster = Sanitize.url(tmdbResize(movie.poster, 'w92') || movie.poster) || 'assets/images/placeholder.svg';
                         const movieYear = Sanitize.text(movie.year || '');
                         const _rawVj = Sanitize.text(movie.vjName || '');
                         const _vjSuffix = _rawVj.replace(/^vj\s*/i, '').trim();
-                        const movieVj = _vjSuffix ? '• VJ ' + _vjSuffix : (_rawVj ? '• ' + _rawVj : '');
-                        
+                        const movieVj = _vjSuffix ? '&middot; VJ ' + _vjSuffix : (_rawVj ? '&middot; ' + _rawVj : '');
+
                         const movieSlug = Sanitize.attr(movie.slug || movie._id);
                         const movieType = Sanitize.attr(movie.contentType || 'movie');
                         return `
                             <div class="suggestion-item" onclick="selectSuggestion('${movieSlug}','${movieType}')">
-                                <img src="${moviePoster}" alt="${movieTitle}" class="suggestion-poster" onerror="this.src='https://placehold.co/50x75/16161f/4ade80?text=Movie'">
+                                <img src="${moviePoster}" alt="" class="suggestion-poster" onerror="this.src='assets/images/placeholder.svg'">
                                 <div class="suggestion-info">
                                     <div class="suggestion-title">${movieTitle}</div>
                                     <div class="suggestion-meta">${movieYear} ${movieVj}</div>
@@ -918,243 +904,200 @@
                 : `/movie/${slug}`;
         }
 
+        // The search API only looks at titles and descriptions, so a VJ or
+        // genre name typed in the box ("VJ Junior", "Action") becomes a filter.
+        function matchFilterOption(selectId, text) {
+            const wanted = text.trim().toLowerCase().replace(/^vj\s*/, '');
+            if (!wanted) return null;
+            return [...document.getElementById(selectId).options].find(o =>
+                o.value && o.textContent.trim().toLowerCase().replace(/^vj\s*/, '') === wanted) || null;
+        }
+
         async function performSearch(event) {
             if (event) event.preventDefault();
-            
+
             hideSuggestions();
-            
-            const query = document.getElementById('searchInput').value.trim();
+
+            const typed = document.getElementById('searchInput').value.trim();
+            let query = typed;
+            const vjMatch = query && matchFilterOption('vjFilter', query);
+            const genreMatch = query && !vjMatch && matchFilterOption('genreFilter', query);
+            if (vjMatch) {
+                document.getElementById('vjFilter').value = vjMatch.value;
+                query = '';
+            } else if (genreMatch) {
+                document.getElementById('genreFilter').value = genreMatch.value;
+                query = '';
+            }
+
             const genre = document.getElementById('genreFilter').value;
             const vj = document.getElementById('vjFilter').value;
             const year = document.getElementById('yearFilter').value;
             const sort = document.getElementById('sortFilter').value;
-            
+            markSetFilters();
+
             // Update URL
             const url = new URL(window.location);
-            url.searchParams.set('q', query);
+            url.searchParams.set('q', typed);
             window.history.pushState({}, '', url);
-            
+
             // Show loading
+            const token = ++searchToken;
+            feed.stop();
+            pendingResults = [];
             const resultsGrid = document.getElementById('resultsGrid');
-            resultsGrid.innerHTML = '<div class="no-results"><p>Searching...</p></div>';
-            document.getElementById('resultsHeader').style.display = 'flex';
+            const resultsCount = document.getElementById('resultsCount');
+            resultsGrid.innerHTML = '';
+            resultsCount.textContent = 'Searching...';
+            document.getElementById('resultsHeader').style.display = 'block';
             document.getElementById('initialState')?.remove();
-            
+
             try {
-                let data;
-                const filters = { page: currentPage, limit: 20 };
-                
+                // Every match at once; the search endpoint also handles the
+                // genre / VJ / year filters and sorting, with or without a query.
+                const filters = { limit: 2000 };
+
                 if (genre) filters.genre = genre;
                 if (vj) filters.vj = vj;
                 if (year) filters.year = year;
                 if (sort) filters.sort = sort;
-                
-                // Use cached API
-                if (query) {
-                    data = await LugandaMoviesAPI.searchMovies(query, filters);
-                } else {
-                    data = await LugandaMoviesAPI.getAllMovies(filters);
-                }
-                
+
+                const data = await LugandaMoviesAPI.searchMovies(query, filters);
+                if (token !== searchToken) return;
+
                 // Handle response
                 const movies = data.data || [];
-                
+                const label = typed || describeFilters() || 'all movies';
+
                 if (movies.length > 0) {
-                    totalResults = data.total || data.count || movies.length;
-                    document.getElementById('resultsCount').innerHTML = `Showing <strong>${totalResults}</strong> results for "${query || 'All Movies'}"`;
-                    
-                    renderResults(movies);
-                    renderPagination(data.pagination || { page: currentPage, pages: data.pages || 1 });
+                    totalResults = movies.length;
+                    resultsCount.innerHTML = `<strong>${totalResults}</strong> ${totalResults === 1 ? 'result' : 'results'} for &ldquo;${Sanitize.text(label)}&rdquo;`;
+
+                    pendingResults = movies.slice(BATCH_SIZE);
+                    renderResults(movies.slice(0, BATCH_SIZE));
+                    feed.reset(pendingResults.length > 0);
                 } else {
+                    resultsCount.innerHTML = `<strong>0</strong> results for &ldquo;${Sanitize.text(label)}&rdquo;`;
                     resultsGrid.innerHTML = `
-                        <div class="no-results" style="grid-column: 1/-1;">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <div class="no-results">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                             </svg>
-                            <h3>No Results Found</h3>
-                            <p>We couldn't find any movies matching "${query}"</p>
-                            <p style="margin-top: 15px;">Try different keywords or check the spelling</p>
+                            <h3>Nothing found</h3>
+                            <p>We couldn't find any movies matching &ldquo;${Sanitize.text(label)}&rdquo;.</p>
+                            <p>Check the spelling, or try a VJ name or a genre.</p>
                         </div>
                     `;
-                    document.getElementById('pagination').style.display = 'none';
                 }
-                
+
                 updateActiveFilters();
             } catch (error) {
+                if (token !== searchToken) return;
                 console.error('Search error:', error);
-                resultsGrid.innerHTML = '<div class="no-results" style="grid-column: 1/-1;"><p>Error performing search. Please try again.</p></div>';
+                resultsCount.textContent = '';
+                resultsGrid.innerHTML = '<div class="no-results"><h3>Something went wrong</h3><p>Please try the search again.</p></div>';
             }
         }
 
-        function renderResults(movies) {
-            const resultsGrid = document.getElementById('resultsGrid');
-            resultsGrid.className = `results-grid ${currentView === 'list' ? 'list-view' : ''}`;
-            
-            resultsGrid.innerHTML = movies.map(movie => {
-                const title = Sanitize.text(movie.originalTitle || movie.title || 'Unknown Movie');
-                const movieId = Sanitize.attr(movie._id);
-                const movieSlug = Sanitize.attr(movie.slug || movie._id);
-                const movieUrl = movie.contentType === 'series' ? `series-player.html?id=${movieSlug}` : `/movie/${movieSlug}`;
-                const posterUrl = Sanitize.url(movie.poster) || `https://placehold.co/300x450/16161f/4ade80?text=${encodeURIComponent(title.substring(0,15))}`;
-                const rating = movie.rating?.userRating || movie.rating?.imdb || null;
-                const _vjRaw = Sanitize.text(movie.vjName || movie.vj || '');
-                const vjName = _vjRaw.replace(/^vj\s*/i, '').trim();
-                const description = Sanitize.text(movie.overview || movie.description || '');
-                const quality = Sanitize.text(movie.video?.quality?.toUpperCase() || 'HD');
-                const year = Sanitize.text(movie.year || '');
-                const tmdbId = movie.tmdbId || movie.metaData?.tmdbId || movie.externalIds?.tmdbId || null;
-                
-                return `
-                <div class="movie-card">
-                    <div class="movie-poster">
-                        <a href="${movieUrl}">
-                            <img src="${posterUrl}" alt="${title}" loading="lazy" onerror="this.src='https://placehold.co/300x450/16161f/4ade80?text=Movie'">
-                        </a>
-                        <div class="movie-badge">${quality}</div>
-                        ${rating ? `
-                            <div class="movie-rating">
-                                <svg viewBox="0 0 24 24" fill="currentColor">
-                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                </svg>
-                                ${parseFloat(rating).toFixed(1)}
-                            </div>
-                        ` : ''}
-                        <div class="movie-overlay">
-                            <button class="play-btn" onclick="window.location.href='${movieUrl}'">
-                                <svg viewBox="0 0 24 24" fill="currentColor">
-                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                </svg>
-                            </button>
-                            ${tmdbId ? `
-                            <button class="trailer-btn" onclick="event.preventDefault(); event.stopPropagation(); trailerPlayer.playTrailer(${tmdbId}, '${title.replace(/'/g, "\\'")}');" title="Watch Trailer">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
-                                    <line x1="7" y1="2" x2="7" y2="22"></line>
-                                    <line x1="17" y1="2" x2="17" y2="22"></line>
-                                    <line x1="2" y1="12" x2="22" y2="12"></line>
-                                </svg>
-                                <span>Trailer</span>
-                            </button>
-                            ` : ''}
+        function tmdbResize(url, size) {
+            if (!url) return '';
+            return url.replace(/\/t\/p\/[^/]+\//, `/t/p/${size}/`);
+        }
+
+        // Same poster card as the Movies page: poster, green VJ tag top-right
+        function cardHtml(movie) {
+            const title = Sanitize.text(movie.originalTitle || movie.lugandaTitle || movie.title || 'Unknown');
+            const slug = Sanitize.attr(movie.slug || movie._id);
+            const url = movie.contentType === 'series' ? `series-player.html?id=${slug}` : `/movie/${slug}`;
+            const poster = (Sanitize.url(tmdbResize(movie.poster, 'w342') || movie.poster) || 'assets/images/placeholder.svg').replace(/'/g, '%27');
+            const vjRaw = String(movie.vjName || '').trim();
+            const vjSuffix = vjRaw.replace(/^vj\s*/i, '').trim();
+            const vj = !vjRaw || /^unknown/i.test(vjRaw) ? '' : Sanitize.text(vjSuffix ? 'VJ ' + vjSuffix : vjRaw);
+            return `
+                <a href="${url}" class="content-card" data-movie-id="${Sanitize.attr(movie._id)}">
+                    <!-- the placeholder underneath shows if the poster link is broken -->
+                    <div class="card-poster" style="background-image: url('${poster}'), url('assets/images/placeholder.svg');">
+                        ${vj ? `<div class="card-badges"><span class="card-badge badge-vj">${vj}</span></div>` : ''}
+                        <div class="play-overlay">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                         </div>
                     </div>
-                    <div class="movie-info">
-                        <div class="movie-title">${title}</div>
-                        <div class="movie-meta">
-                            <span>${year}</span>
-                            ${vjName ? `<span class="movie-vj">VJ ${vjName}</span>` : ''}
-                        </div>
-                        ${currentView === 'list' && description ? `
-                            <div class="movie-description">${description.substring(0, 150)}...</div>
-                        ` : ''}
+                    <div class="card-info">
+                        <h3 class="card-title">${title}</h3>
                     </div>
-                </div>
-            `}).join('');
+                </a>`;
         }
 
-        function renderPagination(pagination) {
-            const paginationEl = document.getElementById('pagination');
-            
-            if (!pagination || pagination.pages <= 1) {
-                paginationEl.style.display = 'none';
-                return;
-            }
-            
-            paginationEl.style.display = 'flex';
-            
-            let html = '';
-            
-            // Previous button
-            html += `<button class="page-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-            </button>`;
-            
-            // Page numbers
-            const startPage = Math.max(1, currentPage - 2);
-            const endPage = Math.min(pagination.pages, currentPage + 2);
-            
-            if (startPage > 1) {
-                html += `<button class="page-btn" onclick="goToPage(1)">1</button>`;
-                if (startPage > 2) html += `<span class="page-btn" style="border: none;">...</span>`;
-            }
-            
-            for (let i = startPage; i <= endPage; i++) {
-                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
-            }
-            
-            if (endPage < pagination.pages) {
-                if (endPage < pagination.pages - 1) html += `<span class="page-btn" style="border: none;">...</span>`;
-                html += `<button class="page-btn" onclick="goToPage(${pagination.pages})">${pagination.pages}</button>`;
-            }
-            
-            // Next button
-            html += `<button class="page-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === pagination.pages ? 'disabled' : ''}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
-            </button>`;
-            
-            paginationEl.innerHTML = html;
-        }
-
-        function goToPage(page) {
-            currentPage = page;
-            performSearch();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function setView(view) {
-            currentView = view;
-            
-            document.getElementById('gridViewBtn').classList.toggle('active', view === 'grid');
-            document.getElementById('listViewBtn').classList.toggle('active', view === 'list');
-            
+        // append = add under the results already shown
+        function renderResults(movies, append = false) {
             const resultsGrid = document.getElementById('resultsGrid');
-            resultsGrid.classList.toggle('list-view', view === 'list');
+            const html = movies.map(cardHtml).join('');
+            if (append) resultsGrid.insertAdjacentHTML('beforeend', html);
+            else resultsGrid.innerHTML = html;
         }
 
         function applyFilters() {
-            currentPage = 1;
             performSearch();
+        }
+
+        // Chosen filters get a green outline
+        function markSetFilters() {
+            document.querySelectorAll('.sx-filter select').forEach(s => s.classList.toggle('is-set', !!s.value));
+        }
+
+        // "Action, VJ Junior, 2024" when searching by filters only
+        function describeFilters() {
+            return ['genreFilter', 'vjFilter', 'yearFilter']
+                .map(id => document.getElementById(id))
+                .filter(s => s.value)
+                .map(s => s.options[s.selectedIndex].textContent)
+                .join(', ');
         }
 
         function updateActiveFilters() {
             const filtersEl = document.getElementById('activeFilters');
             const filters = [];
-            
+
             const genre = document.getElementById('genreFilter');
             if (genre.value) {
                 filters.push({ label: genre.options[genre.selectedIndex].text, type: 'genre' });
             }
-            
+
             const vj = document.getElementById('vjFilter');
             if (vj.value) {
                 filters.push({ label: vj.options[vj.selectedIndex].text, type: 'vj' });
             }
-            
+
             const year = document.getElementById('yearFilter');
             if (year.value) {
                 filters.push({ label: year.value, type: 'year' });
             }
-            
+
             filtersEl.innerHTML = filters.map(f => `
                 <span class="filter-tag">
-                    ${f.label}
-                    <button onclick="clearFilter('${f.type}')">&times;</button>
+                    ${Sanitize.text(f.label)}
+                    <button type="button" aria-label="Remove ${Sanitize.attr(f.label)}" onclick="clearFilter('${f.type}')">&times;</button>
                 </span>
             `).join('');
         }
 
         function clearFilter(type) {
+            const input = document.getElementById('searchInput');
+            // If this VJ or genre came from the words in the search box, clear
+            // them too, or the search would turn them straight back into it.
+            if ((type === 'vj' || type === 'genre') && input.value && matchFilterOption(`${type}Filter`, input.value)) {
+                input.value = '';
+                document.getElementById('searchClear').hidden = true;
+            }
             document.getElementById(`${type}Filter`).value = '';
             applyFilters();
         }
 
         function searchFor(query) {
-            document.getElementById('searchInput').value = query;
+            const input = document.getElementById('searchInput');
+            input.value = query;
+            document.getElementById('searchClear').hidden = false;
             performSearch();
             return false;
         }
@@ -1167,5 +1110,6 @@
         });
     </script>
     <script defer src="js/app-shell.js"></script>
+    <script defer src="js/site-theme.js"></script>
 </body>
 </html>

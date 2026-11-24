@@ -28,6 +28,7 @@
     <!-- Config -->
     <script src="js/config.js"></script>
     <script src="js/pesapal-checkout.js"></script>
+    <script src="js/access-prompt.js"></script>
     <script src="js/watchlist-manager.js"></script>
     
     <style>
@@ -78,6 +79,15 @@
         .header.hidden {
             opacity: 0;
             pointer-events: none;
+        }
+
+        /* Once the page is scrolled past the top, the see-through gradient let
+           the movie details show through behind the logo — give it a solid bar. */
+        .header.scrolled {
+            background: rgba(8, 10, 9, 0.94);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         }
         
         .back-btn {
@@ -1478,6 +1488,10 @@
     <meta name="google-adsense-account" content="ca-pub-1904736753681797">
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904736753681797" crossorigin="anonymous"></script>
+    <!-- Site theme + player theme (top menu, full-width video) — keep last -->
+    <link rel="stylesheet" href="css/site-theme.css">
+    <link rel="stylesheet" href="css/player-theme.css">
+    <link rel="stylesheet" href="css/access-prompt.css">
 </head>
 
 <body>
@@ -1551,11 +1565,11 @@
                             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                         </svg>
                     </div>
-                    <h3>Members Only</h3>
-                    <p>Login or create account to watch the full Luganda translation. or <button onclick="document.getElementById('trailerBtn').click()" style="background:none;border:none;color:var(--accent);font-size:inherit;cursor:pointer;padding:0;text-decoration:underline;">watch trailer</button>.</p>
+                    <h3>Sign in to watch</h3>
+                    <p>Watch the full Luganda translation with a plan from UGX 1,000 a day.</p>
                     <div class="auth-gate-btns">
-                        <button class="auth-gate-login" onclick="watchFullMovie()">Login to Watch Full Movie</button>
-                        <a href="register.html" class="auth-gate-register">Create Free Account</a>
+                        <button class="auth-gate-login" onclick="watchFullMovie()">Sign in</button>
+                        <a href="register.html" class="auth-gate-register">Create an account</a>
                     </div>
                 </div>
             </div>
@@ -1590,35 +1604,27 @@
     <!-- Content Section -->
     <div class="content">
         <!-- Movie Card -->
-        <div class="movie-card">
-            <div class="movie-header">
-                <img src="assets/images/placeholder.svg" alt="" class="movie-poster" id="moviePoster">
-                <div class="movie-info">
-                    <h1 class="movie-title" id="movieTitle">Loading...</h1>
-                    
-                    <div class="movie-meta" id="movieMeta">
-                        <span class="meta-badge quality" id="movieQuality">HD</span>
-                        <span class="meta-badge rating" id="movieRating" style="display:none"></span>
-                        <span class="meta-badge" id="movieYear">2024</span>
-                        <span class="meta-badge" id="movieDuration">2h 15m</span>
-                    </div>
-                    
-                    <div class="movie-genres" id="movieGenres"></div>
-                    
-                    <div class="vj-info" id="vjInfo">
-                        <img src="assets/images/default-avatar.svg" alt="VJ" class="vj-avatar" id="vjAvatar">
-                        <div>
-                            <div class="vj-label">Translated by</div>
-                            <div class="vj-name" id="vjName">VJ Junior</div>
-                        </div>
-                    </div>
-                </div>
+        <div class="movie-card st-details">
+            <!-- Left: title and story -->
+            <div class="st-details-main">
+                <h1 class="movie-title" id="movieTitle">Loading...</h1>
+                <p class="movie-description collapsed" id="movieDescription">Loading description...</p>
+                <button class="show-more-btn" id="showMoreBtn">Show more</button>
             </div>
-            
-            <p class="movie-description collapsed" id="movieDescription">Loading description...</p>
-            <button class="show-more-btn" id="showMoreBtn">Show more</button>
-            
-            <div class="action-buttons">
+
+            <!-- Right: facts and buttons -->
+            <aside class="st-details-side">
+                <ul class="st-facts" id="movieMeta">
+                    <li><span class="st-fact-label">Genre:</span> <span class="movie-genres" id="movieGenres"></span></li>
+                    <li><span class="st-fact-label">Translated by:</span> <span id="vjName"></span></li>
+                    <li><span class="st-fact-label">Released:</span> <span id="movieYear"></span></li>
+                    <li><span class="st-fact-label">Quality:</span> <span id="movieQuality">HD</span></li>
+                    <li class="st-fact-rating" id="movieRating" style="display:none"></li>
+                    <li><span class="st-fact-label">Narration:</span> <span>Luganda</span></li>
+                </ul>
+                <div class="st-duration" id="movieDuration"></div>
+
+                <div class="action-buttons">
                 <button class="action-btn secondary" id="trailerBtn" style="display:none;" onclick="playMovieTrailer(this.dataset.tmdbId, this.dataset.title)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polygon points="5 3 19 12 5 21 5 3"></polygon>
@@ -1645,13 +1651,20 @@
                     </svg>
                     <span>Download</span>
                 </button>
+                </div>
+            </aside>
+
+            <!-- Filled in by the page script; not shown in this layout -->
+            <img src="assets/images/placeholder.svg" alt="" class="movie-poster" id="moviePoster" hidden>
+            <div class="vj-info" id="vjInfo" hidden>
+                <img src="assets/images/default-avatar.svg" alt="VJ" class="vj-avatar" id="vjAvatar">
             </div>
         </div>
-        
-        <!-- You May Also Like -->
+
+        <!-- You May Also Like: a row with arrows (added by js/site-theme.js) -->
         <div id="relatedSection">
             <h2 class="section-title">You May Also Like</h2>
-            <div class="related-grid" id="relatedGrid"></div>
+            <div class="related-grid h-scroll" id="relatedGrid"></div>
         </div>
     </div>
     
@@ -1796,9 +1809,86 @@
         // unreachable-on-touch keyboard hotkey). Registered as real Button
         // components (not floating overlays) so they inherit the control bar's
         // sizing/hover/fullscreen behavior automatically.
+        // Player icons: circular arrows with "10" inside, plus play/pause for the
+        // big centre buttons shown on phones and tablets.
+        const SEEK_BACK_ICON = '<svg class="st-seek-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 1 1-8.5 8.5"/><path d="M14.6 1.2 12 3.5l2.6 2.3"/><text x="12" y="15.3" text-anchor="middle" font-size="8" font-weight="700" font-family="Inter, Arial, sans-serif" fill="currentColor" stroke="none">10</text></svg>';
+        const SEEK_FWD_ICON = '<svg class="st-seek-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5"/><path d="M9.4 1.2 12 3.5 9.4 5.8"/><text x="12" y="15.3" text-anchor="middle" font-size="8" font-weight="700" font-family="Inter, Arial, sans-serif" fill="currentColor" stroke="none">10</text></svg>';
+        const CENTER_PLAY_ICON = '<svg class="ico-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.6v12.8c0 .8.9 1.3 1.6.8l10-6.4c.6-.4.6-1.3 0-1.7l-10-6.4C8.9 4.3 8 4.8 8 5.6z"/></svg>';
+        const CENTER_PAUSE_ICON = '<svg class="ico-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4.5" width="4.2" height="15" rx="1.2"/><rect x="13.8" y="4.5" width="4.2" height="15" rx="1.2"/></svg>';
+        const LOCK_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+        const UNLOCK_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.6-1.7"/></svg>';
+        const NEXT_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 5.6v12.8c0 .8.9 1.3 1.6.8l9-6.4c.6-.4.6-1.3 0-1.7l-9-6.4C5.9 4.3 5 4.8 5 5.6z"/><rect x="17" y="5" width="2.6" height="14" rx="1"/></svg>';
+
+        // Speed: only a choice from the Speed menu may change it. Anything else
+        // (the browser, an extension, a remembered rate) is put back — see the
+        // 'ratechange' handler in initPlayer.
+        let chosenPlaybackRate = 1;
+
         if (typeof videojs !== 'undefined' && !videojs.getComponent('SeekBackButton')) {
             const Button = videojs.getComponent('Button');
-            const SEEK_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a8 8 0 1 1-8 8"></path><polyline points="12 1 12 4 9 4"></polyline></svg><span class="seek-label">10</span>';
+            const Component = videojs.getComponent('Component');
+
+            // Forces the second row of the control bar onto its own line
+            class BarBreak extends Component {
+                createEl() {
+                    return videojs.dom.createEl('div', { className: 'st-bar-break' });
+                }
+            }
+
+            // "Lock": hides every control so taps can't pause or skip; a single
+            // "Tap to unlock" button brings them back.
+            class LockButton extends Button {
+                constructor(playerInst, options) {
+                    super(playerInst, options);
+                    this.controlText('Lock the controls');
+                }
+                buildCSSClass() {
+                    return `vjs-st-lock ${super.buildCSSClass()}`;
+                }
+                createEl() {
+                    const el = super.createEl();
+                    const placeholder = el.querySelector('.vjs-icon-placeholder');
+                    if (placeholder) placeholder.innerHTML = `${LOCK_ICON}<span class="st-btn-label">Lock</span>`;
+                    return el;
+                }
+                handleClick() {
+                    setPlayerLocked(true);
+                }
+            }
+
+            // "Next": the next movie (the first "You May Also Like" title)
+            class NextButton extends Button {
+                constructor(playerInst, options) {
+                    super(playerInst, options);
+                    this.controlText('Next movie');
+                }
+                buildCSSClass() {
+                    return `vjs-st-next ${super.buildCSSClass()}`;
+                }
+                createEl() {
+                    const el = super.createEl();
+                    const placeholder = el.querySelector('.vjs-icon-placeholder');
+                    if (placeholder) placeholder.innerHTML = `${NEXT_ICON}<span class="st-btn-label">Next</span>`;
+                    return el;
+                }
+                handleClick() {
+                    if (upNextMovie) playUpNext();
+                }
+            }
+
+            videojs.registerComponent('BarBreak', BarBreak);
+            videojs.registerComponent('LockButton', LockButton);
+            videojs.registerComponent('NextButton', NextButton);
+
+            // Remember which speed the visitor picked from the Speed menu
+            const RateItem = videojs.getComponent('PlaybackRateMenuItem');
+            if (RateItem) {
+                const pickRate = RateItem.prototype.handleClick;
+                RateItem.prototype.handleClick = function (event) {
+                    chosenPlaybackRate = this.rate;
+                    return pickRate.call(this, event);
+                };
+            }
 
             class SeekBackButton extends Button {
                 constructor(playerInst, options) {
@@ -1815,7 +1905,7 @@
                 createEl() {
                     const el = super.createEl();
                     const placeholder = el.querySelector('.vjs-icon-placeholder');
-                    if (placeholder) placeholder.innerHTML = SEEK_ICON;
+                    if (placeholder) placeholder.innerHTML = SEEK_BACK_ICON;
                     return el;
                 }
             }
@@ -1837,7 +1927,7 @@
                 createEl() {
                     const el = super.createEl();
                     const placeholder = el.querySelector('.vjs-icon-placeholder');
-                    if (placeholder) placeholder.innerHTML = SEEK_ICON;
+                    if (placeholder) placeholder.innerHTML = SEEK_FWD_ICON;
                     return el;
                 }
             }
@@ -1856,19 +1946,19 @@
                 fluid: false,
                 responsive: true,
                 playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 2],
+                // Two rows: "time | progress | length", then Lock, Speed,
+                // Next, volume and fullscreen. Play and the 10-second skips
+                // are the big buttons in the middle (addCenterControls).
                 controlBar: {
                     children: [
-                        'playToggle',
-                        'SeekBackButton',
-                        'SeekForwardButton',
-                        'volumePanel',
                         'currentTimeDisplay',
-                        'timeDivider',
-                        'durationDisplay',
                         'progressControl',
-                        'customControlSpacer',
+                        'durationDisplay',
+                        'BarBreak',
+                        'LockButton',
                         'playbackRateMenuButton',
-                        'pictureInPictureToggle',
+                        'NextButton',
+                        'volumePanel',
                         'fullscreenToggle'
                     ]
                 },
@@ -1885,14 +1975,22 @@
                 try {
                     player.playbackRate(1.0);
                 } catch (e) {}
+                addCenterControls();
+                fillControlBarTitle();
+                updateSpeedLabel();
+                updateNextButton();
             });
 
             // Custom event handlers
+            // Speed changes are only allowed from the Speed menu; any other
+            // change (browser, extension, a remembered rate) is put back.
             player.on('ratechange', () => {
-                if (player.playbackRate() !== 1.0) {
-                    console.warn('⚠️ Playback rate changed to', player.playbackRate(), '- resetting to 1.0');
-                    player.playbackRate(1.0);
+                if (player.playbackRate() !== chosenPlaybackRate) {
+                    console.warn('Playback rate changed to', player.playbackRate(), '- putting back', chosenPlaybackRate);
+                    player.playbackRate(chosenPlaybackRate);
+                    return;
                 }
+                updateSpeedLabel();
             });
 
             player.on('play', () => {
@@ -1986,6 +2084,98 @@
             });
             
             return player;
+        }
+
+        // Big rewind / play-pause / forward buttons in the middle of the video,
+        // the full-screen title bar, and the "Tap to unlock" layer for Lock.
+        // Inserted before the control bar so the bar always sits on top.
+        function addCenterControls() {
+            const el = player && player.el();
+            if (!el || el.querySelector('.st-center-controls')) return;
+            const box = document.createElement('div');
+            box.className = 'st-center-controls';
+            box.innerHTML =
+                `<button type="button" class="st-cc-btn" data-act="back" aria-label="Rewind 10 seconds">${SEEK_BACK_ICON}</button>` +
+                `<button type="button" class="st-cc-btn st-cc-play" data-act="play" aria-label="Play or pause">${CENTER_PLAY_ICON}${CENTER_PAUSE_ICON}</button>` +
+                `<button type="button" class="st-cc-btn" data-act="fwd" aria-label="Forward 10 seconds">${SEEK_FWD_ICON}</button>`;
+            box.addEventListener('click', (e) => {
+                const btn = e.target.closest('.st-cc-btn');
+                if (!btn) return;
+                e.stopPropagation();
+                const act = btn.dataset.act;
+                if (act === 'play') {
+                    if (player.paused()) player.play(); else player.pause();
+                } else {
+                    const dur = player.duration();
+                    const next = player.currentTime() + (act === 'fwd' ? 10 : -10);
+                    player.currentTime(Math.max(0, isFinite(dur) ? Math.min(dur, next) : next));
+                }
+                player.userActive(true);
+            });
+            const bar = el.querySelector('.vjs-control-bar');
+            el.insertBefore(box, bar);
+
+            // "MOVIE NAME BY VJ NAME" across the top in full screen
+            const top = document.createElement('div');
+            top.className = 'st-top-title';
+            el.insertBefore(top, bar);
+
+            // While locked: a layer that swallows taps, and one button to unlock
+            const shield = document.createElement('div');
+            shield.className = 'st-lock-shield';
+            shield.addEventListener('click', (e) => {
+                e.stopPropagation();
+                player.userActive(true);
+            });
+            const unlock = document.createElement('button');
+            unlock.type = 'button';
+            unlock.className = 'st-unlock-btn';
+            unlock.innerHTML = `${UNLOCK_ICON}<span>Tap to unlock</span>`;
+            unlock.addEventListener('click', (e) => {
+                e.stopPropagation();
+                setPlayerLocked(false);
+            });
+            el.appendChild(shield);
+            el.appendChild(unlock);
+        }
+
+        function setPlayerLocked(locked) {
+            if (!player) return;
+            player.toggleClass('st-locked', locked);
+            player.userActive(true);
+            if (!locked) {
+                const lockBtn = player.el().querySelector('.vjs-st-lock');
+                if (lockBtn) lockBtn.focus({ preventScroll: true });
+            }
+        }
+
+        // "Speed 1x (Normal)" on the Speed button ("1x" on small screens)
+        function updateSpeedLabel() {
+            const label = player && player.el().querySelector('.vjs-playback-rate-value');
+            if (!label) return;
+            const rate = player.playbackRate();
+            label.innerHTML = `<span class="st-speed-word">Speed </span>${rate}x` +
+                (rate === 1 ? '<span class="st-speed-normal"> (Normal)</span>' : '');
+        }
+
+        // The Next button only shows when there is a next movie
+        function updateNextButton() {
+            if (player) player.toggleClass('st-has-next', !!upNextMovie);
+        }
+
+        // Full-screen title: "Movie name by VJ name"
+        function fillControlBarTitle(movie) {
+            movie = movie || currentMovie;
+            const top = player && player.el().querySelector('.st-top-title');
+            if (!top || !movie) return;
+            const name = (movie.originalTitle || movie.title || '').trim();
+            if (!name) return;
+            let text = name;
+            if (movie.vjName && movie.vjName.trim()) {
+                const suffix = movie.vjName.replace(/^vj\s*/i, '').trim();
+                text += ` by ${suffix ? `VJ ${suffix}` : movie.vjName.trim()}`;
+            }
+            top.textContent = text;
         }
 
         function isMobileViewport() {
@@ -2223,7 +2413,8 @@
 
         playerWrapper.addEventListener('touchend', (e) => {
             if (!player || !isTouchDevice()) return;
-            if (e.target.closest('.vjs-control-bar, .player-skip-btn, .up-next-overlay')) return;
+            if (player.hasClass('st-locked')) return; // Lock: no double-tap skipping
+            if (e.target.closest('.vjs-control-bar, .st-center-controls, .player-skip-btn, .up-next-overlay')) return;
 
             const touch = e.changedTouches[0];
             const rect = playerWrapper.getBoundingClientRect();
@@ -2254,6 +2445,13 @@
             if (document.visibilityState === 'hidden') saveProgress();
         });
         window.addEventListener('beforeunload', saveProgress);
+
+        // ========== HEADER BACKGROUND ON SCROLL ==========
+        function updateHeaderBackground() {
+            header.classList.toggle('scrolled', window.scrollY > 24);
+        }
+        window.addEventListener('scroll', updateHeaderBackground, { passive: true });
+        updateHeaderBackground();
 
         // ========== HEADER AUTO-HIDE ==========
         let headerTimeout = null;
@@ -2524,8 +2722,10 @@
             // the same thing. Anyone else (paid, or in the trial window)
             // still goes through loadEntitledVideo/playback-token as the
             // real, server-side entitlement check.
+            // (A free movie only needs the sign-in: the server lets any
+            // signed-in account watch it.)
             const access = window._userAccess;
-            if (access && access.canWatch === false) {
+            if (access && access.canWatch === false && !currentMovie.isFree) {
                 hideLoading();
                 showAuthGate(currentMovie);
                 return;
@@ -2554,15 +2754,34 @@
                     },
                     body: JSON.stringify({ movieId: id })
                 });
-                const tokenData = await tokenResponse.json();
+                const tokenData = await tokenResponse.json().catch(() => ({}));
                 if (!tokenData.success || !tokenData.token) {
-                    // No token issued — genuinely not entitled. Go to the
-                    // paywall, not a generic error.
                     hideLoading();
-                    showAuthGate(currentMovie);
+                    if (tokenResponse.status === 401) {
+                        // the stored sign-in has expired: ask them to sign in again
+                        clearStoredSession();
+                        showAuthGate(currentMovie);
+                    } else if (tokenData.code === 'DEVICE_LIMIT') {
+                        // Daily plan signed in on another device: "Log out your other device?"
+                        askAboutOtherDevice('watch', authToken, tokenData, () => {
+                            loadingOverlay.classList.remove('hidden');
+                            loadEntitledVideo(id);
+                        });
+                    } else if (tokenResponse.status === 403) {
+                        // signed in, but no plan that covers this movie
+                        showPlans('watch');
+                    } else {
+                        showError(tokenData.message || 'Playback couldn’t start. Please try again.');
+                    }
                     return;
                 }
                 currentPlaybackToken = tokenData.token;
+                // Daily plan: stop if the account moves to another device mid-movie
+                AccessPrompt.guardPlayback({
+                    apiBase: API_BASE,
+                    getToken: () => normalizeBearerToken(getAuthToken()),
+                    getMedia: () => document.querySelector('#videoPlayer .vjs-tech')
+                });
 
                 const resolveResponse = await fetch(`${API_BASE}/api/video/resolve/luganda/${id}?token=${encodeURIComponent(tokenData.token)}`);
                 const resolveData = await resolveResponse.json();
@@ -2719,6 +2938,7 @@
                 const vjSuffix = movie.vjName.replace(/^vj\s*/i, '').trim();
                 document.getElementById('vjName').textContent = vjSuffix ? `VJ ${vjSuffix}` : movie.vjName.trim();
             }
+            if (player) fillControlBarTitle(movie);
             if (movie.vjAvatar) {
                 document.getElementById('vjAvatar').src = movie.vjAvatar;
             }
@@ -2752,157 +2972,125 @@
             downloadBtn.onclick = () => handleDownload(movie);
         }
         
-        function showDownloadPrompt() {
-            const existing = document.getElementById('downloadPrompt');
-            if (existing) existing.remove();
-
-            const overlay = document.createElement('div');
-            overlay.id = 'downloadPrompt';
-            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
-            overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
-
-            overlay.innerHTML = `
-                <div id="downloadPromptInner" style="background:linear-gradient(145deg,#1a1a2e,#16213e);border:1px solid rgba(74,222,128,0.2);border-radius:20px;padding:28px;max-width:380px;width:100%;text-align:center;">
-                    <div style="width:54px;height:54px;border-radius:50%;background:rgba(74,222,128,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
-                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    </div>
-                    <h3 style="color:#fff;font-size:17px;margin-bottom:6px;">Unlock Full Access</h3>
-                    <p style="color:#888;font-size:12px;line-height:1.6;margin-bottom:14px;">Watch every movie, ad-light, with download included — on any plan below.</p>
-                    <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:16px;text-align:left;">
-                        <div style="display:flex;align-items:center;gap:9px;font-size:11px;color:rgba(255,255,255,0.7);">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            Full catalog — every VJ, every title
-                        </div>
-                        <div style="display:flex;align-items:center;gap:9px;font-size:11px;color:rgba(255,255,255,0.7);">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            Download for offline viewing
-                        </div>
-                        <div style="display:flex;align-items:center;gap:9px;font-size:11px;color:rgba(255,255,255,0.7);">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            Cancel anytime, no contract
-                        </div>
-                    </div>
-                    <div id="planError" style="display:none;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);border-radius:8px;padding:10px;margin-bottom:14px;color:#f87171;font-size:12px;"></div>
-                    <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:16px;">
-                        <button onclick="window._playerSelectPlan('daily')" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:13px;cursor:pointer;width:100%;">
-                            <span>Daily</span><span style="color:#f59e0b;font-weight:700;">UGX 1,000 <small style="color:#888;font-weight:400;">/ 1 day</small></span>
-                        </button>
-                        <button onclick="window._playerSelectPlan('weekly')" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:13px;cursor:pointer;width:100%;">
-                            <span>Weekly</span><span style="color:#00d9ff;font-weight:700;">UGX 5,000 <small style="color:#888;font-weight:400;">/ 7 days</small></span>
-                        </button>
-                        <button onclick="window._playerSelectPlan('biweekly')" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:13px;cursor:pointer;width:100%;">
-                            <span>2 Weeks</span><span style="color:#a78bfa;font-weight:700;">UGX 7,000 <small style="color:#888;font-weight:400;">/ 14 days</small></span>
-                        </button>
-                        <button onclick="window._playerSelectPlan('monthly')" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.3);border-radius:10px;color:#fff;font-size:13px;cursor:pointer;width:100%;">
-                            <span>Monthly <span style="background:#4ade80;color:#000;font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;margin-left:6px;">BEST</span></span>
-                            <span style="color:#4ade80;font-weight:700;">UGX 12,000 <small style="color:#888;font-weight:400;">/ 30 days</small></span>
-                        </button>
-                    </div>
-                    <a href="subscribe.html" style="display:block;margin-bottom:8px;color:#4ade80;font-size:12px;text-decoration:underline;">More payment options</a>
-                    <button onclick="document.getElementById('downloadPrompt')?.remove()" style="background:none;border:none;color:#555;font-size:12px;cursor:pointer;">Not now</button>
-                </div>
-            `;
-            document.body.appendChild(overlay);
-            window._playerSelectPlan = async (plan) => {
-                const token = localStorage.getItem('token') || localStorage.getItem('authToken') || '';
-                if (!token) { window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href); return; }
-                const btn = overlay.querySelector(`button[onclick*="'${plan}'"]`);
-                const origHTML = btn ? btn.innerHTML : '';
-                const errorBox = document.getElementById('planError');
-                if (errorBox) { errorBox.style.display = 'none'; errorBox.textContent = ''; }
-                if (btn) { btn.innerHTML = '<span style="opacity:0.7">Processing...</span>'; btn.disabled = true; }
-
-                // Open synchronously, inside the click gesture, so it isn't popup-blocked.
-                const popup = window.PesapalCheckout?.openBlankPopup();
-
-                try {
-                    const r = await fetch(`${API_BASE}/api/payments/subscribe`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                        body: JSON.stringify({ plan, paymentMethod: 'pesapal' })
-                    });
-                    const d = await r.json();
-                    if (d.status === 'success' && d.data?.redirectUrl) {
-                        overlay.remove();
-
-                        if (window.PesapalCheckout && popup) {
-                            window.PesapalCheckout.runCheckout(popup, d.data.redirectUrl, {
-                                ref: d.data.merchantReference,
-                                token,
-                                apiBase: API_BASE,
-                                onSuccess: () => {
-                                    window.dispatchEvent(new CustomEvent('pesapal-payment-success', { detail: { plan } }));
-                                    window.location.reload();
-                                },
-                                onFailure: (status) => {
-                                    if (status === 'cancelled') return;
-                                    alert(status === 'timeout'
-                                        ? 'Still waiting on confirmation — check back in a moment.'
-                                        : 'Payment failed. Please try again.');
-                                }
-                            });
-                        } else {
-                            // Popup blocked or helper unavailable — fall back to same-tab redirect.
-                            window.location.href = d.data.redirectUrl;
-                        }
-                    } else {
-                        if (popup && !popup.closed) popup.close();
-                        const msg = d.message || d.error || 'Payment could not be initiated. Please try again.';
-                        if (errorBox) { errorBox.textContent = msg; errorBox.style.display = 'block'; }
-                        if (btn) { btn.innerHTML = origHTML; btn.disabled = false; }
-                    }
-                } catch(e) {
-                    if (popup && !popup.closed) popup.close();
-                    if (errorBox) { errorBox.textContent = 'Network error. Check your connection and try again.'; errorBox.style.display = 'block'; }
-                    if (btn) { btn.innerHTML = origHTML; btn.disabled = false; }
-                }
-            };
-        }
-
-        function showSubscribePlans() {
-            showDownloadPrompt();
-        }
-
-
-
-        async function handleDownload(movie) {
-            const authToken = normalizeBearerToken(getAuthToken());
-            const tokenResponse = await fetch(`${API_BASE}/api/video/playback-token`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
-                body: JSON.stringify({ movieId: movie._id, forDownload: true })
+        // ========== NO SUBSCRIPTION: SIGN IN OR CHOOSE A PLAN ==========
+        // Signed out: a "Sign in to …" box (js/access-prompt.js).
+        // Signed in without the right plan: the plans page, which shows this
+        // movie and brings the viewer back here after paying.
+        // reason: 'watch' | 'download' | 'upgrade' (Daily plan, no downloads)
+        function showPlans(reason) {
+            AccessPrompt.plans(reason || 'watch', {
+                movieId: currentMovie && currentMovie._id,
+                // coming back with the browser's Back button shows the play button again
+                beforeLeave: restorePlayGate
             });
-            const tokenData = await tokenResponse.json();
-            if (!tokenData.success || !tokenData.token) {
-                showNotification(tokenData.message || 'Unable to start download');
+        }
+
+        function showDownloadPrompt() { showPlans('download'); }
+        function showSubscribePlans() { showPlans('watch'); }
+
+        function restorePlayGate() {
+            hideLoading();
+            if (currentMovie && !(player && player.hasStarted())) showPlayGate(currentMovie);
+        }
+
+        // The Daily plan works on 1 device at a time: "Log out your other
+        // device?" Yes logs it out and tries again here; No goes back.
+        function askAboutOtherDevice(reason, authToken, tokenData, retry) {
+            AccessPrompt.otherDevice(reason, {
+                apiBase: API_BASE,
+                token: authToken,
+                otherDevice: tokenData.otherDevice,
+                onYes: retry,
+                onNo: reason === 'watch' ? restorePlayGate : null
+            });
+        }
+
+        // A stored sign-in the server no longer accepts (expired or signed out elsewhere)
+        function clearStoredSession() {
+            ['token', 'authToken'].forEach(k => { localStorage.removeItem(k); sessionStorage.removeItem(k); });
+            window._userAccess = null;
+        }
+
+        // Paying, but on a plan without downloads (Daily)
+        function isPayingWithoutDownloads(data) {
+            const access = window._userAccess;
+            if (access) return !!(access.isActive && access.plan && access.plan !== 'free' && !access.canDownload);
+            return data && data.code === 'DOWNLOAD_REQUIRES_SUBSCRIPTION' && /daily/i.test(data.message || '');
+        }
+
+        function setDownloadBusy(busy) {
+            const btn = document.getElementById('downloadBtn');
+            if (!btn) return;
+            btn.disabled = busy;
+            btn.classList.toggle('is-busy', busy);
+            const label = btn.querySelector('span');
+            if (label) label.textContent = busy ? 'Preparing...' : 'Download';
+        }
+
+        let downloadInProgress = false;
+        async function handleDownload(movie) {
+            if (downloadInProgress) return;
+            const authToken = normalizeBearerToken(getAuthToken());
+            if (!authToken) {
+                AccessPrompt.signIn('download');
                 return;
             }
 
-            const fileName = `${(movie.originalTitle || movie.lugandaTitle || 'movie').replace(/[^a-zA-Z0-9 _-]/g, '').trim()}.mp4`;
+            downloadInProgress = true;
+            setDownloadBusy(true);
+            try {
+                const tokenResponse = await fetch(`${API_BASE}/api/video/playback-token`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+                    body: JSON.stringify({ movieId: movie._id, forDownload: true })
+                });
+                const tokenData = await tokenResponse.json().catch(() => ({}));
+                if (!tokenData.success || !tokenData.token) {
+                    if (tokenResponse.status === 401) {
+                        clearStoredSession();
+                        AccessPrompt.signIn('download');
+                    } else if (tokenData.code === 'DEVICE_LIMIT') {
+                        askAboutOtherDevice('download', authToken, tokenData, () => handleDownload(movie));
+                    } else if (tokenResponse.status === 403) {
+                        showPlans(isPayingWithoutDownloads(tokenData) ? 'upgrade' : 'download');
+                    } else {
+                        AccessPrompt.toast(tokenData.message || 'The download couldn’t start. Please try again.', 'error');
+                    }
+                    return;
+                }
 
-            const resolveResponse = await fetch(`${API_BASE}/api/video/resolve/luganda/${movie._id}?token=${encodeURIComponent(tokenData.token)}&download=${encodeURIComponent(fileName)}`);
-            const resolveData = await resolveResponse.json();
-            if (!resolveData.success || !resolveData.directUrl) {
-                showNotification(resolveData.message || 'Download unavailable for this movie');
-                return;
+                const fileName = `${(movie.originalTitle || movie.lugandaTitle || 'movie').replace(/[^a-zA-Z0-9 _-]/g, '').trim()}.mp4`;
+
+                const resolveResponse = await fetch(`${API_BASE}/api/video/resolve/luganda/${movie._id}?token=${encodeURIComponent(tokenData.token)}&download=${encodeURIComponent(fileName)}`);
+                const resolveData = await resolveResponse.json().catch(() => ({}));
+                if (!resolveData.success || !resolveData.directUrl) {
+                    AccessPrompt.toast(resolveData.message || 'This movie can’t be downloaded right now.', 'error');
+                    return;
+                }
+
+                // direct:true means the server could sign the CDN URL itself
+                // (Bunny Token Authentication configured for that host) with the
+                // `download` param baked in — Bunny adds Content-Disposition on
+                // its own, so the file comes straight from the CDN, not through
+                // our own server's bandwidth. Otherwise fall back to the backend
+                // proxy, which still has to add that header itself.
+                const proxyDownload = resolveData.direct
+                    ? resolveData.directUrl
+                    : proxyUrlFor(resolveData.directUrl, tokenData.token, `&download=${encodeURIComponent(fileName)}`);
+                const link = document.createElement('a');
+                link.href = proxyDownload;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                AccessPrompt.toast('Your download has started.');
+            } catch (error) {
+                console.error('Download error:', error);
+                AccessPrompt.toast('Network error. Check your connection and try again.', 'error');
+            } finally {
+                downloadInProgress = false;
+                setDownloadBusy(false);
             }
-
-            // direct:true means the server could sign the CDN URL itself
-            // (Bunny Token Authentication configured for that host) with the
-            // `download` param baked in — Bunny adds Content-Disposition on
-            // its own, so the file comes straight from the CDN, not through
-            // our own server's bandwidth. Otherwise fall back to the backend
-            // proxy, which still has to add that header itself.
-            const proxyDownload = resolveData.direct
-                ? resolveData.directUrl
-                : proxyUrlFor(resolveData.directUrl, tokenData.token, `&download=${encodeURIComponent(fileName)}`);
-            const link = document.createElement('a');
-            link.href = proxyDownload;
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showNotification('Download started!');
         }
 
         // ========== RELATED MOVIES ==========
@@ -2913,17 +3101,19 @@
                 const genre = currentMovie.genres?.[0];
                 const vjName = currentMovie.vjName;
                 
-                let url = `${API_BASE}/api/luganda-movies/latest?limit=8`;
+                // Enough titles to fill a scrolling row with arrows
+                let url = `${API_BASE}/api/luganda-movies/latest?limit=16`;
                 if (genre) {
-                    url = `${API_BASE}/api/luganda-movies/genre/${encodeURIComponent(genre)}?limit=8`;
+                    url = `${API_BASE}/api/luganda-movies/genre/${encodeURIComponent(genre)}?limit=16`;
                 }
-                
+
                 const response = await fetch(url);
                 const data = await response.json();
-                
+
                 if ((data.success || data.status === 'success') && data.data) {
-                    const movies = data.data.filter(m => m._id !== currentMovie._id).slice(0, 6);
+                    const movies = data.data.filter(m => m._id !== currentMovie._id).slice(0, 15);
                     upNextMovie = movies[0] || null;
+                    updateNextButton();
                     renderRelatedMovies(movies);
                 }
             } catch (e) {
@@ -3022,30 +3212,9 @@
             showError(message);
         }
         
-        function showNotification(message) {
-            // Create notification element
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: rgba(0,0,0,0.9);
-                color: #fff;
-                padding: 12px 24px;
-                border-radius: 8px;
-                font-size: 14px;
-                z-index: 10000;
-                animation: fadeIn 0.3s ease;
-            `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transition = 'opacity 0.3s';
-                setTimeout(() => notification.remove(), 300);
-            }, 2000);
+        // A clear notice at the bottom of the screen (js/access-prompt.js)
+        function showNotification(message, kind) {
+            AccessPrompt.toast(message, kind);
         }
         
         // ========== DESCRIPTION TOGGLE ==========
@@ -3065,7 +3234,8 @@
         // ========== SHARE BUTTON ==========
         document.getElementById('shareBtn').addEventListener('click', async () => {
             const shareData = {
-                title: document.getElementById('movieTitle').textContent,
+                // The heading also holds the VJ tag, so take the plain movie name
+                title: currentMovie ? (currentMovie.originalTitle || currentMovie.title) : document.title,
                 url: window.location.href
             };
             
@@ -3208,6 +3378,8 @@
                         showError(err.message || 'Device limit reached. Log out from your other device.');
                         return false;
                     }
+                    // 401: the stored sign-in has expired, so treat them as signed out
+                    if (res.status === 401) clearStoredSession();
                     return false;
                 }
                 const data = await res.json();
@@ -3221,14 +3393,11 @@
 
         // ========== AUTH GATE ==========
         function showAuthGate(movie) {
-            const access = window._userAccess;
-            const hasToken = !!(localStorage.getItem('token') || localStorage.getItem('authToken') || sessionStorage.getItem('token') || sessionStorage.getItem('authToken'));
-            const isLoggedInUser = !!access || hasToken;
-
-            // Logged-in free/expired user — skip the gate, show plan picker directly
-            if (isLoggedInUser) {
+            // Signed in (the server accepted the sign-in) but no plan: the plans page.
+            // A stored but expired sign-in was cleared, so it gets the sign-in gate.
+            if (window._userAccess) {
                 hideLoading();
-                showDownloadPrompt();
+                showPlans('watch');
                 return;
             }
 
@@ -3240,6 +3409,8 @@
             }
 
             const gateContent = document.querySelector('.auth-gate-content');
+            const trailerBtn = document.getElementById('trailerBtn');
+            const hasTrailer = !!trailerBtn && trailerBtn.style.display !== 'none';
             gateContent.innerHTML = `
                 <div class="auth-gate-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -3247,13 +3418,15 @@
                         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                     </svg>
                 </div>
-                <h3>Members Only</h3>
-                <p>Login or create an account to watch the full Luganda translation.</p>
+                <h3>${movie && movie.isFree ? 'This movie is free' : 'Sign in to watch'}</h3>
+                <p>${movie && movie.isFree
+                    ? 'Sign in or create a free account to watch it. No plan needed.'
+                    : 'Watch the full Luganda translation with a plan from UGX 1,000 a day.'}</p>
                 <div class="auth-gate-btns">
-                    <button class="auth-gate-login" onclick="watchFullMovie()">Login to Watch</button>
-                    <a href="register.html" class="auth-gate-register">Create Free Account</a>
+                    <button class="auth-gate-login" onclick="watchFullMovie()">Sign in</button>
+                    <a href="register.html?redirect=${encodeURIComponent(window.location.href)}" class="auth-gate-register" onclick="try{localStorage.setItem('redirectAfterLogin', window.location.href)}catch(e){}">Create an account</a>
                 </div>
-                <p style="margin-top:12px;font-size:13px;"><button onclick="document.getElementById('trailerBtn')?.click()" style="background:none;border:none;color:var(--accent);font-size:inherit;cursor:pointer;padding:0;text-decoration:underline;">Watch trailer instead</button></p>
+                ${hasTrailer ? `<p style="margin-top:12px;font-size:13px;"><button onclick="document.getElementById('trailerBtn')?.click()" style="background:none;border:none;color:var(--accent);font-size:inherit;cursor:pointer;padding:0;text-decoration:underline;">Watch the trailer instead</button></p>` : ''}
             `;
 
             document.getElementById('authGateOverlay').classList.add('visible');
@@ -3316,5 +3489,6 @@
         }
     </script>
     <script defer src="js/app-shell.js"></script>
+    <script defer src="js/site-theme.js"></script>
 </body>
 </html>

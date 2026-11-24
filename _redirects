@@ -74,6 +74,7 @@ http://unrulymovies.com/* https://unrulymovies.com/:splat 301!
 /vj               /vjs.html              301
 /genres           /genres.html           200
 /trending         /trending.html         200
+/free-movies      /free-movies.html      200
 /about            /about.html            200
 /contact          /contact.html          200
 /terms            /terms.html            200
