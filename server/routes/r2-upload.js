@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
+const {
+    S3Client, PutObjectCommand, DeleteObjectCommand,
+    CreateMultipartUploadCommand, UploadPartCommand, ListPartsCommand,
+    CompleteMultipartUploadCommand, AbortMultipartUploadCommand
+} = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const multer = require('multer');
 const { protect } = require('../middleware/auth');
@@ -83,8 +87,193 @@ router.get('/status', (req, res) => {
     });
 });
 
+// Where an uploaded file goes in the bucket: movies/<time>-<name> by default,
+// or a caller-supplied folder (the series manager sends "series/<slug>").
+// Sanitised so it can't escape the bucket.
+function makeUploadKey(filename, folder) {
+    let prefix = 'movies';
+    if (folder && typeof folder === 'string') {
+        const clean = folder.toLowerCase()
+            .replace(/\\/g, '/')
+            .replace(/[^a-z0-9/_.-]/g, '')
+            .replace(/\.{2,}/g, '')
+            .replace(/\/{2,}/g, '/')
+            .replace(/^\/+|\/+$/g, '');
+        if (clean) prefix = clean;
+    }
+    return `${prefix}/${Date.now()}-${String(filename).replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+}
+
+// Only keys that makeUploadKey could have made (no "..", no odd characters)
+function isUploadKey(key) {
+    return typeof key === 'string' && key.length <= 512 && !key.includes('..') &&
+        /^[a-z0-9_.\/-]+\/\d{10,}-[A-Za-z0-9._-]+$/.test(key);
+}
+
+/* ---------------------------------------------------------------------------
+ * Split uploads (S3 multipart) — how the admin pages upload videos.
+ *
+ * One connection from Uganda to R2 reaches only a fraction of the line's
+ * upload speed (measured Nov 2026: about 0.5 Mbps on one connection, about
+ * 3 Mbps on eight), and a dropped connection meant starting the whole movie
+ * again. So the browser (js/r2-upload.js) cuts the file into pieces, sends
+ * several at once straight to R2, and re-sends only a piece that fails.
+ *
+ *   POST /api/r2/multipart/start     { filename, contentType, folder, size }
+ *        -> { uploadId, key, publicUrl, partSize, partCount }
+ *   POST /api/r2/multipart/sign      { key, uploadId, partNumbers: [1, 2, ...] }
+ *        -> { urls: { "1": "https://...", ... } }   (PUT one piece to each)
+ *   POST /api/r2/multipart/complete  { key, uploadId, partCount }
+ *        -> { publicUrl }   (the pieces are read back from R2, so the browser
+ *                            doesn't need to see R2's ETag headers)
+ *   POST /api/r2/multipart/abort     { key, uploadId }
+ * ------------------------------------------------------------------------- */
+const MIN_PART_SIZE = 8 * 1024 * 1024;   // small enough that a failed piece is quick to re-send
+const MAX_PARTS = 10000;                 // S3/R2 limit
+const SIGN_TTL_SECONDS = 3600;
+
+function partSizeFor(size) {
+    const needed = Math.ceil(size / (MAX_PARTS - 100));
+    return Math.max(MIN_PART_SIZE, Math.ceil(needed / (1024 * 1024)) * 1024 * 1024);
+}
+
+function multipartError(res, error, what) {
+    console.error(`R2 multipart ${what} error:`, error);
+    res.status(500).json({ success: false, message: `Upload ${what} failed. Please try again.` });
+}
+
+router.post('/multipart/start', ...adminGuard, async (req, res) => {
+    setCorsHeaders(req, res);
+    try {
+        const r2 = getR2Client();
+        if (!r2) return res.status(400).json({ success: false, message: 'Cloudflare R2 is not configured' });
+
+        const { filename, contentType, folder } = req.body || {};
+        const size = Number(req.body && req.body.size);
+        if (!filename) return res.status(400).json({ success: false, message: 'Filename is required' });
+        if (!Number.isFinite(size) || size <= 0) return res.status(400).json({ success: false, message: 'File size is required' });
+
+        const key = makeUploadKey(filename, folder);
+        const out = await r2.send(new CreateMultipartUploadCommand({
+            Bucket: process.env.R2_BUCKET_NAME,
+            Key: key,
+            ContentType: contentType || 'video/mp4'
+        }));
+        const partSize = partSizeFor(size);
+        res.json({
+            success: true,
+            uploadId: out.UploadId,
+            key,
+            publicUrl: `${process.env.R2_PUBLIC_URL}/${key}`,
+            partSize,
+            partCount: Math.ceil(size / partSize)
+        });
+    } catch (error) {
+        multipartError(res, error, 'start');
+    }
+});
+
+router.post('/multipart/sign', ...adminGuard, async (req, res) => {
+    setCorsHeaders(req, res);
+    try {
+        const r2 = getR2Client();
+        if (!r2) return res.status(400).json({ success: false, message: 'Cloudflare R2 is not configured' });
+
+        const { key, uploadId, partNumbers } = req.body || {};
+        if (!isUploadKey(key) || !uploadId || typeof uploadId !== 'string') {
+            return res.status(400).json({ success: false, message: 'Invalid upload' });
+        }
+        const numbers = Array.isArray(partNumbers) ? partNumbers.map(Number) : [];
+        if (!numbers.length || numbers.length > 50 ||
+            numbers.some(n => !Number.isInteger(n) || n < 1 || n > MAX_PARTS)) {
+            return res.status(400).json({ success: false, message: 'Invalid part numbers' });
+        }
+
+        const urls = {};
+        await Promise.all(numbers.map(async n => {
+            urls[n] = await getSignedUrl(r2, new UploadPartCommand({
+                Bucket: process.env.R2_BUCKET_NAME,
+                Key: key,
+                UploadId: uploadId,
+                PartNumber: n
+            }), { expiresIn: SIGN_TTL_SECONDS });
+        }));
+        res.json({ success: true, urls, expiresIn: SIGN_TTL_SECONDS });
+    } catch (error) {
+        multipartError(res, error, 'sign');
+    }
+});
+
+router.post('/multipart/complete', ...adminGuard, async (req, res) => {
+    setCorsHeaders(req, res);
+    try {
+        const r2 = getR2Client();
+        if (!r2) return res.status(400).json({ success: false, message: 'Cloudflare R2 is not configured' });
+
+        const { key, uploadId } = req.body || {};
+        const partCount = Number(req.body && req.body.partCount);
+        if (!isUploadKey(key) || !uploadId || typeof uploadId !== 'string') {
+            return res.status(400).json({ success: false, message: 'Invalid upload' });
+        }
+
+        // Read back every piece R2 has for this upload
+        const parts = [];
+        let marker;
+        for (;;) {
+            const page = await r2.send(new ListPartsCommand({
+                Bucket: process.env.R2_BUCKET_NAME,
+                Key: key,
+                UploadId: uploadId,
+                MaxParts: 1000,
+                PartNumberMarker: marker
+            }));
+            (page.Parts || []).forEach(p => parts.push({ PartNumber: p.PartNumber, ETag: p.ETag }));
+            if (!page.IsTruncated) break;
+            marker = page.NextPartNumberMarker;
+        }
+        parts.sort((a, b) => a.PartNumber - b.PartNumber);
+
+        // Every piece must be there, or the video would have holes in it
+        if (Number.isInteger(partCount) && partCount > 0) {
+            const have = new Set(parts.map(p => p.PartNumber));
+            const missing = [];
+            for (let n = 1; n <= partCount && missing.length < 20; n++) if (!have.has(n)) missing.push(n);
+            if (missing.length) {
+                return res.status(409).json({ success: false, code: 'PARTS_MISSING', missing, message: 'Some pieces of the file are missing. Please try again.' });
+            }
+        }
+
+        await r2.send(new CompleteMultipartUploadCommand({
+            Bucket: process.env.R2_BUCKET_NAME,
+            Key: key,
+            UploadId: uploadId,
+            MultipartUpload: { Parts: parts }
+        }));
+        res.json({ success: true, key, publicUrl: `${process.env.R2_PUBLIC_URL}/${key}` });
+    } catch (error) {
+        multipartError(res, error, 'finish');
+    }
+});
+
+router.post('/multipart/abort', ...adminGuard, async (req, res) => {
+    setCorsHeaders(req, res);
+    try {
+        const r2 = getR2Client();
+        if (!r2) return res.status(400).json({ success: false, message: 'Cloudflare R2 is not configured' });
+        const { key, uploadId } = req.body || {};
+        if (!isUploadKey(key) || !uploadId || typeof uploadId !== 'string') {
+            return res.status(400).json({ success: false, message: 'Invalid upload' });
+        }
+        await r2.send(new AbortMultipartUploadCommand({ Bucket: process.env.R2_BUCKET_NAME, Key: key, UploadId: uploadId }));
+        res.json({ success: true });
+    } catch (error) {
+        multipartError(res, error, 'cancel');
+    }
+});
+
 /**
- * Get presigned upload URL (for large files)
+ * Get presigned upload URL (one PUT of the whole file — kept for older pages;
+ * the admin pages now use the split upload above)
  * POST /api/r2/presign
  * Body: { filename: "movie.mp4", contentType: "video/mp4" }
  */
@@ -109,22 +298,8 @@ router.post('/presign', ...adminGuard, async (req, res) => {
             });
         }
 
-        // Default to movies/, but allow a caller-supplied folder (the series
-        // manager sends "series/<slug>"). Sanitised so it can't escape the bucket.
-        let prefix = 'movies';
-        if (folder && typeof folder === 'string') {
-            const clean = folder.toLowerCase()
-                .replace(/\\/g, '/')
-                .replace(/[^a-z0-9/_.-]/g, '')
-                .replace(/\.{2,}/g, '')
-                .replace(/\/{2,}/g, '/')
-                .replace(/^\/+|\/+$/g, '');
-            if (clean) prefix = clean;
-        }
+        const key = makeUploadKey(filename, folder);
 
-        // Generate unique key
-        const key = `${prefix}/${Date.now()}-${filename.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-        
         const command = new PutObjectCommand({
             Bucket: process.env.R2_BUCKET_NAME,
             Key: key,

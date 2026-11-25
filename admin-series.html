@@ -416,6 +416,7 @@
         </div>
     </div>
 
+    <script src="js/r2-upload.js"></script>
     <script>
         // API Configuration
         const API_BASE_URL = (window.API_CONFIG && window.API_CONFIG.BASE_URL)
@@ -726,45 +727,25 @@
                     prog.style.color = 'var(--text-secondary)';
                     prog.textContent = 'Preparing upload…';
 
-                    // 1) presign (admin-only), with the series folder
-                    const presignRes = await fetch(`${API_BASE_URL}/api/r2/presign`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': token ? `Bearer ${token}` : '' },
-                        body: JSON.stringify({ filename: file.name, contentType: file.type || 'video/mp4', folder })
-                    });
-                    const presign = await presignRes.json();
-                    if (!presign.success) throw new Error(presign.message || 'Could not get upload URL (is R2 configured?)');
-
-                    // 2) upload with live progress (XHR, so we get upload % )
-                    const startedAt = Date.now();
-                    await new Promise((resolve, reject) => {
-                        const xhr = new XMLHttpRequest();
-                        xhr.open('PUT', presign.uploadUrl, true);
-                        xhr.setRequestHeader('Content-Type', file.type || 'video/mp4');
-                        xhr.upload.onprogress = (e) => {
-                            if (!e.lengthComputable) return;
-                            const pct = Math.round((e.loaded / e.total) * 100);
-                            const secs = (Date.now() - startedAt) / 1000;
-                            const mbps = secs > 0 ? (e.loaded / 1048576) / secs : 0;
-                            const etaSec = mbps > 0 ? ((e.total - e.loaded) / 1048576) / mbps : 0;
-                            const eta = etaSec >= 90 ? Math.round(etaSec / 60) + ' min' : Math.max(0, Math.round(etaSec)) + ' sec';
-                            prog.textContent = `Uploading… ${pct}%` + (mbps > 0 ? ` (${mbps.toFixed(1)} MB/s, ~${eta} left)` : '');
-                        };
-                        xhr.onload = () => (xhr.status >= 200 && xhr.status < 300) ? resolve() : reject(new Error('R2 rejected the upload (HTTP ' + xhr.status + ')'));
-                        xhr.onerror = () => reject(new Error('Connection lost during upload — please try again'));
-                        xhr.send(file);
+                    // Cut the file into pieces and send 6 at once straight to R2
+                    // (js/r2-upload.js); a piece that fails is re-sent on its own.
+                    const result = await R2Upload.upload(file, {
+                        endpoint: `${API_BASE_URL}/api/r2`,
+                        token,
+                        folder,
+                        onProgress: (info) => { prog.textContent = R2Upload.describe(info); }
                     });
 
                     // 3) fill the URL field and save it to the episode
-                    urlInput.value = presign.publicUrl;
+                    urlInput.value = result.publicUrl;
                     prog.style.color = '#22c55e';
-                    prog.textContent = '✅ Uploaded — saving to episode…';
+                    prog.textContent = 'Uploaded, saving to the episode…';
                     await saveEpisodeUrl(seasonNumber, episodeNumber);
-                    prog.textContent = '✅ Uploaded & saved';
+                    prog.textContent = 'Uploaded and saved';
                 } catch (err) {
                     console.error('Episode upload error:', err);
                     prog.style.color = '#ff6666';
-                    prog.textContent = '❌ ' + (err.message || 'Upload failed');
+                    prog.textContent = 'Upload failed: ' + (err.message || 'please try again');
                 }
             };
             picker.click();
